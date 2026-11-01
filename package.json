@@ -1,0 +1,39 @@
+{
+  "name": "speedtestserver",
+  "version": "1.0.0",
+  "description": "OoklaServer Reverse Engineering Project - TypeScript implementation of OoklaServer speed test server",
+  "main": "reverse-engineered/typescript/dist/bin/ooklaserver.js",
+  "bin": {
+    "ooklaserver": "reverse-engineered/typescript/dist/bin/ooklaserver.js"
+  },
+  "scripts": {
+    "install:ts": "cd reverse-engineered/typescript && npm install",
+    "build:ts": "cd reverse-engineered/typescript && npm run build",
+    "test:ts": "cd reverse-engineered/typescript && npm test",
+    "lint:ts": "cd reverse-engineered/typescript && npm run lint",
+    "typecheck:ts": "cd reverse-engineered/typescript && npm run typecheck",
+    "dev:ts": "cd reverse-engineered/typescript && npm run dev",
+    "start:ts": "cd reverse-engineered/typescript && npm start"
+  },
+  "keywords": [
+    "speedtest",
+    "ookla",
+    "server",
+    "network",
+    "bandwidth",
+    "reverse-engineering",
+    "typescript"
+  ],
+  "author": "SpeedtestServer Reverse Engineering Project",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smahud/SpeedtestServer"
+  },
+  "bugs": {
+    "url": "https://github.com/smahud/SpeedtestServer/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
