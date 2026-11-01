@@ -7,7 +7,9 @@ A complete TypeScript reimplementation of the OoklaServer speed test server, rev
 This project contains:
 1. **Original OoklaServer binaries** for multiple platforms (Linux x86-64, Linux ARM64, macOS, Windows)
 2. **Complete TypeScript implementation** (`reverse-engineered/typescript/`) - a full reimplementation of the OoklaServer based on reverse engineering
-3. **Reverse engineering artifacts** (`reverse-engineered/`) - documentation, extracted strings, and analysis
+3. **Architecture-specific configuration files** (`config/`) - `.properties` files matching each binary
+4. **Easy-to-read config formats** (`reverse-engineered/typescript/config/`) - TypeScript, JavaScript, and JSON configs
+5. **Reverse engineering artifacts** (`reverse-engineered/`) - documentation, extracted strings, and analysis
 
 The TypeScript implementation provides a fully functional speed test server compatible with Ookla's Speedtest clients.
 
@@ -20,8 +22,17 @@ SpeedtestServer/
 ├── OoklaServer-macosx                # Original macOS binary (21.8 MB)
 ├── OoklaServer-windows-x86_64.exe    # Original Windows x86-64 binary (8.7 MB)
 ├── OoklaServer-windows64.zip         # Original Windows ZIP (3.5 MB)
-├── OoklaServer.properties.default    # Default configuration file
+├── config/                           # Architecture-specific config files
+│   ├── OoklaServer-linux-x86_64.properties
+│   ├── OoklaServer-linux-aarch64.properties
+│   ├── OoklaServer-macosx.properties
+│   ├── OoklaServer-windows-x86_64.properties
+│   └── OoklaServer.properties.template
 ├── reverse-engineered/
+│   ├── config/                       # Easy-to-read config formats
+│   │   ├── ooklaserver.config.ts     # TypeScript config with environments
+│   │   ├── ooklaserver.config.js     # JavaScript config
+│   │   └── ooklaserver.config.json   # JSON config
 │   ├── documentation/
 │   │   └── ARCHITECTURE.md           # Comprehensive architecture documentation
 │   ├── strings/
@@ -44,6 +55,10 @@ SpeedtestServer/
 │   │   │       ├── OoklaDownloader.ts          # Download test data generation
 │   │   │       ├── TracerouteManager.ts        # Network traceroute
 │   │   │       └── Logger.ts                   # Multi-channel logging
+│   │   ├── config/                   # TypeScript/JS/JSON configs
+│   │   │   ├── ooklaserver.config.ts
+│   │   │   ├── ooklaserver.config.js
+│   │   │   └── ooklaserver.config.json
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   ├── jest.config.js
@@ -126,11 +141,36 @@ npm run dev
 ## Configuration
 
 Configuration can be provided via:
-1. Environment variable: `OOKLA_SERVER_POCO_CONFIG` (JSON)
-2. Config files: `config.properties`, `config.ini`, `config.xml`, `ooklaserver.json`
-3. Config directories: `/etc/ooklaserver`, `/usr/local/etc/ooklaserver`, `./config`, `.`
+1. **Environment variable**: `OOKLA_SERVER_POCO_CONFIG` (JSON)
+2. **Config files** (auto-detected in order):
+   - `.properties` - Original OoklaServer format (e.g., `OoklaServer.properties`)
+   - `.json` - JSON format (e.g., `ooklaserver.json`, `ooklaserver.config.json`)
+   - `.js` - JavaScript config (e.g., `ooklaserver.config.js`)
+   - `.ts` - TypeScript config (requires compilation, e.g., `ooklaserver.config.ts`)
+   - `.ini` - INI format
+   - `.xml` - XML format
+3. **Config directories** (searched in order):
+   - `/etc/ooklaserver`
+   - `/usr/local/etc/ooklaserver`
+   - `./config`
+   - `../config` (for TypeScript project)
+   - `.` (current directory)
 
-Example configuration:
+### Architecture-Specific Config Files
+Pre-built `.properties` files for each architecture are in the `config/` directory:
+- `config/OoklaServer-linux-x86_64.properties` - Linux x86_64
+- `config/OoklaServer-linux-aarch64.properties` - Linux ARM64
+- `config/OoklaServer-macosx.properties` - macOS (universal)
+- `config/OoklaServer-windows-x86_64.properties` - Windows (includes `adminPassword`)
+- `config/OoklaServer.properties.template` - Generic template
+
+### Easy-to-Read Config Formats
+In `reverse-engineered/typescript/config/`:
+- `ooklaserver.config.ts` - TypeScript with environment configs (development/production/testing)
+- `ooklaserver.config.js` - JavaScript version
+- `ooklaserver.config.json` - JSON version
+
+### Example Configuration (JSON)
 ```json
 {
   "host": { "id": "your-server-id" },
@@ -149,6 +189,19 @@ Example configuration:
     "maxIdleAgeMinutes": 30
   }
 }
+```
+
+### Example Configuration (TypeScript/JavaScript)
+```typescript
+// reverse-engineered/typescript/config/ooklaserver.config.ts
+import { getConfigForEnvironment } from './ooklaserver.config';
+
+// Get production config
+const config = getConfigForEnvironment('production');
+config.host.id = 'your-server-id-from-ookla';
+config.host.password = 'your-server-password';
+config.ssl.certificateFile = '/etc/ooklaserver/cert.pem';
+config.ssl.privateKeyFile = '/etc/ooklaserver/key.pem';
 ```
 
 ## Development (TypeScript Implementation)
