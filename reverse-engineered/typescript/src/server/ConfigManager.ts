@@ -78,8 +78,23 @@ const DEFAULT_CONFIG: OoklaServerConfig = {
   },
 };
 
-const CONFIG_FILE_NAMES = ['config.properties', 'config.ini', 'config.xml', 'ooklaserver.json', 'OoklaServer.properties'];
-const CONFIG_DIRS = ['/etc/ooklaserver', '/usr/local/etc/ooklaserver', './config', '.'];
+const CONFIG_FILE_NAMES = [
+  'config.properties',
+  'config.ini',
+  'config.xml',
+  'ooklaserver.json',
+  'OoklaServer.properties',
+  'ooklaserver.config.ts',
+  'ooklaserver.config.js',
+  'ooklaserver.config.json',
+];
+const CONFIG_DIRS = [
+  '/etc/ooklaserver',
+  '/usr/local/etc/ooklaserver',
+  './config',
+  '../config',
+  '.',
+];
 
 export class ConfigManager extends EventEmitter {
   private config: OoklaServerConfig;
@@ -151,6 +166,28 @@ export class ConfigManager extends EventEmitter {
         break;
       case '.xml':
         parsed = this.parseXml(content);
+        break;
+      case '.ts':
+      case '.js':
+        // For TypeScript/JavaScript config files, we need to evaluate them
+        // In production, these should be pre-compiled or use a proper module loader
+        // For now, we'll use a simple require for .js files and skip .ts files
+        // unless they're compiled to .js
+        if (ext === '.js') {
+          try {
+            // Clear require cache to allow reloading
+            delete require.cache[require.resolve(filePath)];
+            const configModule = require(filePath);
+            parsed = configModule.defaultConfig || configModule;
+          } catch (error) {
+            throw new Error(`Failed to load JS config: ${error}`);
+          }
+        } else {
+          // For .ts files, we'd need ts-node or compilation
+          // Skip for now and log a warning
+          this.logger.warning(`TypeScript config files (.ts) require compilation. Use .js or .json instead.`);
+          return;
+        }
         break;
       default:
         throw new Error(`Unsupported config file format: ${ext}`);

@@ -1,0 +1,60 @@
+{
+  "tcpPorts": [5060, 8080],
+  "udpPorts": [5060, 8080],
+  "httpPorts": [8080],
+  "useIPv6": true,
+  "useIPv4": true,
+  "addresses": ["0.0.0.0", "::"],
+  "allowedDomains": ["*.speedtest.net", "*.ookla.com", "*.speedtestcustom.com"],
+  "excludeDefaultDomains": false,
+  "userAgentFilterEnabled": true,
+  "workerThreadPool": {
+    "capacity": 30000,
+    "stackSizeBytes": 102400
+  },
+  "enableAutoUpdate": true,
+  "binaryAutoUpdate": true,
+  "ipTracking": {
+    "gcIntervalMinutes": 5,
+    "maxIdleAgeMinutes": 35,
+    "slidingWindowBucketLengthMinutes": 5,
+    "metricTopIpCount": 5,
+    "maxConnPerIp": 500,
+    "maxConnPerBucketPerIp": 20000
+  },
+  "maxConnectionSeconds": 3600,
+  "http": {
+    "maxHeadersSize": 65536
+  },
+  "clientAuthToken": {
+    "denyInvalid": true,
+    "additionalValidationFields": []
+  },
+  "websocket": {
+    "frameSizeLimitBytes": 5242880
+  },
+  "ssl": {
+    "letsEncryptRetry": 3,
+    "letsEncryptMaxRetry": 5,
+    "certificateFile": "",
+    "privateKeyFile": "",
+    "verificationMode": "none",
+    "minimumTLSProtocol": "1.2"
+  },
+  "host": {
+    "id": "",
+    "password": ""
+  },
+  "adminPassword": "",
+  "resultEndpointUrl": "https://results.speedtest.net/reports/server/",
+  "hostApiUrl": "https://host-api.speedtest.net",
+  "apiUrl": "https://api.speedtest.net",
+  "sendStatsInterval": 60000,
+  "performTraceroutes": true,
+  "traceroute": {
+    "enabled": true,
+    "maxHops": 30,
+    "timeout": 5000,
+    "maxConcurrent": 10
+  }
+}
