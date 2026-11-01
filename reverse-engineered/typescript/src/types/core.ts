@@ -28,6 +28,16 @@ export interface OoklaServerConfig {
   sharedMemory?: SharedMemoryConfig;
   tls?: TLSCertificateConfig;
   traceroute?: TracerouteConfig;
+  ssl?: SSLConfig;
+  websocket?: WebSocketConfig;
+  update?: UpdateConfig;
+  api?: ApiConfig;
+  resultEndpointUrl?: string;
+  sendStatsInterval?: number;
+  hostApiUrl?: string;
+  apiUrl?: string;
+  enableAutoUpdate?: boolean;
+  updateRequestInitialInterval?: number;
 }
 
 export interface ClientAuthTokenConfig {
@@ -55,6 +65,30 @@ export interface HttpConfig {
 
 export interface HostConfig {
   id: string;
+  password?: string;
+}
+
+export interface SSLConfig {
+  letsEncryptRetry?: number;
+  letsEncryptMaxRetry?: number;
+  certificateFile?: string;
+  privateKeyFile?: string;
+  verificationMode?: string;
+  minimumTLSProtocol?: string;
+}
+
+export interface WebSocketConfig {
+  frameSizeLimitBytes?: number;
+}
+
+export interface UpdateConfig {
+  enabled?: boolean;
+  requestInitialInterval?: number;
+}
+
+export interface ApiConfig {
+  url?: string;
+  hostUrl?: string;
 }
 
 // ============================================================================
@@ -288,7 +322,7 @@ export interface LoggerConfig {
 }
 
 export interface ChannelConfig {
-  class: 'ConsoleChannel' | 'FileChannel' | 'LevelChannel' | 'LogJsonFormatter' | 'LogstashChannel' | 'JSONChannel' | 'SyslogChannel';
+  class: 'ConsoleChannel' | 'FileChannel' | 'LevelChannel' | 'LogJsonFormatter' | 'LogstashChannel' | 'JSONChannel' | 'SyslogChannel' | 'EventLogChannel';
   pattern?: string;
   rotation?: RotationConfig;
   path?: string;

@@ -6,46 +6,79 @@
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
-import { DeepPartial, OoklaServerConfig, LogConfig } from '../types/core';
+import { DeepPartial, OoklaServerConfig, LogConfig, SSLConfig, WebSocketConfig, UpdateConfig, ApiConfig } from '../types/core';
 import { Logger } from './Logger';
 
 const DEFAULT_CONFIG: OoklaServerConfig = {
   clientAuthToken: {
     additionalValidationFields: [],
-    denyInvalid: false,
+    denyInvalid: true, // Binary default is true based on properties file
   },
   excludeDefaultDomains: false,
   workerThreadPool: {
-    capacity: 100,
-    stackSizeBytes: 1024 * 1024, // 1MB
+    capacity: 30000, // Binary default from properties file
+    stackSizeBytes: 102400, // 100KB - Binary default from properties file
   },
   ipTracking: {
-    maxConnPerIp: 100,
-    gcIntervalMinutes: 5,
-    maxIdleAgeMinutes: 30,
-    slidingWindowBucketLengthMinutes: 1,
-    metricTopIpCount: 100,
-    maxConnPerBucketPerIp: 10,
+    maxConnPerIp: 500, // Binary default from properties file
+    gcIntervalMinutes: 5, // Binary default from properties file
+    maxIdleAgeMinutes: 35, // Binary default from properties file
+    slidingWindowBucketLengthMinutes: 5, // Binary default from properties file
+    metricTopIpCount: 5, // Binary default from properties file
+    maxConnPerBucketPerIp: 20000, // Binary default from properties file
   },
   maxConnectionSeconds: 3600,
   http: {
-    maxHeadersSize: 8192,
+    maxHeadersSize: 65536, // Binary default from properties file
   },
   allowedDomains: ['*.speedtest.net', '*.ookla.com', '*.speedtestcustom.com'],
-  tcpPorts: [5060, 8080],
-  udpPorts: [],
+  tcpPorts: [5060, 8080], // Binary default from properties file
+  udpPorts: [5060, 8080], // Binary default from properties file
   httpPorts: [8080],
-  useIPv6: true,
+  useIPv6: true, // Binary default from properties file
   addresses: ['0.0.0.0', '::'],
   useIPv4: true,
   host: {
     id: '',
+    password: '',
   },
-  userAgentFilterEnabled: true,
+  userAgentFilterEnabled: true, // Binary default from properties file
   performTraceroutes: true,
+  binaryAutoUpdate: true,
+  enableAutoUpdate: true,
+  updateRequestInitialInterval: 300000, // 5 minutes default
+  resultEndpointUrl: 'https://results.speedtest.net/reports/server/',
+  sendStatsInterval: 60000, // 1 minute default
+  hostApiUrl: 'https://host-api.speedtest.net',
+  apiUrl: 'https://api.speedtest.net',
+  ssl: {
+    letsEncryptRetry: 3,
+    letsEncryptMaxRetry: 5,
+    certificateFile: '',
+    privateKeyFile: '',
+    verificationMode: 'none', // Binary default from properties file
+    minimumTLSProtocol: '1.2', // Binary default from properties file
+  },
+  websocket: {
+    frameSizeLimitBytes: 5242880, // 5MB - Binary default from properties file
+  },
+  update: {
+    enabled: true,
+    requestInitialInterval: 300000,
+  },
+  api: {
+    url: 'https://api.speedtest.net',
+    hostUrl: 'https://host-api.speedtest.net',
+  },
+  traceroute: {
+    enabled: true,
+    maxHops: 30,
+    timeout: 5000,
+    maxConcurrent: 10,
+  },
 };
 
-const CONFIG_FILE_NAMES = ['config.properties', 'config.ini', 'config.xml', 'ooklaserver.json'];
+const CONFIG_FILE_NAMES = ['config.properties', 'config.ini', 'config.xml', 'ooklaserver.json', 'OoklaServer.properties'];
 const CONFIG_DIRS = ['/etc/ooklaserver', '/usr/local/etc/ooklaserver', './config', '.'];
 
 export class ConfigManager extends EventEmitter {
@@ -143,7 +176,13 @@ export class ConfigManager extends EventEmitter {
       const key = trimmed.substring(0, eqIndex).trim();
       const value = trimmed.substring(eqIndex + 1).trim();
 
-      this.setNestedProperty(result, key, value);
+      // Map openSSL.server.* properties to ssl.* config
+      let mappedKey = key;
+      if (key.startsWith('openSSL.server.')) {
+        mappedKey = 'ssl.' + key.substring('openSSL.server.'.length);
+      }
+
+      this.setNestedProperty(result, mappedKey, value);
     }
 
     return result;
@@ -191,11 +230,25 @@ export class ConfigManager extends EventEmitter {
 
     // Convert value types
     let convertedValue: unknown = value;
+    const lastKey = keys[keys.length - 1];
+
+    // Special handling for version strings that look like floats but should remain strings
+    const isVersionString = lastKey === 'minimumTLSProtocol' || lastKey === 'tlsVersion' || lastKey === 'sslVersion';
+
     if (value === 'true') convertedValue = true;
     else if (value === 'false') convertedValue = false;
     else if (/^\d+$/.test(value)) convertedValue = parseInt(value, 10);
-    else if (/^\d+\.\d+$/.test(value)) convertedValue = parseFloat(value);
-    else if (value.startsWith('[') && value.endsWith(']')) {
+    else if (/^\d+\.\d+$/.test(value) && !isVersionString) convertedValue = parseFloat(value);
+    else if (value.includes(',')) {
+      // Handle comma-separated values (arrays)
+      const parts = value.split(',').map(v => v.trim());
+      // Try to parse as numbers
+      if (parts.every(p => /^\d+$/.test(p))) {
+        convertedValue = parts.map(p => parseInt(p, 10));
+      } else {
+        convertedValue = parts;
+      }
+    } else if (value.startsWith('[') && value.endsWith(']')) {
       try {
         convertedValue = JSON.parse(value);
       } catch {
@@ -203,7 +256,7 @@ export class ConfigManager extends EventEmitter {
       }
     }
 
-    current[keys[keys.length - 1]] = convertedValue;
+    current[lastKey] = convertedValue;
   }
 
   /**
@@ -265,7 +318,7 @@ export class ConfigManager extends EventEmitter {
       name: 'app',
       level: 'information',
       channel: {
-        class: 'ConsoleChannel',
+        class: 'EventLogChannel', // Binary default from properties file
         pattern: '%Y-%m-%d %H:%M:%S [%P - %I] [%p] %t',
       },
     };
@@ -305,6 +358,49 @@ export class ConfigManager extends EventEmitter {
   public set<K extends keyof OoklaServerConfig>(key: K, value: OoklaServerConfig[K]): void {
     this.config = { ...this.config, [key]: value };
     this.emit('configUpdated', this.config);
+  }
+
+  /**
+   * Get SSL configuration
+   */
+  public getSSLConfig(): SSLConfig {
+    return this.config.ssl || {
+      letsEncryptRetry: 3,
+      letsEncryptMaxRetry: 5,
+      certificateFile: '',
+      privateKeyFile: '',
+      verificationMode: 'none',
+      minimumTLSProtocol: '1.2',
+    };
+  }
+
+  /**
+   * Get WebSocket configuration
+   */
+  public getWebSocketConfig(): WebSocketConfig {
+    return this.config.websocket || {
+      frameSizeLimitBytes: 5242880,
+    };
+  }
+
+  /**
+   * Get Update configuration
+   */
+  public getUpdateConfig(): UpdateConfig {
+    return this.config.update || {
+      enabled: true,
+      requestInitialInterval: 300000,
+    };
+  }
+
+  /**
+   * Get API configuration
+   */
+  public getApiConfig(): ApiConfig {
+    return this.config.api || {
+      url: 'https://api.speedtest.net',
+      hostUrl: 'https://host-api.speedtest.net',
+    };
   }
 }
 
