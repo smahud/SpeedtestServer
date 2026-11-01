@@ -1,0 +1,35 @@
+{
+  "name": "ooklaserver",
+  "version": "1.0.0",
+  "description": "OoklaServer JavaScript Implementation - Reverse engineered from OoklaServer binary",
+  "main": "src/server/OoklaServer.js",
+  "bin": {
+    "ooklaserver": "bin/ooklaserver.js"
+  },
+  "scripts": {
+    "start": "node bin/ooklaserver.js",
+    "dev": "node --watch bin/ooklaserver.js",
+    "test": "echo \"Tests not implemented for JavaScript version\" && exit 0",
+    "lint": "echo \"No linter configured for JavaScript version\" && exit 0"
+  },
+  "keywords": [
+    "ookla",
+    "speedtest",
+    "server",
+    "reverse-engineering"
+  ],
+  "author": "Reverse Engineered",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.14.0"
+  },
+  "devDependencies": {},
+  "files": [
+    "bin/",
+    "src/",
+    "README.md"
+  ]
+}
