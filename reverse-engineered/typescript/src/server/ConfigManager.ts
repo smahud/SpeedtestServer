@@ -171,14 +171,16 @@ export class ConfigManager extends EventEmitter {
       case '.js':
         // For TypeScript/JavaScript config files, we need to evaluate them
         // In production, these should be pre-compiled or use a proper module loader
-        // For now, we'll use a simple require for .js files and skip .ts files
+        // For now, we'll use require for .js files (sync) and skip .ts files
         // unless they're compiled to .js
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         if (ext === '.js') {
           try {
             // Clear require cache to allow reloading
             delete require.cache[require.resolve(filePath)];
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const configModule = require(filePath);
-            parsed = configModule.defaultConfig || configModule;
+            parsed = configModule.defaultConfig || configModule.default || configModule;
           } catch (error) {
             throw new Error(`Failed to load JS config: ${error}`);
           }
