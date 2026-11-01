@@ -4,26 +4,17 @@
  */
 
 import { EventEmitter } from 'events';
+import * as os from 'os';
 import {
   OoklaServerConfig,
   ServerToken,
   ClientAuthTokenValidationResult,
   TokenValidationFields,
   ConnectionInfo,
-  ClientSessionContext,
-  UploadStatsRecorder,
-  IpStatsEntry,
-  IpStatsConfig,
+  IpStatsInternal,
   ServerMetrics,
-  MetricsUploadConfig,
-  LogConfig,
-  LogEntry,
-  LogLevel,
-  OoklaRequest,
-  OoklaResponse,
   CrossDomainPolicy,
   DownloadTestFile,
-  DEFAULT_DOWNLOAD_SIZES,
   BinaryInfo,
   UpdateStatus,
   TracerouteRequest,
@@ -32,13 +23,9 @@ import {
   ProcessInfo,
   SharedMemoryConfig,
   SystemInfo,
-  NetworkInterface,
-  OoklaServerError,
-  AuthenticationError,
-  RateLimitError,
-  BinaryUpdateError,
   ConfigurationError,
   DeepPartial,
+  LogLevel,
 } from '../types/core';
 
 import { ConfigManager } from './ConfigManager';
@@ -99,11 +86,11 @@ export class OoklaServer extends EventEmitter {
     this.authValidator = new ClientAuthTokenValidator(this.config.clientAuthToken, this.logger);
     this.connectionTracker = new ConnectionTracker(this.logger);
     this.ipStatsManager = new IpStatsManager(this.config.ipTracking, this.logger);
-    this.metricsUploader = new MetricsUploader(this.getMetricsUploadConfig(), this.logger);
-    this.tlsManager = new TLSCertificateManager(this.config, this.logger);
-    this.requestHandler = new OoklaRequestHandler(this, this.logger);
+    this.metricsUploader = new MetricsUploader(this.config, this.logger, this.binaryManager.getCurrentBinary());
+    this.tlsManager = new TLSCertificateManager(this.config.tls || { enabled: false, certPath: '', keyPath: '' }, this.logger);
+    this.requestHandler = new OoklaRequestHandler(this.config, this.logger, this.authValidator, this.connectionTracker, this.ipStatsManager);
     this.downloader = new OoklaDownloader(this.config, this.logger);
-    this.tracerouteManager = new TracerouteManager(this.config, this.logger);
+    this.tracerouteManager = new TracerouteManager(this.config.traceroute || { enabled: this.config.performTraceroutes, maxHops: 30, timeout: 5000, maxConcurrent: 10 }, this.logger);
 
     this.setupEventHandlers();
   }
@@ -302,15 +289,15 @@ export class OoklaServer extends EventEmitter {
   /**
    * Get IP stats for an IP
    */
-  public getIpStats(ip: string): IpStatsEntry | undefined {
+  public getIpStats(ip: string): IpStatsInternal | undefined {
     return this.ipStatsManager.getIpStats(ip);
   }
 
   /**
    * Block an IP address
    */
-  public blockIp(ip: string, reason: string, durationMs?: number): void {
-    this.ipStatsManager.blockIp(ip, reason, durationMs);
+  public blockIp(ip: string, reason: string): void {
+    this.ipStatsManager.blockIp(ip, reason);
   }
 
   /**
@@ -338,7 +325,10 @@ export class OoklaServer extends EventEmitter {
    * Initiate a traceroute
    */
   public async startTraceroute(request: TracerouteRequest): Promise<TracerouteResult> {
-    return this.tracerouteManager.startTraceroute(request);
+    return this.tracerouteManager.trace(request.targetIp, {
+      maxHops: request.maxHops,
+      timeout: request.timeout,
+    });
   }
 
   /**
@@ -400,7 +390,7 @@ export class OoklaServer extends EventEmitter {
       loadAverage: 0,
       runningProcesses: 0,
       totalProcesses: 0,
-      cpus: require('os').cpus().length,
+      cpus: os.cpus().length,
       fdSize: 0,
       numThreads: 0,
       vmSize: 0,

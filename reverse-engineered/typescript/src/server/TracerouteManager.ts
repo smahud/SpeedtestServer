@@ -5,7 +5,9 @@
 
 import { EventEmitter } from 'events';
 import { spawn, ChildProcess } from 'child_process';
-import { Logger, TracerouteConfig, TracerouteResult, TracerouteHop } from '../types/core';
+import * as fs from 'fs';
+import { TracerouteConfig, TracerouteResult, TracerouteHop } from '../types/core';
+import { Logger } from './Logger';
 
 export class TracerouteManager extends EventEmitter {
   private config: TracerouteConfig;
@@ -23,48 +25,48 @@ export class TracerouteManager extends EventEmitter {
   /**
    * Perform traceroute to target
    */
-  public async trace(target: string, options: Partial<TracerouteConfig> = {}): Promise<TracerouteResult> {
-    const traceId = `${target}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  public async trace(targetIp: string, options: Partial<TracerouteConfig> = {}): Promise<TracerouteResult> {
+    const traceId = `${targetIp}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Check cache first
-    const cached = this.traceCache.get(target);
+    const cached = this.traceCache.get(targetIp);
     if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
-      this.logger.debug('Returning cached traceroute result', { target });
+      this.logger.debug('Returning cached traceroute result', { targetIp });
       return cached.result;
     }
 
     const traceConfig = { ...this.config, ...options };
     const maxHops = traceConfig.maxHops || 30;
-    const timeout = traceConfig.timeoutMs || 5000;
+    const timeout = traceConfig.timeout || 5000;
     const protocol = traceConfig.protocol || 'icmp';
 
-    this.logger.debug('Starting traceroute', { traceId, target, maxHops, protocol });
+    this.logger.debug('Starting traceroute', { traceId, targetIp, maxHops, protocol });
 
     try {
       let result: TracerouteResult;
 
       switch (protocol) {
         case 'icmp':
-          result = await this.traceICMP(target, maxHops, timeout, traceId);
+          result = await this.traceICMP(targetIp, maxHops, timeout, traceId);
           break;
         case 'udp':
-          result = await this.traceUDP(target, maxHops, timeout, traceId);
+          result = await this.traceUDP(targetIp, maxHops, timeout, traceId);
           break;
         case 'tcp':
-          result = await this.traceTCP(target, maxHops, timeout, traceId);
+          result = await this.traceTCP(targetIp, maxHops, timeout, traceId);
           break;
         default:
-          result = await this.traceICMP(target, maxHops, timeout, traceId);
+          result = await this.traceICMP(targetIp, maxHops, timeout, traceId);
       }
 
       // Cache result
-      this.traceCache.set(target, { result, timestamp: Date.now() });
+      this.traceCache.set(targetIp, { result, timestamp: Date.now() });
 
-      this.emit('traceCompleted', { traceId, target, result });
+      this.emit('traceCompleted', { traceId, targetIp, result });
       return result;
 
     } catch (error) {
-      this.logger.error('Traceroute failed', { traceId, target, error });
+      this.logger.error('Traceroute failed', { traceId, targetIp, error });
       throw error;
     }
   }
@@ -72,8 +74,8 @@ export class TracerouteManager extends EventEmitter {
   /**
    * ICMP traceroute (using system traceroute/tracepath)
    */
-  private async traceICMP(target: string, maxHops: number, timeout: number, traceId: string): Promise<TracerouteResult> {
-    const hops: TracerouteHop[] = [];
+  private async traceICMP(targetIp: string, maxHops: number, timeout: number, traceId: string): Promise<TracerouteResult> {
+    const _hops: TracerouteHop[] = [];
     const startTime = Date.now();
 
     return new Promise((resolve, reject) => {
@@ -82,7 +84,7 @@ export class TracerouteManager extends EventEmitter {
         '-m', maxHops.toString(), // Max hops
         '-w', (timeout / 1000).toString(), // Timeout in seconds
         '-q', '1',               // Queries per hop
-        target,
+        targetIp,
       ];
 
       // Try traceroute first, then tracepath
@@ -106,12 +108,12 @@ export class TracerouteManager extends EventEmitter {
         errorOutput += data.toString();
       });
 
-      child.on('close', (code) => {
+      child.on('close', (_code) => {
         this.activeTraces.delete(traceId);
 
-        if (code !== 0 && code !== null) {
+        if (_code !== 0 && _code !== null) {
           // Try tracepath as fallback
-          this.traceWithTracepath(target, maxHops, timeout, traceId)
+          this.traceWithTracepath(targetIp, maxHops, timeout, traceId)
             .then(resolve)
             .catch(() => reject(new Error(`Traceroute failed: ${errorOutput}`)));
           return;
@@ -119,11 +121,13 @@ export class TracerouteManager extends EventEmitter {
 
         const parsedHops = this.parseTracerouteOutput(output);
         const result: TracerouteResult = {
-          target,
+          guid: traceId,
+          targetIp,
           hops: parsedHops,
-          completed: parsedHops.some(h => h.ip === target || h.hostname === target),
+          completed: parsedHops.some(h => h.ip === targetIp || h.hostname === targetIp),
           durationMs: Date.now() - startTime,
           timestamp: startTime,
+          startTime: new Date(startTime),
         };
 
         resolve(result);
@@ -148,30 +152,30 @@ export class TracerouteManager extends EventEmitter {
   /**
    * UDP traceroute
    */
-  private async traceUDP(target: string, maxHops: number, timeout: number, traceId: string): Promise<TracerouteResult> {
+  private async traceUDP(targetIp: string, maxHops: number, timeout: number, traceId: string): Promise<TracerouteResult> {
     // UDP traceroute implementation would go here
     // For now, fall back to ICMP
-    return this.traceICMP(target, maxHops, timeout, traceId);
+    return this.traceICMP(targetIp, maxHops, timeout, traceId);
   }
 
   /**
    * TCP traceroute
    */
-  private async traceTCP(target: string, maxHops: number, timeout: number, traceId: string): Promise<TracerouteResult> {
+  private async traceTCP(targetIp: string, maxHops: number, timeout: number, traceId: string): Promise<TracerouteResult> {
     // TCP traceroute implementation would go here
     // For now, fall back to ICMP
-    return this.traceICMP(target, maxHops, timeout, traceId);
+    return this.traceICMP(targetIp, maxHops, timeout, traceId);
   }
 
   /**
    * Fallback to tracepath
    */
-  private async traceWithTracepath(target: string, maxHops: number, timeout: number, traceId: string): Promise<TracerouteResult> {
-    const hops: TracerouteHop[] = [];
+  private async traceWithTracepath(targetIp: string, maxHops: number, timeout: number, traceId: string): Promise<TracerouteResult> {
+    const _hops: TracerouteHop[] = [];
     const startTime = Date.now();
 
     return new Promise((resolve, reject) => {
-      const child = spawn('tracepath', ['-n', '-m', maxHops.toString(), target]);
+      const child = spawn('tracepath', ['-n', '-m', maxHops.toString(), targetIp]);
       this.activeTraces.set(traceId, child);
 
       let output = '';
@@ -180,16 +184,18 @@ export class TracerouteManager extends EventEmitter {
         output += data.toString();
       });
 
-      child.on('close', (code) => {
+      child.on('close', (_code) => {
         this.activeTraces.delete(traceId);
 
         const parsedHops = this.parseTracepathOutput(output);
         const result: TracerouteResult = {
-          target,
+          guid: traceId,
+          targetIp,
           hops: parsedHops,
-          completed: parsedHops.some(h => h.ip === target),
+          completed: parsedHops.some(h => h.ip === targetIp),
           durationMs: Date.now() - startTime,
           timestamp: startTime,
+          startTime: new Date(startTime),
         };
 
         resolve(result);
@@ -217,7 +223,7 @@ export class TracerouteManager extends EventEmitter {
     const commands = ['traceroute', 'traceroute6', '/usr/sbin/traceroute', '/usr/bin/traceroute'];
     for (const cmd of commands) {
       try {
-        require('fs').accessSync(cmd, require('fs').constants.X_OK);
+        fs.accessSync(cmd, fs.constants.X_OK);
         return cmd;
       } catch {
         // Not found, try next
@@ -240,7 +246,8 @@ export class TracerouteManager extends EventEmitter {
         hops.push({
           hop: parseInt(match[1], 10),
           ip: match[2],
-          rtt: parseFloat(match[3]),
+          rttMs: parseFloat(match[3]),
+          timeout: false,
         });
       }
     }
@@ -260,12 +267,14 @@ export class TracerouteManager extends EventEmitter {
       // or " 1:  192.168.1.1                                           1.234ms"
       const match = line.match(/^\s*(\d+)[?:]\s+(\S+)(?:\s+([\d.]+)ms)?/);
       if (match) {
-        const ip = match[2].replace(/[\[\]]/g, '');
+        // eslint-disable-next-line no-useless-escape
+const ip = match[2].replace(/[\[\]]/g, '');
         if (ip !== 'LOCALHOST' && ip !== 'no' && ip !== 'reply') {
           hops.push({
             hop: parseInt(match[1], 10),
             ip,
-            rtt: match[3] ? parseFloat(match[3]) : 0,
+            rttMs: match[3] ? parseFloat(match[3]) : 0,
+            timeout: false,
           });
         }
       }
@@ -291,7 +300,7 @@ export class TracerouteManager extends EventEmitter {
    * Cancel all active traces
    */
   public cancelAllTraces(): void {
-    for (const [traceId, child] of this.activeTraces) {
+    for (const [_traceId, child] of this.activeTraces) {
       child.kill('SIGTERM');
     }
     this.activeTraces.clear();
@@ -316,6 +325,21 @@ export class TracerouteManager extends EventEmitter {
    */
   public updateConfig(config: Partial<TracerouteConfig>): void {
     this.config = { ...this.config, ...config };
+  }
+
+  /**
+   * Start the traceroute manager
+   */
+  public async start(): Promise<void> {
+    this.logger.debug('TracerouteManager started');
+  }
+
+  /**
+   * Stop the traceroute manager
+   */
+  public async stop(): Promise<void> {
+    this.destroy();
+    this.logger.debug('TracerouteManager stopped');
   }
 
   /**

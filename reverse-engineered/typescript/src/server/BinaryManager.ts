@@ -7,9 +7,10 @@ import { EventEmitter } from 'events';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import { BinaryInfo, UpdateStatus, OoklaServerConfig, Logger } from '../types/core';
+import { BinaryInfo, UpdateStatus, OoklaServerConfig } from '../types/core';
+import { Logger } from './Logger';
 
-const HOST_API_URL = 'https://host-api.speedtest.net';
+const _HOST_API_URL = 'https://host-api.speedtest.net';
 const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // 1 hour
 
 export class BinaryManager extends EventEmitter {
@@ -161,7 +162,7 @@ export class BinaryManager extends EventEmitter {
   /**
    * Verify binary signature
    */
-  private async verifyBinary(binary: BinaryInfo): Promise<void> {
+  private async verifyBinary(_binary: BinaryInfo): Promise<void> {
     // Verify using embedded public keys
     // Implementation would use crypto.verify
     this.logger.debug('Verifying binary signature...');
@@ -186,7 +187,7 @@ export class BinaryManager extends EventEmitter {
   /**
    * Replace binary with new version
    */
-  private async replaceBinary(binary: BinaryInfo): Promise<void> {
+  private async replaceBinary(_binary: BinaryInfo): Promise<void> {
     const binaryPath = process.argv[0];
     const newPath = `${binaryPath}.new`;
 
@@ -288,7 +289,7 @@ export class BinaryManager extends EventEmitter {
   /**
    * Set private key salt (for passphrase generation)
    */
-  public setPrivateKeySalt(salt: string): void {
+  public setPrivateKeySalt(_salt: string): void {
     // Store salt securely
     this.logger.info('Private key salt updated');
   }

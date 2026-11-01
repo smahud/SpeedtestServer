@@ -209,12 +209,12 @@ export class ConfigManager extends EventEmitter {
   /**
    * Deep merge two configurations
    */
-  private mergeConfig<T extends Record<string, unknown>>(base: T, override: DeepPartial<T>): T {
-    const result = { ...base };
+  private mergeConfig<T>(base: T, override: DeepPartial<T>): T {
+    const result = { ...base } as Record<string, unknown>;
 
-    for (const key of Object.keys(override) as (keyof T)[]) {
-      const overrideValue = override[key];
-      const baseValue = base[key];
+    for (const key of Object.keys(override)) {
+      const overrideValue = (override as Record<string, unknown>)[key];
+      const baseValue = (base as Record<string, unknown>)[key];
 
       if (overrideValue === undefined) continue;
 
@@ -226,16 +226,16 @@ export class ConfigManager extends EventEmitter {
         baseValue !== null &&
         !Array.isArray(baseValue)
       ) {
-        (result as Record<string, unknown>)[key] = this.mergeConfig(
+        result[key] = this.mergeConfig(
           baseValue as Record<string, unknown>,
           overrideValue as Record<string, unknown>
         );
       } else {
-        (result as Record<string, unknown>)[key] = overrideValue;
+        result[key] = overrideValue;
       }
     }
 
-    return result;
+    return result as T;
   }
 
   /**
@@ -303,7 +303,7 @@ export class ConfigManager extends EventEmitter {
    * Set a specific config value by dot-notation path
    */
   public set<K extends keyof OoklaServerConfig>(key: K, value: OoklaServerConfig[K]): void {
-    (this.config as Record<string, unknown>)[key] = value;
+    this.config = { ...this.config, [key]: value };
     this.emit('configUpdated', this.config);
   }
 }

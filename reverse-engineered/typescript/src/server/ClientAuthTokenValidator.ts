@@ -5,7 +5,8 @@
 
 import { EventEmitter } from 'events';
 import * as crypto from 'crypto';
-import { Logger, ServerToken, ClientAuthTokenValidationResult, TokenValidationFields, ClientAuthTokenConfig } from '../types/core';
+import { ServerToken, ClientAuthTokenValidationResult, TokenValidationFields, ClientAuthTokenConfig } from '../types/core';
+import { Logger } from './Logger';
 
 export class ClientAuthTokenValidator extends EventEmitter {
   private config: ClientAuthTokenConfig;
@@ -173,7 +174,7 @@ export class ClientAuthTokenValidator extends EventEmitter {
 
     try {
       // Create verification data (token without signature)
-      const verifyData = JSON.stringify({
+      const _verifyData = JSON.stringify({
         token: token.token,
         expiration: token.expiration,
         ip: token.ip,
@@ -194,7 +195,7 @@ export class ClientAuthTokenValidator extends EventEmitter {
    */
   public updateConfig(config: Partial<ClientAuthTokenConfig>): void {
     this.config = { ...this.config, ...config };
-    this.logger.debug('ClientAuthTokenValidator config updated', this.config);
+    this.logger.debug('ClientAuthTokenValidator config updated', { ...this.config });
   }
 
   /**

@@ -24,6 +24,10 @@ export interface OoklaServerConfig {
   host: HostConfig;
   userAgentFilterEnabled: boolean;
   performTraceroutes: boolean;
+  binaryAutoUpdate?: boolean;
+  sharedMemory?: SharedMemoryConfig;
+  tls?: TLSCertificateConfig;
+  traceroute?: TracerouteConfig;
 }
 
 export interface ClientAuthTokenConfig {
@@ -163,6 +167,37 @@ export interface IpStatsConfig {
   maxConnPerBucketPerIp: number;
 }
 
+export interface IpStats {
+  entries: IpStatsEntry[];
+  totalIps: number;
+  blockedIps: number;
+}
+
+export interface IpBucket {
+  ip: string;
+  count: number;
+  timestamp: number;
+}
+
+// Internal types for IpStatsManager
+export interface IpStatsInternal {
+  ip: string;
+  totalConnections: number;
+  bytesSent: number;
+  bytesReceived: number;
+  buckets: Map<number, IpBucketInternal>;
+  lastActivity: number;
+  createdAt: number;
+  isBlocked: boolean;
+  blockReason?: string;
+}
+
+export interface IpBucketInternal {
+  index: number;
+  count: number;
+  startTime: number;
+}
+
 // ============================================================================
 // Metrics Types
 // ============================================================================
@@ -195,6 +230,27 @@ export interface ServerMetrics {
   vmSize: number;
   vmRss: number;
   timestamp: Date;
+  connections?: number;
+  bandwidth?: {
+    upload: number;
+    download: number;
+  };
+  latency?: {
+    min: number;
+    max: number;
+    avg: number;
+  };
+  tests?: {
+    total: number;
+    completed: number;
+    failed: number;
+  };
+  errors?: number;
+  system?: {
+    cpu: number;
+    memory: number;
+    network: number;
+  };
 }
 
 export interface MetricsUploadConfig {
@@ -207,7 +263,7 @@ export interface MetricsUploadConfig {
 // Logging Types
 // ============================================================================
 
-export type LogLevel = 'fatal' | 'critical' | 'warning' | 'notice' | 'information' | 'debug' | 'trace';
+export type LogLevel = 'fatal' | 'critical' | 'error' | 'warning' | 'notice' | 'information' | 'debug' | 'trace';
 
 export interface LogEntry {
   level: LogLevel;
@@ -232,19 +288,34 @@ export interface LoggerConfig {
 }
 
 export interface ChannelConfig {
-  class: 'ConsoleChannel' | 'FileChannel' | 'LevelChannel' | 'LogJsonFormatter' | 'LogstashChannel';
+  class: 'ConsoleChannel' | 'FileChannel' | 'LevelChannel' | 'LogJsonFormatter' | 'LogstashChannel' | 'JSONChannel' | 'SyslogChannel';
   pattern?: string;
   rotation?: RotationConfig;
   path?: string;
   archive?: string;
   compress?: boolean;
   purgeCount?: number;
+  maxSize?: number;
+  maxFiles?: number;
+  channelOptions?: {
+    stderr?: boolean;
+    path?: string;
+    maxSize?: number;
+    maxFiles?: number;
+  };
 }
 
 export interface RotationConfig {
   type: 'timestamp' | 'size';
   interval?: string;
   maxSize?: string;
+}
+
+export interface LogChannel {
+  name: string;
+  level: LogLevel;
+  class: string;
+  channelOptions?: ChannelConfig['channelOptions'];
 }
 
 // ============================================================================
@@ -346,6 +417,8 @@ export interface TracerouteResult {
   error?: string;
   startTime: Date;
   endTime?: Date;
+  durationMs?: number;
+  timestamp?: number;
 }
 
 export interface TracerouteHop {
@@ -353,7 +426,17 @@ export interface TracerouteHop {
   ip?: string;
   hostname?: string;
   rttMs?: number;
+  rtt?: number;
   timeout: boolean;
+}
+
+export interface TracerouteConfig {
+  enabled: boolean;
+  maxHops: number;
+  timeout: number;
+  timeoutMs?: number;
+  maxConcurrent: number;
+  protocol?: 'icmp' | 'udp' | 'tcp';
 }
 
 // ============================================================================
@@ -378,6 +461,40 @@ export interface SharedMemoryConfig {
   serverShMem: string;
   managerShMemMutex: string;
   serverShMemMutex: string;
+}
+
+// ============================================================================
+// TLS Certificate Types
+// ============================================================================
+
+export interface TLSCertificateConfig {
+  enabled: boolean;
+  certPath?: string;
+  keyPath?: string;
+  caPath?: string;
+  autoGenerate?: boolean;
+  acme?: {
+    enabled: boolean;
+    email: string;
+    domains: string[];
+    staging?: boolean;
+  };
+  publicKey?: string;
+}
+
+export interface TLSCertificateInfo {
+  subject: string;
+  issuer: string;
+  validFrom: Date;
+  validTo: Date;
+  fingerprint: string;
+  san: string[];
+  certPem?: string;
+  keyPem?: string;
+  caPem?: string;
+  expiresAt?: number;
+  daysUntilExpiry?: number;
+  isSelfSigned?: boolean;
 }
 
 // ============================================================================
@@ -462,3 +579,24 @@ export type DeepPartial<T> = {
 export type RequiredKeys<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 export type OptionalKeys<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+// ============================================================================
+// Logger Interface
+// ============================================================================
+
+export interface Logger {
+  trace(message: string, meta?: Record<string, unknown>): void;
+  debug(message: string, meta?: Record<string, unknown>): void;
+  info(message: string, meta?: Record<string, unknown>): void;
+  notice(message: string, meta?: Record<string, unknown>): void;
+  warning(message: string, meta?: Record<string, unknown>): void;
+  error(message: string, meta?: Record<string, unknown>): void;
+  critical(message: string, meta?: Record<string, unknown>): void;
+  fatal(message: string, meta?: Record<string, unknown>): void;
+  log(level: LogLevel, message: string, meta?: Record<string, unknown>): void;
+  setLevel(level: LogLevel): void;
+  getLevel(): LogLevel;
+  child(meta: Record<string, unknown>): Logger;
+  destroy(): void;
+  flush(): void;
+}

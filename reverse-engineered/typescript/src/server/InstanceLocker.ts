@@ -6,7 +6,8 @@
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
-import { SharedMemoryConfig, Logger, ProcessRole } from '../types/core';
+import { SharedMemoryConfig, ProcessRole } from '../types/core';
+import { Logger } from './Logger';
 
 export class InstanceLocker extends EventEmitter {
   private config: SharedMemoryConfig;

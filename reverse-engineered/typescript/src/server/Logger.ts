@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Logger as LoggerInterface, LogConfig, LogChannel, LogLevel } from '../types/core';
+import { LogConfig, LogChannel, LogLevel, LoggerConfig, Logger as LoggerInterface } from '../types/core';
 
 const LOG_LEVELS: Record<LogLevel, number> = {
   trace: 0,
@@ -17,17 +17,6 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   error: 40,
   critical: 50,
   fatal: 60,
-};
-
-const LEVEL_NAMES: Record<number, LogLevel> = {
-  0: 'trace',
-  10: 'debug',
-  20: 'information',
-  25: 'notice',
-  30: 'warning',
-  40: 'error',
-  50: 'critical',
-  60: 'fatal',
 };
 
 export class Logger extends EventEmitter implements LoggerInterface {
@@ -58,7 +47,13 @@ export class Logger extends EventEmitter implements LoggerInterface {
   /**
    * Add a log channel
    */
-  public addChannel(name: string, channel: LogChannel): void {
+  public addChannel(name: string, channelConfig: LoggerConfig): void {
+    const channel: LogChannel = {
+      name,
+      level: channelConfig.level,
+      class: channelConfig.channel.class,
+      channelOptions: channelConfig.channel.channelOptions,
+    };
     this.channels.set(name, channel);
     this.emit('channelAdded', { name, channel });
   }
@@ -294,7 +289,8 @@ export class Logger extends EventEmitter implements LoggerInterface {
   private parseLogEntry(entry: string): { message: string; level: string; logger: string; meta?: Record<string, unknown> } {
     // Simple parsing - in production would be more robust
     const parts = entry.split(' ');
-    const level = parts[3]?.replace(/[\[\]]/g, '') || 'INFO';
+    // eslint-disable-next-line no-useless-escape
+const level = parts[3]?.replace(/[\[\]]/g, '') || 'INFO';
     const message = parts.slice(4).join(' ');
 
     return { message, level, logger: 'app' };
@@ -340,7 +336,7 @@ export class Logger extends EventEmitter implements LoggerInterface {
   /**
    * Close channel
    */
-  private closeChannel(channel: LogChannel): void {
+  private closeChannel(_channel: LogChannel): void {
     // Close any open file handles
   }
 
@@ -383,7 +379,7 @@ export class Logger extends EventEmitter implements LoggerInterface {
    * Clean up resources
    */
   public destroy(): void {
-    for (const [name, channel] of this.channels) {
+    for (const [_name, channel] of this.channels) {
       this.closeChannel(channel);
     }
     this.channels.clear();

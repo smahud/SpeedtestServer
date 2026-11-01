@@ -4,7 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { Logger, ConnectionInfo, ClientSessionContext, UploadStatsRecorder } from '../types/core';
+import { ConnectionInfo, ClientSessionContext, UploadStatsRecorder } from '../types/core';
+import { Logger } from './Logger';
 
 export class ConnectionTracker extends EventEmitter {
   private logger: Logger;
@@ -104,10 +105,10 @@ export class ConnectionTracker extends EventEmitter {
   /**
    * Set connection token
    */
-  public setConnectionToken(id: string, token: { token: string; expiration: number; ip?: string; guid?: string }): void {
+  public setConnectionToken(id: string, token: { token: string; expiration: number; ip?: string; guid?: string; additionalFields?: Record<string, unknown> }): void {
     const connection = this.connections.get(id);
     if (connection) {
-      connection.token = token;
+      connection.token = { ...token, additionalFields: token.additionalFields || {} };
       connection.guid = token.guid;
     }
   }
@@ -146,7 +147,7 @@ export class ConnectionTracker extends EventEmitter {
    * Close all connections
    */
   public closeAllConnections(): void {
-    for (const [id, connection] of this.connections) {
+    for (const [_id, connection] of this.connections) {
       connection.isExpired = true;
       this.emit('connectionClosed', connection);
     }
@@ -181,7 +182,7 @@ export class ConnectionTracker extends EventEmitter {
   public createSession(
     connectionId: string,
     guid: string,
-    token: { token: string; expiration: number; ip?: string; guid?: string },
+    token: { token: string; expiration: number; ip?: string; guid?: string; additionalFields?: Record<string, unknown> },
     ipAddress: string,
     userAgent: string,
     testType: 'download' | 'upload' | 'latency' | 'traceroute'
@@ -189,7 +190,7 @@ export class ConnectionTracker extends EventEmitter {
     const session: ClientSessionContext = {
       connectionId,
       guid,
-      token,
+      token: { ...token, additionalFields: token.additionalFields || {} },
       ipAddress,
       userAgent,
       startTime: new Date(),

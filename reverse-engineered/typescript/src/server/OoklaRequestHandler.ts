@@ -5,7 +5,8 @@
 
 import { EventEmitter } from 'events';
 import * as crypto from 'crypto';
-import { Logger, OoklaServerConfig, ConnectionInfo, ClientSessionContext, UploadStatsRecorder, ServerToken } from '../types/core';
+import { OoklaServerConfig, ClientSessionContext } from '../types/core';
+import { Logger } from './Logger';
 import { ClientAuthTokenValidator } from './ClientAuthTokenValidator';
 import { ConnectionTracker } from './ConnectionTracker';
 import { IpStatsManager } from './IpStatsManager';
@@ -186,7 +187,7 @@ export class OoklaRequestHandler extends EventEmitter {
   private normalizePath(url: string): string {
     const path = url.split('?')[0];
     // Replace parameterized segments
-    return path.replace(/\/[^\/]+(?=\/|$)/g, (match) => {
+    return path.replace(/\/[^/]+(?=\/|$)/g, (match) => {
       if (match.startsWith('/:')) return match;
       return match;
     });
@@ -209,7 +210,7 @@ export class OoklaRequestHandler extends EventEmitter {
 
   // Route handlers
 
-  private async handleHealth(context: RequestContext): Promise<Response> {
+  private async handleHealth(_context: RequestContext): Promise<Response> {
     return this.createResponse(200, { 'Content-Type': 'application/json' }, {
       status: 'ok',
       version: '1.0.0',
@@ -217,11 +218,11 @@ export class OoklaRequestHandler extends EventEmitter {
     });
   }
 
-  private async handlePing(context: RequestContext): Promise<Response> {
+  private async handlePing(_context: RequestContext): Promise<Response> {
     return this.createResponse(200, { 'Content-Type': 'text/plain' }, 'pong');
   }
 
-  private async handleConfig(context: RequestContext): Promise<Response> {
+  private async handleConfig(_context: RequestContext): Promise<Response> {
     return this.createResponse(200, { 'Content-Type': 'application/json' }, {
       server: {
         id: this.config.host.id,
@@ -242,7 +243,7 @@ export class OoklaRequestHandler extends EventEmitter {
     });
   }
 
-  private async handleSettings(context: RequestContext): Promise<Response> {
+  private async handleSettings(_context: RequestContext): Promise<Response> {
     return this.createResponse(200, { 'Content-Type': 'application/json' }, {
       allowedDomains: this.config.allowedDomains,
       tcpPorts: this.config.tcpPorts,
@@ -274,7 +275,7 @@ export class OoklaRequestHandler extends EventEmitter {
 
     // Create session
     const connectionId = context.connectionId;
-    const session = this.connectionTracker.createSession(
+    const _session = this.connectionTracker.createSession(
       connectionId,
       guid,
       { token, expiration: Date.now() / 1000 + 3600 },
@@ -301,8 +302,8 @@ export class OoklaRequestHandler extends EventEmitter {
     }, data);
   }
 
-  private async handleDownloadSize(context: RequestContext): Promise<Response> {
-    return this.handleDownload(context);
+  private async handleDownloadSize(_context: RequestContext): Promise<Response> {
+    return this.handleDownload(_context);
   }
 
   private async handleUpload(context: RequestContext): Promise<Response> {
@@ -317,8 +318,8 @@ export class OoklaRequestHandler extends EventEmitter {
     });
   }
 
-  private async handleUploadSize(context: RequestContext): Promise<Response> {
-    return this.handleUpload(context);
+  private async handleUploadSize(_context: RequestContext): Promise<Response> {
+    return this.handleUpload(_context);
   }
 
   private async handleLatency(context: RequestContext): Promise<Response> {
@@ -352,7 +353,7 @@ export class OoklaRequestHandler extends EventEmitter {
     });
   }
 
-  private async handleMetrics(context: RequestContext): Promise<Response> {
+  private async handleMetrics(_context: RequestContext): Promise<Response> {
     // Accept metrics from clients
     return this.createResponse(200, { 'Content-Type': 'application/json' }, {
       status: 'received',
@@ -367,16 +368,16 @@ export class OoklaRequestHandler extends EventEmitter {
     }, '');
   }
 
-  private async handleWsDownload(context: RequestContext): Promise<Response> {
-    return this.handleWebSocket(context);
+  private async handleWsDownload(_context: RequestContext): Promise<Response> {
+    return this.handleWebSocket(_context);
   }
 
-  private async handleWsUpload(context: RequestContext): Promise<Response> {
-    return this.handleWebSocket(context);
+  private async handleWsUpload(_context: RequestContext): Promise<Response> {
+    return this.handleWebSocket(_context);
   }
 
-  private async handleWsLatency(context: RequestContext): Promise<Response> {
-    return this.handleWebSocket(context);
+  private async handleWsLatency(_context: RequestContext): Promise<Response> {
+    return this.handleWebSocket(_context);
   }
 
   /**
@@ -392,6 +393,29 @@ export class OoklaRequestHandler extends EventEmitter {
    */
   public updateConfig(config: Partial<OoklaServerConfig>): void {
     this.config = { ...this.config, ...config };
+  }
+
+  /**
+   * Start the request handler
+   */
+  public async start(): Promise<void> {
+    this.logger.debug('OoklaRequestHandler started');
+  }
+
+  /**
+   * Stop the request handler
+   */
+  public async stop(): Promise<void> {
+    this.destroy();
+    this.logger.debug('OoklaRequestHandler stopped');
+  }
+
+  /**
+   * Force stop the request handler
+   */
+  public async forceStop(): Promise<void> {
+    this.destroy();
+    this.logger.debug('OoklaRequestHandler force stopped');
   }
 
   /**

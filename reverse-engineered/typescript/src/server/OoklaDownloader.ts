@@ -5,7 +5,8 @@
 
 import { EventEmitter } from 'events';
 import * as crypto from 'crypto';
-import { Logger, OoklaServerConfig } from '../types/core';
+import { OoklaServerConfig } from '../types/core';
+import { Logger } from './Logger';
 
 export interface DownloadOptions {
   size: number;
@@ -45,6 +46,7 @@ export class OoklaDownloader extends EventEmitter {
     const streamId = `${connectionId}-${Date.now()}`;
     let bytesSent = 0;
     let destroyed = false;
+    const activeStreamsRef = this.activeStreams;
 
     // Create deterministic random generator if seed provided
     let rng: () => Buffer;
@@ -93,10 +95,10 @@ export class OoklaDownloader extends EventEmitter {
 
       destroy(): void {
         destroyed = true;
-        this.activeStreams.delete(streamId);
+        activeStreamsRef.delete(streamId);
       },
 
-      on(event: 'data' | 'end' | 'error', listener: (...args: unknown[]) => void): DownloadStream {
+      on(_event: 'data' | 'end' | 'error', _listener: (...args: unknown[]) => void): DownloadStream {
         // EventEmitter-like interface
         return stream;
       },
@@ -130,12 +132,13 @@ export class OoklaDownloader extends EventEmitter {
     switch (pattern) {
       case 'zeros':
         return Buffer.alloc(size, 0);
-      case 'compressible':
+      case 'compressible': {
         const buf = Buffer.alloc(size);
         for (let i = 0; i < size; i++) {
           buf[i] = i % 256;
         }
         return buf;
+      }
       case 'random':
       default:
         return rng().subarray(0, size);

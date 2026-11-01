@@ -4,12 +4,13 @@
  */
 
 import { EventEmitter } from 'events';
-import { Logger, IpTrackingConfig, IpStats, IpBucket } from '../types/core';
+import { IpTrackingConfig, IpStatsInternal, IpBucketInternal } from '../types/core';
+import { Logger } from './Logger';
 
 export class IpStatsManager extends EventEmitter {
   private config: IpTrackingConfig;
   private logger: Logger;
-  private ipStats: Map<string, IpStats> = new Map();
+  private ipStats: Map<string, IpStatsInternal> = new Map();
   private cleanupTimer?: NodeJS.Timeout;
   private gcTimer?: NodeJS.Timeout;
 
@@ -109,14 +110,14 @@ export class IpStatsManager extends EventEmitter {
   /**
    * Get statistics for a specific IP
    */
-  public getIpStats(ip: string): IpStats | undefined {
+  public getIpStats(ip: string): IpStatsInternal | undefined {
     return this.ipStats.get(ip);
   }
 
   /**
    * Get top IPs by connection count
    */
-  public getTopIps(count: number = this.config.metricTopIpCount): IpStats[] {
+  public getTopIps(count: number = this.config.metricTopIpCount): IpStatsInternal[] {
     return Array.from(this.ipStats.values())
       .filter(s => s.totalConnections > 0)
       .sort((a, b) => b.totalConnections - a.totalConnections)
@@ -126,7 +127,7 @@ export class IpStatsManager extends EventEmitter {
   /**
    * Get all IP statistics
    */
-  public getAllIpStats(): IpStats[] {
+  public getAllIpStats(): IpStatsInternal[] {
     return Array.from(this.ipStats.values());
   }
 
@@ -192,13 +193,13 @@ export class IpStatsManager extends EventEmitter {
    */
   public updateConfig(config: Partial<IpTrackingConfig>): void {
     this.config = { ...this.config, ...config };
-    this.logger.debug('IpStatsManager config updated', this.config);
+    this.logger.debug('IpStatsManager config updated', { ...this.config });
   }
 
   /**
    * Create initial stats for an IP
    */
-  private createInitialStats(ip: string, now: number): IpStats {
+  private createInitialStats(ip: string, now: number): IpStatsInternal {
     const bucketLengthMs = this.config.slidingWindowBucketLengthMinutes * 60 * 1000;
     const bucketIndex = Math.floor(now / bucketLengthMs);
 
@@ -217,7 +218,7 @@ export class IpStatsManager extends EventEmitter {
   /**
    * Get or create current bucket
    */
-  private getCurrentBucket(stats: IpStats, now: number): IpBucket {
+  private getCurrentBucket(stats: IpStatsInternal, now: number): IpBucketInternal {
     const bucketLengthMs = this.config.slidingWindowBucketLengthMinutes * 60 * 1000;
     const bucketIndex = Math.floor(now / bucketLengthMs);
 
@@ -232,13 +233,13 @@ export class IpStatsManager extends EventEmitter {
   /**
    * Clean up old buckets outside the sliding window
    */
-  private cleanupOldBuckets(stats: IpStats, now: number): void {
+  private cleanupOldBuckets(stats: IpStatsInternal, now: number): void {
     const windowMs = this.config.maxIdleAgeMinutes * 60 * 1000;
     const cutoffTime = now - windowMs;
     const bucketLengthMs = this.config.slidingWindowBucketLengthMinutes * 60 * 1000;
     const cutoffIndex = Math.floor(cutoffTime / bucketLengthMs);
 
-    for (const [index, bucket] of stats.buckets) {
+    for (const [index, _bucket] of stats.buckets) {
       if (index < cutoffIndex) {
         stats.buckets.delete(index);
       }
@@ -295,6 +296,22 @@ export class IpStatsManager extends EventEmitter {
    */
   public getConfig(): IpTrackingConfig {
     return { ...this.config };
+  }
+
+  /**
+   * Start the IP stats manager (timers are started in constructor)
+   */
+  public async start(): Promise<void> {
+    // Timers are already started in constructor
+    this.logger.debug('IpStatsManager started');
+  }
+
+  /**
+   * Stop the IP stats manager
+   */
+  public async stop(): Promise<void> {
+    this.destroy();
+    this.logger.debug('IpStatsManager stopped');
   }
 
   /**

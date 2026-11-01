@@ -7,7 +7,9 @@ import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { Logger, TLSCertificateConfig, TLSCertificateInfo } from '../types/core';
+import * as tls from 'tls';
+import { TLSCertificateConfig, TLSCertificateInfo } from '../types/core';
+import { Logger } from './Logger';
 
 const DEFAULT_CERT_DIR = '/etc/ooklaserver/certs';
 const CERT_FILE_NAME = 'server.pem';
@@ -27,7 +29,7 @@ export class TLSCertificateManager extends EventEmitter {
     super();
     this.config = config;
     this.logger = logger;
-    this.certDir = config.certDirectory || DEFAULT_CERT_DIR;
+    this.certDir = config.certPath ? path.dirname(config.certPath) : DEFAULT_CERT_DIR;
   }
 
   /**
@@ -126,12 +128,12 @@ export class TLSCertificateManager extends EventEmitter {
   /**
    * Create a self-signed certificate
    */
-  private createSelfSignedCert(publicKey: string, privateKey: string): string {
+  private createSelfSignedCert(_publicKey: string, _privateKey: string): string {
     // Simplified self-signed certificate creation
     // In production, this would use a proper X.509 library
-    const subject = `/CN=OoklaServer/O=Ookla/OU=Speedtest`;
-    const notBefore = new Date();
-    const notAfter = new Date(notBefore.getTime() + 365 * 24 * 60 * 60 * 1000); // 1 year
+    const _subject = `/CN=OoklaServer/O=Ookla/OU=Speedtest`;
+    const _notBefore = new Date();
+    const _notAfter = new Date(_notBefore.getTime() + 365 * 24 * 60 * 60 * 1000); // 1 year
 
     // This is a placeholder - real implementation would use forge or similar
     return `-----BEGIN CERTIFICATE-----\nMIID... (self-signed cert placeholder)\n-----END CERTIFICATE-----`;
@@ -151,6 +153,8 @@ export class TLSCertificateManager extends EventEmitter {
 
     const now = Date.now();
     const daysUntilExpiry = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+    const validFrom = new Date(now);
+    const validTo = new Date(expiresAt);
 
     return {
       certPem,
@@ -158,6 +162,8 @@ export class TLSCertificateManager extends EventEmitter {
       caPem,
       subject,
       issuer,
+      validFrom,
+      validTo,
       expiresAt,
       daysUntilExpiry,
       san,
@@ -177,7 +183,7 @@ export class TLSCertificateManager extends EventEmitter {
   /**
    * Extract subject from certificate DER
    */
-  private extractSubject(der: Buffer): string {
+  private extractSubject(_der: Buffer): string {
     // Simplified - real implementation would parse ASN.1
     return 'CN=OoklaServer,O=Ookla,OU=Speedtest';
   }
@@ -185,7 +191,7 @@ export class TLSCertificateManager extends EventEmitter {
   /**
    * Extract issuer from certificate DER
    */
-  private extractIssuer(der: Buffer): string {
+  private extractIssuer(_der: Buffer): string {
     // Simplified
     return 'CN=OoklaServer,O=Ookla,OU=Speedtest';
   }
@@ -193,7 +199,7 @@ export class TLSCertificateManager extends EventEmitter {
   /**
    * Extract expiry from certificate DER
    */
-  private extractExpiry(der: Buffer): number {
+  private extractExpiry(_der: Buffer): number {
     // Simplified - return 1 year from now
     return Date.now() + 365 * 24 * 60 * 60 * 1000;
   }
@@ -201,7 +207,7 @@ export class TLSCertificateManager extends EventEmitter {
   /**
    * Extract Subject Alternative Names
    */
-  private extractSAN(der: Buffer): string[] {
+  private extractSAN(_der: Buffer): string[] {
     return ['localhost', '127.0.0.1', '::1'];
   }
 
@@ -223,8 +229,9 @@ export class TLSCertificateManager extends EventEmitter {
    * Check if certificate needs renewal
    */
   public needsRenewal(): boolean {
-    if (!this.certificate) return true;
-    return this.certificate.daysUntilExpiry <= CERT_RENEWAL_DAYS;
+    const cert = this.certificate;
+    if (!cert) return true;
+    return (cert.daysUntilExpiry ?? 0) <= CERT_RENEWAL_DAYS;
   }
 
   /**
@@ -276,7 +283,7 @@ export class TLSCertificateManager extends EventEmitter {
    * Get TLS credentials for server
    */
   public getCredentials(): { cert: string; key: string; ca?: string } | undefined {
-    if (!this.certificate) return undefined;
+    if (!this.certificate || !this.certificate.certPem || !this.certificate.keyPem) return undefined;
 
     return {
       cert: this.certificate.certPem,
@@ -288,11 +295,11 @@ export class TLSCertificateManager extends EventEmitter {
   /**
    * Create secure context for TLS server
    */
-  public createSecureContext(): crypto.SecureContext | undefined {
+  public createSecureContext(): tls.SecureContext | undefined {
     const creds = this.getCredentials();
     if (!creds) return undefined;
 
-    return crypto.createSecureContext({
+    return tls.createSecureContext({
       cert: creds.cert,
       key: creds.key,
       ca: creds.ca,
@@ -305,6 +312,14 @@ export class TLSCertificateManager extends EventEmitter {
   public updateConfig(config: Partial<TLSCertificateConfig>): void {
     this.config = { ...this.config, ...config };
     this.logger.debug('TLSCertificateManager config updated');
+  }
+
+  /**
+   * Stop the certificate manager
+   */
+  public async stop(): Promise<void> {
+    this.destroy();
+    this.logger.debug('TLSCertificateManager stopped');
   }
 
   /**

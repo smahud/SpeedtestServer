@@ -4,7 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { Logger, OoklaServerConfig, ServerMetrics, BinaryInfo } from '../types/core';
+import { OoklaServerConfig, ServerMetrics, BinaryInfo } from '../types/core';
+import { Logger } from './Logger';
 
 const HOST_API_URL = 'https://host-api.speedtest.net';
 const METRICS_UPLOAD_INTERVAL = 60 * 1000; // 1 minute
@@ -58,7 +59,7 @@ export class MetricsUploader extends EventEmitter {
    * Record metrics snapshot
    */
   public recordMetrics(metrics: ServerMetrics): void {
-    metrics.timestamp = Date.now();
+    metrics.timestamp = new Date();
     this.metricsBuffer.push(metrics);
 
     // Keep buffer size manageable
@@ -68,7 +69,7 @@ export class MetricsUploader extends EventEmitter {
 
     // Clean old metrics
     const cutoff = Date.now() - METRICS_RETENTION_MS;
-    this.metricsBuffer = this.metricsBuffer.filter(m => m.timestamp > cutoff);
+    this.metricsBuffer = this.metricsBuffer.filter(m => m.timestamp.getTime() > cutoff);
   }
 
   /**
@@ -91,7 +92,7 @@ export class MetricsUploader extends EventEmitter {
     this.metricsBuffer = [];
 
     try {
-      const payload = this.buildPayload(metricsToUpload);
+      const _payload = this.buildPayload(metricsToUpload);
 
       // In production, this would POST to the host API
       // await this.postToHostApi(payload);
@@ -129,7 +130,7 @@ export class MetricsUploader extends EventEmitter {
         arch: this.binaryInfo.architecture,
       },
       metrics: metrics.map(m => ({
-        timestamp: m.timestamp,
+        timestamp: m.timestamp.getTime(),
         connections: m.connections,
         bandwidth: m.bandwidth,
         latency: m.latency,
@@ -189,6 +190,53 @@ export class MetricsUploader extends EventEmitter {
    */
   public updateBinaryInfo(binaryInfo: BinaryInfo): void {
     this.binaryInfo = binaryInfo;
+  }
+
+  /**
+   * Collect current metrics
+   */
+  public collectMetrics(): ServerMetrics {
+    // Return the latest metrics or create a new one
+    if (this.metricsBuffer.length > 0) {
+      return this.metricsBuffer[this.metricsBuffer.length - 1];
+    }
+    // Return empty metrics
+    return {
+      uniqueTests: 0,
+      unidentifiedTests: 0,
+      sentBytes: 0,
+      receivedBytes: 0,
+      sentBytesTotal: 0,
+      receivedBytesTotal: 0,
+      congestionControl: 'cubic',
+      availableCongestionControl: ['cubic', 'reno'],
+      windowScaling: true,
+      numFiles: 0,
+      disabled: 0,
+      established: 0,
+      blocked: 0,
+      connectionSeconds: 0,
+      maxConcurrent: 0,
+      listeningAddresses: [],
+      exceededMaxDuration: 0,
+      cpuModelName: '',
+      loadAverage10Mins: 0,
+      runningProcesses: 0,
+      totalProcesses: 0,
+      cpus: 0,
+      fdSize: 0,
+      numThreads: 0,
+      vmSize: 0,
+      vmRss: 0,
+      timestamp: new Date(),
+    };
+  }
+
+  /**
+   * Upload metrics now
+   */
+  public async uploadNow(): Promise<void> {
+    await this.forceUpload();
   }
 
   /**
