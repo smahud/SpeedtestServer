@@ -1,0 +1,4 @@
+
+Symbol table '.dynsym' contains 1 entry:
+   Jumlah: Nilai          Ukuran Tipe  Bind   Vis      Ndx Nama
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 

@@ -1,0 +1,1 @@
+nm: /root/project/OoklaServer/OoklaServer-linux-x86_64: tidak ada simbol
