@@ -1,0 +1,542 @@
+Breakpoint 1 at 0xb52ebc
+Warning:
+Cannot insert breakpoint 1.
+Cannot access memory at address 0xb52ebc
+
+#0  0x00007ffff709fc35 in ?? ()
+#1  0x0000000000000001 in ?? ()
+#2  0x00007fffffffe9fc in ?? ()
+#3  0x0000000000000000 in ?? ()
+rax            0x0                 0
+rbx            0x0                 0
+rcx            0x0                 0
+rdx            0x0                 0
+rsi            0x0                 0
+rdi            0x0                 0
+rbp            0x0                 0x0
+rsp            0x7fffffffe720      0x7fffffffe720
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+r13            0x0                 0
+r14            0x0                 0
+r15            0x0                 0
+rip            0x7ffff709fc35      0x7ffff709fc35
+eflags         0x200               [ IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+=> 0x7ffff709fc35:	xor    rbp,rbp
+   0x7ffff709fc38:	mov    rdi,rsp
+   0x7ffff709fc3b:	lea    rsi,[rip+0xdfc4fe]        # 0x7ffff7e9c140
+   0x7ffff709fc42:	and    rsp,0xfffffffffffffff0
+   0x7ffff709fc46:	call   0x7ffff709fc4b
+   0x7ffff709fc4b:	sub    rsp,0x190
+   0x7ffff709fc52:	mov    eax,DWORD PTR [rdi]
+   0x7ffff709fc54:	mov    r8,rdi
+   0x7ffff709fc57:	mov    rcx,rsi
+   0x7ffff709fc5a:	inc    eax
+   0x7ffff709fc5c:	cdqe
+   0x7ffff709fc5e:	mov    rsi,QWORD PTR [r8+rax*8+0x8]
+   0x7ffff709fc63:	mov    rdx,rax
+   0x7ffff709fc66:	inc    rax
+   0x7ffff709fc69:	test   rsi,rsi
+   0x7ffff709fc6c:	jne    0x7ffff709fc5e
+   0x7ffff709fc6e:	lea    rdx,[r8+rdx*8+0x10]
+   0x7ffff709fc73:	xor    eax,eax
+   0x7ffff709fc75:	mov    QWORD PTR [rsp+rax*8-0x78],0x0
+   0x7ffff709fc7e:	inc    rax
+Breakpoint 1 at 0x29fc35
+Warning:
+Cannot insert breakpoint 1.
+Cannot access memory at address 0x29fc35
+
+Warning:
+Cannot insert breakpoint 1.
+Cannot access memory at address 0x29fc35
+
+Command aborted.
+Warning:
+Cannot insert breakpoint 1.
+Cannot access memory at address 0x29fc35
+
+Command aborted.
+Warning:
+Cannot insert breakpoint 1.
+Cannot access memory at address 0x29fc35
+
+Command aborted.
+#0  0x00007ffff709fc35 in ?? ()
+#1  0x0000000000000001 in ?? ()
+#2  0x00007fffffffe9fc in ?? ()
+#3  0x0000000000000000 in ?? ()
+rip            0x7ffff709fc35      0x7ffff709fc35
+No current process: you must name one.
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+rip            0x7ffff709fc35      0x7ffff709fc35
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+process 40349
+Mapped address spaces:
+
+          Start Addr           End Addr       Size     Offset  Perms  objfile
+      0x7ffff6e00000     0x7ffff6ee9000    0xe9000        0x0  r--p   /root/project/OoklaServer/OoklaServer-linux-x86_64
+      0x7ffff7000000     0x7ffff795c000   0x95c000   0x200000  r-xp   /root/project/OoklaServer/OoklaServer-linux-x86_64
+      0x7ffff7a00000     0x7ffff7c00000   0x200000   0xc00000  r--p   /root/project/OoklaServer/OoklaServer-linux-x86_64
+      0x7ffff7dff000     0x7ffff7ed5000    0xd6000   0xdff000  rw-p   /root/project/OoklaServer/OoklaServer-linux-x86_64
+      0x7ffff7ed5000     0x7ffff7ee1000     0xc000        0x0  rw-p   
+      0x7ffff7ff9000     0x7ffff7ffd000     0x4000        0x0  r--p   [vvar]
+      0x7ffff7ffd000     0x7ffff7fff000     0x2000        0x0  r-xp   [vdso]
+      0x7ffffffde000     0x7ffffffff000    0x21000        0x0  rw-p   [stack]
+rip            0x7ffff709fc35      0x7ffff709fc35
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Breakpoint 1 at 0x7ffff79445f0
+
+Breakpoint 1, 0x00007ffff79445f0 in ?? ()
+#0  0x00007ffff79445f0 in ?? ()
+#1  0x00007ffff709fec1 in ?? ()
+#2  0x0000000000000001 in ?? ()
+#3  0x00007ffff79452ff in ?? ()
+#4  0x00007ffff7096250 in ?? ()
+#5  0x00007ffff7945324 in ?? ()
+#6  0x00007ffff7945307 in ?? ()
+#7  0x0000000000000000 in ?? ()
+rax            0x1                 1
+rbx            0x7ffff7dff2b0      140737352037040
+rcx            0x0                 0
+rdx            0x9e9a2203          2660901379
+rsi            0x7ffff7ed41e0      140737352909280
+rdi            0x7ffff7b20958      140737349028184
+rbp            0x7fffffffe6d0      0x7fffffffe6d0
+rsp            0x7fffffffe6c8      0x7fffffffe6c8
+r8             0x7ffff7096250      140737337975376
+r9             0x9e9a220300000000  -7018259673023250432
+r10            0x5f8bfbff          1603009535
+r11            0xd                 13
+r12            0x7fffffffe728      140737488348968
+r13            0x7fffffffe738      140737488348984
+r14            0x0                 0
+r15            0x0                 0
+rip            0x7ffff79445f0      0x7ffff79445f0
+eflags         0x206               [ PF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Breakpoint 1 at 0x7ffff7952af5
+Breakpoint 2 at 0x7ffff7952ebc
+
+Breakpoint 1, 0x00007ffff7952af5 in ?? ()
+#0  0x00007ffff7952af5 in ?? ()
+#1  0x00007ffff794463b in ?? ()
+#2  0x00007ffff709fec1 in ?? ()
+#3  0x0000000000000001 in ?? ()
+#4  0x00007ffff79452ff in ?? ()
+#5  0x00007ffff7096250 in ?? ()
+#6  0x00007ffff7945324 in ?? ()
+#7  0x00007ffff7945307 in ?? ()
+#8  0x0000000000000000 in ?? ()
+rax            0x1                 1
+rbx            0x7ffff7ed41e0      140737352909280
+rcx            0x0                 0
+rdx            0x10                16
+rsi            0x7ffff7ed41e0      140737352909280
+rdi            0x7ffff7ede580      140737352951168
+rbp            0x7ffff7ede580      0x7ffff7ede580
+rsp            0x7fffffffe6a8      0x7fffffffe6a8
+r8             0x7ffff7096250      140737337975376
+r9             0x9e9a220300000000  -7018259673023250432
+r10            0x5f8bfbff          1603009535
+r11            0xd                 13
+r12            0x7fffffffe728      140737488348968
+r13            0x7fffffffe738      140737488348984
+r14            0x0                 0
+r15            0x0                 0
+rip            0x7ffff7952af5      0x7ffff7952af5
+eflags         0x202               [ IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+
+Breakpoint 2, 0x00007ffff7952ebc in ?? ()
+#0  0x00007ffff7952ebc in ?? ()
+#1  0x00007ffff709fec1 in ?? ()
+#2  0x0000000000000001 in ?? ()
+#3  0x00007ffff79452ff in ?? ()
+#4  0x00007ffff7096250 in ?? ()
+#5  0x00007ffff7945324 in ?? ()
+#6  0x00007ffff7945307 in ?? ()
+#7  0x0000000000000000 in ?? ()
+rax            0x0                 0
+rbx            0x7ffff7dff2b0      140737352037040
+rcx            0x0                 0
+rdx            0x10                16
+rsi            0x7ffff7ed41e0      140737352909280
+rdi            0x7ffff7ede580      140737352951168
+rbp            0x7fffffffe6d0      0x7fffffffe6d0
+rsp            0x7fffffffe6c8      0x7fffffffe6c8
+r8             0x7ffff7096250      140737337975376
+r9             0x9e9a220300000000  -7018259673023250432
+r10            0x5f8bfbff          1603009535
+r11            0xd                 13
+r12            0x7fffffffe728      140737488348968
+r13            0x7fffffffe738      140737488348984
+r14            0x0                 0
+r15            0x0                 0
+rip            0x7ffff7952ebc      0x7ffff7952ebc
+eflags         0x206               [ PF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Breakpoint 1 at 0x7ffff7952ebc
+
+Breakpoint 1, 0x00007ffff7952ebc in ?? ()
+0x00007ffff709fec1 in ?? ()
+#0  0x00007ffff709fec1 in ?? ()
+#1  0x0000000000000001 in ?? ()
+#2  0x00007ffff79452ff in ?? ()
+#3  0x00007ffff7096250 in ?? ()
+#4  0x00007ffff7945324 in ?? ()
+#5  0x00007ffff7945307 in ?? ()
+#6  0x0000000000000000 in ?? ()
+=> 0x7ffff709fec1:	pop    rbp
+   0x7ffff709fec2:	jmp    0x7ffff709fe00
+   0x7ffff709fec7:	nop    WORD PTR [rax+rax*1+0x0]
+   0x7ffff709fed0:	jmp    0x7ffff709fe00
+   0x7ffff709fed5:	cs nop WORD PTR [rax+rax*1+0x0]
+   0x7ffff709fedf:	nop
+   0x7ffff709fee0:	endbr64
+   0x7ffff709fee4:	push   rbp
+   0x7ffff709fee5:	mov    rbp,rsp
+   0x7ffff709fee8:	push   r15
+   0x7ffff709feea:	push   r14
+   0x7ffff709feec:	lea    r15,[rbp-0x60]
+   0x7ffff709fef0:	lea    r14,[rbp-0x90]
+   0x7ffff709fef7:	push   r13
+   0x7ffff709fef9:	mov    r13,r9
+   0x7ffff709fefc:	push   r12
+   0x7ffff709fefe:	push   rbx
+   0x7ffff709feff:	lea    rbx,[rbp-0x50]
+   0x7ffff709ff03:	sub    rsp,0x98
+   0x7ffff709ff0a:	mov    QWORD PTR [rbp-0x98],rdi
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Breakpoint 1 at 0x7ffff7952ebc
+
+Breakpoint 1, 0x00007ffff7952ebc in ?? ()
+0x00007ffff709fec1 in ?? ()
+
+Breakpoint 1, 0x00007ffff7952ebc in ?? ()
+#0  0x00007ffff7952ebc in ?? ()
+#1  0x00007ffff7353922 in ?? ()
+#2  0x00007ffff728d531 in ?? ()
+#3  0x00007ffff72a41d5 in ?? ()
+#4  0x00007ffff711104f in ?? ()
+#5  0x00007ffff7096295 in ?? ()
+#6  0x00007ffff794532e in ?? ()
+#7  0x00007ffff7945307 in ?? ()
+#8  0x0000000000000000 in ?? ()
+=> 0x7ffff7952ebc:	push   r15
+   0x7ffff7952ebe:	push   r14
+   0x7ffff7952ec0:	push   r13
+   0x7ffff7952ec2:	mov    r13,rdi
+   0x7ffff7952ec5:	push   r12
+   0x7ffff7952ec7:	push   rbp
+   0x7ffff7952ec8:	push   rbx
+   0x7ffff7952ec9:	sub    rsp,0x18
+   0x7ffff7952ecd:	mov    ecx,DWORD PTR [rdi]
+   0x7ffff7952ecf:	mov    r12d,DWORD PTR [rdi+0x8]
+   0x7ffff7952ed3:	mov    r14d,ecx
+   0x7ffff7952ed6:	mov    eax,ecx
+   0x7ffff7952ed8:	not    r14d
+   0x7ffff7952edb:	and    r14d,0x80
+   0x7ffff7952ee2:	and    eax,0xf
+   0x7ffff7952ee5:	mov    DWORD PTR [rsp],eax
+   0x7ffff7952ee8:	je     0x7ffff7952f87
+   0x7ffff7952eee:	mov    edx,DWORD PTR [rdi+0x4]
+   0x7ffff7952ef1:	mov    eax,0x1
+   0x7ffff7952ef6:	mov    rbp,QWORD PTR fs:0x0
+   0x7ffff7952eff:	mov    edi,edx
+   0x7ffff7952f01:	mov    r15,rbp
+   0x7ffff7952f04:	and    edi,0x3fffffff
+   0x7ffff7952f0a:	cmp    DWORD PTR [rbp+0x30],edi
+   0x7ffff7952f0d:	jne    0x7ffff7953029
+   0x7ffff7952f13:	mov    eax,ecx
+   0x7ffff7952f15:	and    eax,0x3
+   0x7ffff7952f18:	dec    eax
+   0x7ffff7952f1a:	jne    0x7ffff7952f2f
+   0x7ffff7952f1c:	mov    eax,DWORD PTR [r13+0x14]
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Breakpoint 1 at 0x7ffff7952ebc
+
+Breakpoint 1, 0x00007ffff7952ebc in ?? ()
+
+Breakpoint 1, 0x00007ffff7952ebc in ?? ()
+
+Breakpoint 1, 0x00007ffff7952ebc in ?? ()
+
+Breakpoint 1, 0x00007ffff7952ebc in ?? ()
+
+Breakpoint 1, 0x00007ffff7952ebc in ?? ()
+#0  0x00007ffff7952ebc in ?? ()
+#1  0x00007ffff7353229 in ?? ()
+#2  0x00007ffff728d261 in ?? ()
+#3  0x00007ffff728d595 in ?? ()
+#4  0x00007ffff72a41d5 in ?? ()
+#5  0x00007ffff711104f in ?? ()
+#6  0x00007ffff7096295 in ?? ()
+#7  0x00007ffff794532e in ?? ()
+#8  0x00007ffff7945307 in ?? ()
+#9  0x0000000000000000 in ?? ()
+rip            0x7ffff7952ebc      0x7ffff7952ebc
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Function "main" not defined.
+Make breakpoint pending on future shared library load? (y or [n]) [answered N; input not from terminal]
+[New LWP 40730]
+[New LWP 40731]
+[New LWP 40732]
+[New LWP 40733]
+No config file found; using defaults
+2026-11-02 14:30:13 [40729 - 0] [Information] OoklaServer version 2.11 (2.11.5.2) build number 2026-06-04.1737.7d0993d
+2026-11-02 14:30:13 [40729 - 0] [Information] OoklaServer instance ID 0c59a34c-e45e-4083-9fd0-51a292b74ccb
+[New LWP 40734]
+[New LWP 40735]
+[Detaching after fork from child process 40736]
+No config file found; using defaults
+2026-11-02 14:30:13 [40736 - 0] [Information] OoklaServer version 2.11 (2.11.5.2) build number 2026-06-04.1737.7d0993d
+2026-11-02 14:30:13 [40736 - 0] [Information] OoklaServer instance ID 0c59a34c-e45e-4083-9fd0-51a292b74ccb
+2026-11-02 14:30:13 [40736 - 0] [Information] Generating 2097152 bytes of download data
+2026-11-02 14:30:13 [40736 - 0] [Information] Listening on TCP socket: 0.0.0.0:5060
+2026-11-02 14:30:13 [40736 - 0] [Information] Listening on TCP socket: 0.0.0.0:8080
+2026-11-02 14:30:13 [40736 - 1] [Information] Listening on UDP socket: 0.0.0.0:5060
+2026-11-02 14:30:13 [40736 - 2] [Information] Listening on UDP socket: 0.0.0.0:8080
+2026-11-02 14:30:13 [40736 - 43] [Information] Generating self-signed certificate
+2026-11-02 14:30:13 [40736 - 0] [Information] TCP port: 5060 - current: 0, queued: 0, blocked: 0, queueFull: 0, concurrent: 0, currentThreads: 0
+TCP port: 8080 - current: 0, queued: 0, blocked: 0, queueFull: 0, concurrent: 0, currentThreads: 0
+2026-11-02 14:30:13 [40736 - 44] [Information] CA bundle is empty; skipping
+2026-11-02 14:30:14 [40736 - 43] [Information] No configuration setting for minimumTLSProtocol found. Defaulting to 1.2
+2026-11-02 14:30:14 [40736 - 43] [Information] Server is configured to require minimum TLS version of 1.2
+2026-11-02 14:30:14 [40736 - 43] [Information] CA bundle is empty; skipping
+2026-11-02 14:30:14 [40736 - 43] [Information] TLS context initialized using self-signed certificate <68:cb:66:39:7e:67:c0:e6:d1:98:4c:10:18:88:7c:d5:02:b6:df:2d>
+2026-11-02 14:30:14 [40736 - 43] [Information] CA bundle is empty; skipping
+2026-11-02 14:30:14 [40736 - 43] [Information] CA bundle is empty; skipping
+2026-11-02 14:30:14 [40736 - 43] [Error] Failed to generate LE certificate: Application exception: Invalid response (401) from certificate server: Unauthorized
+Exception ignored in: <gdb._GdbFile object at 0x7f380c255390>
+Traceback (most recent call last):
+  File "/usr/share/gdb/python/gdb/__init__.py", line 56, in flush
+    def flush(self):
+
+KeyboardInterrupt: 
+2026-11-02 14:30:28 [40736 - 4] [Information] The manager is down. Will attempt to restart.
+No config file found; using defaults
+2026-11-02 14:30:28 [40815 - 0] [Information] OoklaServer version 2.11 (2.11.5.2) build number 2026-06-04.1737.7d0993d
+2026-11-02 14:30:28 [40815 - 0] [Information] OoklaServer instance ID 0c59a34c-e45e-4083-9fd0-51a292b74ccb
+No config file found; using defaults
+2026-11-02 14:30:28 [40814 - 0] [Information] OoklaServer version 2.11 (2.11.5.2) build number 2026-06-04.1737.7d0993d
+2026-11-02 14:30:28 [40814 - 0] [Information] OoklaServer instance ID 0c59a34c-e45e-4083-9fd0-51a292b74ccb
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Breakpoint 1 at 0x7ffff709fda8
+
+Breakpoint 1, 0x00007ffff709fda8 in ?? ()
+#0  0x00007ffff709fda8 in ?? ()
+#1  0x00007ffff709fc4b in ?? ()
+#2  0x0000000000000001 in ?? ()
+#3  0x00007fffffffe9fc in ?? ()
+#4  0x0000000000000000 in ?? ()
+=> 0x7ffff709fda8:	lea    rdx,[rsi+0x8]
+   0x7ffff709fdac:	lea    r8,[rip+0x8bbff2]        # 0x7ffff795bda5
+   0x7ffff709fdb3:	mov    esi,DWORD PTR [rsi]
+   0x7ffff709fdb5:	xor    r9d,r9d
+   0x7ffff709fdb8:	lea    rcx,[rip+0xfffffffffff60241]        # 0x7ffff7000000
+   0x7ffff709fdbf:	lea    rdi,[rip+0xffffffffffff648a]        # 0x7ffff7096250
+   0x7ffff709fdc6:	jmp    0x7ffff7945335
+   0x7ffff709fdcb:	nop    DWORD PTR [rax+rax*1+0x0]
+   0x7ffff709fdd0:	lea    rdi,[rip+0xe34359]        # 0x7ffff7ed4130
+   0x7ffff709fdd7:	lea    rax,[rip+0xe34352]        # 0x7ffff7ed4130
+   0x7ffff709fdde:	cmp    rax,rdi
+   0x7ffff709fde1:	je     0x7ffff709fdf8
+   0x7ffff709fde3:	mov    rax,0x0
+   0x7ffff709fdea:	test   rax,rax
+   0x7ffff709fded:	je     0x7ffff709fdf8
+   0x7ffff709fdef:	jmp    rax
+   0x7ffff709fdf1:	nop    DWORD PTR [rax+0x0]
+   0x7ffff709fdf8:	ret
+   0x7ffff709fdf9:	nop    DWORD PTR [rax+0x0]
+   0x7ffff709fe00:	lea    rdi,[rip+0xe34329]        # 0x7ffff7ed4130
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Breakpoint 1 at 0x7ffff7096250
+
+Breakpoint 1, 0x00007ffff7096250 in ?? ()
+#0  0x00007ffff7096250 in ?? ()
+#1  0x00007ffff794532e in ?? ()
+#2  0x00007ffff7945307 in ?? ()
+#3  0x0000000000000000 in ?? ()
+=> 0x7ffff7096250:	endbr64
+   0x7ffff7096254:	push   rbp
+   0x7ffff7096255:	mov    rbp,rsp
+   0x7ffff7096258:	push   r14
+   0x7ffff709625a:	push   r13
+   0x7ffff709625c:	push   r12
+   0x7ffff709625e:	sub    rsp,0x1000
+   0x7ffff7096265:	or     QWORD PTR [rsp],0x0
+   0x7ffff709626a:	sub    rsp,0x318
+   0x7ffff7096271:	mov    rax,QWORD PTR fs:0x28
+   0x7ffff709627a:	mov    QWORD PTR [rbp-0x28],rax
+   0x7ffff709627e:	xor    eax,eax
+   0x7ffff7096280:	lea    r12,[rbp-0x1330]
+   0x7ffff7096287:	mov    r13d,edi
+   0x7ffff709628a:	mov    r14,rsi
+   0x7ffff709628d:	mov    rdi,r12
+   0x7ffff7096290:	call   0x7ffff7111020
+   0x7ffff7096295:	mov    rdx,r14
+   0x7ffff7096298:	mov    esi,r13d
+   0x7ffff709629b:	mov    rdi,r12
+   0x7ffff709629e:	call   0x7ffff72a46f0
+   0x7ffff70962a3:	mov    rdi,r12
+   0x7ffff70962a6:	mov    r13d,eax
+   0x7ffff70962a9:	call   0x7ffff71121e0
+   0x7ffff70962ae:	mov    rax,QWORD PTR [rbp-0x28]
+   0x7ffff70962b2:	sub    rax,QWORD PTR fs:0x28
+   0x7ffff70962bb:	jne    0x7ffff70962cf
+   0x7ffff70962bd:	add    rsp,0x1318
+   0x7ffff70962c4:	mov    eax,r13d
+   0x7ffff70962c7:	pop    r12
+
+Program stopped.
+0x00007ffff709fc35 in ?? ()
+Breakpoint 1 at 0x7ffff7096250
+
+Breakpoint 1, 0x00007ffff7096250 in ?? ()
+=> 0x7ffff7096250:	endbr64
+   0x7ffff7096254:	push   rbp
+   0x7ffff7096255:	mov    rbp,rsp
+   0x7ffff7096258:	push   r14
+   0x7ffff709625a:	push   r13
+   0x7ffff709625c:	push   r12
+   0x7ffff709625e:	sub    rsp,0x1000
+   0x7ffff7096265:	or     QWORD PTR [rsp],0x0
+   0x7ffff709626a:	sub    rsp,0x318
+   0x7ffff7096271:	mov    rax,QWORD PTR fs:0x28
+   0x7ffff709627a:	mov    QWORD PTR [rbp-0x28],rax
+   0x7ffff709627e:	xor    eax,eax
+   0x7ffff7096280:	lea    r12,[rbp-0x1330]
+   0x7ffff7096287:	mov    r13d,edi
+   0x7ffff709628a:	mov    r14,rsi
+   0x7ffff709628d:	mov    rdi,r12
+   0x7ffff7096290:	call   0x7ffff7111020
+   0x7ffff7096295:	mov    rdx,r14
+   0x7ffff7096298:	mov    esi,r13d
+   0x7ffff709629b:	mov    rdi,r12
+   0x7ffff709629e:	call   0x7ffff72a46f0
+   0x7ffff70962a3:	mov    rdi,r12
+   0x7ffff70962a6:	mov    r13d,eax
+   0x7ffff70962a9:	call   0x7ffff71121e0
+   0x7ffff70962ae:	mov    rax,QWORD PTR [rbp-0x28]
+   0x7ffff70962b2:	sub    rax,QWORD PTR fs:0x28
+   0x7ffff70962bb:	jne    0x7ffff70962cf
+   0x7ffff70962bd:	add    rsp,0x1318
+   0x7ffff70962c4:	mov    eax,r13d
+   0x7ffff70962c7:	pop    r12
+   0x7ffff70962c9:	pop    r13
+   0x7ffff70962cb:	pop    r14
+   0x7ffff70962cd:	pop    rbp
+   0x7ffff70962ce:	ret
+   0x7ffff70962cf:	call   0x7ffff79453b0
+   0x7ffff70962d4:	endbr64
+   0x7ffff70962d8:	mov    r13,rax
+   0x7ffff70962db:	mov    r14,rdx
+   0x7ffff70962de:	jmp    0x7ffff70148b8
+   0x7ffff70962e3:	endbr64
+   0x7ffff70962e7:	mov    rdi,rax
+   0x7ffff70962ea:	mov    rax,rdx
+   0x7ffff70962ed:	jmp    0x7ffff70148c6
+   0x7ffff70962f2:	data16 cs nop WORD PTR [rax+rax*1+0x0]
+   0x7ffff70962fd:	nop    DWORD PTR [rax]
+   0x7ffff7096300:	endbr64
+   0x7ffff7096304:	push   rbp
+   0x7ffff7096305:	mov    rbp,rsp
+   0x7ffff7096308:	push   r15
+   0x7ffff709630a:	mov    r15,rdi
+   0x7ffff709630d:	push   r14
+   0x7ffff709630f:	push   r13
+   0x7ffff7096311:	push   r12
+   0x7ffff7096313:	push   rbx
+   0x7ffff7096314:	sub    rsp,0x1c8
+   0x7ffff709631b:	mov    rdi,QWORD PTR [rdi+0x1008]
+   0x7ffff7096322:	mov    rax,QWORD PTR fs:0x28
+   0x7ffff709632b:	mov    QWORD PTR [rbp-0x38],rax
+   0x7ffff709632f:	xor    eax,eax
+   0x7ffff7096331:	call   0x7ffff79551e2
+   0x7ffff7096336:	cmp    BYTE PTR [r15+0x4c8],0x0
+   0x7ffff709633e:	jne    0x7ffff70966e6
+   0x7ffff7096344:	cmp    BYTE PTR [r15+0x4c9],0x0
+   0x7ffff709634c:	jne    0x7ffff7097012
+   0x7ffff7096352:	cmp    BYTE PTR [r15+0x4cb],0x0
+   0x7ffff709635a:	jne    0x7ffff70970b5
+   0x7ffff7096360:	cmp    BYTE PTR [r15+0x4cc],0x0
+   0x7ffff7096368:	jne    0x7ffff7096719
+   0x7ffff709636e:	cmp    BYTE PTR [r15+0x4cd],0x0
+   0x7ffff7096376:	jne    0x7ffff7096f8c
+   0x7ffff709637c:	cmp    BYTE PTR [r15+0x4ca],0x0
+   0x7ffff7096384:	jne    0x7ffff70967f8
+   0x7ffff709638a:	mov    r12,QWORD PTR [r15+0xa8]
+   0x7ffff7096391:	test   r12,r12
+   0x7ffff7096394:	je     0x7ffff7097fec
+   0x7ffff709639a:	lea    rbx,[rbp-0xa0]
+   0x7ffff70963a1:	lea    r14,[rbp-0xc0]
+   0x7ffff70963a8:	mov    rdi,rbx
+   0x7ffff70963ab:	mov    QWORD PTR [rbp-0x1c8],rbx
+   0x7ffff70963b2:	call   0x7ffff71a2a10
+   0x7ffff70963b7:	mov    rdi,r14
+   0x7ffff70963ba:	call   0x7ffff71a29d0
+   0x7ffff70963bf:	lea    rax,[rbp-0xe0]
+   0x7ffff70963c6:	mov    rdi,rax
+   0x7ffff70963c9:	mov    QWORD PTR [rbp-0x1e8],rax
+   0x7ffff70963d0:	call   0x7ffff71a3690
+   0x7ffff70963d5:	lea    r13,[rbp-0x80]
+   0x7ffff70963d9:	lea    rsi,[rip+0x96e950]        # 0x7ffff7a04d30
+   0x7ffff70963e0:	mov    rdi,r13
+   0x7ffff70963e3:	call   0x7ffff7101f00
+   0x7ffff70963e8:	mov    rdx,QWORD PTR [rbp-0x1e8]
+   0x7ffff70963ef:	mov    r8,rbx
+   0x7ffff70963f2:	mov    rcx,r14
+   0x7ffff70963f5:	mov    rsi,r13
+   0x7ffff70963f8:	mov    rdi,r12
+   0x7ffff70963fb:	call   0x7ffff7128760
+   0x7ffff7096400:	mov    rdi,QWORD PTR [rbp-0x80]
+   0x7ffff7096404:	lea    rax,[rbp-0x70]
+   0x7ffff7096408:	mov    QWORD PTR [rbp-0x1b8],rax
+   0x7ffff709640f:	cmp    rdi,rax
