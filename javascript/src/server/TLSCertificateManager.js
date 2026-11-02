@@ -1,7 +1,7 @@
 /**
  * TLS Certificate Manager - Handles SSL/TLS certificates for secure connections
  * Based on reverse engineering of OoklaServer TLSCertificateManager.cpp
- * JavaScript implementation
+ * JavaScript implementation with proper certificate generation using node-forge
  */
 
 const EventEmitter = require('events');
@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const tls = require('tls');
+const forge = require('node-forge');
 const { Logger } = require('./Logger');
 
 const DEFAULT_CERT_DIR = '/etc/ooklaserver/certs';
@@ -87,55 +88,99 @@ class TLSCertificateManager extends EventEmitter {
     const certPath = path.join(this.certDir, CERT_FILE_NAME);
     const keyPath = path.join(this.certDir, KEY_FILE_NAME);
 
-    // Generate key pair
-    const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-      modulusLength: 2048,
-      publicKeyEncoding: { type: 'spki', format: 'pem' },
-      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
-    });
+    // Generate key pair using forge
+    const keys = forge.pki.rsa.generateKeyPair(2048);
 
     // Create self-signed certificate
-    const cert = this.createSelfSignedCert(publicKey, privateKey);
+    const cert = forge.pki.createCertificate();
+    cert.publicKey = keys.publicKey;
+    cert.serialNumber = '01';
+    cert.validity.notBefore = new Date();
+    cert.validity.notAfter = new Date();
+    cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1);
+
+    const attrs = [{
+      name: 'commonName',
+      value: 'OoklaServer'
+    }, {
+      name: 'organizationName',
+      value: 'Ookla'
+    }, {
+      name: 'organizationalUnitName',
+      value: 'Speedtest'
+    }, {
+      name: 'countryName',
+      value: 'US'
+    }];
+
+    cert.setSubject(attrs);
+    cert.setIssuer(attrs);
+
+    // Add extensions
+    cert.setExtensions([{
+      name: 'basicConstraints',
+      cA: true
+    }, {
+      name: 'keyUsage',
+      keyCertSign: true,
+      digitalSignature: true,
+      nonRepudiation: true,
+      keyEncipherment: true,
+      dataEncipherment: true
+    }, {
+      name: 'extKeyUsage',
+      serverAuth: true,
+      clientAuth: true
+    }, {
+      name: 'subjectAltName',
+      altNames: [{
+        type: 2, // DNS
+        value: 'localhost'
+      }, {
+        type: 2,
+        value: '127.0.0.1'
+      }, {
+        type: 2,
+        value: '::1'
+      }]
+    }]);
+
+    // Sign certificate
+    cert.sign(keys.privateKey, forge.md.sha256.create());
+
+    // Convert to PEM
+    const certPem = forge.pki.certificateToPem(cert);
+    const keyPem = forge.pki.privateKeyToPem(keys.privateKey);
 
     // Write files
-    fs.writeFileSync(keyPath, privateKey, { mode: 0o600 });
-    fs.writeFileSync(certPath, cert, { mode: 0o644 });
+    fs.writeFileSync(keyPath, keyPem, { mode: 0o600 });
+    fs.writeFileSync(certPath, certPem, { mode: 0o644 });
 
-    this.certificate = this.parseCertificate(cert, privateKey);
+    this.certificate = this.parseCertificate(certPem, keyPem);
 
     this.logger.info('Self-signed certificate generated', {
       subject: this.certificate.subject,
+      issuer: this.certificate.issuer,
       expiresAt: this.certificate.expiresAt,
+      daysUntilExpiry: this.certificate.daysUntilExpiry,
     });
 
     this.emit('certificateGenerated', this.certificate);
     return this.certificate;
   }
 
-  createSelfSignedCert(_publicKey, _privateKey) {
-    // Simplified self-signed certificate creation
-    // In production, this would use a proper X.509 library
-    const _subject = '/CN=OoklaServer/O=Ookla/OU=Speedtest';
-    const _notBefore = new Date();
-    const _notAfter = new Date(_notBefore.getTime() + 365 * 24 * 60 * 60 * 1000); // 1 year
-
-    // This is a placeholder - real implementation would use forge or similar
-    return `-----BEGIN CERTIFICATE-----\nMIID... (self-signed cert placeholder)\n-----END CERTIFICATE-----`;
-  }
-
   parseCertificate(certPem, keyPem, caPem) {
-    // Extract certificate details from PEM
-    // In production, use a proper X.509 parser like 'x509' or 'forge'
-    const certDer = this.pemToDer(certPem);
-    const subject = this.extractSubject(certDer);
-    const issuer = this.extractIssuer(certDer);
-    const expiresAt = this.extractExpiry(certDer);
-    const san = this.extractSAN(certDer);
+    const cert = forge.pki.certificateFromPem(certPem);
+    const certDer = forge.asn1.toDer(forge.pki.certificateToAsn1(cert)).getBytes();
+    const subject = cert.subject.attributes.map(a => `${a.name}=${a.value}`).join(',');
+    const issuer = cert.issuer.attributes.map(a => `${a.name}=${a.value}`).join(',');
+    const expiresAt = cert.validity.notAfter.getTime();
+    const san = cert.getExtension('subjectAltName')?.altNames.map(n => n.value) || ['localhost', '127.0.0.1', '::1'];
 
     const now = Date.now();
     const daysUntilExpiry = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
-    const validFrom = new Date(now);
-    const validTo = new Date(expiresAt);
+    const validFrom = new Date(cert.validity.notBefore);
+    const validTo = new Date(cert.validity.notAfter);
 
     return {
       certPem,
@@ -149,36 +194,8 @@ class TLSCertificateManager extends EventEmitter {
       daysUntilExpiry,
       san,
       isSelfSigned: subject === issuer,
-      fingerprint: this.computeFingerprint(certDer),
+      fingerprint: crypto.createHash('sha256').update(certDer).digest('hex'),
     };
-  }
-
-  pemToDer(pem) {
-    const b64 = pem.replace(/-----(BEGIN|END) CERTIFICATE-----/g, '').replace(/\s/g, '');
-    return Buffer.from(b64, 'base64');
-  }
-
-  extractSubject(_der) {
-    // Simplified - real implementation would parse ASN.1
-    return 'CN=OoklaServer,O=Ookla,OU=Speedtest';
-  }
-
-  extractIssuer(_der) {
-    // Simplified
-    return 'CN=OoklaServer,O=Ookla,OU=Speedtest';
-  }
-
-  extractExpiry(_der) {
-    // Simplified - return 1 year from now
-    return Date.now() + 365 * 24 * 60 * 60 * 1000;
-  }
-
-  extractSAN(_der) {
-    return ['localhost', '127.0.0.1', '::1'];
-  }
-
-  computeFingerprint(der) {
-    return crypto.createHash('sha256').update(der).digest('hex');
   }
 
   getCertificate() {
@@ -193,9 +210,6 @@ class TLSCertificateManager extends EventEmitter {
 
   async renewCertificate() {
     this.logger.info('Renewing TLS certificate...');
-
-    // In production, this would integrate with ACME/Let's Encrypt
-    // For now, regenerate self-signed
     return this.generateSelfSignedCertificate();
   }
 
@@ -207,7 +221,7 @@ class TLSCertificateManager extends EventEmitter {
           this.logger.error('Certificate renewal failed', { error });
         });
       }
-    }, 24 * 60 * 60 * 1000); // Check daily
+    }, 24 * 60 * 60 * 1000);
   }
 
   startCertWatcher() {

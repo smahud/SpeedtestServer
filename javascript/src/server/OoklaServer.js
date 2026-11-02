@@ -47,7 +47,8 @@ class OoklaServer extends EventEmitter {
       this.logger,
       this.authValidator,
       this.connectionTracker,
-      this.ipStatsManager
+      this.ipStatsManager,
+      this.tlsManager
     );
     this.downloader = new OoklaDownloader(this.config, this.logger);
     this.tracerouteManager = new TracerouteManager(

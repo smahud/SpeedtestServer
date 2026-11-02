@@ -88,7 +88,7 @@ export class OoklaServer extends EventEmitter {
     this.ipStatsManager = new IpStatsManager(this.config.ipTracking, this.logger);
     this.metricsUploader = new MetricsUploader(this.config, this.logger, this.binaryManager.getCurrentBinary());
     this.tlsManager = new TLSCertificateManager(this.config.tls || { enabled: false, certPath: '', keyPath: '' }, this.logger);
-    this.requestHandler = new OoklaRequestHandler(this.config, this.logger, this.authValidator, this.connectionTracker, this.ipStatsManager);
+    this.requestHandler = new OoklaRequestHandler(this.config, this.logger, this.authValidator, this.connectionTracker, this.ipStatsManager, this.tlsManager);
     this.downloader = new OoklaDownloader(this.config, this.logger);
     this.tracerouteManager = new TracerouteManager(this.config.traceroute || { enabled: this.config.performTraceroutes, maxHops: 30, timeout: 5000, maxConcurrent: 10 }, this.logger);
 
