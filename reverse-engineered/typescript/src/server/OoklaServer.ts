@@ -87,7 +87,20 @@ export class OoklaServer extends EventEmitter {
     this.connectionTracker = new ConnectionTracker(this.logger);
     this.ipStatsManager = new IpStatsManager(this.config.ipTracking, this.logger);
     this.metricsUploader = new MetricsUploader(this.config, this.logger, this.binaryManager.getCurrentBinary());
-    this.tlsManager = new TLSCertificateManager(this.config.tls || { enabled: false, certPath: '', keyPath: '' }, this.logger);
+    // Use SSL config for certificate file paths (certificateFile, privateKeyFile from properties)
+    this.tlsManager = new TLSCertificateManager({
+      enabled: this.config.tls?.enabled ?? false,
+      certPath: this.config.tls?.certPath,
+      keyPath: this.config.tls?.keyPath,
+      caPath: this.config.tls?.caPath,
+      autoGenerate: this.config.tls?.autoGenerate,
+      acme: this.config.tls?.acme,
+      publicKey: this.config.tls?.publicKey,
+      // Map SSL config properties
+      certificateFile: this.config.ssl?.certificateFile,
+      privateKeyFile: this.config.ssl?.privateKeyFile,
+      caFile: this.config.ssl?.caFile,
+    } as any, this.logger);
     this.requestHandler = new OoklaRequestHandler(this.config, this.logger, this.authValidator, this.connectionTracker, this.ipStatsManager, this.tlsManager);
     this.downloader = new OoklaDownloader(this.config, this.logger);
     this.tracerouteManager = new TracerouteManager(this.config.traceroute || { enabled: this.config.performTraceroutes, maxHops: 30, timeout: 5000, maxConcurrent: 10 }, this.logger);

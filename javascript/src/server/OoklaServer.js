@@ -41,7 +41,14 @@ class OoklaServer extends EventEmitter {
     this.connectionTracker = new ConnectionTracker(this.logger);
     this.ipStatsManager = new IpStatsManager(this.config.ipTracking, this.logger);
     this.metricsUploader = new MetricsUploader(this.config, this.logger, this.binaryManager.getCurrentBinary());
-    this.tlsManager = new TLSCertificateManager(this.config.tls || { enabled: false, certPath: '', keyPath: '' }, this.logger);
+    // Use SSL config for certificate file paths (certificateFile, privateKeyFile from properties)
+    const tlsConfig = {
+      ...(this.config.tls || { enabled: false, certPath: '', keyPath: '' }),
+      certificateFile: this.config.ssl?.certificateFile,
+      privateKeyFile: this.config.ssl?.privateKeyFile,
+      caFile: this.config.ssl?.caFile,
+    };
+    this.tlsManager = new TLSCertificateManager(tlsConfig, this.logger);
     this.requestHandler = new OoklaRequestHandler(
       this.config,
       this.logger,

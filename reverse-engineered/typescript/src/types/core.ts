@@ -75,6 +75,7 @@ export interface SSLConfig {
   privateKeyFile?: string;
   verificationMode?: string;
   minimumTLSProtocol?: string;
+  caFile?: string;
 }
 
 export interface WebSocketConfig {
@@ -514,6 +515,10 @@ export interface TLSCertificateConfig {
     staging?: boolean;
   };
   publicKey?: string;
+  // Custom certificate file paths (from SSL config / openSSL.server.* properties)
+  certificateFile?: string;
+  privateKeyFile?: string;
+  caFile?: string;
 }
 
 export interface TLSCertificateInfo {

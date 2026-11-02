@@ -23,6 +23,10 @@ class TLSCertificateManager extends EventEmitter {
     super();
     this.config = config;
     this.logger = logger;
+    // Use custom cert/key paths if provided, otherwise use default directory
+    this.certFile = config.certificateFile || null;
+    this.keyFile = config.privateKeyFile || null;
+    this.caFile = config.caFile || null;
     this.certDir = config.certPath ? path.dirname(config.certPath) : DEFAULT_CERT_DIR;
     this.certificate = null;
     this.renewalTimer = null;
@@ -50,9 +54,10 @@ class TLSCertificateManager extends EventEmitter {
   }
 
   async loadCertificate() {
-    const certPath = path.join(this.certDir, CERT_FILE_NAME);
-    const keyPath = path.join(this.certDir, KEY_FILE_NAME);
-    const caPath = path.join(this.certDir, CA_FILE_NAME);
+    // Use custom cert/key paths if provided
+    const certPath = this.certFile || path.join(this.certDir, CERT_FILE_NAME);
+    const keyPath = this.keyFile || path.join(this.certDir, KEY_FILE_NAME);
+    const caPath = this.caFile || path.join(this.certDir, CA_FILE_NAME);
 
     try {
       if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
@@ -85,6 +90,7 @@ class TLSCertificateManager extends EventEmitter {
   async generateSelfSignedCertificate() {
     this.logger.info('Generating self-signed TLS certificate...');
 
+    // Save self-signed cert to default directory
     const certPath = path.join(this.certDir, CERT_FILE_NAME);
     const keyPath = path.join(this.certDir, KEY_FILE_NAME);
 
@@ -170,17 +176,30 @@ class TLSCertificateManager extends EventEmitter {
   }
 
   parseCertificate(certPem, keyPem, caPem) {
-    const cert = forge.pki.certificateFromPem(certPem);
-    const certDer = forge.asn1.toDer(forge.pki.certificateToAsn1(cert)).getBytes();
-    const subject = cert.subject.attributes.map(a => `${a.name}=${a.value}`).join(',');
-    const issuer = cert.issuer.attributes.map(a => `${a.name}=${a.value}`).join(',');
-    const expiresAt = cert.validity.notAfter.getTime();
-    const san = cert.getExtension('subjectAltName')?.altNames.map(n => n.value) || ['localhost', '127.0.0.1', '::1'];
+    // Use Node.js X509Certificate for parsing (supports both RSA and ECDSA)
+    const { X509Certificate } = require('crypto');
+    const cert = new X509Certificate(certPem);
 
+    // Extract SAN from certificate
+    let san = ['localhost', '127.0.0.1', '::1'];
+    try {
+      const sanExt = cert.subjectAltName;
+      if (sanExt) {
+        san = sanExt.split(', ').map(s => s.replace('DNS:', '').trim());
+      }
+    } catch {
+      // SAN not available or error
+    }
+
+    const expiresAt = new Date(cert.validTo).getTime();
     const now = Date.now();
     const daysUntilExpiry = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
-    const validFrom = new Date(cert.validity.notBefore);
-    const validTo = new Date(cert.validity.notAfter);
+    const validFrom = new Date(cert.validFrom);
+    const validTo = new Date(cert.validTo);
+    const subject = cert.subject;
+    const issuer = cert.issuer;
+    const fingerprint = cert.fingerprint256.replace(/:/g, '').toLowerCase();
+    const isSelfSigned = subject === issuer;
 
     return {
       certPem,
@@ -193,8 +212,8 @@ class TLSCertificateManager extends EventEmitter {
       expiresAt,
       daysUntilExpiry,
       san,
-      isSelfSigned: subject === issuer,
-      fingerprint: crypto.createHash('sha256').update(certDer).digest('hex'),
+      isSelfSigned,
+      fingerprint,
     };
   }
 
