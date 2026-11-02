@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import * as tls from 'tls';
+import * as https from 'https';
 import * as forge from 'node-forge';
 import { TLSCertificateConfig, TLSCertificateInfo } from '../types/core';
 import { Logger } from './Logger';
@@ -18,6 +19,11 @@ const CERT_FILE_NAME = 'server.pem';
 const KEY_FILE_NAME = 'server.key';
 const CA_FILE_NAME = 'ca.pem';
 const CERT_RENEWAL_DAYS = 30;
+
+// Ookla Host API endpoints for Let's Encrypt
+const HOST_API_URL = 'https://host-api.speedtest.net';
+const LE_CERT_ENDPOINT = '/api/le/certificate';
+const LE_CERT_RENEW_ENDPOINT = '/api/le/renew';
 
 export class TLSCertificateManager extends EventEmitter {
   private config: TLSCertificateConfig;
@@ -29,6 +35,9 @@ export class TLSCertificateManager extends EventEmitter {
   private certificate?: TLSCertificateInfo;
   private renewalTimer?: NodeJS.Timeout;
   private certWatcher?: fs.FSWatcher;
+  private hostApiUrl: string;
+  private serverId: string;
+  private serverPassword: string;
 
   constructor(config: TLSCertificateConfig, logger: Logger) {
     super();
@@ -39,6 +48,9 @@ export class TLSCertificateManager extends EventEmitter {
     this.keyFile = config.privateKeyFile || null;
     this.caFile = config.caFile || null;
     this.certDir = config.certPath ? path.dirname(config.certPath) : DEFAULT_CERT_DIR;
+    this.hostApiUrl = config.acme?.hostApiUrl || HOST_API_URL;
+    this.serverId = config.acme?.serverId || '';
+    this.serverPassword = config.acme?.serverPassword || '';
   }
 
   /**
@@ -76,7 +88,7 @@ export class TLSCertificateManager extends EventEmitter {
     try {
       if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
         this.logger.warning('Certificate files not found', { certPath, keyPath });
-        return await this.generateSelfSignedCertificate();
+        return await this.requestInitialCertificate();
       }
 
       const certPem = fs.readFileSync(certPath, 'utf-8');
@@ -253,13 +265,214 @@ export class TLSCertificateManager extends EventEmitter {
   }
 
   /**
-   * Renew certificate (placeholder for ACME/Let's Encrypt integration)
+   * Request Let's Encrypt certificate from Ookla Host API
+   */
+  private async requestLeCertificate(): Promise<{ certPem: string; keyPem: string; caPem?: string } | null> {
+    if (!this.serverId || !this.serverPassword) {
+      this.logger.warning('Server ID or password not configured for Let\'s Encrypt');
+      return null;
+    }
+
+    try {
+      this.logger.info('Requesting Let\'s Encrypt certificate from Ookla Host API...');
+
+      const url = `${this.hostApiUrl}${LE_CERT_ENDPOINT}`;
+      const auth = Buffer.from(`${this.serverId}:${this.serverPassword}`).toString('base64');
+
+      const response = await this.makeHttpRequest('POST', url, {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'OoklaServer/1.0',
+      }, JSON.stringify({
+        serverId: this.serverId,
+        domains: this.config.acme?.domains || [],
+        keyType: 'ECDSA',
+      }));
+
+      if (response.statusCode !== 200) {
+        this.logger.error('Failed to request LE certificate', { status: response.statusCode, body: response.body });
+        return null;
+      }
+
+      const data = JSON.parse(response.body);
+      if (!data.certificate || !data.privateKey) {
+        this.logger.error('Invalid LE certificate response', { data });
+        return null;
+      }
+
+      this.logger.info('Let\'s Encrypt certificate received from Host API');
+      return {
+        certPem: data.certificate,
+        keyPem: data.privateKey,
+        caPem: data.caCertificate,
+      };
+    } catch (error) {
+      this.logger.error('Error requesting LE certificate', { error: error instanceof Error ? error.message : String(error) });
+      return null;
+    }
+  }
+
+  /**
+   * Renew Let's Encrypt certificate via Ookla Host API
+   */
+  private async renewLeCertificate(): Promise<{ certPem: string; keyPem: string; caPem?: string } | null> {
+    if (!this.serverId || !this.serverPassword) {
+      this.logger.warning('Server ID or password not configured for Let\'s Encrypt renewal');
+      return null;
+    }
+
+    try {
+      this.logger.info('Renewing Let\'s Encrypt certificate via Ookla Host API...');
+
+      const url = `${this.hostApiUrl}${LE_CERT_RENEW_ENDPOINT}`;
+      const auth = Buffer.from(`${this.serverId}:${this.serverPassword}`).toString('base64');
+
+      const response = await this.makeHttpRequest('POST', url, {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'OoklaServer/1.0',
+      }, JSON.stringify({
+        serverId: this.serverId,
+      }));
+
+      if (response.statusCode !== 200) {
+        this.logger.error('Failed to renew LE certificate', { status: response.statusCode, body: response.body });
+        return null;
+      }
+
+      const data = JSON.parse(response.body);
+      if (!data.certificate || !data.privateKey) {
+        this.logger.error('Invalid LE certificate renewal response', { data });
+        return null;
+      }
+
+      this.logger.info('Let\'s Encrypt certificate renewed via Host API');
+      return {
+        certPem: data.certificate,
+        keyPem: data.privateKey,
+        caPem: data.caCertificate,
+      };
+    } catch (error) {
+      this.logger.error('Error renewing LE certificate', { error: error instanceof Error ? error.message : String(error) });
+      return null;
+    }
+  }
+
+  /**
+   * Make HTTP request to Host API
+   */
+  private makeHttpRequest(method: string, url: string, headers: Record<string, string>, body?: string): Promise<{ statusCode: number; body: string }> {
+    return new Promise((resolve, reject) => {
+      const parsedUrl = new URL(url);
+      const options = {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port || 443,
+        path: parsedUrl.pathname + parsedUrl.search,
+        method,
+        headers,
+        rejectUnauthorized: false, // For testing with self-signed
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => { data += chunk; });
+        res.on('end', () => {
+          resolve({ statusCode: res.statusCode || 0, body: data });
+        });
+      });
+
+      req.on('error', (err) => reject(err));
+      req.setTimeout(30000, () => {
+        req.destroy();
+        reject(new Error('Request timeout'));
+      });
+
+      if (body) {
+        req.write(body);
+      }
+      req.end();
+    });
+  }
+
+  /**
+   * Save certificate files to disk
+   */
+  private async saveCertificate(certPem: string, keyPem: string, caPem?: string): Promise<void> {
+    const certPath = this.certFile || path.join(this.certDir, CERT_FILE_NAME);
+    const keyPath = this.keyFile || path.join(this.certDir, KEY_FILE_NAME);
+    const caPath = this.caFile || path.join(this.certDir, CA_FILE_NAME);
+
+    // Ensure directory exists
+    const certDir = path.dirname(certPath);
+    if (!fs.existsSync(certDir)) {
+      fs.mkdirSync(certDir, { recursive: true, mode: 0o755 });
+    }
+
+    // Write files
+    fs.writeFileSync(certPath, certPem, { mode: 0o644 });
+    fs.writeFileSync(keyPath, keyPem, { mode: 0o600 });
+    if (caPem) {
+      fs.writeFileSync(caPath, caPem, { mode: 0o644 });
+    }
+
+    this.logger.debug('Certificate files saved', { certPath, keyPath });
+  }
+
+  /**
+   * Renew certificate - tries Let's Encrypt via Host API first, falls back to self-signed
    */
   public async renewCertificate(): Promise<TLSCertificateInfo> {
     this.logger.info('Renewing TLS certificate...');
 
-    // In production, this would integrate with ACME/Let's Encrypt
-    // For now, regenerate self-signed
+    // Try Let's Encrypt via Host API if configured
+    if (this.config.acme?.enabled && this.serverId && this.serverPassword) {
+      this.logger.info('Attempting Let\'s Encrypt renewal via Ookla Host API...');
+      let leResult = await this.renewLeCertificate();
+
+      // If renewal fails, try initial request
+      if (!leResult) {
+        this.logger.info('Renewal failed, trying initial certificate request...');
+        leResult = await this.requestLeCertificate();
+      }
+
+      if (leResult) {
+        await this.saveCertificate(leResult.certPem, leResult.keyPem, leResult.caPem);
+        const cert = await this.loadCertificate();
+        if (cert) {
+          this.emit('certificateRenewed', cert);
+          return cert;
+        }
+      }
+
+      this.logger.warning('Let\'s Encrypt via Host API failed, falling back to self-signed');
+    }
+
+    // Fallback to self-signed
+    return this.generateSelfSignedCertificate();
+  }
+
+  /**
+   * Initial certificate request - tries Let's Encrypt via Host API if enabled
+   */
+  private async requestInitialCertificate(): Promise<TLSCertificateInfo> {
+    // Try Let's Encrypt via Host API if configured
+    if (this.config.acme?.enabled && this.serverId && this.serverPassword) {
+      this.logger.info('Requesting Let\'s Encrypt certificate via Ookla Host API...');
+      const leResult = await this.requestLeCertificate();
+
+      if (leResult) {
+        await this.saveCertificate(leResult.certPem, leResult.keyPem, leResult.caPem);
+        const cert = await this.loadCertificate();
+        if (cert) {
+          this.emit('certificateGenerated', cert);
+          return cert;
+        }
+      }
+
+      this.logger.warning('Let\'s Encrypt via Host API failed, falling back to self-signed');
+    }
+
+    // Fallback to self-signed
     return this.generateSelfSignedCertificate();
   }
 

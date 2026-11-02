@@ -510,8 +510,13 @@ export interface TLSCertificateConfig {
   autoGenerate?: boolean;
   acme?: {
     enabled: boolean;
-    email: string;
-    domains: string[];
+    // Ookla Host API settings for Let's Encrypt
+    hostApiUrl?: string;
+    serverId?: string;
+    serverPassword?: string;
+    domains?: string[];
+    // Legacy ACME settings (for direct ACME integration)
+    email?: string;
     staging?: boolean;
   };
   publicKey?: string;

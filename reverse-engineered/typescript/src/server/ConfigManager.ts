@@ -220,6 +220,14 @@ export class ConfigManager extends EventEmitter {
       if (key.startsWith('openSSL.server.')) {
         mappedKey = 'ssl.' + key.substring('openSSL.server.'.length);
       }
+      // Map OoklaServer.ssl.* properties (from OoklaServer.properties)
+      else if (key.startsWith('OoklaServer.ssl.')) {
+        mappedKey = 'ssl.' + key.substring('OoklaServer.ssl.'.length);
+      }
+      // Map OoklaServer.* properties to root config
+      else if (key.startsWith('OoklaServer.')) {
+        mappedKey = key.substring('OoklaServer.'.length);
+      }
 
       this.setNestedProperty(result, mappedKey, value);
     }
