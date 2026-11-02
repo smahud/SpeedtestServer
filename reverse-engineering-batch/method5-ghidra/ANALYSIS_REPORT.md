@@ -1,56 +1,72 @@
-# Method 5: Ghidra Decompilation Analysis
+# Method 5: Ghidra Decompilation Analysis (Extended Run)
 
 ## Binary Information
 - **File**: OoklaServer-linux-x86_64
 - **SHA256**: f19e5ed240dc185bcaf6ca96e0fa40d5ee53e3a543f4c562082ac0d8d92f027a
 - **Tool**: Ghidra 12.1.4 (headless analyzer)
+- **Run Time**: ~2 hours (timeout at 7200s)
 
-## Analysis Attempt
-- **Status**: Timeout during analysis (5+ minutes)
-- **Script**: Custom DecompileAll.java script
-- **Java**: OpenJDK 17
-- **Errors**: Multiple "Failed to disassemble" errors from GccExceptionAnalyzer
+## Analysis Results
 
-## Ghidra Analysis Challenges
-1. **Large Binary**: 15.5 MB stripped static binary
-2. **C++ Exception Handling**: Extensive .eh_frame/.gcc_except_table causing GccExceptionAnalyzer errors
-3. **Stripped Symbols**: No function names or symbols to guide analysis
-4. **Static Linking**: All library code embedded, massive function count
-5. **Templates/Virtual Functions**: Heavy C++ template usage creates many similar functions
+### Status: **Partial Completion - Timeout**
+The Ghidra analysis ran for 2 hours but timed out before completing full decompilation of all functions.
 
-## Expected Ghidra Outputs (if completed)
-1. **Function List**: 3000+ functions (estimated)
-2. **Decompiled C Code**: Pseudo-C for each function
-3. **Type Recovery**: C++ class hierarchies, vtables
-4. **Cross-References**: Call graph, data references
-5. **String References**: All string usage locations
+### What Was Achieved:
+1. **Project Creation**: Successful
+2. **Binary Import**: Successful (15.5 MB ELF64)
+3. **Auto-Analysis**: Started and ran extensively
+4. **Function Discovery**: Ghidra identified thousands of functions
+5. **Decompilation Started**: Began decompiling functions but incomplete
 
-## Partial Results from Ghidra Launch
-- Project created successfully
-- Binary imported and analyzed (auto-analysis started)
-- Decompiler initialized
-- Script execution began but timed out
+### Issues Encountered:
+1. **Massive C++ Exception Handling**: Hundreds of "Failed to disassemble" errors from GccExceptionAnalyzer
+2. **Stripped Binary**: No symbols to guide analysis
+3. **Static Linking**: All library code embedded (~3000+ functions estimated)
+4. **Template Bloat**: Heavy C++ template usage creates many similar functions
+5. **Constructor Resolution**: Thousands of "Unable to resolve constructor" warnings
 
-## Alternative: Use Ghidra GUI for Interactive Analysis
-For future analysis, recommend:
-1. Use Ghidra GUI with longer timeout
-2. Focus on entry point and main functions first
-3. Use FunctionID to identify library functions
-4. Apply C++ RTTI analysis for class recovery
+### Decompilation Statistics (from log):
+- **Functions with warnings**: 1000+ functions showing decompilation issues
+- **Common errors**: 
+  - "Unable to resolve constructor at <address>"
+  - "Failed to resolve varnode <Sreg>, index=6/7"
+  - "Could not follow disassembly flow into non-existing memory"
 
-## Comparison with Other Methods
-| Aspect | objdump | readelf | Ghidra (expected) |
-|--------|---------|---------|-------------------|
-| Disassembly | Raw assembly | N/A | Annotated assembly |
-| Decompilation | No | No | Yes (pseudo-C) |
-| Function Detection | Basic | No | Advanced (ML-based) |
-| Type Recovery | No | No | Yes (C++ classes) |
-| Call Graph | Manual | No | Automated |
-| Cross-Refs | Manual | No | Full graph |
+### Functions Likely Identified (from init_array analysis):
+From GDB analysis of .init_array (133 entries), key constructor functions include:
+- `0x294eb0` - First constructor (references 0x10d42a0)
+- `0x294f90` - Second constructor (references 0x10d42e0)
+- `0x295020` - Third constructor (references 0x10d43a0)
+- `0x29fea0` - Checks 0x109c690, calls 0xb445f0
+- `0x29fb80` - Last constructor (initializes bytes at 0x10de300-0x10de318)
 
-## Recommendation
-Ghidra analysis requires significant time (30+ minutes) for a binary this size. For production analysis:
-1. Use Ghidra with FunctionID database for library identification
-2. Focus on specific areas (entry, network, crypto)
-3. Export decompilation for key functions only
-4. Use headless with longer timeout and more memory
+### Key Function at 0xb445f0:
+- Appears to be a **singleton/initialization pattern**
+- Tests `rdi` (pointer), reads dword, branches on zero
+- Initializes structure at `rsi` with:
+  - `QWORD [rsi] = -1`
+  - `QWORD [rsi+8] = 0`
+  - `QWORD [rsi+10] = 0`
+  - `QWORD [rsi+18] = rdi`
+  - `QWORD [rsi+20] = 0x7f8` (2040)
+- Calls `0xb52af5` and `0xb52ebc` (likely library init)
+- Sets up global at `0x10de5b8`
+
+### Recommendations for Complete Analysis:
+1. **Use Ghidra GUI** for interactive analysis of key functions
+2. **Focus on entry point tracing** (0x29fc35 → init_array → main)
+3. **Use FunctionID** with Boost/POCO/OpenSSL signatures
+4. **Target specific addresses**: 0x29fc35, 0x29fea0, 0xb445f0, 0xb52af5, 0xb52ebc
+5. **Extend timeout** to 4+ hours with 16GB+ heap for full decompilation
+
+### Comparison with Other Methods:
+| Aspect | objdump | readelf | GDB | Ghidra (partial) |
+|--------|---------|---------|-----|------------------|
+| Entry point disasm | Raw | N/A | ✅ Annotated | N/A |
+| Init array analysis | N/A | N/A | ✅ 133 funcs | N/A |
+| Function boundaries | Manual | N/A | N/A | Auto (incomplete) |
+| Decompilation | No | No | No | Started |
+| Type recovery | No | No | No | Attempted |
+
+## Conclusion
+Ghidra analysis **partially successful** but requires more time. The binary's stripped, static nature with massive C++ exception handling makes automated analysis extremely slow. Manual/interactive Ghidra analysis of the entry point and init_array functions is the most productive path forward.
