@@ -7,6 +7,7 @@
 import { EventEmitter } from 'events';
 import * as http from 'http';
 import * as https from 'https';
+import * as dgram from 'dgram';
 import * as tls from 'tls';
 import * as crypto from 'crypto';
 import * as url from 'url';
@@ -55,6 +56,7 @@ export class OoklaRequestHandler extends EventEmitter {
   private httpsServer: https.Server | null = null;
   private wsServer: WebSocket.Server | null = null;
   private wssHttps: WebSocket.Server | null = null;
+  private udpServers: dgram.Socket[] = [];
 
   constructor(
     config: OoklaServerConfig,
@@ -218,7 +220,24 @@ export class OoklaRequestHandler extends EventEmitter {
       }
     }
 
+    // UDP server for latency/jitter tests
+    const udpPorts = this.config.udpPorts || [5060, 8080];
+    const udpPromises: Promise<dgram.Socket | null>[] = [];
+    for (const port of udpPorts) {
+      if (useIPv4) {
+        udpPromises.push(this.createUdpServer(port, '0.0.0.0', 'UDP'));
+      }
+      if (useIPv6) {
+        udpPromises.push(this.createUdpServer(port, '::', 'UDP-IPv6'));
+      }
+    }
+
     await Promise.all(listenPromises);
+
+    // Wait for UDP servers and filter out null (failed to bind)
+    const udpResults = await Promise.all(udpPromises);
+    this.udpServers = udpResults.filter(s => s !== null);
+
     this.logger.info('All servers started successfully');
   }
 
@@ -238,6 +257,53 @@ export class OoklaRequestHandler extends EventEmitter {
         }
       });
     });
+  }
+
+  private createUdpServer(port: number, host: string, label: string): Promise<dgram.Socket | null> {
+    return new Promise((resolve, reject) => {
+      const server = dgram.createSocket(host === '::' ? 'udp6' : 'udp4');
+
+      server.on('listening', () => {
+        const addr = server.address();
+        this.logger.info(`${label} server listening on ${addr.address}:${addr.port}`);
+        resolve(server);
+      });
+
+      server.on('error', (err: NodeJS.ErrnoException) => {
+        if (err.code === 'EADDRINUSE') {
+          this.logger.warning(`${label} port ${port} on ${host} already in use`);
+          server.close();
+          resolve(null);
+        } else {
+          this.logger.error(`${label} server error on ${host}:${port}`, { error: err.message });
+          reject(err);
+        }
+      });
+
+      server.on('message', (msg: Buffer, rinfo: dgram.RemoteInfo) => {
+        this.handleUdpMessage(server, msg, rinfo);
+      });
+
+      server.bind(port, host);
+    });
+  }
+
+  private handleUdpMessage(server: dgram.Socket, msg: Buffer, rinfo: dgram.RemoteInfo): void {
+    // OoklaServer UDP protocol: echo back the received packet for latency measurement
+    // The client sends a timestamp and expects it echoed back
+    try {
+      // If it's a latency test packet, echo it back
+      if (msg.length >= 8) {
+        // Echo the packet back to the sender
+        server.send(msg, rinfo.port, rinfo.address, (err) => {
+          if (err) {
+            this.logger.debug('UDP send error', { error: err.message });
+          }
+        });
+      }
+    } catch (error) {
+      this.logger.debug('UDP message handling error', { error: error instanceof Error ? error.message : String(error) });
+    }
   }
 
   private handleHttpRequest(req: http.IncomingMessage, res: http.ServerResponse): void {
@@ -613,7 +679,7 @@ export class OoklaRequestHandler extends EventEmitter {
   }
 
   public async stop(): Promise<void> {
-    this.logger.info('Stopping HTTP/HTTPS/WebSocket servers...');
+    this.logger.info('Stopping HTTP/HTTPS/WebSocket/UDP servers...');
 
     const closePromises: Promise<void>[] = [];
 
@@ -637,6 +703,15 @@ export class OoklaRequestHandler extends EventEmitter {
         this.httpsServer!.close(() => resolve());
       }));
     }
+    if (this.udpServers) {
+      for (const server of this.udpServers) {
+        if (server) {
+          closePromises.push(new Promise((resolve) => {
+            server.close(() => resolve());
+          }));
+        }
+      }
+    }
 
     await Promise.all(closePromises);
     this.destroy();
@@ -651,6 +726,11 @@ export class OoklaRequestHandler extends EventEmitter {
     if (this.wssHttps) this.wssHttps.close();
     if (this.httpServer) this.httpServer.close();
     if (this.httpsServer) this.httpsServer.close();
+    if (this.udpServers) {
+      for (const server of this.udpServers) {
+        if (server) server.close();
+      }
+    }
   }
 
   public getRoutes(): string[] {

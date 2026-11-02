@@ -7,6 +7,7 @@
 const EventEmitter = require('events');
 const http = require('http');
 const https = require('https');
+const dgram = require('dgram');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -180,7 +181,24 @@ class OoklaRequestHandler extends EventEmitter {
       }
     }
 
+    // UDP server for latency/jitter tests
+    const udpPorts = this.config.udpPorts || [5060, 8080];
+    const udpPromises = [];
+    for (const port of udpPorts) {
+      if (useIPv4) {
+        udpPromises.push(this.createUdpServer(port, '0.0.0.0', 'UDP'));
+      }
+      if (useIPv6) {
+        udpPromises.push(this.createUdpServer(port, '::', 'UDP-IPv6'));
+      }
+    }
+
     await Promise.all(listenPromises);
+
+    // Wait for UDP servers and filter out null (failed to bind)
+    const udpResults = await Promise.all(udpPromises);
+    this.udpServers = udpResults.filter(s => s !== null);
+
     this.logger.info('All servers started successfully');
   }
 
@@ -200,6 +218,53 @@ class OoklaRequestHandler extends EventEmitter {
         }
       });
     });
+  }
+
+  createUdpServer(port, host, label) {
+    return new Promise((resolve, reject) => {
+      const server = dgram.createSocket(host === '::' ? 'udp6' : 'udp4');
+
+      server.on('listening', () => {
+        const addr = server.address();
+        this.logger.info(`${label} server listening on ${addr.address}:${addr.port}`);
+        resolve(server);
+      });
+
+      server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+          this.logger.warning(`${label} port ${port} on ${host} already in use`);
+          server.close();
+          resolve(null); // Don't fail, just warn
+        } else {
+          this.logger.error(`${label} server error on ${host}:${port}`, { error: err.message });
+          reject(err);
+        }
+      });
+
+      server.on('message', (msg, rinfo) => {
+        this.handleUdpMessage(server, msg, rinfo);
+      });
+
+      server.bind(port, host);
+    });
+  }
+
+  handleUdpMessage(server, msg, rinfo) {
+    // OoklaServer UDP protocol: echo back the received packet for latency measurement
+    // The client sends a timestamp and expects it echoed back
+    try {
+      // If it's a latency test packet, echo it back
+      if (msg.length >= 8) {
+        // Echo the packet back to the sender
+        server.send(msg, rinfo.port, rinfo.address, (err) => {
+          if (err) {
+            this.logger.debug('UDP send error', { error: err.message });
+          }
+        });
+      }
+    } catch (error) {
+      this.logger.debug('UDP message handling error', { error: error.message });
+    }
   }
 
   handleHttpRequest(req, res) {
@@ -578,7 +643,7 @@ class OoklaRequestHandler extends EventEmitter {
   }
 
   async stop() {
-    this.logger.info('Stopping HTTP/HTTPS/WebSocket servers...');
+    this.logger.info('Stopping HTTP/HTTPS/WebSocket/UDP servers...');
 
     const closePromises = [];
 
@@ -602,6 +667,15 @@ class OoklaRequestHandler extends EventEmitter {
         this.httpsServer.close(() => resolve());
       }));
     }
+    if (this.udpServers) {
+      for (const server of this.udpServers) {
+        if (server) {
+          closePromises.push(new Promise((resolve) => {
+            server.close(() => resolve());
+          }));
+        }
+      }
+    }
 
     await Promise.all(closePromises);
     this.destroy();
@@ -616,6 +690,11 @@ class OoklaRequestHandler extends EventEmitter {
     if (this.wssHttps) this.wssHttps.close();
     if (this.httpServer) this.httpServer.close();
     if (this.httpsServer) this.httpsServer.close();
+    if (this.udpServers) {
+      for (const server of this.udpServers) {
+        if (server) server.close();
+      }
+    }
   }
 
   getRoutes() {
