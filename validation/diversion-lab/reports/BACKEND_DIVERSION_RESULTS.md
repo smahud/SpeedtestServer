@@ -53,7 +53,7 @@ lintas 2 backend); S4 firstN:A:12 (belahan indeks eksak 1–12→A, 13–23→B)
 
 ### F2a — seleksi/handshake → daemon resmi (A), pengukuran → STS (B)
 
-- Status eksekusi: **BLOCKED** (kuota config; 9 percobaan 19:12–19:53 UTC).
+- Status eksekusi: **BLOCKED** (kuota config; 11 percobaan 19:12–20:19 UTC).
 - Prediksi berbasis bukti: **lulus** — karena (i) F0 membuktikan daemon
   menerima probe terenkripsi; (ii) C1/gate-repo membuktikan STS melayani
   koneksi pengukuran fallback plaintext per koneksi (CLI memulihkan fallback
