@@ -1,0 +1,13 @@
+{"ts":1793815904468,"k":"listen_tcp","port":8080,"family":"dual-stack"}
+{"ts":1793815904469,"k":"listen_udp","port":8080}
+{"ts":1793815904469,"k":"started","tcpPorts":[8080],"udpPorts":[8080],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"20daf202-5b2d-4ac8-8210-e02012df713a","pid":29089}
+{"ts":1793815911968,"k":"conn_netgauge","id":1,"peer":"::ffff:127.0.0.1:43032","transport":"tcp"}
+{"ts":1793815911968,"k":"ng_cmd","id":1,"peer":"::ffff:127.0.0.1:43032","line":"HI"}
+{"ts":1793815911968,"k":"ng_cmd","id":1,"peer":"::ffff:127.0.0.1:43032","line":"GETIP"}
+{"ts":1793815911968,"k":"ng_cmd","id":1,"peer":"::ffff:127.0.0.1:43032","line":"PING 1"}
+{"ts":1793815911968,"k":"ng_cmd","id":1,"peer":"::ffff:127.0.0.1:43032","line":"CAPABILITIES"}
+{"ts":1793815911969,"k":"ng_cmd","id":1,"peer":"::ffff:127.0.0.1:43032","line":"SERVERID"}
+{"ts":1793815911969,"k":"ng_cmd","id":1,"peer":"::ffff:127.0.0.1:43032","line":"UPTIME"}
+{"ts":1793815911969,"k":"ng_cmd","id":1,"peer":"::ffff:127.0.0.1:43032","line":"QUIT"}
+{"ts":1793815911970,"k":"conn_close","id":1,"peer":"::ffff:127.0.0.1:43032","stats":{"peer":"::ffff:127.0.0.1:43032","peerIp":"::ffff:127.0.0.1","openedAt":1793815911967,"transport":"tcp","bytesDown":178,"bytesUp":0,"commands":0}}
+{"ts":1793816582833,"k":"stopped","connections":1}

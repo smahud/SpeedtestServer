@@ -1,0 +1,170 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T18:57:17Z",
+    "ping": {
+        "jitter": 0.030,
+        "latency": 0.095,
+        "low": 0.076,
+        "high": 0.133
+    },
+    "download": {
+        "bandwidth": 1041754515,
+        "bytes": 12092316427,
+        "elapsed": 12312,
+        "latency": {
+            "iqm": 3.498,
+            "low": 0.464,
+            "high": 83.840,
+            "jitter": 7.119
+        }
+    },
+    "upload": {
+        "bandwidth": 907640556,
+        "bytes": 8161420469,
+        "elapsed": 9409,
+        "latency": {
+            "iqm": 4.559,
+            "low": 0.391,
+            "high": 35.083,
+            "jitter": 5.922
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 48446,
+        "selectedLatency": 0.106,
+        "servers": [
+            {
+                "latency": 0.42599999999999999,
+                "server": {
+                    "id": 43356,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": 1010,
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.23000000000000001,
+                "server": {
+                    "id": 35791,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "SmarTone",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.46800000000000003,
+                "server": {
+                    "id": 63143,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "Netvigator",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.36199999999999999,
+                "server": {
+                    "id": 57571,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "CMC Telecom",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.27100000000000002,
+                "server": {
+                    "id": 1536,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "STC",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.161,
+                "server": {
+                    "id": 60178,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "Sun Mobile",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.22600000000000001,
+                "server": {
+                    "id": 65463,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "HKBN",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.14399999999999999,
+                "server": {
+                    "id": 60177,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "Club SIM by HKT",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.42899999999999999,
+                "server": {
+                    "id": 28912,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "fdcservers.net",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.106,
+                "server": {
+                    "id": 48446,
+                    "host": "localhost",
+                    "port": 9090,
+                    "name": "GSL Networks",
+                    "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+                    "country": "Hong Kong"
+                }
+            }
+        ]
+    },
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "127.0.0.1"
+    },
+    "server": {
+        "id": 48446,
+        "host": "localhost",
+        "port": 9090,
+        "name": "GSL Networks",
+        "location": "Hong Kong -> LAB (localhost:9090) [diversion audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "37c9c4c0-eb84-4cac-8704-5b4058ceeaea",
+        "persisted": false
+    }
+}

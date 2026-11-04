@@ -1,0 +1,22 @@
+Wed Nov  4 18:56:29 UTC 2026
+Linux c-6aeb5ca9-14127d0f-b3045c283a8b 5.10.134-013.15.kangaroo.al8.x86_64 #1 SMP Thu Jul 30 12:54:59 UTC 2026 x86_64 GNU/Linux
+repo HEAD: 7b58988b8b9683c48843ade190ffd7ce5af44622
+policy: all:B | udp: B | diverter port: 9090
+backend A: official OoklaServer 2.11.5.2 (sha ce180aa3…) :18080
+backend B: SpeedtestServer TS (7b58988) :8080
+CLI: Speedtest by Ookla 1.2.0.84 (ea6b6773cf) Linux/x86_64-linux-musl 5.10.134-013.15.kangaroo.al8.x86_64 x86_64
+--- listeners before:
+LISTEN 0      64           0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=463,fd=5))
+LISTEN 0      511                *:8080             *:*    users:(("MainThread",pid=524,fd=22))
+LISTEN 0      64              [::]:18080         [::]:*    users:(("OoklaServer",pid=463,fd=6))
+--- listeners at run start:
+LISTEN 0      511        127.0.0.1:8888       0.0.0.0:*    users:(("MainThread",pid=889,fd=22))
+LISTEN 0      64           0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=777,fd=5))
+LISTEN 0      511                *:8080             *:*    users:(("MainThread",pid=838,fd=22))
+LISTEN 0      64              [::]:18080         [::]:*    users:(("OoklaServer",pid=777,fd=6))
+LISTEN 0      511                *:9090             *:*    users:(("MainThread",pid=874,fd=21))
+--- udp:
+UNCONN 0      0            0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=777,fd=10))
+UNCONN 0      0                  *:9090             *:*    users:(("MainThread",pid=874,fd=23)) 
+UNCONN 0      0                  *:8080             *:*    users:(("MainThread",pid=838,fd=23)) 
+UNCONN 0      0                  *:18080            *:*    users:(("OoklaServer",pid=777,fd=11))

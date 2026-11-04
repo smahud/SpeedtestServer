@@ -1,0 +1,61 @@
+# analysis — c1-all-b
+CLI exit=0 type=result | server: localhost:9090 id=48446 name=GSL Networks
+fase: latency=false download=true(12.09GB) upload=true(8.16GB) loss=true(0)
+persisted=false | proxy blocked=["results.speedtest.net:443"] configServed=1 rewriteIds=,,,,,,,,,
+
+== koneksi (34) ==
+id | fase                         | backend | alasan routing        | c2b(B)      | b2c(B)      | dur(ms)
+---|------------------------------|---------|-----------------------|-------------|-------------|--------
+ 1 | other                        | ?       |                       |           0 |           0 | 4
+ 2 | selection-probe(encrypted)   | B       | policy:all            |          82 |         124 | 8
+ 3 | other                        | ?       |                       |           0 |           0 | 2
+ 4 | selection-probe(encrypted)   | B       | policy:all            |          88 |         124 | 6
+ 5 | other                        | ?       |                       |           0 |           0 | 3
+ 6 | selection-probe(encrypted)   | B       | policy:all            |          93 |         124 | 10
+ 7 | other                        | ?       |                       |           0 |           0 | 1
+ 8 | selection-probe(encrypted)   | B       | policy:all            |          91 |         124 | 8
+ 9 | other                        | ?       |                       |           0 |           0 | 2
+10 | selection-probe(encrypted)   | B       | policy:all            |          80 |         124 | 6
+11 | other                        | ?       |                       |           0 |           0 | 1
+12 | selection-probe(encrypted)   | B       | policy:all            |          85 |         124 | 3
+13 | other                        | B       | policy:all            |           0 |           0 | 1
+14 | selection-probe(encrypted)   | B       | policy:all            |          87 |         124 | 3
+15 | other                        | B       | policy:all            |           0 |           0 | 0
+16 | other                        | ?       |                       |           0 |           0 | 0
+17 | selection-probe(encrypted)   | B       | policy:all            |          92 |         124 | 4
+18 | other                        | ?       |                       |           0 |           0 | 1
+19 | selection-probe(encrypted)   | B       | policy:all            |          94 |         124 | 6
+20 | selection-probe(encrypted)   | B       | policy:all            |          89 |         124 | 3
+21 | other                        | ?       |                       |           0 |           0 | 0
+22 | selection-probe(encrypted)   | B       | policy:all            |         202 |         162 | 2
+23 | loss                         | B       | policy:all            |          56 |          63 | 12844
+24 | ping-monitor                 | B       | policy:all            |        3944 |        4680 | 15329
+25 | download                     | B       | policy:all            |        2254 |  3880763118 | 12338
+26 | download                     | B       | policy:all            |        1624 |  2769347910 | 12337
+27 | download                     | B       | policy:all            |        1750 |  3008571383 | 12339
+28 | download                     | B       | policy:all            |        1444 |  2457670452 | 12335
+29 | ping-monitor                 | B       | policy:all            |        3048 |        3616 | 9531
+30 | upload                       | B       | policy:all            |          77 |          93 | 9500
+31 | selection-probe(encrypted)   | B       | policy:all            |  2156255926 |        1786 | 9525
+32 | selection-probe(encrypted)   | B       | policy:all            |  1856000040 |        1526 | 9525
+33 | selection-probe(encrypted)   | B       | policy:all            |  2528000040 |        2098 | 9493
+34 | selection-probe(encrypted)   | B       | policy:all            |  1760000040 |        1474 | 9498
+
+== atribusi fase ==
+other                          → +B  (11 conn, 0.00 GB be→cli)
+selection-probe(encrypted)     → B  (15 conn, 0.00 GB be→cli)
+loss                           → B  (1 conn, 0.00 GB be→cli)
+ping-monitor                   → B  (2 conn, 0.00 GB be→cli)
+download                       → B  (4 conn, 12.12 GB be→cli)
+upload                         → B  (1 conn, 0.00 GB be→cli)
+
+== UDP ==
+clients=[{"client":"::1:50037","backend":"B"},{"client":"::1:39783","backend":"B"},{"client":"::1:40357","backend":"B"}] cli→be=240 be→cli=160 contoh=["LOSS 266983503 0 A1AC72C2-6462-4093-8F4C","LOSS 185050308 0 37C9C4C0-EB84-4CAC-8704","LOSS 266983503 1 A1AC72C2-6462-4093-8F4C"]
+
+== krobosrasi backend ==
+B(STS): {"netgaugeConns":25,"commands":1162,"downloadsDone":373,"uploadsDone":258,"udpRecv":432,"udpCount":245,"bytesSent":0}
+A(daemon): {"note":"log daemon tidak tersedia"}
+
+== volume diverter (be→cli) == A=0.00 GB  B=12.12 GB
+
+== VERDICT == {"cli_exit":0,"complete":false,"non_publishing":true,"backends_used":[null,"B"],"diverted":true}
