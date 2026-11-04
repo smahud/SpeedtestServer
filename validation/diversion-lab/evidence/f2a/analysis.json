@@ -1,0 +1,57 @@
+{
+  "outcome": {
+    "exit": 2,
+    "type": null,
+    "latency": null,
+    "jitter": null,
+    "download": null,
+    "upload": null,
+    "packetLoss": null,
+    "persisted": null,
+    "server": null
+  },
+  "phasesPresent": {
+    "latency": false,
+    "download": false,
+    "upload": false,
+    "packetLoss": false
+  },
+  "proxyFacts": {
+    "configServed": 0,
+    "blocked": [],
+    "tunnels": [],
+    "rewritten": []
+  },
+  "connections": [],
+  "phaseAttribution": {},
+  "udpFacts": {
+    "clients": [],
+    "cliToBe": 0,
+    "beToCli": 0,
+    "sampleHeads": []
+  },
+  "stsFacts": {
+    "netgaugeConns": 2,
+    "commands": 2,
+    "downloadsDone": 0,
+    "uploadsDone": 0,
+    "udpRecv": 0,
+    "udpCount": 0,
+    "bytesSent": 0
+  },
+  "daemonFacts": {
+    "note": "log daemon tidak tersedia"
+  },
+  "volume": {
+    "diverterBytes": {
+      "A": 0,
+      "B": 0
+    }
+  },
+  "verdict": {
+    "cli_exit": 2,
+    "complete": false,
+    "non_publishing": false,
+    "backends_used": []
+  }
+}
