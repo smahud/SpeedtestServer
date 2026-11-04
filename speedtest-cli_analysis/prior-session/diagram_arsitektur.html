@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans SC', 'DejaVu Sans', Arial, sans-serif;
+    background: #ffffff;
+    width: 1200px;
+    padding: 28px 34px;
+    color: #142840;
+  }
+  .row { display: flex; gap: 36px; margin-bottom: 8px; }
+  .panel {
+    flex: 1;
+    border: 1.5px solid #c0d0e2;
+    border-radius: 10px;
+    background: #f5f8fc;
+    padding: 20px 24px 24px;
+    position: relative;
+  }
+  .panel-title {
+    font-size: 15px; font-weight: 700; color: #1a4a7a;
+    margin-bottom: 4px; letter-spacing: 0.3px;
+  }
+  .panel-sub {
+    font-size: 11px; color: #5a7a96; margin-bottom: 16px;
+  }
+  .badge {
+    display: inline-block; font-size: 10.5px; font-weight: 700;
+    padding: 2px 10px; border-radius: 10px; margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  .badge-a { background: #e4ecf5; color: #1a4a7a; border: 1px solid #b8cbe0; }
+  .badge-b { background: #e8f3ec; color: #2d6a4a; border: 1px solid #bcd8c8; }
+
+  .client {
+    width: 148px; border-radius: 8px; padding: 10px 8px; text-align: center;
+    background: #1a4a7a; color: #fff; font-weight: 700; font-size: 13px;
+    box-shadow: 0 2px 6px rgba(20,40,64,0.18);
+  }
+  .client small { display: block; font-weight: 400; font-size: 10px; color: #bcd8ec; margin-top: 3px; }
+
+  /* Panel A: fase seleksi */
+  .sel-wrap { display: flex; align-items: center; gap: 0; }
+  .sel-servers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px 14px; flex: 1; margin-left: 46px; position: relative; }
+  .mini-server {
+    border: 1.2px solid #b8cbe0; background: #fff; border-radius: 6px;
+    font-size: 10.5px; padding: 5px 8px; color: #3d5a78; text-align: center;
+    white-space: nowrap;
+  }
+  .mini-server.win { border: 1.8px solid #1a4a7a; background: #e4ecf5; font-weight: 700; color: #1a4a7a; }
+  .sel-arrows { position: relative; width: 46px; height: 100%; }
+  svg.links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+  /* Panel B: multi connection */
+  .mc-wrap { display: flex; align-items: center; }
+  .conn-stack { display: flex; flex-direction: column; gap: 4px; flex: 1; margin: 0 8px 0 54px; position: relative; min-height: 150px; }
+  .conn-line {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 10px; color: #5a7a96;
+  }
+  .conn-bar { height: 5px; border-radius: 3px; background: #2d7ab3; flex: 1; position: relative; }
+  .conn-bar::after {
+    content: ''; position: absolute; right: -1px; top: 50%; transform: translateY(-50%) rotate(45deg);
+    width: 7px; height: 7px; background: #2d7ab3; border-radius: 1px;
+  }
+  .port { font-size: 9.5px; color: #5a7a96; width: 52px; text-align: right; font-family: 'DejaVu Sans Mono', monospace; }
+  .big-server {
+    width: 170px; border-radius: 8px; padding: 12px 10px; text-align: center;
+    background: #fff; border: 2px solid #1a4a7a; color: #1a4a7a;
+    font-weight: 700; font-size: 13px;
+    box-shadow: 0 2px 6px rgba(20,40,64,0.12);
+  }
+  .big-server small { display: block; font-weight: 400; font-size: 10px; color: #5a7a96; margin-top: 3px; }
+  .note {
+    margin-top: 14px; font-size: 10.5px; color: #3d5a78; background: #eef3fa;
+    border-left: 3px solid #2d7ab3; padding: 7px 10px; border-radius: 0 5px 5px 0; line-height: 1.5;
+  }
+  .dots { font-size: 11px; color: #5a7a96; text-align: center; margin: 2px 0; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <!-- Panel A: Fase seleksi server -->
+    <div class="panel">
+      <div class="badge badge-a">FASE 1 &mdash; SELEKSI SERVER (&plusmn;1&ndash;2 DETIK)</div>
+      <div class="panel-title">Ping paralel ke 10 kandidat server</div>
+      <div class="panel-sub">Satu koneksi TCP singkat per kandidat &mdash; hanya untuk mengukur latency &amp; memilih server terbaik</div>
+      <div class="sel-wrap">
+        <div class="client">SPEEDTEST CLI<small>client</small></div>
+        <div class="sel-arrows">
+          <svg class="links" viewBox="0 0 46 150" preserveAspectRatio="none">
+            <g stroke="#9fb8d0" stroke-width="1.1" fill="none">
+              <path d="M0,20 C24,20 24,16 46,16"/>
+              <path d="M0,45 C24,45 24,38 46,38"/>
+              <path d="M0,70 C24,70 24,60 46,60"/>
+              <path d="M0,95 C24,95 24,84 46,84"/>
+              <path d="M0,120 C24,120 24,108 46,108"/>
+              <path d="M0,145 C24,145 24,132 46,132"/>
+            </g>
+          </svg>
+        </div>
+        <div class="sel-servers">
+          <div class="mini-server">1010 &middot; :8080</div>
+          <div class="mini-server">SmarTone &middot; :8080</div>
+          <div class="mini-server">Netvigator &middot; :8080</div>
+          <div class="mini-server">CMC Telecom &middot; :8080</div>
+          <div class="mini-server">STC &middot; :8080</div>
+          <div class="mini-server">Club SIM &middot; :8080</div>
+          <div class="mini-server">Sun Mobile &middot; :8080</div>
+          <div class="mini-server win">fdcservers &middot; :8080 &nbsp;&#10003;</div>
+          <div class="mini-server">HKBN &middot; :8080</div>
+          <div class="mini-server">GSL Networks &middot; :8080</div>
+        </div>
+      </div>
+      <div class="note">Tidak ada transfer data throughput pada fase ini. Koneksi ke server yang kalah langsung ditutup.</div>
+    </div>
+
+    <!-- Panel B: Fase test multi-connection -->
+    <div class="panel">
+      <div class="badge badge-b">FASE 2 &mdash; DOWNLOAD &amp; UPLOAD (15 DETIK / STAGE)</div>
+      <div class="panel-title">Banyak koneksi TCP simultan ke SATU server</div>
+      <div class="panel-sub">Teramati 20&ndash;27 koneksi paralel (download) dan 6&ndash;8 koneksi (upload) &mdash; semua ke IP:port yang sama</div>
+      <div class="mc-wrap">
+        <div class="client">SPEEDTEST CLI<small>1 proses</small></div>
+        <div class="conn-stack">
+          <div class="conn-line"><span class="port">:42014</span><div class="conn-bar"></div></div>
+          <div class="conn-line"><span class="port">:42030</span><div class="conn-bar"></div></div>
+          <div class="conn-line"><span class="port">:42044</span><div class="conn-bar"></div></div>
+          <div class="conn-line"><span class="port">:42060</span><div class="conn-bar"></div></div>
+          <div class="conn-line"><span class="port">:42074</span><div class="conn-bar"></div></div>
+          <div class="dots">&bull;&bull;&bull;</div>
+          <div class="conn-line"><span class="port">:42174</span><div class="conn-bar"></div></div>
+          <div class="conn-line"><span class="port">:42182</span><div class="conn-bar"></div></div>
+        </div>
+        <div class="big-server">SERVER TERPILIH<small>202.165.70.3:8080<br>GSL Networks, Hong Kong</small></div>
+      </div>
+      <div class="note">Jumlah koneksi naik bertahap (adaptive scaling, maks. 32 sesuai engine config). Source port berbeda-beda, tujuan selalu sama.</div>
+    </div>
+  </div>
+</body>
+</html>

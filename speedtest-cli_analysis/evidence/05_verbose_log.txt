@@ -1,0 +1,14 @@
+
+   Speedtest by Ookla
+
+      Server: GSL Networks - Hong Kong (id: 48446)
+         ISP: Alibaba
+Idle Latency:     4.64 ms   (jitter: 0.05ms, low: 4.58ms, high: 4.71ms)
+    Download:  3354.63 Mbps (data used: 3.2 GB)                                                   
+                  4.46 ms   (jitter: 21.55ms, low: 3.83ms, high: 277.56ms)
+[warning] Loaded latency: cannot read response.: [11] Resource temporarily unavailable
+      Upload:   999.53 Mbps (data used: 1.3 GB)                                                   
+                  5.41 ms   (jitter: 0.10ms, low: 5.29ms, high: 8.07ms)
+[warning] No libz support available, not compressing data.
+ Packet Loss:     0.0%
+  Result URL: https://www.speedtest.net/result/c/db7d864f-00d5-4b01-a23a-a4f500c54425

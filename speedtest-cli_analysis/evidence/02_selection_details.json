@@ -1,0 +1,178 @@
+{
+    "type": "log",
+    "timestamp": "2026-11-04T11:06:32Z",
+    "message": "Error: [0] Timeout occurred in connect.",
+    "level": "error"
+}
+{
+    "type": "result",
+    "timestamp": "2026-11-04T11:06:47Z",
+    "ping": {
+        "jitter": 0.145,
+        "latency": 4.738,
+        "low": 4.646,
+        "high": 5.000
+    },
+    "download": {
+        "bandwidth": 116988825,
+        "bytes": 848176952,
+        "elapsed": 7214,
+        "latency": {
+            "iqm": 4.623,
+            "low": 4.528,
+            "high": 212.125,
+            "jitter": 5.169
+        }
+    },
+    "upload": {
+        "bandwidth": 117617914,
+        "bytes": 887142449,
+        "elapsed": 7513,
+        "latency": {
+            "iqm": 4.406,
+            "low": 4.290,
+            "high": 7.694,
+            "jitter": 0.160
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 65463,
+        "selectedLatency": 3.734,
+        "servers": [
+            {
+                "latency": 5.1529999999999996,
+                "server": {
+                    "id": 43356,
+                    "host": "1010.hkspeedtest.com",
+                    "port": 8080,
+                    "name": 1010,
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 6.1740000000000004,
+                "server": {
+                    "id": 35791,
+                    "host": "kami.smartone.com",
+                    "port": 8080,
+                    "name": "SmarTone",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "error": "Latency test failed",
+                "errorCode": 0,
+                "server": {
+                    "id": 63143,
+                    "host": "hkspeedtest.netvigator.com",
+                    "port": 8080,
+                    "name": "Netvigator",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 49.448,
+                "server": {
+                    "id": 57571,
+                    "host": "hkgspeedtest.cmctelecom.vn",
+                    "port": 8080,
+                    "name": "CMC Telecom",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 4,
+                "server": {
+                    "id": 1536,
+                    "host": "suntechspeedtest.com",
+                    "port": 8080,
+                    "name": "STC",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 3.734,
+                "server": {
+                    "id": 65463,
+                    "host": "speedtest21.hkbn.net",
+                    "port": 8080,
+                    "name": "HKBN",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 4.6299999999999999,
+                "server": {
+                    "id": 48446,
+                    "host": "hk1.speedtest.gslnetworks.com",
+                    "port": 8080,
+                    "name": "GSL Networks",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 5.0270000000000001,
+                "server": {
+                    "id": 60178,
+                    "host": "sunmobile.hkspeedtest.com",
+                    "port": 8080,
+                    "name": "Sun Mobile",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 4.7640000000000002,
+                "server": {
+                    "id": 60177,
+                    "host": "hkt.hkspeedtest.com",
+                    "port": 8080,
+                    "name": "Club SIM by HKT",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 4.1879999999999997,
+                "server": {
+                    "id": 28912,
+                    "host": "speedtest.hkg.fdcservers.net",
+                    "port": 8080,
+                    "name": "fdcservers.net",
+                    "location": "Hong Kong",
+                    "country": "Hong Kong"
+                }
+            }
+        ]
+    },
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "21.0.7.203",
+        "name": "eth0",
+        "macAddr": "8A:74:54:37:26:B8",
+        "isVpn": false,
+        "externalIp": "8.212.10.159"
+    },
+    "server": {
+        "id": 65463,
+        "host": "speedtest21.hkbn.net",
+        "port": 8080,
+        "name": "HKBN",
+        "location": "Hong Kong",
+        "country": "Hong Kong",
+        "ip": "203.185.10.2"
+    },
+    "result": {
+        "id": "d7cd79f6-c2be-4f64-8061-a0d238940df1",
+        "url": "https://www.speedtest.net/result/c/d7cd79f6-c2be-4f64-8061-a0d238940df1",
+        "persisted": true
+    }
+}

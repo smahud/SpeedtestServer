@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Noto+Serif+SC:wght@400;700;900&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  @page { size: 794px 1123px; margin: 0; }
+  :root {
+    --c-bg: #0a1628;
+    --c-accent: #4da8da;
+    --c-text: #e8f0f8;
+    --c-muted: #7a9bb8;
+    --c-glow: #2d7ab3;
+  }
+  html, body {
+    margin: 0; padding: 0; width: 794px; height: 1123px;
+    background: var(--c-bg); color: var(--c-text);
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  }
+  @media screen {
+    html { height: auto; display: flex; justify-content: center; min-height: 100vh; background: var(--c-bg); }
+    body { transform-origin: top center; scale: min(1, calc(100vw / 794), calc(100vh / 1123)); margin: 0 auto; box-shadow: 0 0 60px rgba(0,0,0,0.3); }
+  }
+  .cover { width: 794px; height: 1123px; position: relative; box-sizing: border-box; }
+
+  /* Layer 1: background glow (clipped) */
+  .layer-1 {
+    position: absolute; inset: 0; overflow: hidden; z-index: 1;
+  }
+  .glow-a {
+    position: absolute; top: -120px; left: -100px; width: 520px; height: 520px;
+    background: radial-gradient(circle, rgba(45,122,179,0.14) 0%, rgba(45,122,179,0) 70%);
+  }
+  .glow-b {
+    position: absolute; bottom: -140px; right: -120px; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(45,122,179,0.12) 0%, rgba(45,122,179,0) 70%);
+  }
+
+  /* Layer 2: luminous rectangular frame */
+  .layer-2 { position: absolute; inset: 0; z-index: 2; }
+  .frame {
+    position: absolute; top: 80px; bottom: 80px; left: 60px; right: 60px;
+    border: 2px solid var(--c-accent); opacity: 0.85;
+  }
+
+  /* Layer 3: content */
+  .layer-3 { position: absolute; inset: 0; z-index: 3; }
+  .kicker {
+    position: absolute; left: 90px; top: 135px;
+    font-size: 11pt; color: var(--c-accent); letter-spacing: 5px;
+    text-transform: uppercase; font-weight: 300;
+  }
+  .title {
+    position: absolute; left: 90px; top: 236px;
+    font-size: 50pt; font-weight: 900; line-height: 1.15;
+    font-family: 'Playfair Display', 'Noto Serif SC', serif;
+    color: var(--c-text); max-width: 600px;
+    text-shadow: 0 0 24px rgba(45,122,179,0.35);
+  }
+  .summary {
+    position: absolute; left: 90px; top: 505px;
+    font-size: 15pt; line-height: 1.7; color: var(--c-muted);
+    max-width: 520px; font-weight: 300;
+  }
+  .stats {
+    position: absolute; left: 90px; top: 700px;
+    display: flex; gap: 48px;
+  }
+  .stat .num {
+    font-size: 30pt; font-weight: 600; color: var(--c-accent);
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  }
+  .stat .lbl {
+    font-size: 9.5pt; color: var(--c-muted); letter-spacing: 1.5px;
+    text-transform: uppercase; margin-top: 6px;
+  }
+  .org {
+    position: absolute; left: 90px; top: 855px;
+    font-size: 18pt; color: var(--c-text); font-weight: 500;
+  }
+  .date {
+    position: absolute; left: 90px; bottom: 108px;
+    font-size: 10pt; color: var(--c-muted); letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+  <div class="cover">
+    <div class="layer-1">
+      <div class="glow-a"></div>
+      <div class="glow-b"></div>
+    </div>
+    <div class="layer-2">
+      <div class="frame"></div>
+    </div>
+    <div class="layer-3">
+      <div class="kicker">LAPORAN PENGUJIAN TEKNIS</div>
+      <div class="title">Analisis<br>Multi-Connection<br>Speedtest CLI</div>
+      <div class="summary">
+        Pengujian empiris perilaku jaringan Speedtest by Ookla CLI v1.2.0:
+        apakah koneksi simultan diarahkan ke server berbeda, atau dikonsentrasikan
+        pada satu server yang sama.
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="num">27</div><div class="lbl">Koneksi simultan</div></div>
+        <div class="stat"><div class="num">1</div><div class="lbl">Server tujuan</div></div>
+        <div class="stat"><div class="num">32</div><div class="lbl">Batas engine</div></div>
+      </div>
+      <div class="org">Speedtest by Ookla 1.2.0.84 &middot; Linux x86_64</div>
+      <div class="date">4 November 2026 &middot; Sandbox Linux &middot; Hong Kong</div>
+    </div>
+  </div>
+</body>
+</html>

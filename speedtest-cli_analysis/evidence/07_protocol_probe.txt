@@ -1,0 +1,5 @@
+SENT: b'HI\n'
+RECV hex: 48454c4c4f20322e31312028322e31312e352920323032362d30362d30342e313733372e376430393933640a
+RECV repr: b'HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n'
+phase2: timed out
+HTTP-probe repr: b'HTTP/1.1 307 Temporary Redirect\r\nDate: Wed, 04 Nov 2026 11:14:16 GMT\r\nConnection: Close\r\nContent-Length: 0\r\nLocation: https://server-1536.prod.hosts.ooklaserver.net:8080/\r\n\r\n'
