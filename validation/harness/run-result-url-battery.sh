@@ -76,7 +76,9 @@ preflight() { # $1=tag -> fail-closed prechecks + inventory file
   local TAG="$1" PORT_PID OWNER_CMD DAEMONS
   PORT_PID=$(ss -tlnp 2>/dev/null | grep -E ":${STS_PORT} " | grep -o 'pid=[0-9]*' | head -1 | cut -d= -f2)
   OWNER_CMD=$(tr '\0' ' ' < "/proc/$PORT_PID/cmdline" 2>/dev/null || true)
-  DAEMONS=$(ps aux | grep -iE 'ooklaserver(-linux|[[:space:]]--ward)' | grep -v grep | grep -v dist/bin/ooklaserver.js || true)
+  # Official-daemon detection by process NAME (comm): matches OoklaServer and
+  # the suffixed binaries; never our own node dist/bin/ooklaserver.js process.
+  DAEMONS=$(ps -eo pid=,comm= | awk '$2 ~ /^[Oo]okla[Ss]erver([.-][[:alnum:]_.-]*)?$/ {print $1, $2}')
   {
     date -u
     echo "SpeedtestServer git SHA: $GIT_SHA"

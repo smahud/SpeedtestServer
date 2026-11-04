@@ -31,7 +31,7 @@ sleep 1
 # 3) run the official CLI (unmodified) through the proxy
 set +e
 ALL_PROXY=http://127.0.0.1:8888 HTTPS_PROXY=http://127.0.0.1:8888 HTTP_PROXY=http://127.0.0.1:8888 \
-  "$CLI" --ca-certificate=../certs/cli-ca-bundle.pem --accept-license --accept-gdpr \
+  "$CLI" --ca-certificate=certs/cli-ca-bundle.pem --accept-license --accept-gdpr \
   --selection-details -f json-pretty > "$OUT/cli.json" 2> "$OUT/cli.stderr"
 EXIT=$?
 set -e

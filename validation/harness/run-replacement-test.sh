@@ -17,8 +17,13 @@ CLI="${CLI:-../../clients/speedtest/speedtest}"
 [ -x "$CLI" ] || { echo "official CLI not found at $CLI"; exit 2; }
 
 # --- Gate CLI-3 pre-checks (fail closed) ---
-if ps aux | grep -iE 'ooklaserver(-linux|[[:space:]]--ward)' | grep -v grep | grep -vq dist/bin/ooklaserver.js; then
+# Official-daemon detection by process NAME (comm): matches OoklaServer,
+# OoklaServer-linux-x86_64 (comm is truncated to 15 chars, hence the prefix
+# match) — but never our own `node dist/bin/ooklaserver.js` process.
+DAEMONS="$(ps -eo pid=,comm= | awk '$2 ~ /^[Oo]okla[Ss]erver([.-][[:alnum:]_.-]*)?$/ {print $1, $2}')"
+if [ -n "$DAEMONS" ]; then
   echo "FATAL: an official OoklaServer process is running — kill it first (no hidden dependency allowed)."
+  echo "$DAEMONS"
   exit 3
 fi
 OWNER=$(ss -tlnp 2>/dev/null | grep -E ":${STS_PORT} " | grep -o 'pid=[0-9]*' | head -1 || true)
@@ -32,7 +37,8 @@ fi
   echo "target owner: $OWNER"
   ss -tlnp 2>/dev/null | grep -E ":${STS_PORT} |:5060 "
   ss -ulnp 2>/dev/null | grep -E ":${STS_PORT} |:5060 " || true
-  ps aux | grep -iE 'ooklaserver' | grep -v grep || echo "official daemon: ABSENT"
+  ps -eo pid=,comm= | awk '$2 ~ /^[Oo]okla[Ss]erver([.-][[:alnum:]_.-]*)?$/ {print $1, $2}' || true
+  if [ -z "$DAEMONS" ]; then echo "official daemon: ABSENT"; fi
 } > "$OUT/process-inventory.txt"
 if ! grep -q "official daemon: ABSENT" "$OUT/process-inventory.txt"; then
   echo "FATAL: official daemon still present — see $OUT/process-inventory.txt"
@@ -48,7 +54,7 @@ sleep 1
 
 set +e
 ALL_PROXY=http://127.0.0.1:8888 HTTPS_PROXY=http://127.0.0.1:8888 HTTP_PROXY=http://127.0.0.1:8888 \
-  "$CLI" --ca-certificate=../certs/cli-ca-bundle.pem --accept-license --accept-gdpr \
+  "$CLI" --ca-certificate=certs/cli-ca-bundle.pem --accept-license --accept-gdpr \
   --selection-details -f json-pretty > "$OUT/cli.json" 2> "$OUT/cli.stderr"
 EXIT=$?
 set -e
