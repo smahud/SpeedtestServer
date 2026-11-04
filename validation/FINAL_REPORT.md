@@ -1,114 +1,150 @@
-# FINAL_REPORT — audit/official-cli-interoperability (2026-11-04)
+# FINAL_REPORT — audit/typescript-official-parity (2026-11-04, revision 2)
 
-Scope: MASTER PROMPT v3.0 (SpeedtestServer interoperability, differential
-validation, autonomous remediation, open-source production readiness).
+Scope: MASTER PROMPT **v6.0** (SpeedtestServer interoperability, TLS §9/§10,
+configuration parity §11, external-flow audit §8, installer §13, README §14,
+differential validation, autonomous remediation, open-source production
+readiness). Supersedes the v3.0 report of `audit/official-cli-interoperability`
+(whose evidence remains valid and committed).
 
 ## A. Repository state
 
-- Baseline: `master` @ `f3ea41cdd2bb8b6ea7dff7b4bb552d7455710bf8`
-- Deliverable branch: **`audit/official-cli-interoperability`** (this tree)
-- Canonical implementation: `reverse-engineered/typescript` — new core
-  `ServerCore.ts`, `NetGaugeEngine.ts`, `UdpLossEngine.ts`, `HttpApi.ts`,
-  rewritten `OoklaServer.ts` and `bin/ooklaserver.ts` (+ fixes in
-  `ConfigManager`/types). JavaScript twin: deprecated, frozen.
-- Implementation commit: see `git log` (first commit on the branch);
-  this documentation commit adds the validation package on top.
+- Baseline: `master` @ `f3ea41cdd2bb8b6ea7dff7b4bb552d7455710bf8`; prior
+  deliverable `audit/official-cli-interoperability` @ `c54abf7`; **this
+  revision: `audit/typescript-official-parity`** (created from c54abf7).
+- Canonical implementation: `reverse-engineered/typescript` — `ServerCore`,
+  `NetGaugeEngine`, `UdpLossEngine`, `HttpApi`, rewritten `OoklaServer`/
+  `bin/ooklaserver.ts` (+`--validate-config`), and NEW this revision:
+  `CertificateManager` (§9.2–§9.6 fail-closed resolution), `AcmeProvisioner`
+  (standard ACME/HTTP-01), validated `ServerCore.reloadTls()` (§9.7),
+  ConfigManager precedence/list-coercion/logging fixes. Legacy
+  `TLSCertificateManager` stripped of invented Host-API endpoints and
+  `rejectUnauthorized:false` (FINDINGS C-3). JS twin deprecated, frozen.
+- Root `install.sh` (§13) added; README restructured (§14); validation
+  package restructured to the §15 layout.
 
 ## B. Architecture
 
-Original defects (verified): competing HTTP/HTTPS listeners on 8080 with
-swallowed EADDRINUSE, **no native protocol at all**, WS random-bytes, UDP
-blind echo, root-only paths, JSON-mangled bodies, mock subsystems, outbound
-`rejectUnauthorized:false` — see `FINDINGS.md` (7 P0/P1 entries + 7 new
-reference-behavior discoveries).
-Corrected design: single-port multiplexing (TLS/HTTP/WS/NetGauge per
-connection), fail-closed binds, one engine shared by three transports,
-byte-parity HTTP surface, UDP LOSS/RECV with anti-spoof session binding,
-built-in JSONL evidence logging — `ARCHITECTURE_TARGET.md`.
+Corrected design (prior revision, unchanged): single-port multiplexing
+(TLS/HTTP/WS/NetGauge per connection), fail-closed binds, one engine shared
+by three transports, byte-parity HTTP surface, UDP LOSS/RECV with anti-spoof
+binding, JSONL evidence logging. NEW: TLS material resolution is a
+fail-closed §9 matrix; certificates hot-reload with validation; ACME
+provisioning via the established `acme-client` library.
 
 ## C. Official binary reference
 
-OoklaServer 2.11.5.2 `2026-06-04.1737.7d0993d`, tarball sha256
-`ce180aa3…598159` (current stable; the prompt's previously recorded
-`f19e5ed2…` artifact is preserved as a *separate* historical baseline and all
-2026-11-04 evidence is labeled with the current one). Official CLI 1.2.0.84,
-tarball sha256 `5690596c…cfeeb7`, unmodified. No vendor binaries committed.
-`REFERENCE_BINARY_MANIFEST.md`.
+OoklaServer 2.11.5.2 `2026-06-04.1737.7d0993d`, tarball sha256 `ce180aa3…598159`;
+official CLI 1.2.0.84 `ea6b6773cf`, tarball sha256 `5690596c…cfeeb7`, unmodified.
+No vendor binaries committed. `REFERENCE_BINARY_MANIFEST.md` / `BASELINE.md`.
 
-## D. Differential validation
+## D. Differential validation (re-run this revision)
 
-Probe battery: **35/37 byte-identical**, 2 expected non-differences (PONG
-timestamp, random payload). Host tester v1.1.0: **10/10 on both servers**.
-`DIFFERENTIAL_MATRIX.md`, `evidence/diff-probe-*.json`.
+Probe battery: **35/37 byte-identical** (2 expected: PONG timestamp, random
+payload). Host tester v1.1.0: **10/10**. `evidence/gate-revision2/`.
 
 ## E. Genuine Speedtest CLI cross-validation ★
 
-`OFFICIAL_CLI_RESULTS.md` + machine-readable gate files:
-
 | Path | Outcome |
 |---|---|
-| Official CLI → official OoklaServer | 3 runs, exit 0 (direct runs loss 0; the one relayed run documents the relay-NAT UDP artifact, A-2) |
-| Official CLI → **SpeedtestServer** | **3/3 exit 0 · ping 0.033–0.047 ms · download 18.4–21.7 Gbps (24.56 GB on the gate run) · upload 13.6–15.7 Gbps (18.95 GB) · packetLoss 0 · persisted=false** |
-| Official CLI → SpeedtestServer, **publishing opt-in** | 9 runs / 6 distinct server IDs, all exit 0, `persisted=true`, each returning a **genuine public Result URL** (spot-verified against the live result pages) — `PUBLISHED_RESULT_URLS.md` |
+| Official CLI → official OoklaServer | 3/3 exit 0 (prior revision; protocol path unchanged) |
+| Official CLI → **SpeedtestServer** (non-publishing, isolated) | **3/3 exit 0 · ping 0.041–0.077 ms · DL 17.96–18.53 Gbps · UL 12.38–13.44 Gbps · packetLoss 0 · persisted=false** |
+| Official CLI → SpeedtestServer, publishing opt-in (rev2 battery) | 6 runs / 4 distinct server IDs; 4/6 zero-loss PASS with genuine public Result URLs (spot-verified live); 2 documented stochastic loopback-loss outliers (§5) |
 
-Destination proof: `server.host=localhost`, `server.ip=::1`, port owned by
-`node dist/bin/ooklaserver.js` (pid recorded pre-run); all daemon processes
-verified absent. Server-side corroboration: SpeedtestServer's own evidence
-log shows 23 NetGauge sessions / 1,883 commands / **24,651,035,453 B sent /
-19,107,443,639 B received**, matching the client-reported volumes. Non-publishing:
-`persisted:false` + submission endpoint refused at the proxy (logged), every run.
+Destination proof per run (comm-based official-daemon check + port owner via
+/proc) and server-side byte corroboration captured for every run.
 
-## F. Host tester cross-validation
+## F. TLS (§9/§10 — new this revision)
 
-10/10 both servers, identical verdict strings — `HOST_TESTER_COMPARISON.md`.
+Strict validation battery **10/10** on the actual multiplexed listener:
+trusted custom pair PASS; self-signed/expired/wrong-hostname strictly
+REJECTED; mismatch/incomplete/LE-unconfigured/dead-ACME all abort startup;
+§9.7 delayed activation + last-valid preservation verified;
+minimumTLSProtocol enforcement verified. Real ACME issuance BLOCKED (no
+operator domain in lab) — fail-closed paths verified, staging path
+documented. `TLS_CERTIFICATES.md`, `evidence/tls/`.
 
-## G. Remaining compatibility gaps
+## G. Configuration (§11 — new this revision)
+
+Precedence fixed to CLI > env > file > defaults (C-1); list coercion (C-2);
+logging wired; template-parity unit-verified. Full property matrix in
+`CONFIG_MATRIX.md` — every key classified IV/P/PNA/N-A/EXT with rationale;
+no silent acceptance.
+
+## H. External communication (§8 — new this revision)
+
+`EXTERNAL_FLOWS.md`: the CLIENT fetches engine config from cli.speedtest.net,
+measures against the server, and submits results to results.speedtest.net
+(publishing = opt-in; non-publishing gates refuse it and still pass). Result
+URLs are produced by the Ookla result service, NOT by the speedtest server;
+the independent server makes ZERO outbound connections; invented private
+endpoints removed (C-3).
+
+## I. Installer (§13 — new this revision)
+
+`install.sh` deploys the TypeScript server to Debian 13 + systemd: OS/deps
+checks, reproducible deps (committed package-lock.json; isolated prod
+install), build, `--validate-config` validation, /opt install, dedicated
+non-root user, hardened systemd unit (`systemd-analyze verify` OK),
+config/cert preservation, idempotent re-runs, direct launch + protocol probe
+verification. Verified via dry-run + full staged install + invalid-config
+fail-closed. **systemd service start itself: BLOCKED in this container**
+(PID 1 = tini) — the only unverified installer step, documented with exact
+commands. `evidence/installer/`.
+
+## J. Automated tests
+
+Unit/protocol conformance **66/66** (44 + 22 new §9/§11). TLS battery 10/10.
+Negative battery 7/7. Differential 37 probes (35 identical/2 expected).
+Official CLI gates 3/3 isolated (+ battery 6 runs). Installer 4 scenarios.
+Mocks never substitute the mandatory real-client runs.
+
+## K. Remaining compatibility gaps
 
 | Gap | Severity | Blocks replacement objective? |
 |---|---|---|
-| Encrypted-binary engine protocol not implemented (plaintext fallback used instead) | Low (fallback verified 3/3; documented D-2) | **No** — for the verified client profile |
-| `allowedDomains`/`userAgentFilterEnabled` not enforced (keys parsed) | Low | No (lab/standalone profile) |
-| Traceroute/metrics/auto-update decommissioned | Intentional | No |
-| Throughput ~30–37% of native daemon on loopback (single-threaded Node) | Informational | No (assignment §15) |
+| Encrypted-binary engine protocol not implemented (plaintext fallback verified 3/3; D-2) | Low | No — verified client profile |
+| systemd start + real ACME issuance need a real host (lab BLOCKED, commands documented) | Operational | No — verified by direct-launch + fail-closed tests |
+| allowedDomains / UA-filter flag / frameSizeLimit / explicit addresses binding documented PNA/P (CONFIG_MATRIX) | Low | No — standalone profile |
+| Throughput ~30–37 % of native daemon on loopback (single-threaded Node) | Informational | No |
 
-## H. Security & performance
+## L. Security assessment
 
-`SECURITY_AUDIT.md` (validated mitigations + 4 documented residual risks),
-`PERFORMANCE_REPORT.md` (stability over ~118 GB of gate+diagnostic traffic;
-backpressure-aware streaming; no leak trend).
+`SECURITY_AUDIT.md` mitigations still hold; this revision additionally
+removed the disabled-verification outbound client and the invented
+credential-bearing endpoints (C-3), and made TLS misconfiguration fatal
+instead of silently degrading (C-4). No known critical unresolved
+vulnerabilities in the release scope.
 
-## I. Automated tests
+## M. Documentation
 
-Unit/protocol conformance: **44/44** (jest). Negative battery: **7/7**.
-Differential probes: 37 (35 identical/2 expected). Official CLI gates: **6/6
-exit 0** (3 baseline + 3 replacement). Mocks never substitute the mandatory
-real-client runs.
+README restructured to §14's 16 sections with commands actually executed;
+validation package matches code and evidence (`TEST_RESULTS.md` index).
 
-## J. Git delivery
+## N. Git delivery
 
-- Branch `audit/official-cli-interoperability`, coherent commits
-  (implementation → validation/docs → multi-server Result-URL battery).
-  `master` untouched.
-- Push: executed at delivery time (2026-11-04) with owner-supplied
-  credentials; the audit environment itself holds none. A **git bundle**
-  with the full branch is also exported for archival (`download/`).
-- No proprietary binaries or credentials are included anywhere.
+Branch `audit/typescript-official-parity`, coherent commits (implementation
++ harness + evidence + docs). `master` untouched; no proprietary binaries or
+credentials committed; harness scripts now carry the executable bit.
 
-## K. Release verdict
+## O. Release verdict
 
-### **CONDITIONAL PASS — VERIFIED STANDALONE REPLACEMENT PROFILE**
+### **CONDITIONAL PASS — VERIFIED STANDALONE REPLACEMENT PROFILE (v6.0)**
 
-All mandatory gates verified with independent evidence: server launches
-standalone (unprivileged), full native protocol functions (TCP + TLS-wrapped +
-WS + UDP), host-tester parity 10/10, **the unmodified official CLI completes
-the authorized test against SpeedtestServer with the official daemon absent
-(3/3, packetLoss 0, non-publishing)**, security findings remediated,
-reproducible build + harness. "Conditional" reflects the documented residual
-items in §G (none of which blocks the verified profile) per MASTER PROMPT §23.
-This is **not** Ookla certification, **not** server-network admission, and
-applies only to the verified compatibility profile.
+All mandatory gates verified with independent evidence on the current code:
+genuine unmodified official CLI completes authorized end-to-end tests against
+SpeedtestServer with the official daemon absent (3/3, packetLoss 0,
+non-publishing); protocol/byte parity 35/37 with only documented
+non-differences; host tester 10/10; TLS §9/§10 semantics fail-closed and
+strictly validated (10/10); configuration precedence and parity unit-verified
+with a complete honest matrix; external flows accurately classified with the
+server making zero outbound connections; installer verified end-to-end as far
+as the container allows. **Conditions** (documented, non-blocking): systemd
+service start and real ACME issuance require a real Debian 13 host with an
+operator domain; §G/§K low-severity items remain documented rather than
+implemented. This is **not** Ookla certification, **not** host-network
+admission, and applies only to the verified compatibility profile.
 
-## L. Future-session handoff
+## P. Future-session handoff
 
 `HANDOFF.md` (self-contained: re-verify steps, ordered next steps, knowledge
 map). `REPRODUCE.md` reproduces every claim from a clean checkout.

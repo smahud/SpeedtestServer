@@ -1,0 +1,11 @@
+Wed Nov  4 10:44:14 UTC 2026
+SpeedtestServer git SHA: c54abf7b6659a2794c3f1c4b605dee50319f4979
+CLI sha256: 31f1124c5ab8acdae6b9fe1741e704df420f9f2e7d429679fabe62075453c051
+target owner pid=6153 cmd=node ../../reverse-engineered/typescript/dist/bin/ooklaserver.js --ports 8080,5060 --udp-ports 8080,5060 --evidence-log ./out/result-urls-rev2/run-s60178-sts-evidence.jsonl 
+--- listeners ---
+LISTEN 0      511                *:8080             *:*    users:(("MainThread",pid=6153,fd=22))
+LISTEN 0      511                *:5060             *:*    users:(("MainThread",pid=6153,fd=23))
+UNCONN 0      0                  *:8080            *:*    users:(("MainThread",pid=6153,fd=24))
+UNCONN 0      0                  *:5060            *:*    users:(("MainThread",pid=6153,fd=25))
+--- processes ---
+official daemon: ABSENT

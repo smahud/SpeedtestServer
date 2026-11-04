@@ -1,0 +1,6 @@
+fingerprintA(start)=87:7C:FC:4D:88:EA:7A:B1:23:02:2D:77:F1:C5:BE:58:D5:EC:39:94:8D:B0:0E:8B:8D:88:5E:A1:86:0F:23:BC
+fingerprintB(after swap)=22:2C:86:3A:5F:1F:FB:C4:9B:D9:13:ED:21:98:3A:60:23:34:E3:1F:48:08:98:96:53:C9:99:F2:27:40:F8:EF
+fingerprintStillB(after broken write)=22:2C:86:3A:5F:1F:FB:C4:9B:D9:13:ED:21:98:3A:60:23:34:E3:1F:48:08:98:96:53:C9:99:F2:27:40:F8:EF
+2026-11-04 10:04:33 [3121 - 3061] [INFORMATION] [net] tls_reloaded {"fingerprint":"22:2C:86:3A:5F:1F:FB:C4:9B:D9:13:ED:21:98:3A:60:23:34:E3:1F:48:08:98:96:53:C9:99:F2:27:40:F8:EF"}
+2026-11-04 10:04:33 [3121 - 3061] [INFORMATION] Custom certificate reloaded (hot activation, no restart) {"file":"/home/z/my-project/SpeedtestServer/validation/harness/out/tls-validation/scratch/live.pem"}
+2026-11-04 10:04:36 [3121 - 3061] [ERROR] Certificate reload failed (keeping last valid certificate): ./out/tls-validation/scratch/live.pem: certificate is not parseable PEM X.509: error:0480006C:PEM routines::no start line

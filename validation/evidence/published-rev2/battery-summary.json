@@ -1,0 +1,14 @@
+{"k":"battery","startedUtc":"2026-11-04T10:43:22Z","gitSha":"c54abf7b6659a2794c3f1c4b605dee50319f4979","cliSha256":"31f1124c5ab8acdae6b9fe1741e704df420f9f2e7d429679fabe62075453c051","publishing":true,"target":"localhost:8080"}
+{"k":"run","id":63143,"format":"json-pretty","tag":"s63143","status":"PASS","exit":0,"resultUrl":"https://www.speedtest.net/result/c/572dd200-a096-4093-9363-1f086a6cf526","packetLoss":"0"}
+{"k":"battery","finishedUtc":"2026-11-04T10:44:02Z"}
+{"k":"battery","startedUtc":"2026-11-04T10:44:13Z","gitSha":"c54abf7b6659a2794c3f1c4b605dee50319f4979","cliSha256":"31f1124c5ab8acdae6b9fe1741e704df420f9f2e7d429679fabe62075453c051","publishing":true,"target":"localhost:8080"}
+{"k":"run","id":60178,"format":"json-pretty","tag":"s60178","status":"EXIT_0","exit":0,"resultUrl":"https://www.speedtest.net/result/c/48d4d353-2206-4a35-bd9d-0fc527d1c4c7","packetLoss":"3.6082474226804124"}
+{"k":"run","id":35791,"format":"json-pretty","tag":"s35791","status":"PASS","exit":0,"resultUrl":"https://www.speedtest.net/result/c/42afd2e9-6b73-4729-9b1d-caaf8efbf715","packetLoss":"0"}
+{"k":"run","id":48446,"format":"json-pretty","tag":"s48446","status":"PASS","exit":0,"resultUrl":"https://www.speedtest.net/result/c/cd393af6-2b69-4d23-b576-a73894ce6f15","packetLoss":"0"}
+{"k":"battery","finishedUtc":"2026-11-04T10:45:32Z"}
+{"k":"battery","startedUtc":"2026-11-04T10:45:39Z","gitSha":"c54abf7b6659a2794c3f1c4b605dee50319f4979","cliSha256":"31f1124c5ab8acdae6b9fe1741e704df420f9f2e7d429679fabe62075453c051","publishing":true,"target":"localhost:8080"}
+{"k":"run","id":60178,"format":"json-pretty","tag":"s60178-run2","status":"EXIT_0","exit":0,"resultUrl":"https://www.speedtest.net/result/c/3520bdd8-0bee-402b-b78f-f1ef0a6a5523","packetLoss":"0.34843205574912894"}
+{"k":"battery","finishedUtc":"2026-11-04T10:46:09Z"}
+{"k":"battery","startedUtc":"2026-11-04T10:47:03Z","gitSha":"c54abf7b6659a2794c3f1c4b605dee50319f4979","cliSha256":"31f1124c5ab8acdae6b9fe1741e704df420f9f2e7d429679fabe62075453c051","publishing":true,"target":"localhost:8080"}
+{"k":"run","id":60178,"format":"json-pretty","tag":"s60178-run3","status":"PASS","exit":0,"resultUrl":"https://www.speedtest.net/result/c/55713fba-3d50-4558-95f2-7afbde18107a","packetLoss":"0"}
+{"k":"battery","finishedUtc":"2026-11-04T10:47:30Z"}

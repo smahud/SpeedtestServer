@@ -1,0 +1,15 @@
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":3195,"role":"standalone","config":"./out/tls-validation/scratch/t3.properties"}
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] TLS material resolved {"mode":"custom","source":"custom pair /home/z/my-project/SpeedtestServer/validation/harness/tls-cases/server-a.pem + /home/z/my-project/SpeedtestServer/validation/harness/tls-cases/server-a.key (effectiveUseLetsEncrypt=false)","effectiveUseLetsEncrypt":false}
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] [net] listen_tcp {"port":8443,"family":"dual-stack"}
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] [net] listen_udp {"port":8443}
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] [net] started {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"226C0A25-CF3A-466C-AB70-5A99ED2DC97B","pid":3195}
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] Watching custom certificate for changes (hot reload) {"file":"/home/z/my-project/SpeedtestServer/validation/harness/tls-cases/server-a.pem"}
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] SpeedtestServer started (canonical ServerCore) {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","tlsMode":"custom","effectiveUseLetsEncrypt":false,"tlsMinimumProtocol":"1.3","role":"standalone"}
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] SpeedtestServer started successfully {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d"}
+2026-11-04 10:04:39 [3195 - 3061] [INFORMATION] This is an INDEPENDENT open-source implementation — not an Ookla product.
+2026-11-04 10:04:40 [3195 - 3061] [INFORMATION] [net] tls_error {"id":1,"peer":"::ffff:127.0.0.1:57168","error":"Error: C042AA966C7F0000:error:0A000102:SSL routines:tls_early_post_process_client_hello:unsupported protocol:../deps/openssl/openssl/ssl/statem/statem_srvr.c:1780:\n"}
+2026-11-04 10:04:40 [3195 - 3061] [INFORMATION] [net] conn_close {"id":1,"peer":"::ffff:127.0.0.1:57168"}
+2026-11-04 10:04:40 [3195 - 3061] [INFORMATION] [net] conn_close {"id":2,"peer":"::ffff:127.0.0.1:57184"}
+2026-11-04 10:04:40 [3195 - 3061] [INFORMATION] Received SIGTERM, shutting down...
+2026-11-04 10:04:40 [3195 - 3061] [INFORMATION] [net] stopped {"connections":2}
+2026-11-04 10:04:40 [3195 - 3061] [INFORMATION] SpeedtestServer stopped

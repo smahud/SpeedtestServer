@@ -1,0 +1,1 @@
+[cv-proxy] on 127.0.0.1:8888 | cli.speedtest.net -> crafted config (1 server -> localhost:8080) | results.speedtest.net TUNNELED (publishing ENABLED — Result URL capture)

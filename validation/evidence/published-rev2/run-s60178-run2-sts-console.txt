@@ -1,0 +1,41 @@
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":6475,"role":"standalone","config":"(search path)"}
+2026-11-04 10:45:39 [6475 - 6465] [WARNING] DEVELOPMENT MODE: no TLS material configured; generating an untrusted self-signed certificate. For production set openSSL.server.certificateFile/privateKeyFile (custom) or OoklaServer.ssl.useLetsEncrypt=true with OoklaServer.ssl.acme.* (automatic).
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] TLS material resolved {"mode":"dev-self-signed","source":"generated self-signed (development only, NOT publicly trusted)","effectiveUseLetsEncrypt":false}
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] [net] listen_tcp {"port":8080,"family":"dual-stack"}
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] [net] listen_tcp {"port":5060,"family":"dual-stack"}
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] [net] listen_udp {"port":8080}
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] [net] listen_udp {"port":5060}
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] [net] started {"tcpPorts":[8080,5060],"udpPorts":[8080,5060],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"B18DE927-805D-473C-B1D1-204293DEAE4A","pid":6475}
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] SpeedtestServer started (canonical ServerCore) {"tcpPorts":[8080,5060],"udpPorts":[8080,5060],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","tlsMode":"dev-self-signed","effectiveUseLetsEncrypt":false,"tlsMinimumProtocol":"1.2","role":"standalone"}
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] SpeedtestServer started successfully {"tcpPorts":[8080,5060],"udpPorts":[8080,5060],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d"}
+2026-11-04 10:45:39 [6475 - 6465] [INFORMATION] This is an INDEPENDENT open-source implementation — not an Ookla product.
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_close {"id":1,"peer":"?:?"}
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":2,"peer":"::1:58552","transport":"tcp"}
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_close {"id":2,"peer":"::1:58552","stats":{"peer":"::1:58552","openedAt":1793789142499,"transport":"tcp","bytesDown":156,"bytesUp":126,"commands":7}}
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":4,"peer":"::1:58570","transport":"tcp"}
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":5,"peer":"::1:58572","transport":"tcp"}
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":3,"peer":"::1:58560","transport":"tcp"}
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":6,"peer":"::1:58582","transport":"tcp"}
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":7,"peer":"::1:58588","transport":"tcp"}
+2026-11-04 10:45:42 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":8,"peer":"::1:58600","transport":"tcp"}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_close {"id":6,"peer":"::1:58582","stats":{"peer":"::1:58582","openedAt":1793789142566,"transport":"tcp","bytesDown":9779398700,"bytesUp":5526,"commands":307}}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_close {"id":4,"peer":"::1:58570","stats":{"peer":"::1:58570","openedAt":1793789142503,"transport":"tcp","bytesDown":8290621484,"bytesUp":4680,"commands":260}}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_close {"id":5,"peer":"::1:58572","stats":{"peer":"::1:58572","openedAt":1793789142560,"transport":"tcp","bytesDown":10081572908,"bytesUp":5688,"commands":316}}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_close {"id":7,"peer":"::1:58588","stats":{"peer":"::1:58588","openedAt":1793789142567,"transport":"tcp","bytesDown":9057572908,"bytesUp":5112,"commands":284}}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":9,"peer":"::1:42560","transport":"tcp"}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":10,"peer":"::1:42564","transport":"tcp"}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":11,"peer":"::1:42570","transport":"tcp"}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":12,"peer":"::1:42582","transport":"tcp"}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":13,"peer":"::1:42584","transport":"tcp"}
+2026-11-04 10:45:56 [6475 - 6465] [INFORMATION] [net] conn_netgauge {"id":14,"peer":"::1:42588","transport":"tcp"}
+2026-11-04 10:45:59 [6475 - 6465] [INFORMATION] [net] conn_close {"id":8,"peer":"::1:58600","stats":{"peer":"::1:58600","openedAt":1793789142572,"transport":"tcp","bytesDown":5478,"bytesUp":4576,"commands":286}}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] [net] conn_close {"id":13,"peer":"::1:42584","stats":{"peer":"::1:42584","openedAt":1793789156964,"transport":"tcp","bytesDown":93,"bytesUp":37,"commands":2}}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] [net] conn_close {"id":11,"peer":"::1:42570","stats":{"peer":"::1:42570","openedAt":1793789156962,"transport":"tcp","bytesDown":2176,"bytesUp":2641492593,"commands":84}}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] [net] conn_close {"id":12,"peer":"::1:42582","stats":{"peer":"::1:42582","openedAt":1793789156963,"transport":"tcp","bytesDown":2826,"bytesUp":3443980585,"commands":109}}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] [net] conn_close {"id":9,"peer":"::1:42560","stats":{"peer":"::1:42560","openedAt":1793789156962,"transport":"tcp","bytesDown":2826,"bytesUp":3431005393,"commands":109}}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] [net] conn_close {"id":10,"peer":"::1:42564","stats":{"peer":"::1:42564","openedAt":1793789156962,"transport":"tcp","bytesDown":2670,"bytesUp":3249675305,"commands":103}}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] [net] conn_close {"id":3,"peer":"::1:58560","stats":{"peer":"::1:58560","openedAt":1793789142566,"transport":"tcp","bytesDown":300,"bytesUp":112,"commands":18}}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] [net] conn_close {"id":14,"peer":"::1:42588","stats":{"peer":"::1:42588","openedAt":1793789156966,"transport":"tcp","bytesDown":3141,"bytesUp":2608,"commands":163}}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] Received SIGTERM, shutting down...
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] [net] stopped {"connections":14}
+2026-11-04 10:46:05 [6475 - 6465] [INFORMATION] SpeedtestServer stopped

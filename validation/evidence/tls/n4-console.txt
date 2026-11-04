@@ -1,0 +1,2 @@
+2026-11-04 10:04:46 [3378 - 3377] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":3378,"role":"standalone","config":"./out/tls-validation/scratch/n4.properties"}
+2026-11-04 10:04:46 [3378 - 3377] [ERROR] Failed to start SpeedtestServer {"error":"TlsConfigurationError: /home/z/my-project/SpeedtestServer/validation/harness/tls-cases/server-a.pem: certificate/private key do not match (or key is invalid): error:05800074:x509 certificate routines::key values mismatch"}

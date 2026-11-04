@@ -1,0 +1,13 @@
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":3247,"role":"standalone","config":"./out/tls-validation/scratch/n1.properties"}
+2026-11-04 10:04:41 [3247 - 3061] [WARNING] DEVELOPMENT MODE: no TLS material configured; generating an untrusted self-signed certificate. For production set openSSL.server.certificateFile/privateKeyFile (custom) or OoklaServer.ssl.useLetsEncrypt=true with OoklaServer.ssl.acme.* (automatic).
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] TLS material resolved {"mode":"dev-self-signed","source":"generated self-signed (development only, NOT publicly trusted)","effectiveUseLetsEncrypt":false}
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] [net] listen_tcp {"port":8443,"family":"dual-stack"}
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] [net] listen_udp {"port":8443}
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] [net] started {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"08D2F6CA-A504-4410-84FA-DA0403A4379A","pid":3247}
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] SpeedtestServer started (canonical ServerCore) {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","tlsMode":"dev-self-signed","effectiveUseLetsEncrypt":false,"tlsMinimumProtocol":"1.2","role":"standalone"}
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] SpeedtestServer started successfully {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d"}
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] This is an INDEPENDENT open-source implementation — not an Ookla product.
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] [net] conn_close {"id":1,"peer":"::ffff:127.0.0.1:57196"}
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] Received SIGTERM, shutting down...
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] [net] stopped {"connections":1}
+2026-11-04 10:04:41 [3247 - 3061] [INFORMATION] SpeedtestServer stopped

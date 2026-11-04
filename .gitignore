@@ -10,3 +10,4 @@ clients/
 lab/
 *.pem
 *.key
+validation/harness/tls-cases/

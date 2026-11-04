@@ -1,0 +1,170 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T10:20:24Z",
+    "ping": {
+        "jitter": 0.076,
+        "latency": 0.041,
+        "low": 0.031,
+        "high": 0.186
+    },
+    "download": {
+        "bandwidth": 2315953702,
+        "bytes": 27505284072,
+        "elapsed": 12012,
+        "latency": {
+            "iqm": 21.761,
+            "low": 0.158,
+            "high": 148.706,
+            "jitter": 28.258
+        }
+    },
+    "upload": {
+        "bandwidth": 1680290284,
+        "bytes": 13751748221,
+        "elapsed": 8400,
+        "latency": {
+            "iqm": 5.166,
+            "low": 0.092,
+            "high": 33.514,
+            "jitter": 6.815
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 65463,
+        "selectedLatency": 0.040000000000000001,
+        "servers": [
+            {
+                "latency": 0.16700000000000001,
+                "server": {
+                    "id": 43356,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": 1010,
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.157,
+                "server": {
+                    "id": 35791,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "SmarTone",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.070999999999999994,
+                "server": {
+                    "id": 63143,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "Netvigator",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.070999999999999994,
+                "server": {
+                    "id": 57571,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "CMC Telecom",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.059999999999999998,
+                "server": {
+                    "id": 1536,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "STC",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.059999999999999998,
+                "server": {
+                    "id": 48446,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "GSL Networks",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.065000000000000002,
+                "server": {
+                    "id": 60177,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "Club SIM by HKT",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.059999999999999998,
+                "server": {
+                    "id": 28912,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "fdcservers.net",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.068000000000000005,
+                "server": {
+                    "id": 60178,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "Sun Mobile",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.040000000000000001,
+                "server": {
+                    "id": 65463,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "HKBN",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            }
+        ]
+    },
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 65463,
+        "host": "localhost",
+        "port": 8080,
+        "name": "HKBN",
+        "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "1db4201e-c420-4ee5-96a3-cb9d3ab12a6e",
+        "persisted": false
+    }
+}

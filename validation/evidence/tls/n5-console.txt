@@ -1,0 +1,2 @@
+2026-11-04 10:04:46 [3392 - 3391] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":3392,"role":"standalone","config":"./out/tls-validation/scratch/n5.properties"}
+2026-11-04 10:04:46 [3392 - 3391] [ERROR] Failed to start SpeedtestServer {"error":"TlsConfigurationError: Incomplete custom certificate configuration: openSSL.server.certificateFile is set but openSSL.server.privateKeyFile is missing. Configure BOTH (custom mode) or NEITHER (automatic/dev mode). Refusing to fall back."}

@@ -1,0 +1,71 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T10:45:01Z",
+    "ping": {
+        "jitter": 0.065,
+        "latency": 0.090,
+        "low": 0.054,
+        "high": 0.166
+    },
+    "download": {
+        "bandwidth": 2245559979,
+        "bytes": 20247537585,
+        "elapsed": 9119,
+        "latency": {
+            "iqm": 26.417,
+            "low": 0.137,
+            "high": 117.003,
+            "jitter": 34.730
+        }
+    },
+    "upload": {
+        "bandwidth": 1593917211,
+        "bytes": 14873074108,
+        "elapsed": 9607,
+        "latency": {
+            "iqm": 5.233,
+            "low": 0.294,
+            "high": 36.212,
+            "jitter": 6.622
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 35791,
+        "selectionMethod": "manual",
+        "servers": [
+            {
+                "server": {
+                    "id": 35791,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "SmarTone",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            }
+        ]
+    },
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 35791,
+        "host": "localhost",
+        "port": 8080,
+        "name": "SmarTone",
+        "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "42afd2e9-6b73-4729-9b1d-caaf8efbf715",
+        "url": "https://www.speedtest.net/result/c/42afd2e9-6b73-4729-9b1d-caaf8efbf715",
+        "persisted": true
+    }
+}
