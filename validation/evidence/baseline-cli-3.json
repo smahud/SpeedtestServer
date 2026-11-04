@@ -1,0 +1,54 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T07:18:25Z",
+    "ping": {
+        "jitter": 0.008,
+        "latency": 0.051,
+        "low": 0.049,
+        "high": 0.080
+    },
+    "download": {
+        "bandwidth": 8601097998,
+        "bytes": 77693732016,
+        "elapsed": 9007,
+        "latency": {
+            "iqm": 0.133,
+            "low": 0.106,
+            "high": 42.989,
+            "jitter": 0.663
+        }
+    },
+    "upload": {
+        "bandwidth": 5291246222,
+        "bytes": 48605083275,
+        "elapsed": 10516,
+        "latency": {
+            "iqm": 0.157,
+            "low": 0.086,
+            "high": 0.375,
+            "jitter": 0.029
+        }
+    },
+    "packetLoss": 0,
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 60177,
+        "host": "localhost",
+        "port": 18080,
+        "name": "Club SIM by HKT",
+        "location": "Hong Kong -> LAB (localhost:18080) [SpeedtestServer audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "96752bd8-d789-47a6-a908-4e5ab896a8b9",
+        "persisted": false
+    }
+}

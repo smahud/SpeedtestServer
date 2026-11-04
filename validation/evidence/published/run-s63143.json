@@ -1,0 +1,71 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T08:12:18Z",
+    "ping": {
+        "jitter": 0.036,
+        "latency": 0.085,
+        "low": 0.052,
+        "high": 0.104
+    },
+    "download": {
+        "bandwidth": 2353084049,
+        "bytes": 27565270464,
+        "elapsed": 11812,
+        "latency": {
+            "iqm": 21.846,
+            "low": 0.125,
+            "high": 116.407,
+            "jitter": 29.324
+        }
+    },
+    "upload": {
+        "bandwidth": 1836309124,
+        "bytes": 19796925450,
+        "elapsed": 11104,
+        "latency": {
+            "iqm": 4.373,
+            "low": 0.148,
+            "high": 34.584,
+            "jitter": 5.251
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 63143,
+        "selectionMethod": "manual",
+        "servers": [
+            {
+                "server": {
+                    "id": 63143,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "Netvigator",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            }
+        ]
+    },
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 63143,
+        "host": "localhost",
+        "port": 8080,
+        "name": "Netvigator",
+        "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "1510b504-3fd4-4b53-b809-232ac9845272",
+        "url": "https://www.speedtest.net/result/c/1510b504-3fd4-4b53-b809-232ac9845272",
+        "persisted": true
+    }
+}

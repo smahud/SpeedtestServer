@@ -1,0 +1,40 @@
+2026-11-04 08:13:46 [8327 - 7621] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":8327,"role":"standalone","config":"(search path)"}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] TLS enabled with generated self-signed certificate {"dir":"/home/z/my-project/SpeedtestServer/validation/harness/certs"}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] [net] listen_tcp {"port":8080,"family":"dual-stack"}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] [net] listen_tcp {"port":5060,"family":"dual-stack"}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] [net] listen_udp {"port":8080}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] [net] listen_udp {"port":5060}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] [net] started {"tcpPorts":[8080,5060],"udpPorts":[8080,5060],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"E6053BAD-1897-45A6-AB00-CAEEA7C01556","pid":8327}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] SpeedtestServer started (canonical ServerCore) {"tcpPorts":[8080,5060],"udpPorts":[8080,5060],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","role":"standalone"}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] SpeedtestServer started successfully {"tcpPorts":[8080,5060],"udpPorts":[8080,5060],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d"}
+2026-11-04 08:13:47 [8327 - 7621] [INFORMATION] This is an INDEPENDENT open-source implementation — not an Ookla product.
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_close {"id":1,"peer":"?:?"}
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":2,"peer":"::1:58160","transport":"tcp"}
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_close {"id":2,"peer":"::1:58160","stats":{"peer":"::1:58160","openedAt":1793780029664,"transport":"tcp","bytesDown":156,"bytesUp":126,"commands":7}}
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":4,"peer":"::1:58170","transport":"tcp"}
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":3,"peer":"::1:58162","transport":"tcp"}
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":5,"peer":"::1:58174","transport":"tcp"}
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":6,"peer":"::1:58176","transport":"tcp"}
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":7,"peer":"::1:58178","transport":"tcp"}
+2026-11-04 08:13:49 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":8,"peer":"::1:58180","transport":"tcp"}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_close {"id":5,"peer":"::1:58174","stats":{"peer":"::1:58174","openedAt":1793780029703,"transport":"tcp","bytesDown":4598020140,"bytesUp":2592,"commands":144}}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_close {"id":4,"peer":"::1:58170","stats":{"peer":"::1:58170","openedAt":1793780029668,"transport":"tcp","bytesDown":5012971564,"bytesUp":2844,"commands":158}}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_close {"id":8,"peer":"::1:58180","stats":{"peer":"::1:58180","openedAt":1793780029823,"transport":"tcp","bytesDown":4602214444,"bytesUp":2610,"commands":145}}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_close {"id":3,"peer":"::1:58162","stats":{"peer":"::1:58162","openedAt":1793780029703,"transport":"tcp","bytesDown":4794738732,"bytesUp":2718,"commands":151}}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":9,"peer":"::1:53840","transport":"tcp"}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":10,"peer":"::1:53852","transport":"tcp"}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":11,"peer":"::1:53866","transport":"tcp"}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":12,"peer":"::1:53874","transport":"tcp"}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":13,"peer":"::1:53886","transport":"tcp"}
+2026-11-04 08:13:57 [8327 - 7621] [INFORMATION] [net] conn_netgauge {"id":14,"peer":"::1:53888","transport":"tcp"}
+2026-11-04 08:13:58 [8327 - 7621] [INFORMATION] [net] conn_close {"id":6,"peer":"::1:58176","stats":{"peer":"::1:58176","openedAt":1793780029789,"transport":"tcp","bytesDown":63,"bytesUp":16,"commands":2}}
+2026-11-04 08:14:00 [8327 - 7621] [INFORMATION] [net] conn_close {"id":7,"peer":"::1:58178","stats":{"peer":"::1:58178","openedAt":1793780029821,"transport":"tcp","bytesDown":3046,"bytesUp":2528,"commands":158}}
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] [net] conn_close {"id":11,"peer":"::1:53866","stats":{"peer":"::1:53866","openedAt":1793780037810,"transport":"tcp","bytesDown":93,"bytesUp":37,"commands":2}}
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] [net] conn_close {"id":13,"peer":"::1:53886","stats":{"peer":"::1:53886","openedAt":1793780037812,"transport":"tcp","bytesDown":3450,"bytesUp":4192000000,"commands":132}}
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] [net] conn_close {"id":10,"peer":"::1:53852","stats":{"peer":"::1:53852","openedAt":1793780037809,"transport":"tcp","bytesDown":3502,"bytesUp":4260587545,"commands":135}}
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] [net] conn_close {"id":9,"peer":"::1:53840","stats":{"peer":"::1:53840","openedAt":1793780037808,"transport":"tcp","bytesDown":3658,"bytesUp":4450293785,"commands":141}}
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] [net] conn_close {"id":14,"peer":"::1:53888","stats":{"peer":"::1:53888","openedAt":1793780037815,"transport":"tcp","bytesDown":3450,"bytesUp":4192983065,"commands":133}}
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] [net] conn_close {"id":12,"peer":"::1:53874","stats":{"peer":"::1:53874","openedAt":1793780037811,"transport":"tcp","bytesDown":3939,"bytesUp":3280,"commands":205}}
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] Received SIGTERM, shutting down...
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] [net] stopped {"connections":14}
+2026-11-04 08:14:08 [8327 - 7621] [INFORMATION] SpeedtestServer stopped

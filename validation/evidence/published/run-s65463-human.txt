@@ -1,0 +1,12 @@
+
+   Speedtest by Ookla
+
+      Server: HKBN - Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit] (id: 65463)
+         ISP: Alibaba
+Idle Latency:     0.07 ms   (jitter: 0.03ms, low: 0.05ms, high: 0.11ms)
+    Download: 20055.34 Mbps (data used: 36.2 GB)                                                   
+                 19.71 ms   (jitter: 26.89ms, low: 0.19ms, high: 136.43ms)
+      Upload: 16214.70 Mbps (data used: 18.2 GB)                                                   
+                  4.18 ms   (jitter: 6.57ms, low: 0.07ms, high: 31.41ms)
+ Packet Loss:     0.3%
+  Result URL: https://www.speedtest.net/result/c/dd41b421-751f-45a4-a6bd-4c61be9a2081

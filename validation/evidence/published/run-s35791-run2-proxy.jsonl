@@ -1,0 +1,7 @@
+{"k":"meta","port":8888,"target":"localhost:8080","serverId":null,"publish":true,"pid":8364,"ts":1793780028413}
+{"k":"mitm","target":"cli.speedtest.net:443","ts":1793780029386}
+{"k":"mitm_tls_ok","alpn":"none","ts":1793780029396}
+{"k":"config_req","method":"GET","target":"/api/cli/config?deviceId=93aa2e4ff6bdd705a2442c13c1e64cfd4e35f73e3cb9d1d57cda80e5cde3e443&hid=%2500N%251EL%251D%251AL%251F%2540%2516Y%255C%255C%255D_%250D%250BY%250F%2515BOOM%251A%251A%251AN%251C%2510FC&serverid=35791&sid=ccf34f5dfbb4400ebb07391065ddb50ae635d86d8a3805a4b3d4ca7476a35062&uname=Linux%205.10.134-013.15.kangaroo.al8.x86_64%20%231%20SMP%20Thu%20Jul%2030%2012%3A54%3A59%20UTC%202026%20x86_64","ua":"ookla-cli/1.2.0.84-1.ea6b6773cf (speedtest-cli-linux-x86_64)","ts":1793780029396}
+{"k":"config_served","liveBytes":1263,"servedBytes":1302,"rewritten":[{"id":"35791","host":"kami.smartone.com:8080","name":"Hong Kong"}],"ts":1793780029656}
+{"k":"publish_tunnel","target":"results.speedtest.net:443","note":"publishing opt-in: submission allowed, Result URL expected","ts":1793780048148}
+{"k":"tunnel","target":"results.speedtest.net:443","ts":1793780048148}

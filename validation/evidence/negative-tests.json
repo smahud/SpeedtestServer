@@ -1,0 +1,37 @@
+[
+  {
+    "name": "invalid command → ERROR then usable",
+    "pass": true,
+    "detail": "\"ERROR\\nPONG 1793777635185\\n\""
+  },
+  {
+    "name": "oversized command line → connection dropped",
+    "pass": true,
+    "detail": "true"
+  },
+  {
+    "name": "server survives abuse",
+    "pass": true,
+    "detail": "true"
+  },
+  {
+    "name": "server survives malformed TLS",
+    "pass": true,
+    "detail": "true"
+  },
+  {
+    "name": "server survives mid-download abort",
+    "pass": true,
+    "detail": "true"
+  },
+  {
+    "name": "server survives oversized HTTP headers",
+    "pass": true,
+    "detail": "true"
+  },
+  {
+    "name": "server survives UDP garbage flood",
+    "pass": true,
+    "detail": "true"
+  }
+]

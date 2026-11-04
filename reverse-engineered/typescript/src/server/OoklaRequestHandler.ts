@@ -1,4 +1,11 @@
 /**
+ * @deprecated DEPRECATED 2026-11-04 — replaced by ServerCore + NetGaugeEngine +
+ * HttpApi + UdpLossEngine (canonical implementation, audit/official-cli-interoperability).
+ * Kept for historical reference only; NOT used by the server. Its P0 defects
+ * (port conflict, no native protocol, WS random data, UDP blind echo) are
+ * documented in validation/FINDINGS.md.
+ */
+/**
  * Ookla Request Handler - Handles HTTP/REST and WebSocket requests for speed tests
  * Based on reverse engineering of OoklaServer RequestHandler.cpp
  * TypeScript implementation with full HTTP/HTTPS/WebSocket server

@@ -1,0 +1,345 @@
+[
+ {
+  "tag": "s60178",
+  "id": 60178,
+  "format": "json-pretty",
+  "status": "PASS",
+  "resultUrl": "https://www.speedtest.net/result/c/b7d0c8f1-610c-45b6-ba04-90773391fa91",
+  "packetLoss": "0",
+  "timestamp": "2026-11-04T08:10:52Z",
+  "serverName": "Sun Mobile",
+  "target": "localhost:8080",
+  "serverIp": "::1",
+  "selectedServerId": 60178,
+  "dlMbps": 21108.54,
+  "ulMbps": 15023.42,
+  "dlGiB": 34.9,
+  "ulGiB": 25.1,
+  "latencyMs": 0.08,
+  "jitterMs": 0.067,
+  "lossPct": "0",
+  "persisted": true,
+  "resultId": "b7d0c8f1-610c-45b6-ba04-90773391fa91",
+  "sts": {
+   "netgaugeConns": 13,
+   "commands": 2649,
+   "downloadDone": 1172,
+   "uploadDone": 844,
+   "udpSessions": 2,
+   "approxSentGiB": 34.9,
+   "approxRecvGiB": 25.2
+  },
+  "proxy": {
+   "configRewritten": [
+    {
+     "id": "60178",
+     "host": "sunmobile.hkspeedtest.com:8080",
+     "name": "Hong Kong"
+    }
+   ],
+   "publishTunnel": true
+  }
+ },
+ {
+  "tag": "s43356",
+  "id": 43356,
+  "format": "json-pretty",
+  "status": "EXIT_0",
+  "resultUrl": "https://www.speedtest.net/result/c/65279bab-1f41-472f-b92a-c6b09404d86b",
+  "packetLoss": "32.77591973244147",
+  "timestamp": "2026-11-04T08:11:25Z",
+  "serverName": "1010",
+  "target": "localhost:8080",
+  "serverIp": "::1",
+  "selectedServerId": 43356,
+  "dlMbps": 20972.32,
+  "ulMbps": 14054.82,
+  "dlGiB": 34.8,
+  "ulGiB": 16.1,
+  "latencyMs": 0.095,
+  "jitterMs": 0.05,
+  "lossPct": "32.77591973244147",
+  "persisted": true,
+  "resultId": "65279bab-1f41-472f-b92a-c6b09404d86b",
+  "sts": {
+   "netgaugeConns": 13,
+   "commands": 2266,
+   "downloadDone": 1172,
+   "uploadDone": 544,
+   "udpSessions": 2,
+   "approxSentGiB": 34.9,
+   "approxRecvGiB": 16.2
+  },
+  "proxy": {
+   "configRewritten": [
+    {
+     "id": "43356",
+     "host": "1010.hkspeedtest.com:8080",
+     "name": "Hong Kong"
+    }
+   ],
+   "publishTunnel": true
+  }
+ },
+ {
+  "tag": "s35791",
+  "id": 35791,
+  "format": "json-pretty",
+  "status": "PASS",
+  "resultUrl": "https://www.speedtest.net/result/c/0c64a277-f92c-4178-a0bd-c398abec4e53",
+  "packetLoss": "0",
+  "timestamp": "2026-11-04T08:11:47Z",
+  "serverName": "SmarTone",
+  "target": "localhost:8080",
+  "serverIp": "::1",
+  "selectedServerId": 35791,
+  "dlMbps": 20586.99,
+  "ulMbps": 14770.83,
+  "dlGiB": 16.7,
+  "ulGiB": 13.9,
+  "latencyMs": 0.097,
+  "jitterMs": 0.073,
+  "lossPct": "0",
+  "persisted": true,
+  "resultId": "0c64a277-f92c-4178-a0bd-c398abec4e53",
+  "sts": {
+   "netgaugeConns": 13,
+   "commands": 1381,
+   "downloadDone": 560,
+   "uploadDone": 469,
+   "udpSessions": 2,
+   "approxSentGiB": 16.7,
+   "approxRecvGiB": 14
+  },
+  "proxy": {
+   "configRewritten": [
+    {
+     "id": "35791",
+     "host": "kami.smartone.com:8080",
+     "name": "Hong Kong"
+    }
+   ],
+   "publishTunnel": true
+  }
+ },
+ {
+  "tag": "s63143",
+  "id": 63143,
+  "format": "json-pretty",
+  "status": "PASS",
+  "resultUrl": "https://www.speedtest.net/result/c/1510b504-3fd4-4b53-b809-232ac9845272",
+  "packetLoss": "0",
+  "timestamp": "2026-11-04T08:12:18Z",
+  "serverName": "Netvigator",
+  "target": "localhost:8080",
+  "serverIp": "::1",
+  "selectedServerId": 63143,
+  "dlMbps": 18824.67,
+  "ulMbps": 14690.47,
+  "dlGiB": 25.7,
+  "ulGiB": 18.4,
+  "latencyMs": 0.085,
+  "jitterMs": 0.036,
+  "lossPct": "0",
+  "persisted": true,
+  "resultId": "1510b504-3fd4-4b53-b809-232ac9845272",
+  "sts": {
+   "netgaugeConns": 13,
+   "commands": 1975,
+   "downloadDone": 861,
+   "uploadDone": 620,
+   "udpSessions": 2,
+   "approxSentGiB": 25.7,
+   "approxRecvGiB": 18.5
+  },
+  "proxy": {
+   "configRewritten": [
+    {
+     "id": "63143",
+     "host": "hkspeedtest.netvigator.com:8080",
+     "name": "Hong Kong"
+    }
+   ],
+   "publishTunnel": true
+  }
+ },
+ {
+  "tag": "s48446",
+  "id": 48446,
+  "format": "json-pretty",
+  "status": "PASS",
+  "resultUrl": "https://www.speedtest.net/result/c/5d96a9ce-a8c4-49f7-82ec-63db4be4e6de",
+  "packetLoss": "0",
+  "timestamp": "2026-11-04T08:12:46Z",
+  "serverName": "GSL Networks",
+  "target": "localhost:8080",
+  "serverIp": "::1",
+  "selectedServerId": 48446,
+  "dlMbps": 21639.67,
+  "ulMbps": 14309.67,
+  "dlGiB": 25.8,
+  "ulGiB": 15.3,
+  "latencyMs": 0.073,
+  "jitterMs": 0.042,
+  "lossPct": "0",
+  "persisted": true,
+  "resultId": "5d96a9ce-a8c4-49f7-82ec-63db4be4e6de",
+  "sts": {
+   "netgaugeConns": 13,
+   "commands": 1815,
+   "downloadDone": 869,
+   "uploadDone": 516,
+   "udpSessions": 2,
+   "approxSentGiB": 25.9,
+   "approxRecvGiB": 15.4
+  },
+  "proxy": {
+   "configRewritten": [
+    {
+     "id": "48446",
+     "host": "hk1.speedtest.gslnetworks.com:8080",
+     "name": "Hong Kong"
+    }
+   ],
+   "publishTunnel": true
+  }
+ },
+ {
+  "tag": "s65463-human",
+  "id": 65463,
+  "format": "human",
+  "status": "PASS",
+  "resultUrl": "https://www.speedtest.net/result/c/dd41b421-751f-45a4-a6bd-4c61be9a2081",
+  "packetLoss": "",
+  "serverName": "HKBN",
+  "target": "localhost:8080",
+  "dlMbps": 20055.34,
+  "ulMbps": 16214.7,
+  "latencyMs": 0.07,
+  "lossPct": "0.3",
+  "persisted": true
+ },
+ {
+  "tag": "s60178-run2",
+  "id": 60178,
+  "format": "json-pretty",
+  "status": "PASS",
+  "resultUrl": "https://www.speedtest.net/result/c/9e592b8b-6792-4770-8813-f3f9f30abc32",
+  "packetLoss": "0",
+  "timestamp": "2026-11-04T08:13:42Z",
+  "serverName": "Sun Mobile",
+  "target": "localhost:8080",
+  "serverIp": "::1",
+  "selectedServerId": 60178,
+  "dlMbps": 20463.04,
+  "ulMbps": 14212.2,
+  "dlGiB": 17.6,
+  "ulGiB": 13.3,
+  "latencyMs": 0.084,
+  "jitterMs": 0.072,
+  "lossPct": "0",
+  "persisted": true,
+  "resultId": "9e592b8b-6792-4770-8813-f3f9f30abc32",
+  "sts": {
+   "netgaugeConns": 13,
+   "commands": 1386,
+   "downloadDone": 589,
+   "uploadDone": 448,
+   "udpSessions": 2,
+   "approxSentGiB": 17.6,
+   "approxRecvGiB": 13.4
+  },
+  "proxy": {
+   "configRewritten": [
+    {
+     "id": "60178",
+     "host": "sunmobile.hkspeedtest.com:8080",
+     "name": "Hong Kong"
+    }
+   ],
+   "publishTunnel": true
+  }
+ },
+ {
+  "tag": "s35791-run2",
+  "id": 35791,
+  "format": "json-pretty",
+  "status": "PASS",
+  "resultUrl": "https://www.speedtest.net/result/c/308e5be6-5a7e-4488-ab93-3e98d5767f2b",
+  "packetLoss": "0",
+  "timestamp": "2026-11-04T08:14:08Z",
+  "serverName": "SmarTone",
+  "target": "localhost:8080",
+  "serverIp": "::1",
+  "selectedServerId": 35791,
+  "dlMbps": 18700.06,
+  "ulMbps": 13558.4,
+  "dlGiB": 17.6,
+  "ulGiB": 15.8,
+  "latencyMs": 0.081,
+  "jitterMs": 0.063,
+  "lossPct": "0",
+  "persisted": true,
+  "resultId": "308e5be6-5a7e-4488-ab93-3e98d5767f2b",
+  "sts": {
+   "netgaugeConns": 13,
+   "commands": 1522,
+   "downloadDone": 591,
+   "uploadDone": 534,
+   "udpSessions": 2,
+   "approxSentGiB": 17.6,
+   "approxRecvGiB": 15.9
+  },
+  "proxy": {
+   "configRewritten": [
+    {
+     "id": "35791",
+     "host": "kami.smartone.com:8080",
+     "name": "Hong Kong"
+    }
+   ],
+   "publishTunnel": true
+  }
+ },
+ {
+  "tag": "s43356-run2",
+  "id": 43356,
+  "format": "json-pretty",
+  "status": "PASS",
+  "resultUrl": "https://www.speedtest.net/result/c/7d7473ee-8da5-4448-bf59-c6ec713847b3",
+  "packetLoss": "0",
+  "timestamp": "2026-11-04T08:15:26Z",
+  "serverName": "1010",
+  "target": "localhost:8080",
+  "serverIp": "::1",
+  "selectedServerId": 43356,
+  "dlMbps": 25628.45,
+  "ulMbps": 14799.09,
+  "dlGiB": 41.8,
+  "ulGiB": 14,
+  "latencyMs": 0.073,
+  "jitterMs": 0.051,
+  "lossPct": "0",
+  "persisted": true,
+  "resultId": "7d7473ee-8da5-4448-bf59-c6ec713847b3",
+  "sts": {
+   "netgaugeConns": 13,
+   "commands": 2373,
+   "downloadDone": 1404,
+   "uploadDone": 473,
+   "udpSessions": 2,
+   "approxSentGiB": 41.8,
+   "approxRecvGiB": 14.1
+  },
+  "proxy": {
+   "configRewritten": [
+    {
+     "id": "43356",
+     "host": "1010.hkspeedtest.com:8080",
+     "name": "Hong Kong"
+    }
+   ],
+   "publishTunnel": true
+  }
+ }
+]

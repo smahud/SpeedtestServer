@@ -1,0 +1,34 @@
+{
+  "gate": "OFFICIAL_CLI_TO_OFFICIAL_SERVER",
+  "status": "PASS",
+  "generatedAt": "2026-11-04T07:17:30Z",
+  "client": {
+    "isOfficialBinary": true,
+    "version": "Speedtest by Ookla 1.2.0.84 (ea6b6773cf) Linux/x86_64-linux-musl",
+    "tarballSha256": "5690596c54ff9bed63fa3732f818a05dbc2db19ad36ed68f21ca5f64d5cfeeb7",
+    "modified": false,
+    "targetingMethod": "same config-level proxy method, server entries redirected to localhost:18080 where the authorized reference daemon runs"
+  },
+  "server": {
+    "implementation": "OoklaServer (official reference daemon)",
+    "version": "2.11 (2.11.5.2) build 2026-06-04.1737.7d0993d",
+    "binarySha256Tarball": "ce180aa3ed9b3c099713cf37ea2ded48c1f799f47c534ab732e21cea61598159",
+    "processVerified": true
+  },
+  "target": { "host": "localhost", "port": 18080, "verified": true },
+  "phases": { "handshake": true, "latency": true, "download": true, "upload": true, "packetLoss": "PASS" },
+  "repetitions": [
+    { "run": "baseline-cli-1 (via recording relay, protocol capture)", "exitCode": 0, "packetLoss": 0.515, "note": "relay NAT distorted UDP RECV responses; TCP protocol fully captured — see PROTOCOL_CONTRACT.md" },
+    { "run": "baseline-cli-2-direct", "exitCode": 0, "pingMs": 0.055, "downloadGbps": 67.01, "uploadGbps": 37.58, "packetLoss": 0 },
+    { "run": "baseline-cli-3", "exitCode": 0, "pingMs": 0.051, "downloadGbps": 68.8, "uploadGbps": 42.3, "packetLoss": 0 }
+  ],
+  "nonPublishingVerified": true,
+  "evidenceFiles": [
+    "validation/evidence/baseline-cli-1.json",
+    "validation/evidence/baseline-cli-2-direct.json",
+    "validation/evidence/baseline-cli-3.json",
+    "validation/evidence/baseline-cli-1-proxy.jsonl",
+    "validation/evidence/baseline-cli-2-direct-proxy.jsonl"
+  ],
+  "blockers": []
+}

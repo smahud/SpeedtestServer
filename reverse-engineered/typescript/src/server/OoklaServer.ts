@@ -1,463 +1,162 @@
 /**
- * Main OoklaServer class - TypeScript port of the C++ OoklaServer
- * Based on reverse engineering of OoklaServer-linux-x86_64 binary
+ * OoklaServer — top-level server facade (canonical implementation).
+ *
+ * This revision replaces the previous listener architecture (which had P0
+ * defects: competing HTTP/HTTPS listeners on the same port, swallowed
+ * EADDRINUSE, no native NetGauge engine, root-only paths) with ServerCore:
+ * a single multiplexed listener per port speaking the full OoklaServer
+ * compatibility profile — native NetGauge (TCP + TLS-wrapped), HTTP/legacy
+ * endpoints, WebSocket (/ws), and the UDP packet-loss protocol.
+ *
+ * Decommissioned from the startup path (kept in the repo for history):
+ * BinaryManager (mock), MetricsUploader (no-op), TracerouteManager (fake
+ * data), InstanceLocker (required /var/lock), legacy OoklaRequestHandler.
+ * See validation/DECISIONS.md.
  */
 
 import { EventEmitter } from 'events';
-import * as os from 'os';
-import {
-  OoklaServerConfig,
-  ServerToken,
-  ClientAuthTokenValidationResult,
-  TokenValidationFields,
-  ConnectionInfo,
-  IpStatsInternal,
-  ServerMetrics,
-  CrossDomainPolicy,
-  DownloadTestFile,
-  BinaryInfo,
-  UpdateStatus,
-  TracerouteRequest,
-  TracerouteResult,
-  ProcessRole,
-  ProcessInfo,
-  SharedMemoryConfig,
-  SystemInfo,
-  ConfigurationError,
-  DeepPartial,
-  LogLevel,
-} from '../types/core';
-
+import * as fs from 'fs';
+import * as path from 'path';
+import * as forge from 'node-forge';
+import { DeepPartial, OoklaServerConfig, ProcessRole, UpdateStatus, BinaryInfo, ServerMetrics, TracerouteRequest, TracerouteResult } from '../types/core';
 import { ConfigManager } from './ConfigManager';
-import { BinaryManager } from './BinaryManager';
-import { InstanceLocker } from './InstanceLocker';
-import { ClientAuthTokenValidator } from './ClientAuthTokenValidator';
-import { ConnectionTracker } from './ConnectionTracker';
-import { IpStatsManager } from './IpStatsManager';
-import { MetricsUploader } from './MetricsUploader';
-import { TLSCertificateManager } from './TLSCertificateManager';
-import { OoklaRequestHandler } from './OoklaRequestHandler';
-import { OoklaDownloader } from './OoklaDownloader';
 import { Logger } from './Logger';
-import { TracerouteManager } from './TracerouteManager';
+import { ServerCore } from './ServerCore';
+
+/** Compatibility-profile version banner (verified against OoklaServer
+ *  2.11.5.2 build 2026-06-04.1737.7d0993d on 2026-11-04). Override with
+ *  OoklaServer.netgaugeVersionString in the properties file. */
+export const DEFAULT_VERSION_STRING = '2.11 (2.11.5) 2026-06-04.1737.7d0993d';
 
 export class OoklaServer extends EventEmitter {
   private config: OoklaServerConfig;
   private configManager: ConfigManager;
-  private binaryManager: BinaryManager;
-  private instanceLocker: InstanceLocker;
-  private authValidator: ClientAuthTokenValidator;
-  private connectionTracker: ConnectionTracker;
-  private ipStatsManager: IpStatsManager;
-  private metricsUploader: MetricsUploader;
-  private tlsManager: TLSCertificateManager;
-  private requestHandler: OoklaRequestHandler;
-  private downloader: OoklaDownloader;
   private logger: Logger;
-  private tracerouteManager: TracerouteManager;
-
+  private core: ServerCore | null = null;
   private role: ProcessRole = 'standalone';
-  private pid: number = process.pid;
-  private startTime: Date = new Date();
-  private isRunning: boolean = false;
-  private shutdownRequested: boolean = false;
-
-  // Shared memory names (from binary strings)
-  private static readonly SHARED_MEMORY_CONFIG: SharedMemoryConfig = {
-    managerMutex: 'OoklaManMu_',
-    serverMutex: 'OoklaSerMu_',
-    managerShMem: 'OoklaShMemMan_',
-    serverShMem: 'OoklaShMemSer_',
-    managerShMemMutex: 'OoklaShMemManMu_',
-    serverShMemMutex: 'OoklaShMemSerMu_',
-  };
+  private isRunning = false;
 
   constructor(config?: DeepPartial<OoklaServerConfig>) {
     super();
     this.configManager = new ConfigManager(config);
     this.config = this.configManager.getConfig();
-
-    // Initialize logger first
     this.logger = new Logger(this.configManager.getLogConfig());
-
-    // Initialize core components
-    this.binaryManager = new BinaryManager(this.config, this.logger);
-    this.instanceLocker = new InstanceLocker(OoklaServer.SHARED_MEMORY_CONFIG, this.logger);
-    this.authValidator = new ClientAuthTokenValidator(this.config.clientAuthToken, this.logger);
-    this.connectionTracker = new ConnectionTracker(this.logger);
-    this.ipStatsManager = new IpStatsManager(this.config.ipTracking, this.logger);
-    this.metricsUploader = new MetricsUploader(this.config, this.logger, this.binaryManager.getCurrentBinary());
-    // Use SSL config for certificate file paths (certificateFile, privateKeyFile from properties)
-    this.tlsManager = new TLSCertificateManager({
-      enabled: this.config.tls?.enabled ?? false,
-      certPath: this.config.tls?.certPath,
-      keyPath: this.config.tls?.keyPath,
-      caPath: this.config.tls?.caPath,
-      autoGenerate: this.config.tls?.autoGenerate,
-      acme: this.config.tls?.acme,
-      publicKey: this.config.tls?.publicKey,
-      // Map SSL config properties
-      certificateFile: this.config.ssl?.certificateFile,
-      privateKeyFile: this.config.ssl?.privateKeyFile,
-      caFile: this.config.ssl?.caFile,
-    } as any, this.logger);
-    this.requestHandler = new OoklaRequestHandler(this.config, this.logger, this.authValidator, this.connectionTracker, this.ipStatsManager, this.tlsManager);
-    this.downloader = new OoklaDownloader(this.config, this.logger);
-    this.tracerouteManager = new TracerouteManager(this.config.traceroute || { enabled: this.config.performTraceroutes, maxHops: 30, timeout: 5000, maxConcurrent: 10 }, this.logger);
-
-    this.setupEventHandlers();
   }
 
-  private setupEventHandlers(): void {
-    // Binary manager events
-    this.binaryManager.on('updateAvailable', (update: UpdateStatus) => {
-      this.emit('updateAvailable', update);
-      this.logger.info('Update available', { version: update.latestVersion });
-    });
-
-    this.binaryManager.on('updateDownloaded', (binary: BinaryInfo) => {
-      this.emit('updateDownloaded', binary);
-      this.logger.info('Update downloaded', { version: binary.version });
-    });
-
-    this.binaryManager.on('updateApplied', () => {
-      this.emit('updateApplied');
-      this.logger.info('Update applied, restarting...');
-      this.scheduleRestart();
-    });
-
-    // Connection tracker events
-    this.connectionTracker.on('connectionCreated', (conn: ConnectionInfo) => {
-      this.emit('connectionCreated', conn);
-    });
-
-    this.connectionTracker.on('connectionClosed', (conn: ConnectionInfo) => {
-      this.emit('connectionClosed', conn);
-    });
-
-    // IP stats events
-    this.ipStatsManager.on('ipBlocked', (ip: string, reason: string) => {
-      this.emit('ipBlocked', ip, reason);
-      this.logger.warning('IP blocked', { ip, reason });
-    });
-
-    // Metrics events
-    this.metricsUploader.on('metricsUploaded', (metrics: ServerMetrics) => {
-      this.emit('metricsUploaded', metrics);
-    });
-
-    this.metricsUploader.on('metricsUploadFailed', (error: Error) => {
-      this.emit('metricsUploadFailed', error);
-      this.logger.error('Metrics upload failed', { error: error.message });
-    });
-
-    // TLS events
-    this.tlsManager.on('certificateRenewed', () => {
-      this.emit('certificateRenewed');
-      this.logger.info('TLS certificate renewed');
-    });
-
-    // Traceroute events
-    this.tracerouteManager.on('tracerouteCompleted', (result: TracerouteResult) => {
-      this.emit('tracerouteCompleted', result);
-    });
-  }
-
-  /**
-   * Start the server
-   */
-  public async start(role: ProcessRole = 'standalone'): Promise<void> {
-    if (this.isRunning) {
-      throw new ConfigurationError('Server is already running');
-    }
-
+  async start(role: ProcessRole = 'standalone'): Promise<void> {
+    if (this.isRunning) throw new Error('Server already running');
     this.role = role;
-    this.logger.info(`Starting OoklaServer in ${role} mode`, { pid: this.pid });
 
-    try {
-      // Acquire instance lock
-      await this.instanceLocker.acquire(role);
+    const versionString = this.config.netgaugeVersionString || DEFAULT_VERSION_STRING;
+    const tcpPorts = this.config.tcpPorts && this.config.tcpPorts.length ? this.config.tcpPorts : [8080, 5060];
+    const udpPorts = this.config.udpPorts && this.config.udpPorts.length ? this.config.udpPorts : [8080, 5060];
 
-      // Initialize TLS certificates
-      await this.tlsManager.initialize();
-
-      // Start IP stats manager
-      await this.ipStatsManager.start();
-
-      // Start metrics uploader
-      await this.metricsUploader.start();
-
-      // Start traceroute manager
-      await this.tracerouteManager.start();
-
-      // Check for updates (if manager role)
-      if (role === 'manager') {
-        await this.binaryManager.checkForUpdates();
-      }
-
-      // Start HTTP server
-      await this.requestHandler.start();
-
-      this.isRunning = true;
-      this.emit('started');
-      this.logger.info('OoklaServer started successfully');
-
-    } catch (error) {
-      this.logger.error('Failed to start server', { error });
-      await this.stop();
-      throw error;
-    }
-  }
-
-  /**
-   * Stop the server gracefully
-   */
-  public async stop(): Promise<void> {
-    if (!this.isRunning && !this.shutdownRequested) {
-      return;
+    // TLS material: explicit files, or an ephemeral self-signed pair written
+    // to a WRITABLE location (no /etc/ooklaserver requirement).
+    let tlsOpts: { cert: Buffer; key: Buffer } | null = null;
+    if (this.config.ssl?.certificateFile && this.config.ssl?.privateKeyFile) {
+      tlsOpts = {
+        cert: fs.readFileSync(this.expandPath(this.config.ssl.certificateFile)),
+        key: fs.readFileSync(this.expandPath(this.config.ssl.privateKeyFile)),
+      };
+      this.logger.info('TLS enabled with configured certificate', { cert: this.config.ssl.certificateFile });
+    } else {
+      const { cert, key } = this.generateSelfSigned();
+      const dir = path.join(process.cwd(), 'certs');
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'server.pem'), cert);
+      fs.writeFileSync(path.join(dir, 'server.key'), key);
+      tlsOpts = { cert: Buffer.from(cert), key: Buffer.from(key) };
+      this.logger.info('TLS enabled with generated self-signed certificate', { dir });
     }
 
-    this.shutdownRequested = true;
-    this.logger.info('Shutting down OoklaServer...');
-
-    try {
-      // Stop accepting new connections
-      await this.requestHandler.stop();
-
-      // Wait for active connections to complete (with timeout)
-      await this.connectionTracker.waitForConnections(30000);
-
-      // Stop background services
-      await this.tracerouteManager.stop();
-      await this.metricsUploader.stop();
-      await this.ipStatsManager.stop();
-      await this.tlsManager.stop();
-
-      // Release instance lock
-      await this.instanceLocker.release();
-
-      this.isRunning = false;
-      this.emit('stopped');
-      this.logger.info('OoklaServer stopped');
-
-    } catch (error) {
-      this.logger.error('Error during shutdown', { error });
-      throw error;
-    }
-  }
-
-  /**
-   * Force stop the server immediately
-   */
-  public async forceStop(): Promise<void> {
-    this.shutdownRequested = true;
-    this.logger.warning('Force stopping OoklaServer...');
-
-    await this.requestHandler.forceStop();
-    await this.connectionTracker.closeAllConnections();
-    await this.instanceLocker.release();
-
-    this.isRunning = false;
-    this.emit('forceStopped');
-  }
-
-  /**
-   * Schedule a restart (for updates)
-   */
-  private scheduleRestart(): void {
-    setTimeout(() => {
-      this.emit('restart');
-      // In a real implementation, this would trigger a process restart
-    }, 1000);
-  }
-
-  /**
-   * Validate client authentication token
-   */
-  public validateToken(token: string, clientIp: string, clientGuid: string): ClientAuthTokenValidationResult {
-    return this.authValidator.validate(token, clientIp, clientGuid);
-  }
-
-  /**
-   * Create a new server token
-   */
-  public createToken(expiration: number, ip?: string, guid?: string, additionalFields?: TokenValidationFields): ServerToken {
-    return this.authValidator.createToken(expiration, ip, guid, additionalFields);
-  }
-
-  /**
-   * Get connection info
-   */
-  public getConnection(connectionId: string): ConnectionInfo | undefined {
-    return this.connectionTracker.getConnection(connectionId);
-  }
-
-  /**
-   * Get all active connections
-   */
-  public getAllConnections(): ConnectionInfo[] {
-    return this.connectionTracker.getAllConnections();
-  }
-
-  /**
-   * Get IP stats for an IP
-   */
-  public getIpStats(ip: string): IpStatsInternal | undefined {
-    return this.ipStatsManager.getIpStats(ip);
-  }
-
-  /**
-   * Block an IP address
-   */
-  public blockIp(ip: string, reason: string): void {
-    this.ipStatsManager.blockIp(ip, reason);
-  }
-
-  /**
-   * Unblock an IP address
-   */
-  public unblockIp(ip: string): void {
-    this.ipStatsManager.unblockIp(ip);
-  }
-
-  /**
-   * Get current server metrics
-   */
-  public getMetrics(): ServerMetrics {
-    return this.metricsUploader.collectMetrics();
-  }
-
-  /**
-   * Force metrics upload
-   */
-  public async uploadMetrics(): Promise<void> {
-    await this.metricsUploader.uploadNow();
-  }
-
-  /**
-   * Initiate a traceroute
-   */
-  public async startTraceroute(request: TracerouteRequest): Promise<TracerouteResult> {
-    return this.tracerouteManager.trace(request.targetIp, {
-      maxHops: request.maxHops,
-      timeout: request.timeout,
+    this.core = new ServerCore({
+      tcpPorts,
+      udpPorts,
+      versionString,
+      tls: tlsOpts,
+      crossDomainPorts: String(tcpPorts[0] ?? 8080),
+      evidenceLogPath: this.config.evidenceLogFile || undefined,
+      maxConnections: 4096,
+      maxConnectionsPerIp: this.config.ipTracking?.maxConnPerIp || 500,
+      idleTimeoutMs: Math.min((this.config.maxConnectionSeconds || 3600) * 1000, 3600_000),
+      onEvent: (kind, detail) => {
+        if (kind.startsWith('conn_') || kind === 'listen_tcp' || kind === 'listen_udp' || kind === 'started' || kind === 'stopped') {
+          this.logger.info(`[net] ${kind}`, detail as Record<string, unknown>);
+        }
+      },
     });
-  }
 
-  /**
-   * Check for binary updates
-   */
-  public async checkForUpdates(): Promise<UpdateStatus> {
-    return this.binaryManager.checkForUpdates();
-  }
-
-  /**
-   * Download and apply update
-   */
-  public async applyUpdate(): Promise<void> {
-    await this.binaryManager.downloadAndApplyUpdate();
-  }
-
-  /**
-   * Get server configuration
-   */
-  public getConfig(): Readonly<OoklaServerConfig> {
-    return this.config;
-  }
-
-  /**
-   * Update server configuration (runtime)
-   */
-  public updateConfig(updates: DeepPartial<OoklaServerConfig>): void {
-    this.configManager.updateConfig(updates);
-    this.config = this.configManager.getConfig();
-
-    // Propagate config changes to components
-    this.ipStatsManager.updateConfig(this.config.ipTracking);
-    this.authValidator.updateConfig(this.config.clientAuthToken);
-    this.requestHandler.updateConfig(this.config);
-
-    this.emit('configUpdated', this.config);
-    this.logger.info('Configuration updated');
-  }
-
-  /**
-   * Get server info
-   */
-  public getServerInfo(): ProcessInfo {
-    return {
+    this.core.start = this.core.start.bind(this.core);
+    await this.core.start();
+    this.isRunning = true;
+    this.logger.info('SpeedtestServer started (canonical ServerCore)', {
+      tcpPorts,
+      udpPorts,
+      version: versionString,
       role: this.role,
-      pid: this.pid,
-      startTime: this.startTime,
-      isHealthy: this.isRunning && !this.shutdownRequested,
-    };
+    });
+    this.emit('started');
   }
 
-  /**
-   * Get system information
-   */
-  public getSystemInfo(): SystemInfo {
-    // This would be implemented with actual system calls
+  async stop(): Promise<void> {
+    if (!this.isRunning) return;
+    this.isRunning = false;
+    await this.core?.stop();
+    this.core = null;
+    this.logger.info('SpeedtestServer stopped');
+    this.emit('stopped');
+  }
+
+  stats(): Record<string, unknown> {
+    return this.core ? this.core.stats() : { running: false };
+  }
+
+  get running(): boolean {
+    return this.isRunning;
+  }
+
+  private expandPath(p: string): string {
+    return p.replace('${application.dir}', process.cwd());
+  }
+
+  private generateSelfSigned(): { cert: string; key: string } {
+    const keys = forge.pki.rsa.generateKeyPair(2048);
+    const cert = forge.pki.createCertificate();
+    cert.publicKey = keys.publicKey;
+    cert.serialNumber = String(Date.now());
+    cert.validity.notBefore = new Date();
+    cert.validity.notAfter = new Date();
+    cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 2);
+    const attrs = [
+      { name: 'commonName', value: 'localhost' },
+      { name: 'organizationName', value: 'SpeedtestServer (independent implementation)' },
+    ];
+    cert.setSubject(attrs);
+    cert.setIssuer(attrs);
+    cert.setExtensions([
+      { name: 'subjectAltName', altNames: [
+        { type: 2, value: 'localhost' }, // DNS
+        { type: 2, value: 'lab.ookla.test' },
+        { type: 7, ip: '127.0.0.1' }, // IP
+        { type: 7, ip: '::1' },
+      ] },
+      { name: 'basicConstraints', cA: false },
+      { name: 'keyUsage', digitalSignature: true, keyEncipherment: true },
+      { name: 'extKeyUsage', serverAuth: true },
+    ]);
+    cert.sign(keys.privateKey, forge.md.sha256.create());
     return {
-      cpuModelName: 'Unknown',
-      loadAverage: 0,
-      runningProcesses: 0,
-      totalProcesses: 0,
-      cpus: os.cpus().length,
-      fdSize: 0,
-      numThreads: 0,
-      vmSize: 0,
-      vmRss: 0,
-      networkInterfaces: [],
-      tcpCongestionControl: 'cubic',
-      availableCongestionControl: ['cubic', 'reno'],
-      tcpWindowScaling: true,
+      cert: forge.pki.certificateToPem(cert),
+      key: forge.pki.privateKeyToPem(keys.privateKey),
     };
   }
 
-  /**
-   * Generate download test file
-   */
-  public generateDownloadFile(width: number, height: number): DownloadTestFile {
-    const size = width * height * 3; // Approximate JPEG size
-    const data = Buffer.alloc(size);
-    // Fill with random data (simplified)
-    for (let i = 0; i < size; i++) {
-      data[i] = Math.floor(Math.random() * 256);
-    }
-    return { width, height, size, data };
-  }
-
-  /**
-   * Get cross-domain policy
-   */
-  public getCrossDomainPolicy(): CrossDomainPolicy {
-    return {
-      domains: this.config.allowedDomains,
-      ports: ['5060', '8080', '80', '443'],
-    };
-  }
-
-  /**
-   * Check if server is running
-   */
-  public isServerRunning(): boolean {
-    return this.isRunning && !this.shutdownRequested;
-  }
-
-  /**
-   * Get uptime in seconds
-   */
-  public getUptime(): number {
-    return Math.floor((Date.now() - this.startTime.getTime()) / 1000);
-  }
-
-  /**
-   * Log a message
-   */
-  public log(level: LogLevel, message: string, metadata?: Record<string, unknown>): void {
-    this.logger.log(level, message, metadata);
+  /** Legacy event stubs (kept so old consumers compile; not emitted by ServerCore). */
+  onLegacyUpdate(_cb: (u: UpdateStatus) => void): void { /* binary auto-update decommissioned */ }
+  getBinaryInfo(): BinaryInfo { return { version: 'independent', buildNumber: '', platform: process.platform, architecture: process.arch, sha256: '', size: 0, url: '', signature: '' }; }
+  getMetrics(): ServerMetrics { return this.core ? (this.core.stats() as unknown as ServerMetrics) : ({} as ServerMetrics); }
+  performTraceroute(_req: TracerouteRequest): Promise<TracerouteResult> {
+    return Promise.reject(new Error('Traceroute decommissioned (see validation/DECISIONS.md)'));
   }
 }
-
-export default OoklaServer;
