@@ -18,6 +18,10 @@ export interface OoklaServerConfig {
   tcpPorts: number[];
   udpPorts: number[];
   httpPorts: number[];
+  /** NetGauge/HTTP version banner (compatibility profile). */
+  netgaugeVersionString: string;
+  /** Optional JSONL evidence log path (connections, commands, byte counters). */
+  evidenceLogFile: string;
   useIPv6: boolean;
   addresses: string[];
   useIPv4: boolean;

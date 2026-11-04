@@ -35,6 +35,8 @@ const DEFAULT_CONFIG: OoklaServerConfig = {
   tcpPorts: [5060, 8080], // Binary default from properties file
   udpPorts: [5060, 8080], // Binary default from properties file
   httpPorts: [8080],
+  netgaugeVersionString: '2.11 (2.11.5) 2026-06-04.1737.7d0993d', // compatibility profile (verified 2026-11-04)
+  evidenceLogFile: '',
   useIPv6: true, // Binary default from properties file
   addresses: ['0.0.0.0', '::'],
   useIPv4: true,
@@ -112,6 +114,18 @@ export class ConfigManager extends EventEmitter {
    * Load configuration from file/environment
    */
   private loadConfig(): void {
+    // Explicit config file via --config / OOKLA_SPEEDTESTSERVER_CONFIG_FILE
+    const explicitPath = process.env.OOKLA_SPEEDTESTSERVER_CONFIG_FILE;
+    if (explicitPath && fs.existsSync(explicitPath)) {
+      try {
+        this.loadConfigFile(explicitPath);
+        this.configFilePath = explicitPath;
+        this.logger.info(`Loaded configuration from ${explicitPath} (--config)`);
+        return;
+      } catch (error) {
+        this.logger.warning(`Failed to load config from ${explicitPath}`, { error });
+      }
+    }
     // Check environment variable first
     const envConfig = process.env.OOKLA_SERVER_POCO_CONFIG;
     if (envConfig) {

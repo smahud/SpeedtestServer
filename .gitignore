@@ -1,1 +1,12 @@
 reverse-engineering-batch/method1-objdump/disassembly.txt
+
+# build & runtime artifacts
+node_modules/
+dist/
+certs/
+*.log
+validation/harness/out/
+clients/
+lab/
+*.pem
+*.key
