@@ -34,7 +34,10 @@ export interface ServerCoreOptions {
   tcpPorts: number[];
   udpPorts: number[];
   versionString: string; // NetGauge/HTTP version banner (interop profile default)
-  tls?: { cert: Buffer; key: Buffer } | null;
+  tls?: { cert: Buffer | string; key: Buffer | string } | null;
+  /** Minimum TLS protocol ('TLSv1'|'TLSv1.1'|'TLSv1.2'|'TLSv1.3'); maps
+   *  openSSL.server.minimumTLSProtocol (daemon default: 1.2). */
+  tlsMinVersion?: tls.SecureVersion;
   crossDomainPorts: string;
   evidenceLogPath?: string;
   maxConnections: number;
@@ -54,6 +57,8 @@ interface ConnStats {
 
 export class ServerCore {
   private opts: ServerCoreOptions;
+  /** Current TLS material — swappable at runtime via reloadTls (§9.7). */
+  private tlsMaterial: { cert: Buffer | string; key: Buffer | string } | null;
   private loss = new LossRegistry();
   private pool = crypto.randomBytes(2 * 1024 * 1024); // 2 MiB download pool (daemon parity)
   private instanceUuid = crypto.randomUUID().toUpperCase();
@@ -81,6 +86,7 @@ export class ServerCore {
 
   constructor(opts: ServerCoreOptions) {
     this.opts = opts;
+    this.tlsMaterial = opts.tls ?? null;
     if (opts.evidenceLogPath) {
       this.evidence = fs.createWriteStream(opts.evidenceLogPath, { flags: 'w' });
     }
@@ -166,6 +172,30 @@ export class ServerCore {
     this.evidence?.end();
   }
 
+  /**
+   * §9.7 — hot certificate reload. Validates the new pair (createSecureContext)
+   * BEFORE swapping; on failure keeps the last valid material (never serves a
+   * broken certificate). New connections use the new material; established
+   * connections are unaffected. No restart, no port re-bind.
+   */
+  reloadTls(cert: Buffer | string, key: Buffer | string): { ok: boolean; error?: string } {
+    if (!this.tlsMaterial) {
+      return { ok: false, error: 'TLS not enabled on this server' };
+    }
+    try {
+      tls.createSecureContext({ cert: cert.toString(), key: key.toString() });
+    } catch (error) {
+      const msg = `TLS reload rejected (keeping last valid certificate): ${error instanceof Error ? error.message : String(error)}`;
+      this.ev('tls_reload_failed', { error: msg });
+      return { ok: false, error: msg };
+    }
+    this.tlsMaterial = { cert, key };
+    this.ev('tls_reloaded', {
+      fingerprint: new crypto.X509Certificate(cert.toString()).fingerprint256,
+    });
+    return { ok: true };
+  }
+
   stats(): Record<string, unknown> {
     return {
       startedAt: new Date(this.startedAt).toISOString(),
@@ -203,7 +233,7 @@ export class ServerCore {
     });
     const onFirst = (chunk: Buffer): void => {
       sock.removeListener('data', onFirst);
-      if (this.opts.tls && chunk.length > 0 && chunk[0] === 0x16) {
+      if (this.tlsMaterial && chunk.length > 0 && chunk[0] === 0x16) {
         this.startTls(sock, chunk, id, peer, peerIp);
         return;
       }
@@ -230,9 +260,10 @@ export class ServerCore {
   private startTls(sock: net.Socket, firstChunk: Buffer, id: number, peer: string, peerIp: string): void {
     const tlsSock = new tls.TLSSocket(sock, {
       isServer: true,
-      cert: this.opts.tls!.cert,
-      key: this.opts.tls!.key,
-      minVersion: 'TLSv1.2', // daemon parity: minimumTLSProtocol = 1.2
+      cert: this.tlsMaterial ? this.tlsMaterial.cert : undefined,
+      key: this.tlsMaterial ? this.tlsMaterial.key : undefined,
+      // daemon parity: openSSL.server.minimumTLSProtocol (default 1.2)
+      minVersion: this.opts.tlsMinVersion || ("TLSv1.2" as tls.SecureVersion),
     });
     sock.unshift(firstChunk); // let the TLSSocket consume the ClientHello
     const onPlain = (chunk: Buffer): void => {
@@ -400,7 +431,7 @@ function hostOf(peer: string): string {
 import { ServerResponse } from 'node:http';
 function httpsServerWith(
   handler: (req: http.IncomingMessage, res: ServerResponse) => void,
-  tlsOpts: { cert: Buffer; key: Buffer },
+  tlsOpts: { cert: Buffer | string; key: Buffer | string },
 ): http.Server {
   // https.Server with the same handler; sockets are injected by the
   // multiplexer after TLS termination, so this server never binds.

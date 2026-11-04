@@ -42,6 +42,9 @@ export interface OoklaServerConfig {
   apiUrl?: string;
   enableAutoUpdate?: boolean;
   updateRequestInitialInterval?: number;
+  /** logging.loggers.* from OoklaServer.properties (Poco-style).
+   *  Applied by ConfigManager.getLogConfig(). */
+  logging?: Record<string, unknown>;
 }
 
 export interface ClientAuthTokenConfig {
@@ -80,6 +83,56 @@ export interface SSLConfig {
   verificationMode?: string;
   minimumTLSProtocol?: string;
   caFile?: string;
+  /** OoklaServer.ssl.useLetsEncrypt — automatic issuance (ACME) opt-in.
+   *  Custom certificateFile/privateKeyFile always take precedence and
+   *  effectively disable automatic issuance (effectiveUseLetsEncrypt=false). */
+  useLetsEncrypt?: boolean;
+  /** Explicit opt-in for untrusted self-signed development certificates.
+   *  Forbidden as a fallback once automatic issuance or custom certificates
+   *  are configured (startup fails instead). */
+  allowSelfSigned?: boolean;
+  /** ACME (Let's Encrypt) provisioning parameters, used when
+   *  useLetsEncrypt=true and no custom certificate is configured. */
+  acme?: SSLAcmeConfig;
+}
+
+export interface SSLAcmeConfig {
+  /** FQDNs to issue for; the operator must control their DNS. */
+  domains: string[];
+  /** ACME account contact email (registration/TOS acceptance). */
+  email: string;
+  /** ACME directory URL (default: Let's Encrypt production). */
+  directoryUrl?: string;
+  /** Local port the HTTP-01 challenge listener binds (default 80). */
+  http01Port?: number;
+  /** Directory for account key / issued certificate material
+   *  (default: ./certs/acme). */
+  storageDir?: string;
+}
+
+/** Result of resolving the effective TLS material at startup (MASTER PROMPT
+ *  v6.0 §9.2–§9.6 semantics). Fail-closed: throws ConfigurationError instead
+ *  of silently degrading. */
+export interface TlsResolution {
+  mode: 'custom' | 'acme' | 'dev-self-signed';
+  cert: string;
+  key: string;
+  /** True when the resolved mode performs no automatic issuance. */
+  effectiveUseLetsEncrypt: boolean;
+  /** Human-readable provenance for logs / readiness reporting. */
+  source: string;
+  warnings: string[];
+}
+
+/** Error thrown for invalid or contradictory TLS configuration. Startup
+ *  must abort (fail closed); this is never a fallback situation. */
+export class TlsConfigurationError extends Error {
+  public readonly code: string;
+  constructor(message: string, code = 'TLS_CONFIG') {
+    super(message);
+    this.name = 'TlsConfigurationError';
+    this.code = code;
+  }
 }
 
 export interface WebSocketConfig {

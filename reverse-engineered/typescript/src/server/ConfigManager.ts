@@ -6,8 +6,42 @@
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
-import { DeepPartial, OoklaServerConfig, LogConfig, SSLConfig, WebSocketConfig, UpdateConfig, ApiConfig } from '../types/core';
+import { DeepPartial, OoklaServerConfig, LogConfig, LogLevel, ChannelConfig, SSLConfig, WebSocketConfig, UpdateConfig, ApiConfig } from '../types/core';
 import { Logger } from './Logger';
+
+/** Poco channel classes honored by the Logger (others map to console). */
+const CHANNEL_CLASSES = [
+  'ConsoleChannel', 'FileChannel', 'LevelChannel', 'LogJsonFormatter',
+  'LogstashChannel', 'JSONChannel', 'SyslogChannel', 'EventLogChannel',
+];
+
+/** Properties whose value is ALWAYS a list (comma-separated in the
+ *  properties file; a single value is a one-element list, matching the
+ *  daemon's "at least one port is required" semantics). §11 parity fix:
+ *  single-value entries previously parsed as bare scalars. */
+const LIST_FIELDS: Record<string, true> = {
+  'tcpPorts': true,
+  'udpPorts': true,
+  'httpPorts': true,
+  'addresses': true,
+  'allowedDomains': true,
+  'ssl.acme.domains': true,
+  'clientAuthToken.additionalValidationFields': true,
+};
+
+/** Coerce known list fields to arrays. */
+function coerceListFields(obj: Record<string, unknown>, prefix = ''): void {
+  for (const [key, value] of Object.entries(obj)) {
+    const dotPath = prefix ? `${prefix}.${key}` : key;
+    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+      coerceListFields(value as Record<string, unknown>, dotPath);
+      continue;
+    }
+    if (LIST_FIELDS[dotPath] && !Array.isArray(value)) {
+      obj[key] = value === undefined || value === '' ? [] : [value];
+    }
+  }
+}
 
 const DEFAULT_CONFIG: OoklaServerConfig = {
   clientAuthToken: {
@@ -102,12 +136,24 @@ export class ConfigManager extends EventEmitter {
   private config: OoklaServerConfig;
   private logger: Logger;
   private configFilePath?: string;
+  /** Constructor overrides (CLI flags / API). Precedence: CLI > env > file
+   *  > defaults (§11) — they are re-applied AFTER any config file load. */
+  private overrides: DeepPartial<OoklaServerConfig>;
 
   constructor(overrides?: DeepPartial<OoklaServerConfig>, logger?: Logger) {
     super();
     this.logger = logger || new Logger({ loggers: {}, defaultLevel: 'information', pattern: '' });
-    this.config = this.mergeConfig(DEFAULT_CONFIG, overrides || {});
+    this.overrides = overrides || {};
+    this.config = this.mergeConfig(DEFAULT_CONFIG, this.overrides);
     this.loadConfig();
+    this.applyOverrides();
+  }
+
+  /** Re-apply constructor overrides on top of whatever was loaded (CLI wins). */
+  private applyOverrides(): void {
+    if (Object.keys(this.overrides).length > 0) {
+      this.config = this.mergeConfig(this.config, this.overrides);
+    }
   }
 
   /**
@@ -246,6 +292,7 @@ export class ConfigManager extends EventEmitter {
       this.setNestedProperty(result, mappedKey, value);
     }
 
+    coerceListFields(result as Record<string, unknown>);
     return result;
   }
 
@@ -368,25 +415,63 @@ export class ConfigManager extends EventEmitter {
   }
 
   /**
-   * Get logging configuration
+   * Get logging configuration.
+   *
+   * Honors the Poco-style `logging.loggers.<name>.*` properties when present
+   * (MASTER PROMPT v6.0 §11: parsed settings must reach their runtime
+   * consumer). Mapping:
+   *   logging.loggers.<n>.level              → channel level
+   *   logging.loggers.<n>.channel.class      → ConsoleChannel | FileChannel | …
+   *   logging.loggers.<n>.channel.path       → channelOptions.path
+   *   logging.loggers.<n>.channel.rotation   → channelOptions.rotation
+   * `EventLogChannel` (the daemon's default) maps to console output — the
+   * systemd journal captures it in production (see install.sh unit).
    */
   public getLogConfig(): LogConfig {
-    // Convert our config to logger config format
+    const parsed = ((this.config as unknown as Record<string, unknown>).logging || {}) as
+      { loggers?: Record<string, Record<string, unknown>> };
+
     const loggers: LogConfig['loggers'] = {};
+    const parsedLoggers = parsed.loggers || {};
+    const hasParsed = Object.keys(parsedLoggers).length > 0;
 
-    // Default app logger
-    loggers.app = {
-      name: 'app',
-      level: 'information',
-      channel: {
-        class: 'EventLogChannel', // Binary default from properties file
-        pattern: '%Y-%m-%d %H:%M:%S [%P - %I] [%p] %t',
-      },
-    };
+    if (hasParsed) {
+      for (const [name, cfg] of Object.entries(parsedLoggers)) {
+        const channel = (cfg.channel || {}) as Record<string, unknown>;
+        const channelClass = (
+          typeof channel.class === 'string' && CHANNEL_CLASSES.includes(channel.class)
+            ? channel.class
+            : 'EventLogChannel'
+        ) as ChannelConfig['class'];
+        loggers[name] = {
+          name: typeof cfg.name === 'string' ? cfg.name : name,
+          level: typeof cfg.level === 'string' ? (cfg.level as LogLevel) : 'information',
+          channel: {
+            class: channelClass,
+            pattern: typeof channel.pattern === 'string' ? channel.pattern : undefined,
+            path: typeof channel.path === 'string' ? channel.path.replace('${application.dir}', process.cwd()) : undefined,
+            channelOptions: {
+              path: typeof channel.path === 'string' ? channel.path.replace('${application.dir}', process.cwd()) : undefined,
+            },
+          },
+        };
+      }
+    } else {
+      // Default app logger (daemon default: EventLogChannel / information).
+      loggers.app = {
+        name: 'app',
+        level: 'information',
+        channel: {
+          class: 'EventLogChannel',
+          pattern: '%Y-%m-%d %H:%M:%S [%P - %I] [%p] %t',
+        },
+      };
+    }
 
+    const appLevel = loggers.app?.level || 'information';
     return {
       loggers,
-      defaultLevel: 'information',
+      defaultLevel: appLevel,
       pattern: '%Y-%m-%d %H:%M:%S [%P - %I] [%p] %t',
     };
   }

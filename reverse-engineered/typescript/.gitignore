@@ -37,8 +37,7 @@ certs/
 *.key
 *.crt
 
-# Lock files
-package-lock.json
+# Lock files (package-lock.json IS committed: reproducible installs §13)
 yarn.lock
 pnpm-lock.yaml
 
@@ -46,3 +45,7 @@ pnpm-lock.yaml
 tmp/
 temp/
 *.tmp
+
+# Installer staging artifacts
+node_modules_prod/
+.prod-deps-tmp/
