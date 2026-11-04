@@ -7,16 +7,17 @@ no root required. All commands run from the repo root unless noted.
 
 ```bash
 cd reverse-engineered/typescript
-npm install
+npm ci                 # lock file is committed (reproducible installs)
 npm run build          # dist/bin/ooklaserver.js
-npm test               # 44/44 protocol conformance tests must pass
+npm test               # 66/66 conformance+config+TLS-matrix tests must pass
 ```
 
-## 2. Lab PKI
+## 2. Lab PKI + TLS cases
 
 ```bash
-mkdir -p validation/harness/certs validation/harness/out
-(cd validation/harness && ./gen-pki.sh)
+cd validation/harness
+./gen-pki.sh           # lab CA + server cert + MITM cert + CLI trust bundle
+./gen-tls-cases.sh     # §10 cases: A/B valid pairs, expired, wrong-hostname
 ```
 
 ## 3. Obtain official artifacts (never committed)
@@ -44,6 +45,9 @@ cp ../../validation/harness/certs/server.key key.pem
 
 ```bash
 cd validation/harness
+# TLS §9/§10 strict battery (10 scenarios on the actual listener, port 8443)
+./run-tls-validation.sh            # expect 10/10 PASS
+
 # baseline: official CLI → official daemon (non-publishing enforced)
 REF_PORT=18080 ./run-official-baseline.sh
 
@@ -52,11 +56,12 @@ cd ../../reverse-engineered/typescript
 node dist/bin/ooklaserver.js --ports 8080,5060 --udp-ports 8080,5060 \
   --evidence-log ../../validation/harness/out/sts-evidence.jsonl &
 cd ../../validation/harness
-STS_PORT=8080 ./run-replacement-test.sh
+STS_PORT=8080 ./run-replacement-test.sh        # repeat 3× isolated (acceptance form)
 
-# differential + negative
-REF_PORT=18080 STS_PORT=8080 ./run-differential-suite.sh
-node negative-tests.mjs 8080
+# differential + negative (probe battery from the SpeedtestHost-Tester repo)
+PROBE=/path/to/probe-protocol.mjs REF_PORT=18080 STS_PORT=8080 \
+  OUT=./out/differential ./run-differential-suite.sh   # expect 35/37 identical
+node negative-tests.mjs 8080                          # expect 7/7 PASS
 ```
 
 ## 4b. Result-URL battery (publishing opt-in — optional)
@@ -71,12 +76,23 @@ cd validation/harness
 SERVER_IDS='60178 43356 35791 63143 48446 65463:human' \
   CLI=../../clients/speedtest/speedtest \
   OUT=./out/result-urls ./run-result-url-battery.sh
+node gen-battery-facts.js ./out/result-urls   # derive the facts table
 ```
 
 The script starts/stops SpeedtestServer per run (fresh evidence log each),
-keeps the fail-closed preflight, and appends one machine record per run to
-`battery-summary.json`. Run back-to-back batteries may show stochastic
-loopback UDP-loss outliers — see `PUBLISHED_RESULT_URLS.md` §5.
+keeps the fail-closed preflight (it refuses to run while any official
+OoklaServer process is alive), and appends one machine record per run to
+`battery-summary.json`. Back-to-back batteries may show stochastic loopback
+UDP-loss outliers — retry the affected ID in isolation (see
+`PUBLISHED_RESULT_URLS.md` §5).
+
+## 4c. Installer (§13)
+
+```bash
+./install.sh --dry-run                     # checks + plan + config/TLS validation
+./install.sh --staging-dir /tmp/sts        # full staged install + verification
+sudo ./install.sh [--start]                # real system install (Debian 13 + systemd)
+```
 
 ## 5. What PASS looks like
 
@@ -84,6 +100,7 @@ loopback UDP-loss outliers — see `PUBLISHED_RESULT_URLS.md` §5.
   `packetLoss:0`, `result.persisted:false`, exit code 0.
 - `out/replacement/process-inventory.txt`: target port owned by
   `node dist/bin/ooklaserver.js`; "official daemon: ABSENT".
+- `out/tls-validation/tls-validation.json`: 10× `"verdict":"PASS"`.
 - `out/sts-evidence.jsonl`: byte counters ≈ the client's reported volumes.
 - Host tester (optional, from the SpeedtestHost-Tester repo, read-only):
   `node speedtest-host-tester.mjs 127.0.0.1:8080` → 10/10 PASS.
@@ -96,6 +113,7 @@ printf 'HI\nGETIP\nPING 1\n' | nc 127.0.0.1 8080
 curl -A x http://127.0.0.1:8080/hi              # hello 2.11 (…) 
 curl -A x -X POST --data 12345 http://127.0.0.1:8080/speedtest/upload.php   # size=5
 curl -k -A x https://127.0.0.1:8080/hi          # same over TLS on the SAME port
+node tls-strict-check.mjs --port 8080 --ca certs/lab-ca.pem  # strict (fails for dev self-signed — by design)
 ```
 
 ## Notes / gotchas
@@ -108,3 +126,7 @@ curl -k -A x https://127.0.0.1:8080/hi          # same over TLS on the SAME port
   `OFFICIAL_CLI_FAILURE_ANALYSIS.md` A-2.
 - If the CLI's top-pick server list changes, the harness's rewrite-all mode
   keeps the lab self-contained (no fallback to production servers).
+- The battery/gate preflight refuses to run while ANY official OoklaServer
+  process is alive (comm-based detection) — stop reference daemons first.
+- Regenerating `gen-pki.sh` creates a NEW lab CA: re-issue the reference
+  daemon's cert from the new CA before differential runs (see §3 copies).

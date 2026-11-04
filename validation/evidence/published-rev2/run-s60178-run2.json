@@ -1,0 +1,71 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T10:46:05Z",
+    "ping": {
+        "jitter": 0.025,
+        "latency": 0.148,
+        "low": 0.124,
+        "high": 0.183
+    },
+    "download": {
+        "bandwidth": 2754145490,
+        "bytes": 37125765584,
+        "elapsed": 14411,
+        "latency": {
+            "iqm": 13.717,
+            "low": 0.147,
+            "high": 145.301,
+            "jitter": 21.746
+        }
+    },
+    "upload": {
+        "bandwidth": 1574393072,
+        "bytes": 12647393745,
+        "elapsed": 8108,
+        "latency": {
+            "iqm": 4.835,
+            "low": 0.249,
+            "high": 37.874,
+            "jitter": 8.649
+        }
+    },
+    "packetLoss": 0.34843205574912894,
+    "serverSelection": {
+        "selectedServerId": 60178,
+        "selectionMethod": "manual",
+        "servers": [
+            {
+                "server": {
+                    "id": 60178,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "Sun Mobile",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            }
+        ]
+    },
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 60178,
+        "host": "localhost",
+        "port": 8080,
+        "name": "Sun Mobile",
+        "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "3520bdd8-0bee-402b-b78f-f1ef0a6a5523",
+        "url": "https://www.speedtest.net/result/c/3520bdd8-0bee-402b-b78f-f1ef0a6a5523",
+        "persisted": true
+    }
+}

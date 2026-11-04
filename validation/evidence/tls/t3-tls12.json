@@ -1,0 +1,1 @@
+{"ok":false,"code":"ERR_SSL_TLSV1_ALERT_PROTOCOL_VERSION","message":"C0E254ADE67F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:../deps/openssl/openssl/ssl/record/rec_layer_s3.c:918:SSL alert number 70\n"}

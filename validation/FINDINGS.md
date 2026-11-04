@@ -134,3 +134,83 @@ the same defects). Every fix is in the canonical implementation and covered by
   `RECV` responses for encrypted-protocol sessions (client self-reports its
   address) — measured packetLoss jumped 0 → 0.515 with the relay, 0 without.
   Lesson: run gate tests **directly**, use the relay only for protocol capture.
+
+---
+
+## Revision findings (v6.0 audit, branch audit/typescript-official-parity, 2026-11-04)
+
+Format as above. All fixes are in the canonical TypeScript implementation and
+covered by `ConfigParity.test.ts` (22 new tests) and the TLS harness.
+
+## C-1 — CLI flags silently clobbered by any discovered config file (§11)
+- **Severity:** P1 (configuration correctness)
+- **Reproduction:** start with `--udp-ports 18080` while a properties file in
+  the search path sets `OoklaServer.udpPorts = 5060,8080` → server listens on
+  5060/8080; the flag is silently lost (found by the installer's own
+  verification probe).
+- **Root cause:** `ConfigManager` merged the file ON TOP of constructor
+  overrides; precedence was file > CLI instead of CLI > file.
+- **Fix:** overrides are stored and re-applied after every file/env load.
+  Precedence now CLI > `OOKLA_SERVER_POCO_CONFIG` > file > defaults.
+- **Regression:** "CLI-flag style overrides take precedence over the loaded
+  file" (unit).
+- **Result:** FIXED.
+
+## C-2 — Single-value list properties parsed as scalars (§11)
+- **Severity:** P2 (configuration correctness)
+- **Reproduction:** `OoklaServer.tcpPorts = 9999` (one port, no comma) parsed
+  to the number `9999`, not `[9999]`; same for `httpPorts`, `addresses`,
+  `allowedDomains`, `acme.domains`.
+- **Root cause:** the properties value converter only produced arrays for
+  comma-separated values.
+- **Fix:** list-field coercion pass (`LIST_FIELDS`) after parsing.
+- **Regression:** template-parity + mixed-mapping unit tests.
+- **Result:** FIXED.
+
+## C-3 — Invented "Ookla Host API" Let's-Encrypt endpoints + disabled outbound TLS verification in legacy component
+- **Severity:** P1 security/compliance (RULE 4 violation; decommissioned code)
+- **Reproduction:** `TLSCertificateManager.ts` (legacy, not in the startup
+  path) POSTed to `host-api.speedtest.net/api/le/certificate` — endpoints with
+  no verified public contract — with `rejectUnauthorized:false` and Basic-auth
+  credentials.
+- **Root cause:** earlier revision invented the vendor API (violates RULE 4)
+  and disabled certificate verification on the credential-carrying client.
+- **Fix:** code REMOVED. Automatic issuance now uses standard public ACME
+  (`acme-client`, HTTP-01) in the canonical `AcmeProvisioner`/
+  `CertificateManager`; the legacy file is reduced to a self-signed dev
+  utility with a clear header. No outbound HTTP exists in the canonical
+  server.
+- **Regression:** TLS matrix unit tests + harness N6/N7 (fail-closed paths).
+- **Result:** FIXED (removed).
+
+## C-4 — TLS semantics: silent self-signed fallback and unenforced §9 matrix
+- **Severity:** P1 (production TLS correctness; v6.0 §9.2–§9.6)
+- **Reproduction (before):** configuring only `certificateFile` silently fell
+  back to a self-signed certificate; `useLetsEncrypt=true` did nothing;
+  `minimumTLSProtocol` was parsed but the listener hardcoded TLSv1.2;
+  custom-certificate changes after startup were never activated.
+- **Fix:** canonical `CertificateManager` implements the §9.2–§9.6 matrix
+  (fail-closed; see CONFIG_MATRIX + TLS_CERTIFICATES); `ServerCore` gained a
+  validated hot `reloadTls()` and configurable `tlsMinVersion`; custom-cert
+  watcher + ACME renewal schedule implement §9.7.
+- **Regression:** 10/10 strict TLS battery + TLS unit matrix.
+- **Result:** FIXED.
+
+## C-5 — Harness false positive: own process detected as "official daemon"
+- **Severity:** P2 (harness correctness — would have blocked legitimate gates)
+- **Reproduction:** `run-replacement-test.sh` inventory used a broad
+  `grep ooklaserver` that matched our own `node dist/bin/ooklaserver.js`
+  process → "official daemon still present" FATAL. Conversely the narrow
+  pattern missed a renamed `./OoklaServer` binary.
+- **Fix:** comm-based detection (`ps -eo pid=,comm=` matching `OoklaServer*`
+  process names) in both gate and battery scripts — never matches `node`,
+  catches renamed official binaries. (Strictness increased, not weakened.)
+- **Result:** FIXED.
+
+## C-6 — Harness CA-bundle path inconsistency
+- **Severity:** P2 (harness)
+- **Reproduction:** gate scripts passed `--ca-certificate=../certs/...`
+  (validation/certs) while `gen-pki.sh` writes `certs/...` (harness dir) —
+  CLI failed with "Problem with the SSL CA cert".
+- **Fix:** both gate scripts now reference `certs/cli-ca-bundle.pem`.
+- **Result:** FIXED.

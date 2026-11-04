@@ -1,0 +1,2 @@
+2026-11-04 10:04:46 [3420 - 3419] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":3420,"role":"standalone","config":"./out/tls-validation/scratch/n7.properties"}
+2026-11-04 10:04:46 [3420 - 3419] [ERROR] Failed to start SpeedtestServer {"error":"TlsConfigurationError: Automatic (ACME) certificate provisioning FAILED for [speed.example.org]: acme.crypto.getPemFromPrivateKey is not a function. Startup aborts — a self-signed fallback would hide the failure (§9.6)."}

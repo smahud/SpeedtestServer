@@ -9,6 +9,40 @@ IDs, all transparently redirected to the local SpeedtestServer, with result
 submission allowed so every test returns a **genuine, publicly reachable
 speedtest.net Result URL**.
 
+## 0. Revision 2 (branch audit/typescript-official-parity, same day)
+
+Re-run of the battery against the **v6.0 revision** (new TLS resolution, new
+config precedence, comm-based daemon detection) — proving the publishing path
+survived the changes. Evidence: `validation/evidence/published-rev2/`
+(`battery-summary.json`, `battery-facts.json`, per-run files, fresh server
+process per run with fail-closed preflight — one battery attempt correctly
+refused to run while the differential reference daemon was still alive).
+
+| Run tag | Server ID | Server name (as seen by CLI) | Actual target | DL (Mbps) | UL (Mbps) | Idle lat (ms) | packetLoss (%) | Result URL |
+|---|---|---|---|---|---|---|---|---|
+| s63143 | 63143 | Netvigator | localhost:8080 | 18,090.00 | 13,496.00 | 0.080 | 0 | https://www.speedtest.net/result/c/572dd200-a096-4093-9363-1f086a6cf526 |
+| s35791 | 35791 | SmarTone | localhost:8080 | 17,957.06 | 12,747.58 | 0.081 | 0 | https://www.speedtest.net/result/c/42afd2e9-6b73-4729-9b1d-caaf8efbf715 |
+| s48446 | 48446 | GSL Networks | localhost:8080 | 18,439.67 | 12,804.00 | 0.073 | 0 | https://www.speedtest.net/result/c/cd393af6-2b69-4d23-b576-a73894ce6f15 |
+| s60178-run3 | 60178 | Sun Mobile | localhost:8080 | 19,054.83 | 13,268.76 | 0.081 | 0 | https://www.speedtest.net/result/c/55713fba-3d50-4558-95f2-7afbde18107a |
+| s60178 (superseded) | 60178 | Sun Mobile | localhost:8080 | 17,950.72 | 12,916.00 | 0.078 | 3.61 | https://www.speedtest.net/result/c/48d4d353-2206-4a35-bd9d-0fc527d1c4c7 |
+| s60178-run2 (superseded) | 60178 | Sun Mobile | localhost:8080 | 22,030.00 | 12,604.00 | 0.083 | 0.35 | https://www.speedtest.net/result/c/3520bdd8-0bee-402b-b78f-f1ef0a6a5523 |
+
+Zero-loss PASS rows: 4 distinct server IDs. The two superseded s60178 rows
+are the stochastic back-to-back loopback-loss outliers described in §5 (both
+still genuine published results: exit 0, `persisted=true`); s60178-run3 is
+the isolated zero-loss retry for that ID. Server-side corroboration
+(`battery-facts.json`): e.g. s60178-run3 server-sent 20.3 GiB / received
+14.5 GiB vs client-reported ≈19,054 Mbps × 10 s download ≈ 22.6 GiB requested
+(0.4–1 % framing delta as before), 13 NetGauge connections, 1,848 commands
+per run.
+
+Spot-verification (public page fetched 2026-11-04): the s60178-run3 page at
+`…/c/55713fba-…` shows **19,054.83 / 13,268.76 Mbps, Hong Kong, Alibaba** —
+exact match with the CLI-reported values recorded in
+`evidence/published-rev2/run-s60178-run3.json`.
+
+The original (first-delivery) battery follows.
+
 ## 1. What was done
 
 - Client: official Speedtest CLI `1.2.0.84 (ea6b6773cf)`, unmodified

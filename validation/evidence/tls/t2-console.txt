@@ -1,0 +1,21 @@
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":3121,"role":"standalone","config":"./out/tls-validation/scratch/t2.properties"}
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] TLS material resolved {"mode":"custom","source":"custom pair ./out/tls-validation/scratch/live.pem + ./out/tls-validation/scratch/live.key (effectiveUseLetsEncrypt=false)","effectiveUseLetsEncrypt":false}
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] [net] listen_tcp {"port":8443,"family":"dual-stack"}
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] [net] listen_udp {"port":8443}
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] [net] started {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"4E747262-0EA0-449E-8AFD-BD25B1082672","pid":3121}
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] Watching custom certificate for changes (hot reload) {"file":"/home/z/my-project/SpeedtestServer/validation/harness/out/tls-validation/scratch/live.pem"}
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] SpeedtestServer started (canonical ServerCore) {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","tlsMode":"custom","effectiveUseLetsEncrypt":false,"tlsMinimumProtocol":"1.2","role":"standalone"}
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] SpeedtestServer started successfully {"tcpPorts":[8443],"udpPorts":[8443],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d"}
+2026-11-04 10:04:32 [3121 - 3061] [INFORMATION] This is an INDEPENDENT open-source implementation — not an Ookla product.
+2026-11-04 10:04:33 [3121 - 3061] [INFORMATION] [net] conn_https {"id":1,"peer":"::ffff:127.0.0.1:50216"}
+2026-11-04 10:04:33 [3121 - 3061] [INFORMATION] [net] conn_close {"id":1,"peer":"::ffff:127.0.0.1:50216","stats":{"peer":"::ffff:127.0.0.1:50216","openedAt":1793786673475,"transport":"tls","bytesDown":0,"bytesUp":0,"commands":0}}
+2026-11-04 10:04:33 [3121 - 3061] [INFORMATION] [net] tls_reloaded {"fingerprint":"22:2C:86:3A:5F:1F:FB:C4:9B:D9:13:ED:21:98:3A:60:23:34:E3:1F:48:08:98:96:53:C9:99:F2:27:40:F8:EF"}
+2026-11-04 10:04:33 [3121 - 3061] [INFORMATION] Custom certificate reloaded (hot activation, no restart) {"file":"/home/z/my-project/SpeedtestServer/validation/harness/out/tls-validation/scratch/live.pem"}
+2026-11-04 10:04:36 [3121 - 3061] [INFORMATION] [net] conn_https {"id":2,"peer":"::ffff:127.0.0.1:57156"}
+2026-11-04 10:04:36 [3121 - 3061] [INFORMATION] [net] conn_close {"id":2,"peer":"::ffff:127.0.0.1:57156","stats":{"peer":"::ffff:127.0.0.1:57156","openedAt":1793786676041,"transport":"tls","bytesDown":0,"bytesUp":0,"commands":0}}
+2026-11-04 10:04:36 [3121 - 3061] [ERROR] Certificate reload failed (keeping last valid certificate): ./out/tls-validation/scratch/live.pem: certificate is not parseable PEM X.509: error:0480006C:PEM routines::no start line
+2026-11-04 10:04:38 [3121 - 3061] [INFORMATION] [net] conn_https {"id":3,"peer":"::ffff:127.0.0.1:57162"}
+2026-11-04 10:04:38 [3121 - 3061] [INFORMATION] [net] conn_close {"id":3,"peer":"::ffff:127.0.0.1:57162","stats":{"peer":"::ffff:127.0.0.1:57162","openedAt":1793786678604,"transport":"tls","bytesDown":0,"bytesUp":0,"commands":0}}
+2026-11-04 10:04:38 [3121 - 3061] [INFORMATION] Received SIGTERM, shutting down...
+2026-11-04 10:04:38 [3121 - 3061] [INFORMATION] [net] stopped {"connections":3}
+2026-11-04 10:04:38 [3121 - 3061] [INFORMATION] SpeedtestServer stopped

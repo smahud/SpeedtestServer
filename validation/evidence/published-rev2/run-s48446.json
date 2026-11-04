@@ -1,0 +1,71 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T10:45:27Z",
+    "ping": {
+        "jitter": 0.052,
+        "latency": 0.080,
+        "low": 0.053,
+        "high": 0.150
+    },
+    "download": {
+        "bandwidth": 2304483488,
+        "bytes": 21039516400,
+        "elapsed": 9326,
+        "latency": {
+            "iqm": 24.941,
+            "low": 0.087,
+            "high": 172.816,
+            "jitter": 34.171
+        }
+    },
+    "upload": {
+        "bandwidth": 1599701596,
+        "bytes": 15410073963,
+        "elapsed": 9814,
+        "latency": {
+            "iqm": 4.837,
+            "low": 0.110,
+            "high": 37.085,
+            "jitter": 7.770
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 48446,
+        "selectionMethod": "manual",
+        "servers": [
+            {
+                "server": {
+                    "id": 48446,
+                    "host": "localhost",
+                    "port": 8080,
+                    "name": "GSL Networks",
+                    "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+                    "country": "Hong Kong"
+                }
+            }
+        ]
+    },
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 48446,
+        "host": "localhost",
+        "port": 8080,
+        "name": "GSL Networks",
+        "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "cd393af6-2b69-4d23-b576-a73894ce6f15",
+        "url": "https://www.speedtest.net/result/c/cd393af6-2b69-4d23-b576-a73894ce6f15",
+        "persisted": true
+    }
+}

@@ -1,0 +1,27 @@
+[Unit]
+Description=SpeedtestServer (independent OoklaServer-compatible speedtest server)
+Documentation=file:///tmp/sts-staging/opt/speedtestserver/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=speedtestserver
+Group=speedtestserver
+WorkingDirectory=/tmp/sts-staging/var/lib/speedtestserver
+ExecStart=/usr/bin/node /tmp/sts-staging/opt/speedtestserver/dist/bin/ooklaserver.js --config /tmp/sts-staging/etc/speedtestserver/OoklaServer.properties
+Restart=on-failure
+RestartSec=2
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/tmp/sts-staging/var/lib/speedtestserver
+StateDirectory=speedtestserver
+CapabilityBoundingSet=
+AmbientCapabilities=
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
