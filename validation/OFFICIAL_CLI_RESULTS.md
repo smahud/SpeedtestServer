@@ -63,3 +63,13 @@ handshake ✔ (23 sessions, HI→HELLO) · server selection ✔ (localhost chose
 
 - `evidence/OFFICIAL_CLI_TO_SPEEDTESTSERVER.json` — status **PASS** (schema per MASTER PROMPT §12)
 - `evidence/OFFICIAL_CLI_TO_OFFICIAL_SERVER.json` — status **PASS**
+
+## Row 3 — Official CLI → SpeedtestServer with **publishing opt-in** (Result URLs)
+
+Same forcing chain as Row 2, but `cv-proxy.mjs --publish` tunnels
+`results.speedtest.net` so the CLI's submission is accepted and returns a
+genuine public Result URL. 9 committed runs / 6 distinct server IDs, all
+`persisted=true` — full table, corroboration and reproduction in
+**`PUBLISHED_RESULT_URLS.md`** (evidence: `evidence/published/`, harness:
+`harness/run-result-url-battery.sh`). The non-publishing guarantee of Rows 1–2
+is unchanged; publishing is opt-in only for this battery.

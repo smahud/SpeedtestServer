@@ -7,6 +7,11 @@
   download, upload, packet-loss 0) against SpeedtestServer with the official
   daemon absent — 3/3 gate runs, non-publishing enforced
   (`validation/evidence/OFFICIAL_CLI_TO_SPEEDTESTSERVER.json` = PASS).
+- **Published Result-URL battery (2026-11-04):** same forcing chain with
+  publishing opted in — 9 runs / 6 distinct server IDs, all `persisted=true`
+  with genuine public Result URLs (`PUBLISHED_RESULT_URLS.md`,
+  `evidence/published/`, harness `run-result-url-battery.sh`; `cv-proxy.mjs`
+  grew an opt-in `--publish` flag, default behavior unchanged).
 - Host tester parity 10/10; differential probe parity 35/37 identical (2
   expected non-differences); unit suite 44/44; negative suite 7/7.
 - Canonical implementation: `reverse-engineered/typescript` (new core:

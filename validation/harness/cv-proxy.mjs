@@ -11,12 +11,17 @@
  *     REAL live engine config is fetched from Ookla using the CLI's OWN query
  *     string and User-Agent (license/engine params stay genuine), with exactly
  *     ONE server entry redirected to the local test server.
- *  3. NON-PUBLISHING GUARANTEE: CONNECT results.speedtest.net is REFUSED, so
- *     no lab measurement can be submitted as a genuine public result.
+ *  3. NON-PUBLISHING GUARANTEE (default): CONNECT results.speedtest.net is
+ *     REFUSED, so no lab measurement can be submitted as a genuine public
+ *     result. OPT-IN PUBLISHING (--publish): results.speedtest.net is
+ *     transparently TUNNELED instead, letting the CLI submit the measurement
+ *     and return a genuine public Result URL
+ *     (https://www.speedtest.net/result/c/<uuid>). Every such tunnel is logged
+ *     as k:'publish_tunnel'. Used only by run-result-url-battery.sh.
  *  4. Everything else is transparently tunneled.
  *
- * Usage: node cv-proxy.mjs [--port 8888] [--target localhost:8080] [--server-id ID]
- *       (rewrites servers[0] unless --server-id given)
+ * Usage: node cv-proxy.mjs [--port 8888] [--target localhost:8080] [--server-id ID] [--publish]
+ *       (rewrites servers[0] unless --server-id given; CV_REWRITE_ALL=1 rewrites all)
  */
 import net from 'node:net';
 import tls from 'node:tls';
@@ -28,11 +33,12 @@ const LAB = path.dirname(new URL(import.meta.url).pathname);
 const CERTS = path.join(LAB, 'certs');
 
 function parseArgs(argv) {
-  const a = { port: 8888, target: 'localhost:8080', serverId: null, log: path.join(LAB, 'captures', 'cv-proxy.jsonl') };
+  const a = { port: 8888, target: 'localhost:8080', serverId: null, publish: false, log: path.join(LAB, 'captures', 'cv-proxy.jsonl') };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--port') a.port = parseInt(argv[++i], 10);
     else if (argv[i] === '--target') a.target = argv[++i];
     else if (argv[i] === '--server-id') a.serverId = argv[++i];
+    else if (argv[i] === '--publish') a.publish = true;
     else if (argv[i] === '--log') a.log = argv[++i];
   }
   return a;
@@ -45,9 +51,11 @@ function log(o) { o.ts = Date.now(); LOG.write(JSON.stringify(o) + '\n'); }
 const MITM_CERT = fs.readFileSync(path.join(CERTS, 'mitm.pem'));
 const MITM_KEY = fs.readFileSync(path.join(CERTS, 'mitm.key'));
 const SYSTEM_CA = fs.readFileSync('/etc/ssl/certs/ca-certificates.crt');
-const BLOCKED_HOSTS = new Set(['results.speedtest.net']); // non-publishing guarantee
+// Non-publishing guarantee by default; --publish opts in to result submission
+// (tunneled) so the CLI can return a genuine public Result URL.
+const BLOCKED_HOSTS = new Set(args.publish ? [] : ['results.speedtest.net']);
 
-log({ k: 'meta', port: args.port, target: args.target, serverId: args.serverId, pid: process.pid });
+log({ k: 'meta', port: args.port, target: args.target, serverId: args.serverId, publish: args.publish, pid: process.pid });
 
 async function fetchLiveConfig(query, ua) {
   const url = 'https://cli.speedtest.net/api/cli/config' + (query ? '?' + query : '');
@@ -182,6 +190,9 @@ const server = net.createServer((sock) => {
       if (rest.length) tlsSock.emit('data', rest); // not typical, but safe
       return;
     }
+    if (host === 'results.speedtest.net' && args.publish) {
+      log({ k: 'publish_tunnel', target: hostPort, note: 'publishing opt-in: submission allowed, Result URL expected' });
+    }
     // Transparent tunnel
     log({ k: 'tunnel', target: hostPort });
     const up = net.connect({ host, port: parseInt(hostPort.split(':').pop(), 10) }, () => {
@@ -199,6 +210,6 @@ const server = net.createServer((sock) => {
 
 server.on('error', (e) => { console.error('cv-proxy error:', e.message); process.exit(1); });
 server.listen(args.port, '127.0.0.1', () => {
-  console.log(`[cv-proxy] on 127.0.0.1:${args.port} | cli.speedtest.net -> crafted config (1 server -> ${args.target}) | results.speedtest.net BLOCKED`);
+  console.log(`[cv-proxy] on 127.0.0.1:${args.port} | cli.speedtest.net -> crafted config (1 server -> ${args.target}) | results.speedtest.net ${args.publish ? 'TUNNELED (publishing ENABLED — Result URL capture)' : 'BLOCKED (non-publishing)'}`);
 });
 process.on('SIGINT', () => process.exit(0));

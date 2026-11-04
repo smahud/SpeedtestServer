@@ -59,6 +59,25 @@ REF_PORT=18080 STS_PORT=8080 ./run-differential-suite.sh
 node negative-tests.mjs 8080
 ```
 
+## 4b. Result-URL battery (publishing opt-in — optional)
+
+The gates above are deliberately non-publishing. To reproduce the published
+Result-URL battery (`PUBLISHED_RESULT_URLS.md`), which forces several distinct
+server IDs at SpeedtestServer and captures a genuine public Result URL per run
+(`results.speedtest.net` is tunneled instead of refused):
+
+```bash
+cd validation/harness
+SERVER_IDS='60178 43356 35791 63143 48446 65463:human' \
+  CLI=../../clients/speedtest/speedtest \
+  OUT=./out/result-urls ./run-result-url-battery.sh
+```
+
+The script starts/stops SpeedtestServer per run (fresh evidence log each),
+keeps the fail-closed preflight, and appends one machine record per run to
+`battery-summary.json`. Run back-to-back batteries may show stochastic
+loopback UDP-loss outliers — see `PUBLISHED_RESULT_URLS.md` §5.
+
 ## 5. What PASS looks like
 
 - `out/replacement/cli.json`: `"type":"result"`, `server.host=localhost`,

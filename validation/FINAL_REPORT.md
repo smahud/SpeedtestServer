@@ -49,6 +49,7 @@ timestamp, random payload). Host tester v1.1.0: **10/10 on both servers**.
 |---|---|
 | Official CLI → official OoklaServer | 3 runs, exit 0 (direct runs loss 0; the one relayed run documents the relay-NAT UDP artifact, A-2) |
 | Official CLI → **SpeedtestServer** | **3/3 exit 0 · ping 0.033–0.047 ms · download 18.4–21.7 Gbps (24.56 GB on the gate run) · upload 13.6–15.7 Gbps (18.95 GB) · packetLoss 0 · persisted=false** |
+| Official CLI → SpeedtestServer, **publishing opt-in** | 9 runs / 6 distinct server IDs, all exit 0, `persisted=true`, each returning a **genuine public Result URL** (spot-verified against the live result pages) — `PUBLISHED_RESULT_URLS.md` |
 
 Destination proof: `server.host=localhost`, `server.ip=::1`, port owned by
 `node dist/bin/ooklaserver.js` (pid recorded pre-run); all daemon processes
@@ -86,10 +87,11 @@ real-client runs.
 ## J. Git delivery
 
 - Branch `audit/official-cli-interoperability`, coherent commits
-  (implementation → validation/docs). `master` untouched.
-- Push requires owner credentials (not available in this environment —
-  precise blocker recorded in the delivery notes); a **git bundle** with the
-  full branch is exported so the owner can `git fetch` it and push.
+  (implementation → validation/docs → multi-server Result-URL battery).
+  `master` untouched.
+- Push: executed at delivery time (2026-11-04) with owner-supplied
+  credentials; the audit environment itself holds none. A **git bundle**
+  with the full branch is also exported for archival (`download/`).
 - No proprietary binaries or credentials are included anywhere.
 
 ## K. Release verdict
