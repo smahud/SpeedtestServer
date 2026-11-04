@@ -11,7 +11,6 @@
  *   OOKLA_SERVER_POCO_CONFIG   JSON configuration override (daemon parity)
  */
 
-import * as fs from 'fs';
 import * as path from 'path';
 import { ConfigManager } from '../server/ConfigManager';
 import { Logger } from '../server/Logger';
@@ -30,12 +29,22 @@ interface CliOptions {
 async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
 
-  // The --config flag is honored: point ConfigManager at the file explicitly.
-  if (options.configPath && fs.existsSync(options.configPath)) {
+  // The --config flag is honored — and fail-closed (fixes A-1): the path is
+  // ALWAYS recorded so ConfigManager can reject a missing/unreadable file
+  // instead of silently falling back to the search path.
+  if (options.configPath) {
     process.env.OOKLA_SPEEDTESTSERVER_CONFIG_FILE = path.resolve(options.configPath);
   }
 
-  const configManager = new ConfigManager(options.configOverrides);
+  let configManager: ConfigManager;
+  try {
+    configManager = new ConfigManager(options.configOverrides);
+  } catch (error) {
+    console.error(
+      `Configuration error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(2); // fail closed: explicit config must load
+  }
   const config = configManager.getConfig();
   const logger = new Logger(configManager.getLogConfig());
 
@@ -63,11 +72,9 @@ async function main(): Promise<void> {
       version: config.netgaugeVersionString,
     });
     logger.info(`This is an INDEPENDENT open-source implementation — not an Ookla product.`);
-    await new Promise<void>((resolve) => {
-      process.on('SIGTERM', () => resolve());
-      process.on('SIGINT', () => resolve());
+    await new Promise<void>(() => {
+      /* exit is owned by the signal handler (single shutdown path) */
     });
-    await server.stop();
   } catch (error) {
     logger.error('Failed to start SpeedtestServer', { error: String(error) });
     process.exit(1); // fail closed (P0.1 fix: bind errors are fatal)
@@ -193,14 +200,22 @@ Environment:
 }
 
 function setupSignalHandlers(server: OoklaServer, logger: Logger): void {
+  // Single shutdown path (fixes A-22): one handler stops the server, flushes
+  // logs/evidence, then exits. Exit codes follow the shell convention
+  // (130 = SIGINT, 143 = SIGTERM); a failed stop exits non-zero.
+  let shuttingDown = false;
   const shutdown = async (signal: string) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
     logger.info(`Received ${signal}, shutting down...`);
+    let exitCode = signal === 'SIGINT' ? 130 : 143;
     try {
       await server.stop();
     } catch (error) {
       logger.error('Error during shutdown', { error: String(error) });
+      exitCode = 1;
     }
-    process.exit(0);
+    process.exit(exitCode);
   };
   process.on('SIGTERM', () => void shutdown('SIGTERM'));
   process.on('SIGINT', () => void shutdown('SIGINT'));

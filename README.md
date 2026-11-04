@@ -26,18 +26,28 @@ testing. No proprietary code or assets are included; the compatibility
 banner is configurable (`OoklaServer.netgaugeVersionString`). Parity claims
 are bounded to the verified profile — `validation/PARITY_MATRIX.md`.
 
-## 3. Current TypeScript compatibility status (branch `audit/typescript-official-parity`, 2026-11-04)
+## 3. Current TypeScript compatibility status (revision 4 — live differential lab, 2026-11-04)
 
 | Gate | Result |
 |---|---|
+| **Live differential battery vs the running reference daemon** (103 probes: NetGauge/HTTP/TLS/WS/UDP) | **89/103 raw byte-identical**; 6 expected non-differences (timestamps, random payload, own port); 8 documented deviations (D-2/D-3 + safety refusals) — `validation/evidence/rea-lab-rev4/` |
 | Official Speedtest CLI 1.2.0.84 → this server (non-publishing) | **PASS 3/3 isolated runs** — exit 0, latency+download+upload complete, packet loss 0 |
 | Publishing opt-in battery (multi-server, forced local) | genuine public speedtest.net Result URLs, e.g. `https://www.speedtest.net/result/c/55713fba-3d50-4558-95f2-7afbde18107a` (`validation/PUBLISHED_RESULT_URLS.md`) |
 | Speedtest Host Tester v1.1.0 | **10/10 PASS** (identical verdict to the official reference daemon) |
-| Differential probes vs reference daemon | **35/37 byte-identical** (2 expected: timestamps, random payload) |
-| Strict TLS battery (§9/§10) | **10/10 PASS** (custom-cert trust, fail-closed misconfiguration, hot reload) |
-| Unit/protocol/conformance suite | 66/66 |
+| Unit/protocol/conformance suite | **125/125** |
 | Negative/security battery | 7/7 |
+| Strict TLS battery (§9/§10) | **10/10 PASS** (custom-cert trust, fail-closed misconfiguration, hot reload) |
 | Installer (dry-run/staged/idempotent/fail-closed) | PASS (systemd start: container-blocked, documented) |
+
+Revision 4 (2026-11-04) re-verified the protocol **against the live
+reference binary** on this very machine and closed 25 new reference findings
+(F-8…F-25 in `validation/FINDINGS.md`): the Host/SAN validation with 307
+redirects, the verified `allowedDomains` semantics (CSP + crossdomain.xml +
+CORS Origin filter), byte-exact HTTP header order/casing, the DOWNLOAD
+trailing-newline + printable-ASCII pool structure, the TCP "three strikes"
+rule, CRLF tolerance, the pre-session GETIP gate, WS one-command-per-frame
+and QUIT-over-WS semantics, plus fail-closed/hardening fixes (explicit-config
+failures, prototype pollution, UDP binds, evidence flush, per-IP limits).
 
 Evidence: `validation/evidence/` · index: `validation/TEST_RESULTS.md` ·
 reproduce everything: `validation/REPRODUCE.md`.
@@ -167,9 +177,15 @@ URLs (spot-verified against the live result pages). Details:
   documented plaintext fallback (verified 3/3) is used instead (D-2).
 - Automatic issuance requires an operator-controlled domain; real ACME
   issuance is not exercised in the lab (fail-closed paths are).
-- `allowedDomains`, `userAgentFilterEnabled` flag, `frameSizeLimitBytes`
+- `userAgentFilterEnabled` flag, `frameSizeLimitBytes`
   override, explicit `addresses` binding are parsed but not applied —
   documented with rationale in `validation/CONFIG_MATRIX.md`.
+  (`allowedDomains` IS applied — verified semantics: CSP `connect-src`,
+  crossdomain.xml entries and the CORS Origin filter; see
+  `validation/PROTOCOL_CONTRACT.md` §4.5.)
+- HTTP Host validation follows the daemon exactly: only certificate SAN
+  entries are accepted (others get a 307 redirect to `https://<cert-CN>`) —
+  deploy a certificate whose SANs cover the hostnames/IPs clients will use.
 - Single-process serving tops out at ~18–22 Gbps loopback (informational).
 - systemd service start verified on Debian 13 only via offline unit checks +
   direct-launch probes (container limitation, documented).

@@ -54,6 +54,8 @@ export class OoklaServer extends EventEmitter {
   private isRunning = false;
   private certWatcher: fs.FSWatcher | null = null;
   private acmeRenewalTimer: NodeJS.Timeout | null = null;
+  /** Pending certificate-reload debounce timer (cleared on stop — fixes A-11). */
+  private certReloadTimer: NodeJS.Timeout | null = null;
   private acmeProvisioner: AcmeProvisioner | null = null;
   private tlsResolution: TlsResolution | null = null;
 
@@ -112,6 +114,12 @@ export class OoklaServer extends EventEmitter {
       maxConnections: 4096,
       maxConnectionsPerIp: this.config.ipTracking?.maxConnPerIp || 500,
       idleTimeoutMs: Math.min((this.config.maxConnectionSeconds || 3600) * 1000, 3600_000),
+      // Verified F-22: the daemon's CSP connect-src reflects allowedDomains
+      // (built-in default "*" when the key is absent).
+      allowedDomains: this.config.allowedDomains && this.config.allowedDomains.length > 0
+        ? this.config.allowedDomains
+        : ['*'],
+      excludeDefaultDomains: this.config.excludeDefaultDomains === true,
       onEvent: (kind, detail) => {
         if (kind.startsWith('conn_') || kind === 'listen_tcp' || kind === 'listen_udp' || kind === 'started' || kind === 'stopped'
           || kind.startsWith('tls_')) {
@@ -169,6 +177,9 @@ export class OoklaServer extends EventEmitter {
         // Debounce: editors often fire several events per save.
         if (reloadTimer) clearTimeout(reloadTimer);
         reloadTimer = setTimeout(() => {
+          // Guard (fixes A-11): stop() may have cleared this.core while the
+          // debounce timer was still pending.
+          if (!this.isRunning || !this.core) return;
           const cm = new CertificateManager(this.config.ssl, { logger: this.logger });
           try {
             const pair = cm.reloadCustomPair();
@@ -185,6 +196,7 @@ export class OoklaServer extends EventEmitter {
             );
           }
         }, 250);
+        this.certReloadTimer = reloadTimer;
       });
       this.logger.info('Watching custom certificate for changes (hot reload)', { file: watchPath });
     } catch (error) {
@@ -226,6 +238,10 @@ export class OoklaServer extends EventEmitter {
     this.isRunning = false;
     this.certWatcher?.close();
     this.certWatcher = null;
+    if (this.certReloadTimer) {
+      clearTimeout(this.certReloadTimer);
+      this.certReloadTimer = null;
+    }
     if (this.acmeRenewalTimer) {
       clearInterval(this.acmeRenewalTimer);
       this.acmeRenewalTimer = null;

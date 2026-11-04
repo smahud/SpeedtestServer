@@ -4,21 +4,35 @@
  * observations of OoklaServer 2.11.5.2 (2026-06-04.1737.7d0993d).
  *
  * Wire contract (all verified against the reference daemon; see
- * validation/PROTOCOL_CONTRACT.md):
+ * validation/PROTOCOL_CONTRACT.md — revision 3 differential probes,
+ * 2026-11-04):
  *   Client → Server commands are `\n`-terminated ASCII lines.
- *   HI [uuid]            → HELLO <version>            (uuid must be UUID-shaped, else ERROR)
- *   GETIP                → YOURIP <peer-ip>
- *   CAPABILITIES         → CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS
- *   SERVERID             → SERVERID <instance-uuid>
- *   UPTIME               → UPTIME <seconds>
- *   PING [x]             → PONG <server-epoch-ms>
- *   INITPLOSS            → OK                          (arms packet-loss accounting)
- *   PLOSS                → PLOSS <count> <dupes> <maxseq>
- *   UPLOAD_STATS         → ERROR                       (daemon parity; tolerated by clients)
- *   DOWNLOAD <n>         → exactly n bytes, first 9 = "DOWNLOAD " (counted in n), rest = pool data
- *   UPLOAD <n> [ms] [c]  → reads n bytes INCLUSIVE of the command line, then OK <n> <epoch-ms>
- *   QUIT                 → close
- *   <unknown/binary>     → ERROR
+ *   HI                     → HELLO <version>
+ *   HI <uuid>              → HELLO <version>            (arg must be UUID-shaped)
+ *   HI <bad-arg>           → ERROR                      (incl. empty trailing arg)
+ *   HI <a> <b>…            → connection CLOSED, no reply (daemon JWT-parse path)
+ *   GETIP                  → YOURIP <peer-ip>           (STRICT: the line must be
+ *                            exactly "GETIP"; any trailing bytes incl. \r, spaces
+ *                            or extra commands in the same read silently MUTE the
+ *                            connection — verified daemon quirk F-11/F-12)
+ *   CAPABILITIES           → CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS (extra args tolerated)
+ *   SERVERID               → SERVERID <instance-uuid>   (LOWER-CASE uuid; extra args tolerated)
+ *   UPTIME                 → UPTIME <seconds>           (extra args tolerated)
+ *   PING <x>               → PONG <server-epoch-ms>     (argument REQUIRED; any value)
+ *   PING                   → ERROR
+ *   INITPLOSS              → OK                          (arms packet-loss accounting)
+ *   PLOSS                  → PLOSS <count> <dupes> <maxseq>
+ *   UPLOAD_STATS           → ERROR                       (daemon parity; tolerated by clients)
+ *   DOWNLOAD <n>           → exactly n bytes: "DOWNLOAD " prefix (truncated for
+ *                            n<10) + (n-10) pool bytes + trailing "\n" (all counted
+ *                            in n; n=0 → just "\n"). Pool data is printable ASCII
+ *                            [0x20..0x7F] (daemon charset, verified F-9).
+ *   UPLOAD <n> [ms] [c]    → reads n bytes INCLUSIVE of the command line, then
+ *                            OK <n> <epoch-ms>. n < command-line length → ERROR
+ *                            (n=0 included). Non-numeric/negative n → silently
+ *                            ignored (connection continues).
+ *   QUIT                   → close (TCP) / ERROR reply (WebSocket — verified F-14)
+ *   <unknown>              → ERROR
  *
  * The official Speedtest CLI first attempts an encrypted (binary) hello; an
  * ERROR reply makes it fall back to this plaintext protocol — that fallback
@@ -40,13 +54,21 @@ export interface NetGaugeSessionHooks {
 
 export interface NetGaugeEngineOptions {
   versionString: string;      // e.g. "2.11 (2.11.5) 2026-06-04.1737.7d0993d"
-  instanceUuid: string;       // stable per-process instance id
+  instanceUuid: string;       // stable per-process instance id (LOWER-CASE, daemon parity)
   maxLineBytes: number;       // command line cap (default 1 MiB)
   maxDownloadBytes: number;   // per-DOWNLOAD cap (default 2 GiB - 1)
   maxUploadBytes: number;     // per-UPLOAD cap (default 2 GiB - 1)
-  pool: Buffer;               // random data pool (2 MiB, like the reference daemon)
+  pool: Buffer;               // random data pool (2 MiB printable ASCII, daemon parity)
   loss: LossRegistry;         // shared UDP LOSS registry for INITPLOSS/PLOSS
   startedAt: number;          // process start time (ms)
+  /** QUIT behavior per transport: TCP closes the connection (daemon parity);
+   *  WebSocket replies ERROR and keeps the session (verified F-14). */
+  quitMode?: 'close' | 'error';
+  /** Verified F-24 (daemon "three strikes"): a TCP connection is closed right
+   *  after the 3rd cumulative ERROR reply. Valid commands do NOT reset the
+   *  counter; the HI bad-argument ERROR does NOT count; WebSocket sessions
+   *  do not enforce the limit at all. 0 disables (default). */
+  errorStrikeLimit?: number;
 }
 
 /** Packet-loss session registry shared between the TCP and UDP engines. */
@@ -116,6 +138,9 @@ export function normalizeIp(ip: string): string {
 
 const UUID_RE = /^[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}$/;
 
+/** 9-byte download prefix, counted within n (daemon parity). */
+const DOWNLOAD_PREFIX = 'DOWNLOAD ';
+
 export class NetGaugeEngine {
   private hooks: NetGaugeSessionHooks;
   private opts: NetGaugeEngineOptions;
@@ -126,6 +151,14 @@ export class NetGaugeEngine {
   private uploadCounted = 0;
   private downloadActive = false;
   private closed = false;
+  /** Verified daemon quirk (F-12): a malformed GETIP or a pre-session GETIP
+   *  followed by extra data in the same read silences the connection: no
+   *  replies, no processing, socket kept open until closed/timed out. */
+  private muted = false;
+  /** True once HI has been seen on this connection (pre-session gate scope). */
+  private hiSeen = false;
+  /** Cumulative ERROR replies ("three strikes" — verified F-24). */
+  private errorStrikes = 0;
   /** Bytes transferred on this connection (evidence counters). */
   public readonly counters = { commands: 0, downloads: 0, uploads: 0, bytesDown: 0, bytesUp: 0 };
 
@@ -136,13 +169,25 @@ export class NetGaugeEngine {
 
   /** Feed received bytes (TCP chunk or WS frame payload). */
   feed(data: Buffer): void {
-    if (this.closed) return;
+    if (this.closed || this.muted) return;
+    // Pre-session GETIP gate (verified F-12): if HI has not been seen yet and
+    // the first line of THIS read is exactly "GETIP" with more bytes behind
+    // it in the same read, the reference daemon drops the whole connection
+    // state (no reply ever again, socket kept open). Replicated verbatim.
+    if (!this.hiSeen && data.length > 6 && data.subarray(0, 5).toString('latin1') === 'GETIP') {
+      const nl = data.indexOf(0x0a);
+      if (nl === -1 || nl + 1 < data.length) {
+        this.muted = true;
+        this.hooks.onEvent?.('conn_muted_getip_gate', { bytes: data.length });
+        return;
+      }
+    }
     this.buf = Buffer.concat([this.buf, data]);
     this.processBuffer();
   }
 
   private processBuffer(): void {
-    while (!this.closed) {
+    while (!this.closed && !this.muted) {
       if (this.uploadRemaining > 0) {
         const take = Math.min(this.uploadRemaining, this.buf.length);
         this.uploadCounted += take;
@@ -172,39 +217,90 @@ export class NetGaugeEngine {
     }
   }
 
+  /** Send ERROR and apply the verified "three strikes" rule (F-24):
+   *  the TCP connection closes right after the 3rd cumulative ERROR reply.
+   *  `counts` is false for error paths that do NOT increment the counter
+   *  (verified: the HI bad-argument ERROR). */
+  private errorReply(counts = true): void {
+    this.hooks.writeLine('ERROR');
+    const limit = this.opts.errorStrikeLimit ?? 0;
+    if (counts && limit > 0) {
+      this.errorStrikes++;
+      if (this.errorStrikes >= limit) {
+        this.hooks.onEvent?.('conn_error_strike_close', { strikes: this.errorStrikes });
+        this.hooks.close();
+        this.closed = true;
+      }
+    }
+  }
+
   private processCommand(line: Buffer, lineLen: number): void {
-    const s = line.toString('latin1');
+    const rawLine = line.toString('latin1');
+    // Verified F-25: the daemon strips ONE trailing \r before command
+    // dispatch ("HI\r" → HELLO, "PING 1\r" → PONG) — except GETIP, whose
+    // strictness check runs on the RAW line ("GETIP\r" mutes the connection).
+    const s = rawLine.endsWith('\r') ? rawLine.slice(0, -1) : rawLine;
     this.counters.commands++;
     this.hooks.onEvent?.('cmd', { line: s.length > 80 ? s.slice(0, 80) + '…' : s });
 
     if (s === 'HI' || s.startsWith('HI ')) {
-      const arg = s.split(' ')[1] || null;
-      if (arg && !UUID_RE.test(arg)) {
-        this.hooks.writeLine('ERROR'); // daemon rejects non-UUID HI args
+      const tokens = s.split(' ');
+      if (tokens.length === 1) {
+        // Bare HI: no session registration.
+        this.hiSeen = true;
+        this.hooks.writeLine(`HELLO ${this.opts.versionString}`);
         return;
       }
-      this.sessionUuid = arg;
-      if (arg) this.opts.loss.ensure(arg, this.hooks.peerIp()).lastSeen = Date.now();
-      this.hooks.writeLine(`HELLO ${this.opts.versionString}`);
+      if (tokens.length === 2) {
+        const arg = tokens[1];
+        if (!UUID_RE.test(arg)) {
+          // Verified F-24: this ERROR does not count toward "three strikes".
+          this.hooks.writeLine('ERROR');
+          return;
+        }
+        this.hiSeen = true;
+        this.sessionUuid = arg;
+        this.opts.loss.ensure(arg, this.hooks.peerIp()).lastSeen = Date.now();
+        this.hooks.writeLine(`HELLO ${this.opts.versionString}`);
+        return;
+      }
+      // "HI <a> <b>…" (or trailing space after the uuid): the daemon parses the
+      // second token as a client JWT; an invalid one aborts the connection
+      // with no reply (verified: "Disconnect Exception: JWT parsing failed").
+      this.hooks.onEvent?.('hi_jwt_disconnect', { tokens: tokens.length });
+      this.hooks.close();
+      this.closed = true;
       return;
     }
-    if (s === 'GETIP') {
+    if (s.startsWith('GETIP') || rawLine.startsWith('GETIP')) {
+      if (rawLine !== 'GETIP') {
+        // Strict GETIP (verified F-11): trailing space / \r / extra argument →
+        // the daemon silently stops serving this connection (no ERROR reply).
+        this.muted = true;
+        this.hooks.onEvent?.('conn_muted_getip_strict', { line: rawLine.slice(0, 40) });
+        return;
+      }
       this.hooks.writeLine(`YOURIP ${normalizeIp(this.hooks.peerIp())}`);
       return;
     }
-    if (s === 'CAPABILITIES') {
+    if (s === 'CAPABILITIES' || s.startsWith('CAPABILITIES')) {
+      // Extra arguments tolerated (verified: "CAPABILITIES x" answered normally).
       this.hooks.writeLine('CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS');
       return;
     }
-    if (s === 'SERVERID') {
+    if (s === 'SERVERID' || s.startsWith('SERVERID')) {
       this.hooks.writeLine(`SERVERID ${this.opts.instanceUuid}`);
       return;
     }
-    if (s === 'UPTIME') {
+    if (s === 'UPTIME' || s.startsWith('UPTIME')) {
       this.hooks.writeLine(`UPTIME ${Math.floor((Date.now() - this.opts.startedAt) / 1000)}`);
       return;
     }
-    if (s === 'PING' || s.startsWith('PING ')) {
+    if (s === 'PING') {
+      this.errorReply(); // argument REQUIRED (verified F-10)
+      return;
+    }
+    if (s.startsWith('PING ')) {
       this.hooks.writeLine(`PONG ${Date.now()}`);
       return;
     }
@@ -221,13 +317,16 @@ export class NetGaugeEngine {
       return;
     }
     if (s === 'UPLOAD_STATS') {
-      this.hooks.writeLine('ERROR'); // daemon parity (verified 2026-11-04)
+      this.errorReply(); // daemon parity (verified 2026-11-04)
       return;
     }
     if (s.startsWith('DOWNLOAD ')) {
       const n = parseInt(s.slice(9).trim().split(/\s+/)[0], 10);
       if (!Number.isFinite(n) || n < 0 || n > this.opts.maxDownloadBytes) {
-        this.hooks.writeLine('ERROR');
+        // The reference daemon streams UNBOUNDED data for unparsable sizes
+        // (verified: multi-GB before the probe was killed). We refuse with
+        // ERROR instead — deliberate, documented safety deviation.
+        this.errorReply();
         return;
       }
       this.startDownload(n);
@@ -237,12 +336,20 @@ export class NetGaugeEngine {
       const parts = s.slice(7).trim().split(/\s+/);
       const n = parseInt(parts[0], 10);
       if (!Number.isFinite(n) || n < 0 || n > this.opts.maxUploadBytes) {
-        this.hooks.writeLine('ERROR');
+        // Verified daemon behavior: non-numeric / negative size → the command
+        // is silently ignored (no reply) and the connection keeps processing.
+        this.hooks.onEvent?.('upload_invalid_ignored', { arg: parts[0].slice(0, 24) });
+        return;
+      }
+      if (n < lineLen) {
+        // Verified: n smaller than the command line itself (incl. n=0) → ERROR,
+        // no bytes consumed, connection continues.
+        this.errorReply();
         return;
       }
       this.uploadTotal = n;
       // INCLUSIVE counting: the command line itself counts toward n.
-      this.uploadRemaining = Math.max(0, n - lineLen);
+      this.uploadRemaining = n - lineLen;
       this.uploadCounted = 0;
       this.hooks.onEvent?.('upload_start', { declared: n, cmdLen: lineLen });
       if (this.uploadRemaining === 0) {
@@ -252,50 +359,63 @@ export class NetGaugeEngine {
       return;
     }
     if (s === 'QUIT') {
-      this.hooks.close();
+      // Transport-dependent (verified F-14): TCP closes; WebSocket replies ERROR.
+      if ((this.opts.quitMode || 'close') === 'error') {
+        this.hooks.writeLine('ERROR');
+      } else {
+        this.hooks.close();
+        this.closed = true;
+      }
       return;
     }
     // Unknown (includes the CLI's encrypted-binary hello → triggers its
     // plaintext fallback) → ERROR, exactly like the reference daemon.
-    this.hooks.writeLine('ERROR');
+    this.errorReply();
   }
 
+  /**
+   * DOWNLOAD reply structure (verified byte-exact F-9):
+   *   n = 0  → exactly "\n" (1 byte)
+   *   n ≥ 1  → exactly n bytes total:
+   *            "DOWNLOAD " prefix truncated to min(n-1, 9) bytes, then
+   *            max(0, n-10) pool bytes, then a trailing "\n".
+   *   The last byte of every reply is "\n" and IS counted in n.
+   */
   private startDownload(n: number): void {
     this.downloadActive = true;
     this.counters.downloads++;
-    const PREFIX = 'DOWNLOAD ';
-    let sent = 0;
-    const CHUNK = 512 * 1024;
     const pool = this.opts.pool;
+    const total = n === 0 ? 1 : n;
+    const prefixLen = n >= 1 ? Math.min(n - 1, DOWNLOAD_PREFIX.length) : 0;
+    const phase = (n + this.counters.downloads) % pool.length;
+    const CHUNK = 512 * 1024;
+    const prefixBytes = Buffer.from(DOWNLOAD_PREFIX, 'latin1');
+    let sent = 0;
     const writeNext = (): void => {
-      while (sent < n && !this.closed) {
-        const len = Math.min(CHUNK, n - sent);
-        let chunk: Buffer;
-        if (sent === 0) {
-          // First bytes are the 9-byte ASCII prefix, counted toward n.
-          const prefixLen = Math.min(PREFIX.length, len);
-          const restLen = len - prefixLen;
-          chunk = Buffer.concat([
-            Buffer.from(PREFIX, 'latin1').subarray(0, prefixLen),
-            pool.subarray(0, restLen),
-          ]);
-        } else {
-          const out = Buffer.allocUnsafe(len);
-          let pos = sent % pool.length;
-          for (let done = 0; done < len; ) {
-            const take = Math.min(pool.length - pos, len - done);
-            pool.copy(out, done, pos, pos + take);
-            pos = (pos + take) % pool.length;
-            done += take;
-          }
-          chunk = out;
+      while (sent < total && !this.closed) {
+        const len = Math.min(CHUNK, total - sent);
+        const chunk = Buffer.allocUnsafe(len);
+        // Prefix occupies stream bytes [0, prefixLen) — only the first chunk.
+        const localDataStart = Math.max(prefixLen - sent, 0);
+        // Data region ends before the stream's last byte (the trailing "\n").
+        const localDataEnd = Math.min(len, Math.max(total - 1 - sent, 0));
+        if (localDataStart > 0) {
+          prefixBytes.subarray(0, Math.min(prefixLen, len)).copy(chunk, 0);
         }
+        let p = (phase + Math.max(0, sent + localDataStart - prefixLen)) % pool.length;
+        for (let done = localDataStart; done < localDataEnd; ) {
+          const take = Math.min(pool.length - p, localDataEnd - done);
+          pool.copy(chunk, done, p, p + take);
+          p = (p + take) % pool.length;
+          done += take;
+        }
+        if (sent + len === total) chunk[len - 1] = 0x0a; // trailing newline, counted in n
         const ok = this.hooks.write(chunk);
         sent += len;
         this.counters.bytesDown += len;
         if (!ok) return void this.waitDrain(writeNext);
       }
-      if (sent >= n) {
+      if (sent >= total) {
         this.downloadActive = false;
         this.hooks.onEvent?.('download_done', { n });
       }

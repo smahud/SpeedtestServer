@@ -65,7 +65,7 @@ const DEFAULT_CONFIG: OoklaServerConfig = {
   http: {
     maxHeadersSize: 65536, // Binary default from properties file
   },
-  allowedDomains: ['*.speedtest.net', '*.ookla.com', '*.speedtestcustom.com'],
+  allowedDomains: ['*'], // daemon built-in default when the key is absent (verified: CSP connect-src *)
   tcpPorts: [5060, 8080], // Binary default from properties file
   udpPorts: [5060, 8080], // Binary default from properties file
   httpPorts: [8080],
@@ -157,22 +157,32 @@ export class ConfigManager extends EventEmitter {
   }
 
   /**
-   * Load configuration from file/environment
+   * Load configuration from file/environment.
+   *
+   * Fail-closed (fixes A-1): an EXPLICIT config selection (--config /
+   * OOKLA_SPEEDTESTSERVER_CONFIG_FILE) that cannot be loaded — file missing,
+   * unreadable, unparsable, or an unsupported format — aborts startup by
+   * THROWING instead of silently falling back to defaults/search path.
+   * The old behavior started the server with wrong ports/TLS while the
+   * operator believed their file was active.
    */
   private loadConfig(): void {
     // Explicit config file via --config / OOKLA_SPEEDTESTSERVER_CONFIG_FILE
     const explicitPath = process.env.OOKLA_SPEEDTESTSERVER_CONFIG_FILE;
-    if (explicitPath && fs.existsSync(explicitPath)) {
-      try {
-        this.loadConfigFile(explicitPath);
-        this.configFilePath = explicitPath;
-        this.logger.info(`Loaded configuration from ${explicitPath} (--config)`);
-        return;
-      } catch (error) {
-        this.logger.warning(`Failed to load config from ${explicitPath}`, { error });
+    if (explicitPath) {
+      if (!fs.existsSync(explicitPath)) {
+        throw new Error(
+          `Explicit configuration file not found: ${explicitPath} (--config). ` +
+          'Refusing to fall back to the search path — fix the path or remove --config.',
+        );
       }
+      // loadConfigFile throws on parse/format errors — propagated as fatal.
+      this.loadConfigFile(explicitPath);
+      this.configFilePath = explicitPath;
+      this.logger.info(`Loaded configuration from ${explicitPath} (--config)`);
+      return;
     }
-    // Check environment variable first
+    // Check environment variable next
     const envConfig = process.env.OOKLA_SERVER_POCO_CONFIG;
     if (envConfig) {
       try {
@@ -245,10 +255,12 @@ export class ConfigManager extends EventEmitter {
             throw new Error(`Failed to load JS config: ${error}`);
           }
         } else {
-          // For .ts files, we'd need ts-node or compilation
-          // Skip for now and log a warning
-          this.logger.warning(`TypeScript config files (.ts) require compilation. Use .js or .json instead.`);
-          return;
+          // Fail closed (fixes A-13): a .ts config previously "loaded"
+          // successfully with no content, silently blocking the search path.
+          throw new Error(
+            `TypeScript config files (.ts) are not supported at runtime: ${filePath}. ` +
+            'Compile it to .js/.json or use a .properties file.',
+          );
         }
         break;
       default:
@@ -322,15 +334,26 @@ export class ConfigManager extends EventEmitter {
   }
 
   /**
-   * Set nested property using dot notation
+   * Set nested property using dot notation.
+   *
+   * Hardened against prototype pollution (fixes A-2): `__proto__`,
+   * `constructor` and `prototype` key segments are rejected. The old
+   * traversal followed `__proto__` straight into Object.prototype, letting a
+   * properties line like `__proto__.polluted = true` poison the whole process.
    */
   private setNestedProperty(obj: Record<string, unknown>, key: string, value: string): void {
     const keys = key.split('.');
+    for (const k of keys) {
+      if (k === '__proto__' || k === 'constructor' || k === 'prototype') {
+        this.logger.warning(`Ignored unsafe configuration key segment: ${k}`);
+        return;
+      }
+    }
     let current: Record<string, unknown> = obj;
 
     for (let i = 0; i < keys.length - 1; i++) {
       const k = keys[i];
-      if (!(k in current) || typeof current[k] !== 'object') {
+      if (!(k in current) || typeof current[k] !== 'object' || current[k] === null) {
         current[k] = {};
       }
       current = current[k] as Record<string, unknown>;
@@ -368,12 +391,20 @@ export class ConfigManager extends EventEmitter {
   }
 
   /**
-   * Deep merge two configurations
+   * Deep merge two configurations.
+   *
+   * Hardened against prototype pollution (fixes A-2): unsafe keys never
+   * reach the assignment (a JSON `{"__proto__": {...}}` env override used
+   * to trigger the Object.prototype setter during the merge).
    */
   private mergeConfig<T>(base: T, override: DeepPartial<T>): T {
     const result = { ...base } as Record<string, unknown>;
 
     for (const key of Object.keys(override)) {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        this.logger.warning(`Ignored unsafe configuration key: ${key}`);
+        continue;
+      }
       const overrideValue = (override as Record<string, unknown>)[key];
       const baseValue = (base as Record<string, unknown>)[key];
 

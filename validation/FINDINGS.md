@@ -214,3 +214,129 @@ covered by `ConfigParity.test.ts` (22 new tests) and the TLS harness.
   CLI failed with "Problem with the SSL CA cert".
 - **Fix:** both gate scripts now reference `certs/cli-ca-bundle.pem`.
 - **Result:** FIXED.
+
+---
+
+## Revision 4 findings (live differential lab vs the reference binary, 2026-11-04)
+
+Method: the official `OoklaServer-linux-x86_64` daemon (2.11.5.2) was run
+**live on this machine** next to the SpeedtestServer build (isolated ports,
+identical lab certificates and `allowedDomains`), then a 103-case
+differential battery plus targeted follow-up probes compared both servers
+byte-for-byte. Evidence + probe scripts:
+`validation/evidence/rea-lab-rev4/`. This supersedes the earlier
+relay-capture approach for these rows: everything below was observed
+**first-hand against the running daemon**.
+
+New reference findings (F-8 … F-25) and their fixes:
+
+- **F-8 [V]** `SERVERID` returns a **lower-case** instance UUID (daemon log +
+  wire). Ours was upper-case. FIXED (`crypto.randomUUID()` without
+  `toUpperCase()`; regression test).
+- **F-9 [V]** `DOWNLOAD <n>` reply structure: `"DOWNLOAD "` prefix (truncated
+  for n<10) + max(0, n−10) data bytes + **trailing `\n`** — all counted in n;
+  `DOWNLOAD 0` → `"\n"`; the pool data is **printable ASCII [0x20..0x7F]**
+  (96 values, uniform). Ours had no trailing newline and used binary random
+  data. FIXED (engine + 2 MiB ASCII pool; the same pool feeds the
+  `random{N}x{N}.jpg` endpoints — charset parity verified).
+- **F-10 [V]** Command-argument strictness: bare `PING` → **ERROR**
+  (argument required; any value accepted); `HI ` (empty arg) → ERROR;
+  `HI <a> <b>` (incl. trailing space after the uuid) → **connection closed
+  with no reply** (daemon: `JWT parsing failed` on the second token);
+  `UPLOAD <n>` with n smaller than the command line (incl. 0) → **ERROR**,
+  connection continues; non-numeric/negative n → **silently ignored**. All
+  FIXED with regressions.
+- **F-11 [V]** `GETIP` requires the line to be EXACTLY `GETIP`: any trailing
+  bytes (space, `\r`, extra token) **silently mute the connection forever**
+  (no reply, no further processing, socket kept open). CAPABILITIES/UPTIME/
+  SERVERID tolerate extra arguments. FIXED (muted state + regressions).
+- **F-12 [V]** Pre-session GETIP gate: before any `HI`, a read whose first
+  line is `GETIP` **with trailing bytes in the same TCP segment** silences the
+  whole connection (even later commands get nothing). After `HI` pipelined
+  GETIPs answer normally. Replicated verbatim + regressions.
+- **F-13 [V]** WebSocket processes **one command per frame** (first line
+  only; a newline-less frame is one complete command). Upload payload frames
+  are exempt. FIXED (first-line truncation + synthesized newline).
+- **F-14 [V]** `QUIT` over WebSocket → **`ERROR\n` reply, session stays
+  open** (TCP still closes). FIXED (`quitMode` per transport).
+- **F-15 [V]** HTTP header order/casing: `Date`, `Connection: Close` /
+  `Keep-Alive` (daemon casing), security headers, `Content-Type`,
+  `Content-Length`; keep-alive responses have **no** `Keep-Alive: timeout`
+  header; 404s have no `Content-Length` and **no chunked framing**; HEAD
+  advertises the real body length; `OPTIONS` → `Content-Length: 0`. All
+  FIXED (byte-exact, verified in the differential).
+- **F-16 [V]** **Host validation**: the Host header (port stripped,
+  case-insensitive) must match a **certificate SAN** entry; anything else —
+  including the machine hostname, interface IPs and even the certificate CN
+  when it is not also a SAN — gets `307 Temporary Redirect` to
+  `https://<cert-CN>:<port><target>` (query/fragment echoed; applies to plain
+  HTTP and inside TLS). A MISSING Host → minimal 500. `allowedDomains` does
+  NOT feed this check. IMPLEMENTED (cert SAN/CN parsing + hot-reload refresh;
+  Node's own Host-less 400 is preempted by a multiplexer-level header sniff).
+- **F-17 [V]** The minimal 500 is exactly `HTTP/1.1 500 Internal Server
+  Error\r\nConnection: Close\r\n\r\n` (no Date, no security headers, no body,
+  HTTP/1.1 status line even for HTTP/1.0 requests). Triggers: missing Host,
+  missing User-Agent (**empty value counts as present → served**),
+  `Authorization: Bearer <non-JWT-shaped>` (Basic/JWT-shaped pass). All
+  FIXED with regressions.
+- **F-18 [V]** `Authorization: Bearer <token>` with a non-JWT-shaped token →
+  minimal 500 (see F-17). IMPLEMENTED.
+- **F-19 [V]** Path handling: `//hi`, `/./hi`, `/a/../hi`, `/HI/../hi` →
+  serve `/hi` (normalize before case-sensitive matching); **trailing slash is
+  preserved** (`/hi/` → 404); absolute-form targets use their path. FIXED
+  (`normalizePath` + regressions).
+- **F-20 [V]** Method matrix: only GET/HEAD/OPTIONS serve content (OPTIONS
+  with `Content-Length: 0`); PUT/DELETE/PATCH and POST outside upload.php →
+  404. `TRACE` is **not routed through HTTP at all** (falls to the encrypted
+  engine — unreproducible, D-2). FIXED.
+- **F-21 [V]** `GET /ws` without an upgrade request → **silent close** (no
+  response). Chunked POST to upload.php → **no response, connection held**.
+  Both replicated.
+- **F-22 [V]** **`allowedDomains` semantics found**: one effective list
+  (`allowedDomains` ∪ `*.ookla.com, *.speedtest.net, *.speedtestcustom.com`
+  unless `excludeDefaultDomains`, default `*` when the key is absent) drives
+  **CSP `connect-src`**, the **crossdomain.xml entries** and the **CORS
+  Origin filter**. IMPLEMENTED (previously PNA).
+- **F-23 [V]** CORS Origin filter: the Origin header is reflected ONLY when
+  its host matches the effective domain list (`*.example.org` matches
+  `foo.example.org` but not the bare `example.org`; ports ignored;
+  case-insensitive matching, verbatim reflection; `Origin: null` never
+  reflects; the `*` default reflects every parseable origin). IMPLEMENTED.
+- **F-24 [V]** **"Three strikes"**: a TCP connection is closed right after
+  its 3rd cumulative `ERROR` reply. Valid commands do NOT reset the counter;
+  the HI bad-argument ERROR does NOT count; UPLOAD_STATS / bare-PING /
+  UPLOAD-too-small / unknown-command ERRORs do. **WebSocket sessions do not
+  enforce it.** IMPLEMENTED (`errorStrikeLimit` per transport).
+- **F-25 [V]** Exactly one trailing `\r` is stripped before command dispatch
+  (`HI\r\n` → HELLO, `PING 1\r\n` → PONG) — except GETIP, whose strictness
+  check uses the raw line. IMPLEMENTED.
+
+Hardening fixes from the code audit (not daemon divergences):
+
+- **R-1 (A-1)** Explicit `--config` that is missing/unreadable/unparsable or
+  `.ts` is now **fatal** (exit 2) instead of silently falling back to the
+  search path/defaults.
+- **R-2 (A-2)** **Prototype pollution** blocked in `setNestedProperty` and
+  `mergeConfig` (`__proto__`/`constructor`/`prototype` keys rejected; a
+  `__proto__.polluted = true` properties line no longer poisons the process).
+- **R-3 (A-3/A-4)** Evidence WriteStream is error-watched (graceful degrade
+  instead of a crash) and **fully flushed before exit**; the HTTP servers are
+  closed on `stop()` (fixes the lingering "Jest did not exit" handle).
+- **R-4 (A-5)** UDP bind failures are now **fatal** (async `start()`,
+  awaited binds, `listen_udp` emitted per successful bind).
+- **R-5 (A-23)** Per-IP connection limits use exact IP keys (the old
+  string-prefix match counted `1.2.3.45` against the `1.2.3.4` limit).
+- **R-6 (A-11/A-22)** Single signal-handler shutdown path with conventional
+  exit codes (130/143) and non-zero on failed stop; the certificate
+  hot-reload debounce timer is cleared on `stop()` and guarded.
+- **R-7** `allowedDomains` default corrected to the daemon built-in `*`
+  (key absent), which the CSP/crossdomain/Origin surfaces now reflect.
+
+Differential result after remediation: **89/103 raw byte-identical**; the
+remaining 14 = 6 expected non-differences (PONG/UPTIME timestamps, random
+payload content, each server's own listening port in crossdomain.xml) +
+8 documented deviations (D-2 encrypted-engine replies; D-3 UDP
+permissiveness; the deliberate refusal to stream unbounded data for
+unparsable DOWNLOAD sizes). DOWNLOAD reply STRUCTURE (length, prefix,
+trailing newline, ASCII charset) verified byte-exact for 100/1000/100000
+bytes. Full evidence: `validation/evidence/rea-lab-rev4/probe-diff-results.json`.

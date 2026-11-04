@@ -15,6 +15,10 @@
  * Sessions are auto-registered from client-supplied UUIDs and bound to the
  * sender IP; datagrams from a different IP for a known UUID are dropped
  * (anti-spoof, mirroring the daemon's "Mismatch address" check).
+ *
+ * Bind failures are FATAL (fail closed): `start()` rejects and the caller
+ * aborts startup. The old implementation only emitted an `udp_error` event
+ * and kept serving TCP while UDP was dead.
  */
 
 import dgram from 'node:dgram';
@@ -38,14 +42,26 @@ export class UdpLossEngine {
     this.opts = opts;
   }
 
-  start(): void {
+  /** Bind every UDP port; rejects on the first failure (fail closed). */
+  async start(): Promise<void> {
+    const binds: Promise<void>[] = [];
     for (const port of this.opts.ports) {
       const sock = dgram.createSocket('udp6');
       sock.on('message', (msg, rinfo) => this.handle(msg, rinfo, sock));
       sock.on('error', (err) => this.opts.onEvent?.('udp_error', { port, error: String(err) }));
-      sock.bind(port, '::');
+      binds.push(
+        new Promise<void>((resolve, reject) => {
+          sock.once('error', reject); // bind failure is fatal (fail closed)
+          sock.bind(port, '::', () => {
+            sock.removeListener('error', reject);
+            this.opts.onEvent?.('listen_udp', { port });
+            resolve();
+          });
+        }),
+      );
       this.sockets.push(sock);
     }
+    await Promise.all(binds);
   }
 
   stop(): void {
@@ -73,6 +89,7 @@ export class UdpLossEngine {
       this.counters.rejected++;
       return;
     }
+    void timer;
     this.counters.received++;
     const isNew = !this.opts.loss.get(uuid);
     const reply = this.opts.loss.recordLoss(uuid, normalizeIp(rinfo.address), seq, clientTimer);
