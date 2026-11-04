@@ -1,0 +1,54 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T07:17:28Z",
+    "ping": {
+        "jitter": 0.065,
+        "latency": 0.034,
+        "low": 0.025,
+        "high": 0.150
+    },
+    "download": {
+        "bandwidth": 2710255873,
+        "bytes": 34431212272,
+        "elapsed": 13204,
+        "latency": {
+            "iqm": 16.807,
+            "low": 0.096,
+            "high": 98.626,
+            "jitter": 24.337
+        }
+    },
+    "upload": {
+        "bandwidth": 1823464977,
+        "bytes": 14719540088,
+        "elapsed": 8228,
+        "latency": {
+            "iqm": 4.133,
+            "low": 0.098,
+            "high": 34.658,
+            "jitter": 7.528
+        }
+    },
+    "packetLoss": 0,
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 57571,
+        "host": "localhost",
+        "port": 8080,
+        "name": "CMC Telecom",
+        "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "b6d01d12-828e-4771-99d8-65a503c984d4",
+        "persisted": false
+    }
+}

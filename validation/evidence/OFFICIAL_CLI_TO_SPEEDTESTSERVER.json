@@ -1,0 +1,67 @@
+{
+  "gate": "OFFICIAL_CLI_TO_SPEEDTESTSERVER",
+  "status": "PASS",
+  "generatedAt": "2026-11-04T07:15:58Z",
+  "client": {
+    "isOfficialBinary": true,
+    "version": "Speedtest by Ookla 1.2.0.84 (ea6b6773cf) Linux/x86_64-linux-musl",
+    "sourceUrl": "https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-x86_64.tgz",
+    "tarballSha256": "5690596c54ff9bed63fa3732f818a05dbc2db19ad36ed68f21ca5f64d5cfeeb7",
+    "modified": false,
+    "targetingMethod": "config-level proxy: live cli.speedtest.net engine config fetched with the CLI's own query string; ALL server entries redirected to localhost:8080 (SpeedtestServer); results.speedtest.net REFUSED at the proxy (non-publishing). CLI trusts lab CA via --ca-certificate bundle (system store + lab CA)."
+  },
+  "server": {
+    "implementation": "SpeedtestServer (canonical TypeScript, ServerCore)",
+    "gitSha": "f3ea41cdd2bb8b6ea7dff7b4bb552d7455710bf8+ (audit/official-cli-interoperability, working tree)",
+    "processVerified": true,
+    "officialDaemonAbsent": true,
+    "processEvidence": "ss -tlnp pre-run: *:8080 users:((\"MainThread\",pid=4605)) — node dist/bin/ooklaserver.js; all OoklaServer daemon processes killed and verified absent; port 18080 (daemon lab port) not listening."
+  },
+  "target": { "host": "localhost", "port": 8080, "verified": true },
+  "phases": {
+    "handshake": true,
+    "latency": true,
+    "download": true,
+    "upload": true,
+    "packetLoss": "PASS"
+  },
+  "result": {
+    "clientExitCode": 0,
+    "pingLatencyMs": 0.047,
+    "jitterMs": 0.077,
+    "downloadBandwidth": 2533772582,
+    "downloadBytes": 24557944112,
+    "downloadElapsedMs": 10108,
+    "uploadBandwidth": 1957539337,
+    "uploadBytes": 18952889979,
+    "uploadElapsedMs": 10115,
+    "packetLoss": 0,
+    "serverReportedByClient": { "host": "localhost", "port": 8080, "ip": "::1" }
+  },
+  "serverSideCorroboration": {
+    "evidenceFile": "validation/evidence/gate-cli2-sts-evidence.jsonl",
+    "netgaugeConnections": 23,
+    "commands": 1883,
+    "downloadsCompleted": 770,
+    "uploadsCompleted": 596,
+    "serverSentBytes": 24651035453,
+    "serverReceivedBytes": 19107443639,
+    "httpRequests": 0
+  },
+  "nonPublishingVerified": true,
+  "nonPublishingEvidence": "result.persisted=false in CLI JSON; proxy log records results.speedtest.net CONNECT refused ('blocked' entries); no traffic to any real Ookla endpoint during the measurement (proxy-only egress for config, blocked for submission).",
+  "repetitions": [
+    { "run": "gate-cli2", "exitCode": 0, "packetLoss": 0, "downloadGbps": 20.27, "uploadGbps": 15.66 },
+    { "run": "gate-cli2-run2", "exitCode": 0, "packetLoss": 0, "downloadGbps": 21.7, "uploadGbps": 14.6 },
+    { "run": "gate-cli2-run3", "exitCode": 0, "packetLoss": 0, "downloadGbps": 18.4, "uploadGbps": 13.6 }
+  ],
+  "evidenceFiles": [
+    "validation/evidence/gate-cli2.json",
+    "validation/evidence/gate-cli2.stderr",
+    "validation/evidence/gate-cli2-run2.json",
+    "validation/evidence/gate-cli2-run3.json",
+    "validation/evidence/gate-cli2-sts-evidence.jsonl"
+  ],
+  "blockers": [],
+  "notes": "Mandatory acceptance criterion of MASTER PROMPT v3.0 Section 2 (Gate CLI-2/3/4/5) satisfied: unmodified official CLI completes latency + download + upload + packet-loss (0%) against the independent implementation with the official daemon absent, verified by server-side byte counters matching client-reported volumes (24.65 GB sent vs 24.56 GB reported download; 19.11 GB received vs 18.95 GB reported upload, delta = protocol framing)."
+}

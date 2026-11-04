@@ -1,0 +1,54 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-04T07:03:05Z",
+    "ping": {
+        "jitter": 0.005,
+        "latency": 0.022,
+        "low": 0.018,
+        "high": 0.036
+    },
+    "download": {
+        "bandwidth": 2437250804,
+        "bytes": 22078359080,
+        "elapsed": 9103,
+        "latency": {
+            "iqm": 19.961,
+            "low": 0.218,
+            "high": 179.384,
+            "jitter": 25.200
+        }
+    },
+    "upload": {
+        "bandwidth": 1943244686,
+        "bytes": 27532328065,
+        "elapsed": 15003,
+        "latency": {
+            "iqm": 4.175,
+            "low": 0.079,
+            "high": 34.821,
+            "jitter": 5.282
+        }
+    },
+    "packetLoss": 0,
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 48446,
+        "host": "localhost",
+        "port": 8080,
+        "name": "GSL Networks",
+        "location": "Hong Kong -> LAB (localhost:8080) [SpeedtestServer audit]",
+        "country": "Hong Kong",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "c50c06f2-d81d-4413-85ea-f61f3843cbc3",
+        "persisted": false
+    }
+}
