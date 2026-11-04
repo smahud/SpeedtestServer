@@ -1,0 +1,236 @@
+{
+  "label": "sts-addrs",
+  "port": 18082,
+  "generatedAt": "2026-11-04T20:13:15.894Z",
+  "listeners": {
+    "tcp": [
+      {
+        "local": "127.0.0.1:18082",
+        "process": ""
+      },
+      {
+        "local": "[::1]:18082",
+        "process": ""
+      }
+    ],
+    "udp": [
+      {
+        "local": "127.0.0.1:18082",
+        "process": ""
+      },
+      {
+        "local": "[::1]:18082",
+        "process": ""
+      }
+    ]
+  },
+  "familyConnect": {
+    "v4": {
+      "host": "127.0.0.1",
+      "ok": true
+    },
+    "v6": {
+      "host": "::1",
+      "ok": true
+    }
+  },
+  "uaFilter": [
+    {
+      "tag": "none",
+      "ua": null,
+      "response": "HTTP/1.1 500 Internal Server Error",
+      "len": 57,
+      "closed": true
+    },
+    {
+      "tag": "empty",
+      "ua": "",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "x",
+      "ua": "x",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "curl",
+      "ua": "curl/8.5.0",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "wget",
+      "ua": "Wget/1.21.4",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "python-requests",
+      "ua": "python-requests/2.31.0",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "go-http",
+      "ua": "Go-http-client/2.0",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "okhttp",
+      "ua": "okhttp/4.12.0",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "java",
+      "ua": "Java/1.8.0_312",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "libwww-perl",
+      "ua": "libwww-perl/6.36",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "chrome",
+      "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "firefox",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "mozilla-token",
+      "ua": "Mozilla",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "speedtest-cli",
+      "ua": "Speedtest/1.2.0.84",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "hackerbot",
+      "ua": "HackerBot/1.0",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "zgrab",
+      "ua": "Mozilla/5.0 zgrab/0.x",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "masscan",
+      "ua": "masscan/1.3",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "sqlmap",
+      "ua": "sqlmap/1.7.2#stable (http://sqlmap.org)",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "nmap",
+      "ua": "nmap-testing",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "long-4k",
+      "ua": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    },
+    {
+      "tag": "spaces",
+      "ua": "   ",
+      "response": "HTTP/1.1 200 OK",
+      "len": 537,
+      "closed": true
+    }
+  ],
+  "wsFrameLimit": [
+    {
+      "size": 63,
+      "handshake": "HTTP/1.1 101 Switching Protocols",
+      "frames": [
+        {
+          "opcode": 1,
+          "len": 19,
+          "preview": "PONG <ts>\n"
+        }
+      ],
+      "closedByServer": false
+    },
+    {
+      "size": 64,
+      "handshake": "HTTP/1.1 101 Switching Protocols",
+      "frames": [
+        {
+          "opcode": 1,
+          "len": 19,
+          "preview": "PONG <ts>\n"
+        }
+      ],
+      "closedByServer": false
+    },
+    {
+      "size": 65,
+      "handshake": "HTTP/1.1 101 Switching Protocols",
+      "frames": [
+        {
+          "opcode": 1,
+          "len": 19,
+          "preview": "PONG <ts>\n"
+        }
+      ],
+      "closedByServer": false
+    },
+    {
+      "size": 4096,
+      "handshake": "HTTP/1.1 101 Switching Protocols",
+      "frames": [
+        {
+          "opcode": 1,
+          "len": 19,
+          "preview": "PONG <ts>\n"
+        }
+      ],
+      "closedByServer": false
+    }
+  ]
+}

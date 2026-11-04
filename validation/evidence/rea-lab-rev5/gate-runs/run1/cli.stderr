@@ -1,0 +1,9 @@
+[2026-11-04 20:16:47.276] [error] Configuration - Cannot retrieve configuration document (502)
+[2026-11-04 20:16:47.279] [error] ConfigurationError - Could not retrieve or read configuration (Configuration)
+{
+    "type": "log",
+    "timestamp": "2026-11-04T20:16:47Z",
+    "message": "Configuration - Could not retrieve or read configuration (ConfigurationError)",
+    "level": "error"
+}
+exit=2

@@ -1,0 +1,12 @@
+Wed Nov  4 20:14:21 UTC 2026
+SpeedtestServer git SHA: 7b58988b8b9683c48843ade190ffd7ce5af44622
+target owner: pid=7530
+LISTEN 0      511          0.0.0.0:8080       0.0.0.0:*    users:(("MainThread",pid=7530,fd=22))
+LISTEN 0      511          0.0.0.0:5060       0.0.0.0:*    users:(("MainThread",pid=7530,fd=24))
+LISTEN 0      511             [::]:8080          [::]:*    users:(("MainThread",pid=7530,fd=23))
+LISTEN 0      511             [::]:5060          [::]:*    users:(("MainThread",pid=7530,fd=25))
+UNCONN 0      0            0.0.0.0:8080      0.0.0.0:*    users:(("MainThread",pid=7530,fd=26))
+UNCONN 0      0            0.0.0.0:5060      0.0.0.0:*    users:(("MainThread",pid=7530,fd=28))
+UNCONN 0      0               [::]:8080         [::]:*    users:(("MainThread",pid=7530,fd=27))
+UNCONN 0      0               [::]:5060         [::]:*    users:(("MainThread",pid=7530,fd=29))
+official daemon: ABSENT

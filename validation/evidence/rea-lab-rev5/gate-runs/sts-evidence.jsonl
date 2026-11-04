@@ -1,0 +1,9 @@
+{"ts":1793825529993,"k":"listen_tcp","port":8080,"host":"0.0.0.0","family":"v4"}
+{"ts":1793825529993,"k":"listen_tcp","port":8080,"host":"::","family":"v6"}
+{"ts":1793825529993,"k":"listen_tcp","port":5060,"host":"0.0.0.0","family":"v4"}
+{"ts":1793825529993,"k":"listen_tcp","port":5060,"host":"::","family":"v6"}
+{"ts":1793825529994,"k":"listen_udp","port":8080,"host":"0.0.0.0"}
+{"ts":1793825529994,"k":"listen_udp","port":8080,"host":"::"}
+{"ts":1793825529995,"k":"listen_udp","port":5060,"host":"0.0.0.0"}
+{"ts":1793825529995,"k":"listen_udp","port":5060,"host":"::"}
+{"ts":1793825529995,"k":"started","tcpPorts":[8080,5060],"udpPorts":[8080,5060],"bindTargets":["0.0.0.0","::"],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"7a596402-f2d4-4100-9166-96096773c973","pid":10011}

@@ -34,6 +34,10 @@ source-code identity.
 | Custom certificate precedence + hot reload | ✔ (reload behavior not externally observable in lab) | ✔ (§9.2/§9.7: watcher, validated swap, last-valid preserved) | **superset** (documented) | T2 |
 | Automatic certificate provisioning | host-management (no public contract) | standard ACME (Let's Encrypt, HTTP-01), fail-closed | **independent equivalent**, not vendor parity (documented §8) | N6/N7 + code |
 | Encrypted-binary engine protocol | ✔ | ✖ (planned ERROR → documented plaintext fallback) | **documented deviation (D-2)** — fallback verified 3/3 | FINDINGS F-1 |
+| `userAgentFilterEnabled` bad-UA blocklist (11 patterns, 500-with-Date form, default off) | ✔ | ✔ (rev 5, `HttpApi` step 3.5) | **0 mismatches** (21-UA battery, per-variant differential) | FINDINGS F-26, `rea-lab-rev5` |
+| `websocket.frameSizeLimitBytes` (default 5242880; >limit → silent RST) | ✔ | ✔ (rev 5, FrameGuard + ws maxPayload) | **0 mismatches** (boundary probes 63/64/65/4096 at limit 64; 5242880/5242881 at default) | FINDINGS F-27, `rea-lab-rev5` |
+| useIPv4/useIPv6 per-family listeners (TCP + UDP) | ✔ | ✔ (rev 5, per-family binds, `[::]` V6ONLY) | **identical listener inventories** | FINDINGS F-29, `rea-lab-rev5` |
+| `addresses` explicit bind list | ✔ (broken: never binds listed v4; kills v4 wildcard) | ✔ (documented intent — deviation D-9) | **intentional deviation** (the daemon's own handling is defective) | FINDINGS F-28, DECISIONS D-9 |
 | Result submission / public Result URL generation | client↔Ookla service (server not involved) | server makes zero outbound connections | **by-design non-goal** | EXTERNAL_FLOWS.md |
 | Host telemetry / traceroute / auto-update / host registration | ✔ (proprietary) | decommissioned | **by-design non-goal** (RULE 4) | DECISIONS.md |
 | Throughput on loopback | ~3× Node single-thread | 18–22 Gbps DL / 12–15 Gbps UL | informational (not a parity gate) | PERFORMANCE_REPORT.md |

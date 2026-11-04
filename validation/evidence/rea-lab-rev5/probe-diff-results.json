@@ -1,0 +1,1630 @@
+{
+  "generatedAt": "2026-11-04T20:52:03.399Z",
+  "daemonPort": 18080,
+  "stsPort": 18081,
+  "results": [
+    {
+      "group": "netgauge-tcp",
+      "name": "HI",
+      "daemon": {
+        "closed": false,
+        "len": 44,
+        "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 44,
+        "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "HI with uuid",
+      "daemon": {
+        "closed": false,
+        "len": 44,
+        "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 44,
+        "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "HI with NON-uuid",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "HI extra spaces",
+      "daemon": {
+        "closed": true,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": true,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "HI trailing space",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "lowercase hi",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "GETIP",
+      "daemon": {
+        "closed": false,
+        "len": 17,
+        "preview": "YOURIP 127.0.0.1\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 17,
+        "preview": "YOURIP 127.0.0.1\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "CAPABILITIES",
+      "daemon": {
+        "closed": false,
+        "len": 43,
+        "preview": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 43,
+        "preview": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPTIME",
+      "daemon": {
+        "closed": false,
+        "len": 10,
+        "preview": "UPTIME <s>\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 10,
+        "preview": "UPTIME <s>\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "PING",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "PING 1",
+      "daemon": {
+        "closed": false,
+        "len": 19,
+        "preview": "PONG <ts>\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 19,
+        "preview": "PONG <ts>\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "PING extra",
+      "daemon": {
+        "closed": false,
+        "len": 19,
+        "preview": "PONG <ts>\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 19,
+        "preview": "PONG <ts>\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD_STATS",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "INITPLOSS bare (no HI)",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 3,
+        "preview": "OK\n"
+      },
+      "identical": false
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "PLOSS no session",
+      "daemon": {
+        "closed": false,
+        "len": 12,
+        "preview": "PLOSS 0 0 0\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 12,
+        "preview": "PLOSS 0 0 0\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "QUIT",
+      "daemon": {
+        "closed": true,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": true,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "unknown cmd",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "empty line",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "CRLF line ending",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "pipelined burst",
+      "daemon": {
+        "closed": false,
+        "len": 133,
+        "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\nYOURIP 127.0.0.1\nCAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS\nUPTIME <s>\nPONG <ts>\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 133,
+        "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\nYOURIP 127.0.0.1\nCAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS\nUPTIME <s>\nPONG <ts>\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "GETIP twice",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "GETIP trailing space",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "GETIP extra arg",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "SERVERID uuid case/format",
+      "daemon": {
+        "preview": "SERVERID 7a017763-1916-405b-9108-fbe3f7e01c28\n",
+        "uuid": {
+          "raw": "7a017763-1916-405b-9108-fbe3f7e01c28",
+          "case": "lower"
+        }
+      },
+      "sts": {
+        "preview": "SERVERID 97fff55b-97cf-4633-a652-b31627576f03\n",
+        "uuid": {
+          "raw": "97fff55b-97cf-4633-a652-b31627576f03",
+          "case": "lower"
+        }
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD 0",
+      "daemon": {
+        "closed": false,
+        "len": 1,
+        "preview": "\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 1,
+        "preview": "\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD 9 (prefix only)",
+      "daemon": {
+        "closed": false,
+        "len": 9,
+        "preview": "DOWNLOAD\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 9,
+        "preview": "DOWNLOAD\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD 10",
+      "daemon": {
+        "closed": false,
+        "len": 10,
+        "preview": "DOWNLOAD<prefix9> <10 bytes total>"
+      },
+      "sts": {
+        "closed": false,
+        "len": 10,
+        "preview": "DOWNLOAD<prefix9> <10 bytes total>"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD 100",
+      "daemon": {
+        "closed": false,
+        "len": 100,
+        "preview": "DOWNLOAD<prefix9> <100 bytes total>"
+      },
+      "sts": {
+        "closed": false,
+        "len": 100,
+        "preview": "DOWNLOAD<prefix9> <100 bytes total>"
+      },
+      "identical": false
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD with args",
+      "daemon": {
+        "closed": false,
+        "len": 100000,
+        "preview": "DOWNLOAD<prefix9> <220 bytes total>"
+      },
+      "sts": {
+        "closed": false,
+        "len": 100000,
+        "preview": "DOWNLOAD<prefix9> <220 bytes total>"
+      },
+      "identical": false
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD negative",
+      "daemon": {
+        "closed": false,
+        "len": 3211200,
+        "preview": "DOWNLOAD<prefix9> <220 bytes total>"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": false
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD notanumber",
+      "daemon": {
+        "closed": false,
+        "len": 3177237,
+        "preview": "DOWNLOAD<prefix9> <220 bytes total>"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": false
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD huge",
+      "daemon": {
+        "closed": false,
+        "len": 3211200,
+        "preview": "DOWNLOAD<prefix9> <220 bytes total>"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": false
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD lowercase",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD exact line len",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD shorter than line",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD 100 + 89B",
+      "daemon": {
+        "closed": false,
+        "len": 21,
+        "preview": "OK 100 <ts>\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 21,
+        "preview": "OK 100 <ts>\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD with extra args",
+      "daemon": {
+        "closed": false,
+        "len": 21,
+        "preview": "OK 100 <ts>\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 21,
+        "preview": "OK 100 <ts>\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD 0",
+      "daemon": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 6,
+        "preview": "ERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD negative",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD garbage arg",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "cmd after QUIT",
+      "daemon": {
+        "closed": true,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": true,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "binary garbage",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "long-ish line (500B)",
+      "daemon": {
+        "closed": false,
+        "len": 19,
+        "preview": "PONG <ts>\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 19,
+        "preview": "PONG <ts>\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /",
+      "daemon": {
+        "closed": true,
+        "len": 587,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 587,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /hi",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /hi?query=1",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "HEAD /hi",
+      "daemon": {
+        "closed": true,
+        "len": 493,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 493,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /HI (case)",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /hi/ (trailing slash)",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET //hi (double slash)",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /./hi (dot segment)",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "OPTIONS *",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "OPTIONS /hi",
+      "daemon": {
+        "closed": true,
+        "len": 492,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 492,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "TRACE /hi",
+      "daemon": {
+        "closed": true,
+        "len": 109,
+        "preview": "Þ]ýWï\u0017\u001bznã\u0001ÎêÈÞ·_ëz{ºU«\"\u0005õp\nø\bï\u000e1õÄ³¯¬Kï\u0017©\t¸CWÄHg +\u001a#ðï\u000b£\n\u001bM@yVm*ÙtU\u0014ËÎy«¿ÇûÛ¨\\\u0007¨:p\u00149ñydÄý\n"
+      },
+      "sts": {
+        "closed": true,
+        "len": 18,
+        "preview": "ERROR\nERROR\nERROR\n"
+      },
+      "identical": false
+    },
+    {
+      "group": "http",
+      "name": "PUT /hi",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "DELETE /hi",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "PATCH /hi",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "no User-Agent",
+      "daemon": {
+        "closed": true,
+        "len": 57,
+        "preview": "HTTP/1.1 500 Internal Server Error⏎Connection: Close⏎⏎"
+      },
+      "sts": {
+        "closed": true,
+        "len": 57,
+        "preview": "HTTP/1.1 500 Internal Server Error⏎Connection: Close⏎⏎"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "empty UA value",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "HTTP/1.0 GET /hi",
+      "daemon": {
+        "closed": true,
+        "len": 57,
+        "preview": "HTTP/1.1 500 Internal Server Error⏎Connection: Close⏎⏎"
+      },
+      "sts": {
+        "closed": true,
+        "len": 57,
+        "preview": "HTTP/1.1 500 Internal Server Error⏎Connection: Close⏎⏎"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "no Host header",
+      "daemon": {
+        "closed": true,
+        "len": 57,
+        "preview": "HTTP/1.1 500 Internal Server Error⏎Connection: Close⏎⏎"
+      },
+      "sts": {
+        "closed": true,
+        "len": 57,
+        "preview": "HTTP/1.1 500 Internal Server Error⏎Connection: Close⏎⏎"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET unknown path",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /speedtest/latency.txt",
+      "daemon": {
+        "closed": true,
+        "len": 503,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 503,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /latency.txt",
+      "daemon": {
+        "closed": true,
+        "len": 503,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 503,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /crossdomain.xml",
+      "daemon": {
+        "closed": true,
+        "len": 796,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 796,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": false
+    },
+    {
+      "group": "http",
+      "name": "GET random250x250.jpg",
+      "daemon": {
+        "closed": true,
+        "len": 129627,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 129627,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": false
+    },
+    {
+      "group": "http",
+      "name": "HEAD random250x250.jpg",
+      "daemon": {
+        "closed": true,
+        "len": 482,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 482,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET random250x500.jpg (mismatch)",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET random123x123.jpg (unknown size)",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET random250x250.jpg weird prefix",
+      "daemon": {
+        "closed": true,
+        "len": 129627,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 129627,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": false
+    },
+    {
+      "group": "http",
+      "name": "Range on /hi",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "Origin reflection",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "Origin null",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "POST /speedtest/upload.php body",
+      "daemon": {
+        "closed": true,
+        "len": 499,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 499,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "POST /speedtest/upload.php empty",
+      "daemon": {
+        "closed": true,
+        "len": 499,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 499,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /speedtest/upload.php",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "POST chunked upload.php",
+      "daemon": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": false,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "keep-alive two requests",
+      "daemon": {
+        "closed": true,
+        "len": 1079,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Keep-Alive⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecur"
+      },
+      "sts": {
+        "closed": true,
+        "len": 1079,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Keep-Alive⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecur"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "HTTP/2 preface",
+      "daemon": {
+        "closed": true,
+        "len": 18,
+        "preview": "ERROR\nERROR\nERROR\n"
+      },
+      "sts": {
+        "closed": true,
+        "len": 18,
+        "preview": "ERROR\nERROR\nERROR\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "absolute-form URI",
+      "daemon": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "sts": {
+        "closed": true,
+        "len": 537,
+        "preview": "HTTP/1.1 200 OK⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-req"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "long URL 2KB",
+      "daemon": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "sts": {
+        "closed": true,
+        "len": 439,
+        "preview": "HTTP/1.1 404 Not Found⏎Date: <date>⏎Connection: Close⏎Cache-Control: no-store⏎X-Content-Type-Options: nosniff⏎X-Frame-Options: DENY⏎Strict-Transport-Security: max-age=31536000; includeSubDomains⏎Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.example.org *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insec"
+      },
+      "identical": true
+    },
+    {
+      "group": "http",
+      "name": "GET /ws (plain GET not upgrade)",
+      "daemon": {
+        "closed": true,
+        "len": 0,
+        "preview": ""
+      },
+      "sts": {
+        "closed": true,
+        "len": 0,
+        "preview": ""
+      },
+      "identical": true
+    },
+    {
+      "group": "tls",
+      "name": "TLS GETIP (netgauge over TLS)",
+      "daemon": {
+        "closed": false,
+        "len": 17,
+        "preview": "YOURIP 127.0.0.1\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 17,
+        "preview": "YOURIP 127.0.0.1\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "tls",
+      "name": "TLS HI",
+      "daemon": {
+        "closed": false,
+        "len": 44,
+        "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+      },
+      "sts": {
+        "closed": false,
+        "len": 44,
+        "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+      },
+      "identical": true
+    },
+    {
+      "group": "tls",
+      "name": "TLS1.0 handshake rejected",
+      "daemon": {
+        "ok": false,
+        "code": "ERR_SSL_NO_PROTOCOLS_AVAILABLE",
+        "message": "C082F1C19B7F0000:error:0A0000BF:SSL routines:tls_setup_hands"
+      },
+      "sts": {
+        "ok": false,
+        "code": "ERR_SSL_NO_PROTOCOLS_AVAILABLE",
+        "message": "C082F1C19B7F0000:error:0A0000BF:SSL routines:tls_setup_hands"
+      },
+      "identical": true
+    },
+    {
+      "group": "tls",
+      "name": "TLS1.1 handshake rejected",
+      "daemon": {
+        "ok": false,
+        "code": "ERR_SSL_NO_PROTOCOLS_AVAILABLE",
+        "message": "C082F1C19B7F0000:error:0A0000BF:SSL routines:tls_setup_hands"
+      },
+      "sts": {
+        "ok": false,
+        "code": "ERR_SSL_NO_PROTOCOLS_AVAILABLE",
+        "message": "C082F1C19B7F0000:error:0A0000BF:SSL routines:tls_setup_hands"
+      },
+      "identical": true
+    },
+    {
+      "group": "ws",
+      "name": "WS HI",
+      "daemon": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 43,
+            "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+          }
+        ],
+        "closedByServer": false
+      },
+      "sts": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 43,
+            "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+          }
+        ],
+        "closedByServer": false
+      },
+      "identical": true
+    },
+    {
+      "group": "ws",
+      "name": "WS HI no newline",
+      "daemon": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 43,
+            "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+          }
+        ],
+        "closedByServer": false
+      },
+      "sts": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 43,
+            "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+          }
+        ],
+        "closedByServer": false
+      },
+      "identical": true
+    },
+    {
+      "group": "ws",
+      "name": "WS GETIP",
+      "daemon": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 17,
+            "preview": "YOURIP 127.0.0.1\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "sts": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 17,
+            "preview": "YOURIP 127.0.0.1\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "identical": true
+    },
+    {
+      "group": "ws",
+      "name": "WS HI+GETIP one frame",
+      "daemon": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 43,
+            "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+          }
+        ],
+        "closedByServer": false
+      },
+      "sts": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 43,
+            "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+          }
+        ],
+        "closedByServer": false
+      },
+      "identical": true
+    },
+    {
+      "group": "ws",
+      "name": "WS HI then separate GETIP",
+      "daemon": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 43,
+            "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+          },
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 17,
+            "preview": "YOURIP 127.0.0.1\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "sts": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 43,
+            "preview": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+          },
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 17,
+            "preview": "YOURIP 127.0.0.1\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "identical": true
+    },
+    {
+      "group": "ws",
+      "name": "WS garbage text",
+      "daemon": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 6,
+            "preview": "ERROR\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "sts": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 6,
+            "preview": "ERROR\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "identical": true
+    },
+    {
+      "group": "ws",
+      "name": "WS QUIT",
+      "daemon": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 6,
+            "preview": "ERROR\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "sts": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 6,
+            "preview": "ERROR\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "identical": true
+    },
+    {
+      "group": "ws",
+      "name": "WS PING",
+      "daemon": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 19,
+            "preview": "PONG 1793825505333\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "sts": {
+        "handshake": "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>",
+        "frames": [
+          {
+            "opcode": 1,
+            "bin": false,
+            "len": 19,
+            "preview": "PONG 1793825506506\n"
+          }
+        ],
+        "closedByServer": false
+      },
+      "identical": false
+    },
+    {
+      "group": "udp",
+      "name": "LOSS 4-field init",
+      "daemon": [],
+      "sts": [],
+      "identical": true
+    },
+    {
+      "group": "udp",
+      "name": "LOSS 5-field loaded",
+      "daemon": [],
+      "sts": [
+        {
+          "from": "127.0.0.1:<port>",
+          "data": "RECV 1 456 [2 1 0]\n",
+          "bytes": 19
+        }
+      ],
+      "identical": false
+    },
+    {
+      "group": "udp",
+      "name": "LOSS out-of-order + dupe",
+      "daemon": [],
+      "sts": [
+        {
+          "from": "127.0.0.1:<port>",
+          "data": "RECV 5 10 [3 5 0]\n",
+          "bytes": 18
+        },
+        {
+          "from": "127.0.0.1:<port>",
+          "data": "RECV 3 20 [4 3 1]\n",
+          "bytes": 18
+        },
+        {
+          "from": "127.0.0.1:<port>",
+          "data": "RECV 3 30 [5 3 2]\n",
+          "bytes": 18
+        }
+      ],
+      "identical": false
+    },
+    {
+      "group": "udp",
+      "name": "LOSS bad uuid",
+      "daemon": [],
+      "sts": [],
+      "identical": true
+    },
+    {
+      "group": "udp",
+      "name": "LOSS wrong field count",
+      "daemon": [],
+      "sts": [],
+      "identical": true
+    },
+    {
+      "group": "udp",
+      "name": "LOSS 6 fields",
+      "daemon": [],
+      "sts": [],
+      "identical": true
+    },
+    {
+      "group": "udp",
+      "name": "garbage datagram",
+      "daemon": [],
+      "sts": [],
+      "identical": true
+    },
+    {
+      "group": "udp",
+      "name": "empty datagram",
+      "daemon": [],
+      "sts": [],
+      "identical": true
+    },
+    {
+      "group": "udp",
+      "name": "PLOSS after 2 UDP pkts (5 then 3)",
+      "daemon": "PLOSS 0 0 0\n",
+      "sts": "PLOSS 2 1 5\n",
+      "identical": false
+    }
+  ]
+}
