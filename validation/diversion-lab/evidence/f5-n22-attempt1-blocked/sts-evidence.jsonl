@@ -1,0 +1,10 @@
+{"ts":1793825502222,"k":"listen_tcp","port":8080,"family":"dual-stack"}
+{"ts":1793825502222,"k":"listen_udp","port":8080}
+{"ts":1793825502223,"k":"started","tcpPorts":[8080],"udpPorts":[8080],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"e212325e-a773-4031-874c-7d086d2f190c","pid":3073}
+{"ts":1793825502562,"k":"conn_netgauge","id":1,"peer":"::ffff:127.0.0.1:40402","transport":"tcp"}
+{"ts":1793825502563,"k":"ng_cmd","id":1,"peer":"::ffff:127.0.0.1:40402","line":"HI"}
+{"ts":1793825505067,"k":"conn_close","id":1,"peer":"::ffff:127.0.0.1:40402","stats":{"peer":"::ffff:127.0.0.1:40402","peerIp":"::ffff:127.0.0.1","openedAt":1793825502562,"transport":"tcp","bytesDown":44,"bytesUp":0,"commands":0}}
+{"ts":1793825505093,"k":"conn_netgauge","id":2,"peer":"::ffff:127.0.0.1:40418","transport":"tcp"}
+{"ts":1793825505093,"k":"ng_cmd","id":2,"peer":"::ffff:127.0.0.1:40418","line":"HI"}
+{"ts":1793825507597,"k":"conn_close","id":2,"peer":"::ffff:127.0.0.1:40418","stats":{"peer":"::ffff:127.0.0.1:40418","peerIp":"::ffff:127.0.0.1","openedAt":1793825505092,"transport":"tcp","bytesDown":44,"bytesUp":0,"commands":0}}
+{"ts":1793825792021,"k":"stopped","connections":2}

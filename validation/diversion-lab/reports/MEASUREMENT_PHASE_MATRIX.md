@@ -8,7 +8,7 @@
 
 | Fase pengukuran | Koneksi (per run tipikal) | Perintah protokol | Transport | Umur | Yang menentukan hasil di output CLI | Dapat dialihkan per-fase? |
 |---|---|---|---|---|---|---|
-| **Server selection (probe latency)** | 10 probe + 1 pemenang (+11 zero-byte) | ENC hello → (ERROR →) `HI`[` <UUID>`] → `GETIP` → `PING ×3/×5` | TCP | ~60 ms total | server.id/host/name di JSON (dari entri config, bukan dari protokol); ping.latency dihitung dari PING probe pemenang | ✅ ya (terbukti F2a) |
+| **Server selection (probe latency)** | 10 probe + 1 pemenang (+11 zero-byte) | ENC hello → (ERROR →) `HI`[` <UUID>`] → `GETIP` → `PING ×3/×5` | TCP | ~60 ms total | server.id/host/name di JSON (dari entri config, bukan dari protokol); ping.latency dihitung dari PING probe pemenang | ✅ ya — **VERIFIED f2a×3 + f5-n22×3** (probe→A terenkripsi utuh sementara pengukuran di backend lain) |
 | **Latency / jitter (tak berbeban)** | probe pemenang (koneksi 22) | `PING ×5` | TCP | 2 ms | `ping.latency`, `ping.jitter`, low/high | ✅ (mengikuti probe pemenang) |
 | **Loaded latency (download)** | monitor ping 1 koneksi | `PING` berulang | TCP | 12–15 s | (internal; memengaruhi stableStop) | ✅ |
 | **Download** | 4 worker | `DOWNLOAD 32000000` ×~190 | TCP | ~12,3 s | `download.bandwidth/.bytes` | ✅ |
@@ -31,10 +31,19 @@
    bisa terenkripsi, koneksi pengukuran harus fallback per koneksi).
 3. **Tidak ada keterikatan download↔upload**: koneksi upload terpisah total
    dari download (worker baru, HI baru) → upload bisa dialihkan ke backend
-   berbeda dari download tanpa state bersama (dibuktikan F2a/F4).
+   berbeda dari download tanpa state bersama. Basis saat ini: bukti protokol
+   (koneksi terpisah, UUID sama-sama diterima — f5-n22: dn DAN ul bersama di B
+   setelah seleksi di A) + validasi instrumen S2; **belahan dl→X ul→Y pada CLI
+   = F5-n28 (antre kuota)** — catatan koreksi: versi lama matriks ini melabel
+   "dibuktikan F2a/F4" padahal keduanya belum pernah dijalankan saat itu
+   (lihat `analysis/EVIDENCE_RECONCILIATION.md` §1f).
 4. **Monitor ping per fase independen** → loaded-latency bisa berasal dari
-   backend berbeda dengan beban (dibuktikan F2a: ping→B saat download→B,
-   dengan seleksi→A).
+   backend berbeda dengan beban. Basis: validasi instrumen S2 + f5-n22
+   (pingmon→B fallback plaintext bersama beban di B setelah seleksi terenkripsi
+   di A). Catatan koreksi idem: versi lama melabel "dibuktikan F2a"
+   (ping→B saat download→B) padahal pada F2a AKTUAL seluruh pingmon
+   terenkripsi → A (pemetaan ping=B inert) — pemisahan pingmon↔beban lintas
+   backend pada CLI belum diuji spesifik (antre F5 titik lain).
 
 ## 3. Peta jawaban CLI per fase ↔ backend yang menjawab
 

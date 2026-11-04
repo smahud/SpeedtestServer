@@ -1,0 +1,706 @@
+{
+  "outcome": {
+    "exit": 0,
+    "type": "result",
+    "latency": 0.109,
+    "jitter": 0.109,
+    "download": {
+      "bandwidth": 1111547635,
+      "bytes": 10239855898,
+      "elapsed": 9407,
+      "latency": {
+        "iqm": 2.292,
+        "low": 0.42,
+        "high": 33.414,
+        "jitter": 3.512
+      }
+    },
+    "upload": {
+      "bandwidth": 881514265,
+      "bytes": 7164824171,
+      "elapsed": 8506,
+      "latency": {
+        "iqm": 4.644,
+        "low": 0.265,
+        "high": 36.538,
+        "jitter": 7.405
+      }
+    },
+    "packetLoss": 9.090909090909092,
+    "persisted": false,
+    "server": "localhost:9090 id=28912 name=fdcservers.net"
+  },
+  "phasesPresent": {
+    "latency": true,
+    "download": true,
+    "upload": true,
+    "packetLoss": true
+  },
+  "proxyFacts": {
+    "configServed": 1,
+    "blocked": [
+      "results.speedtest.net:443"
+    ],
+    "tunnels": [],
+    "rewritten": [
+      "43356",
+      "35791",
+      "63143",
+      "57571",
+      "1536",
+      "60178",
+      "48446",
+      "65463",
+      "60177",
+      "28912"
+    ]
+  },
+  "connections": [
+    {
+      "id": 1,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:1(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 3
+    },
+    {
+      "id": 2,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:2(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 174,
+      "bytesB2C": 243,
+      "durMs": 4
+    },
+    {
+      "id": 3,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:3(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 0
+    },
+    {
+      "id": 4,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:4(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 214,
+      "bytesB2C": 244,
+      "durMs": 3
+    },
+    {
+      "id": 5,
+      "phase": "zero-byte",
+      "backend": null,
+      "reason": null,
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 2
+    },
+    {
+      "id": 6,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:6(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 182,
+      "bytesB2C": 245,
+      "durMs": 3
+    },
+    {
+      "id": 7,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:7(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 1
+    },
+    {
+      "id": 8,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:8(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 194,
+      "bytesB2C": 245,
+      "durMs": 1
+    },
+    {
+      "id": 9,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:9(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 0
+    },
+    {
+      "id": 10,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:10(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 191,
+      "bytesB2C": 246,
+      "durMs": 1
+    },
+    {
+      "id": 11,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:11(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 0
+    },
+    {
+      "id": 12,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:12(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 194,
+      "bytesB2C": 242,
+      "durMs": 1
+    },
+    {
+      "id": 13,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:13(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 1
+    },
+    {
+      "id": 14,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:14(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 193,
+      "bytesB2C": 244,
+      "durMs": 1
+    },
+    {
+      "id": 15,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:15(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 1
+    },
+    {
+      "id": 16,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:16(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 223,
+      "bytesB2C": 242,
+      "durMs": 2
+    },
+    {
+      "id": 17,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:17(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 0
+    },
+    {
+      "id": 18,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:18(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 206,
+      "bytesB2C": 242,
+      "durMs": 2
+    },
+    {
+      "id": 19,
+      "phase": "zero-byte",
+      "backend": "A",
+      "reason": "index:19(≤N)",
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 1
+    },
+    {
+      "id": 20,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:20(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 208,
+      "bytesB2C": 241,
+      "durMs": 1
+    },
+    {
+      "id": 21,
+      "phase": "zero-byte",
+      "backend": null,
+      "reason": null,
+      "encHello": false,
+      "uuid": false,
+      "bytesC2B": 0,
+      "bytesB2C": 0,
+      "durMs": 1
+    },
+    {
+      "id": 22,
+      "phase": "selection-probe(encrypted)",
+      "backend": "A",
+      "reason": "index:22(≤N)",
+      "encHello": true,
+      "uuid": false,
+      "bytesC2B": 324,
+      "bytesB2C": 326,
+      "durMs": 2
+    },
+    {
+      "id": 23,
+      "phase": "loss",
+      "backend": "B",
+      "reason": "index:23(>N)",
+      "encHello": false,
+      "uuid": true,
+      "bytesC2B": 152,
+      "bytesB2C": 297,
+      "durMs": 18050
+    },
+    {
+      "id": 24,
+      "phase": "selection-probe(encrypted)",
+      "backend": "B",
+      "reason": "index:24(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 3094,
+      "bytesB2C": 3603,
+      "durMs": 12433
+    },
+    {
+      "id": 25,
+      "phase": "download",
+      "backend": "B",
+      "reason": "index:25(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 2111,
+      "bytesB2C": 3521140608,
+      "durMs": 9448
+    },
+    {
+      "id": 26,
+      "phase": "download",
+      "backend": "B",
+      "reason": "index:26(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 1194,
+      "bytesB2C": 1881802802,
+      "durMs": 9447
+    },
+    {
+      "id": 27,
+      "phase": "download",
+      "backend": "B",
+      "reason": "index:27(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 1218,
+      "bytesB2C": 1932301856,
+      "durMs": 9447
+    },
+    {
+      "id": 28,
+      "phase": "download",
+      "backend": "B",
+      "reason": "index:28(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 1777,
+      "bytesB2C": 2928103315,
+      "durMs": 9427
+    },
+    {
+      "id": 29,
+      "phase": "ping-monitor",
+      "backend": "B",
+      "reason": "index:29(>N)",
+      "encHello": false,
+      "uuid": true,
+      "bytesC2B": 2760,
+      "bytesB2C": 3274,
+      "durMs": 8586
+    },
+    {
+      "id": 30,
+      "phase": "upload-control",
+      "backend": "B",
+      "reason": "index:30(>N)",
+      "encHello": false,
+      "uuid": true,
+      "bytesC2B": 77,
+      "bytesB2C": 93,
+      "durMs": 8550
+    },
+    {
+      "id": 31,
+      "phase": "selection-probe(encrypted)",
+      "backend": "B",
+      "reason": "index:31(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 1760000040,
+      "bytesB2C": 1474,
+      "durMs": 8594
+    },
+    {
+      "id": 32,
+      "phase": "selection-probe(encrypted)",
+      "backend": "B",
+      "reason": "index:32(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 1799847927,
+      "bytesB2C": 1500,
+      "durMs": 8603
+    },
+    {
+      "id": 33,
+      "phase": "selection-probe(encrypted)",
+      "backend": "B",
+      "reason": "index:33(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 1696000040,
+      "bytesB2C": 1422,
+      "durMs": 8588
+    },
+    {
+      "id": 34,
+      "phase": "selection-probe(encrypted)",
+      "backend": "B",
+      "reason": "index:34(>N)",
+      "encHello": true,
+      "uuid": true,
+      "bytesC2B": 1984000040,
+      "bytesB2C": 1656,
+      "durMs": 8602
+    }
+  ],
+  "phaseAttribution": {
+    "zero-byte": [
+      {
+        "conn": 1,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 3,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 5,
+        "backend": null,
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 7,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 9,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 11,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 13,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 15,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 17,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 19,
+        "backend": "A",
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      },
+      {
+        "conn": 21,
+        "backend": null,
+        "bytesC2B": 0,
+        "bytesB2C": 0
+      }
+    ],
+    "selection-probe(encrypted)": [
+      {
+        "conn": 2,
+        "backend": "A",
+        "bytesC2B": 174,
+        "bytesB2C": 243
+      },
+      {
+        "conn": 4,
+        "backend": "A",
+        "bytesC2B": 214,
+        "bytesB2C": 244
+      },
+      {
+        "conn": 6,
+        "backend": "A",
+        "bytesC2B": 182,
+        "bytesB2C": 245
+      },
+      {
+        "conn": 8,
+        "backend": "A",
+        "bytesC2B": 194,
+        "bytesB2C": 245
+      },
+      {
+        "conn": 10,
+        "backend": "A",
+        "bytesC2B": 191,
+        "bytesB2C": 246
+      },
+      {
+        "conn": 12,
+        "backend": "A",
+        "bytesC2B": 194,
+        "bytesB2C": 242
+      },
+      {
+        "conn": 14,
+        "backend": "A",
+        "bytesC2B": 193,
+        "bytesB2C": 244
+      },
+      {
+        "conn": 16,
+        "backend": "A",
+        "bytesC2B": 223,
+        "bytesB2C": 242
+      },
+      {
+        "conn": 18,
+        "backend": "A",
+        "bytesC2B": 206,
+        "bytesB2C": 242
+      },
+      {
+        "conn": 20,
+        "backend": "A",
+        "bytesC2B": 208,
+        "bytesB2C": 241
+      },
+      {
+        "conn": 22,
+        "backend": "A",
+        "bytesC2B": 324,
+        "bytesB2C": 326
+      },
+      {
+        "conn": 24,
+        "backend": "B",
+        "bytesC2B": 3094,
+        "bytesB2C": 3603
+      },
+      {
+        "conn": 31,
+        "backend": "B",
+        "bytesC2B": 1760000040,
+        "bytesB2C": 1474
+      },
+      {
+        "conn": 32,
+        "backend": "B",
+        "bytesC2B": 1799847927,
+        "bytesB2C": 1500
+      },
+      {
+        "conn": 33,
+        "backend": "B",
+        "bytesC2B": 1696000040,
+        "bytesB2C": 1422
+      },
+      {
+        "conn": 34,
+        "backend": "B",
+        "bytesC2B": 1984000040,
+        "bytesB2C": 1656
+      }
+    ],
+    "loss": [
+      {
+        "conn": 23,
+        "backend": "B",
+        "bytesC2B": 152,
+        "bytesB2C": 297
+      }
+    ],
+    "download": [
+      {
+        "conn": 25,
+        "backend": "B",
+        "bytesC2B": 2111,
+        "bytesB2C": 3521140608
+      },
+      {
+        "conn": 26,
+        "backend": "B",
+        "bytesC2B": 1194,
+        "bytesB2C": 1881802802
+      },
+      {
+        "conn": 27,
+        "backend": "B",
+        "bytesC2B": 1218,
+        "bytesB2C": 1932301856
+      },
+      {
+        "conn": 28,
+        "backend": "B",
+        "bytesC2B": 1777,
+        "bytesB2C": 2928103315
+      }
+    ],
+    "ping-monitor": [
+      {
+        "conn": 29,
+        "backend": "B",
+        "bytesC2B": 2760,
+        "bytesB2C": 3274
+      }
+    ],
+    "upload-control": [
+      {
+        "conn": 30,
+        "backend": "B",
+        "bytesC2B": 77,
+        "bytesB2C": 93
+      }
+    ]
+  },
+  "udpFacts": {
+    "clients": [
+      {
+        "client": "::1:34230",
+        "backend": "B"
+      },
+      {
+        "client": "::1:34534",
+        "backend": "B"
+      },
+      {
+        "client": "::1:54311",
+        "backend": "B"
+      }
+    ],
+    "cliToBe": 240,
+    "beToCli": 160,
+    "sampleHeads": [
+      "LOSS 140031440 0 582E379C-0BF2-4833-9BD0",
+      "LOSS 478975624 0 BD9F8E4D-A1FE-4B11-9075",
+      "LOSS 140031440 1 582E379C-0BF2-4833-9BD0"
+    ]
+  },
+  "stsFacts": {
+    "netgaugeConns": 14,
+    "commands": 949,
+    "downloadsDone": 315,
+    "uploadsDone": 226,
+    "udpRecv": 358,
+    "udpCount": 187,
+    "bytesSent": 0
+  },
+  "daemonFacts": {
+    "note": "log daemon tidak tersedia"
+  },
+  "volume": {
+    "diverterBytes": {
+      "A": 2760,
+      "B": 10263361900
+    },
+    "cliDownloadBytes": 10239855898,
+    "cliUploadBytes": 7164824171
+  },
+  "verdict": {
+    "cli_exit": 0,
+    "complete": true,
+    "non_publishing": true,
+    "backends_used": [
+      "A",
+      null,
+      "B"
+    ],
+    "diverted": true
+  }
+}

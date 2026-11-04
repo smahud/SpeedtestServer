@@ -55,7 +55,8 @@ const proxyFacts = {
   configServed: proxy.filter((e) => e.k === 'config_served').length,
   blocked: proxy.filter((e) => e.k === 'blocked').map((e) => e.target),
   tunnels: [...new Set(proxy.filter((e) => e.k === 'tunnel').map((e) => e.target))],
-  rewritten: proxy.find((e) => e.k === 'config_served')?.rewritten?.map((r) => r.id) || [],
+  // proxy logs rewritten as id strings (live) or {id,host} objects (older offline proxy) — accept both
+  rewritten: (proxy.find((e) => e.k === 'config_served')?.rewritten || []).map((r) => (typeof r === 'string' ? r : r.id)),
 };
 
 // ---------- diverter connection map

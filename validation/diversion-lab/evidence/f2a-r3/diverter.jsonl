@@ -1,0 +1,721 @@
+{"k":"meta","policy":"phase:pre=A,enc=A,sel=A,ping=B,loss=B,dn=B,up=B,upctl=B","parsed":{"mode":"phase","map":{"pre":"A","enc":"A","sel":"A","ping":"B","loss":"B","dn":"B","up":"B","upctl":"B","def":"A"}},"udp":"B","a":"127.0.0.1:18080","b":"127.0.0.1:8080","port":9090,"pid":2829,"ts0":1793825426916,"ts":1793825426916,"rt":0}
+{"k":"conn_open","id":1,"peer":"undefined:undefined","ts":1793825428476,"rt":1560}
+{"k":"conn_open","id":2,"peer":"::1:40878","ts":1793825428476,"rt":1560}
+{"k":"conn_close","id":1,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":2,"ts":1793825428477,"rt":1561}
+{"k":"conn_route","id":2,"backend":"A","reason":"enc-hello","heldMs":2,"ts":1793825428479,"rt":1562}
+{"k":"conn_sample","id":2,"c2b":19,"b2c":72,"ts":1793825428479,"rt":1563}
+{"k":"conn_close","id":2,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":190,"bytesBe2Cli":244,"durMs":5,"ts":1793825428481,"rt":1565}
+{"k":"conn_open","id":3,"peer":"::1:40890","ts":1793825428484,"rt":1567}
+{"k":"conn_close","id":3,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":1,"ts":1793825428484,"rt":1568}
+{"k":"conn_open","id":4,"peer":"::1:40896","ts":1793825428484,"rt":1568}
+{"k":"conn_route","id":4,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428484,"rt":1568}
+{"k":"conn_sample","id":4,"c2b":22,"b2c":68,"ts":1793825428485,"rt":1569}
+{"k":"conn_close","id":4,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":175,"bytesBe2Cli":242,"durMs":1,"ts":1793825428485,"rt":1569}
+{"k":"conn_open","id":5,"peer":"::1:40908","ts":1793825428488,"rt":1572}
+{"k":"conn_close","id":5,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":0,"ts":1793825428489,"rt":1572}
+{"k":"conn_open","id":6,"peer":"::1:40922","ts":1793825428489,"rt":1573}
+{"k":"conn_route","id":6,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428489,"rt":1573}
+{"k":"conn_sample","id":6,"c2b":41,"b2c":70,"ts":1793825428489,"rt":1573}
+{"k":"conn_close","id":6,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":213,"bytesBe2Cli":242,"durMs":1,"ts":1793825428490,"rt":1574}
+{"k":"conn_open","id":7,"peer":"::1:40936","ts":1793825428493,"rt":1577}
+{"k":"conn_close","id":7,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":0,"ts":1793825428493,"rt":1577}
+{"k":"conn_open","id":8,"peer":"::1:40950","ts":1793825428493,"rt":1577}
+{"k":"conn_route","id":8,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428494,"rt":1577}
+{"k":"conn_sample","id":8,"c2b":34,"b2c":71,"ts":1793825428494,"rt":1578}
+{"k":"conn_close","id":8,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":202,"bytesBe2Cli":241,"durMs":2,"ts":1793825428495,"rt":1579}
+{"k":"conn_open","id":9,"peer":"::1:40956","ts":1793825428497,"rt":1581}
+{"k":"conn_close","id":9,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":1,"ts":1793825428498,"rt":1582}
+{"k":"conn_open","id":10,"peer":"::1:40960","ts":1793825428498,"rt":1582}
+{"k":"conn_route","id":10,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428498,"rt":1582}
+{"k":"conn_sample","id":10,"c2b":24,"b2c":68,"ts":1793825428498,"rt":1582}
+{"k":"conn_close","id":10,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":210,"bytesBe2Cli":240,"durMs":1,"ts":1793825428499,"rt":1583}
+{"k":"conn_open","id":11,"peer":"::1:40970","ts":1793825428502,"rt":1586}
+{"k":"conn_close","id":11,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":0,"ts":1793825428502,"rt":1586}
+{"k":"conn_open","id":12,"peer":"::1:40982","ts":1793825428502,"rt":1586}
+{"k":"conn_route","id":12,"backend":"A","reason":"enc-hello","heldMs":1,"ts":1793825428503,"rt":1587}
+{"k":"conn_sample","id":12,"c2b":25,"b2c":68,"ts":1793825428503,"rt":1587}
+{"k":"conn_close","id":12,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":182,"bytesBe2Cli":241,"durMs":2,"ts":1793825428504,"rt":1588}
+{"k":"conn_open","id":13,"peer":"::1:40996","ts":1793825428507,"rt":1591}
+{"k":"conn_close","id":13,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":0,"ts":1793825428507,"rt":1591}
+{"k":"conn_open","id":14,"peer":"::1:41002","ts":1793825428507,"rt":1591}
+{"k":"conn_route","id":14,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428507,"rt":1591}
+{"k":"conn_sample","id":14,"c2b":28,"b2c":70,"ts":1793825428508,"rt":1591}
+{"k":"conn_close","id":14,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":201,"bytesBe2Cli":242,"durMs":1,"ts":1793825428508,"rt":1592}
+{"k":"conn_open","id":15,"peer":"::1:41018","ts":1793825428511,"rt":1595}
+{"k":"conn_close","id":15,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":0,"ts":1793825428511,"rt":1595}
+{"k":"conn_open","id":16,"peer":"::1:41022","ts":1793825428511,"rt":1595}
+{"k":"conn_route","id":16,"backend":"A","reason":"enc-hello","heldMs":1,"ts":1793825428512,"rt":1596}
+{"k":"conn_sample","id":16,"c2b":23,"b2c":69,"ts":1793825428512,"rt":1596}
+{"k":"conn_close","id":16,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":189,"bytesBe2Cli":243,"durMs":2,"ts":1793825428513,"rt":1597}
+{"k":"conn_open","id":17,"peer":"::1:41028","ts":1793825428515,"rt":1599}
+{"k":"conn_close","id":17,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":1,"ts":1793825428516,"rt":1600}
+{"k":"conn_open","id":18,"peer":"::1:41036","ts":1793825428516,"rt":1600}
+{"k":"conn_route","id":18,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428516,"rt":1600}
+{"k":"conn_sample","id":18,"c2b":30,"b2c":68,"ts":1793825428516,"rt":1600}
+{"k":"conn_close","id":18,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":205,"bytesBe2Cli":239,"durMs":1,"ts":1793825428517,"rt":1601}
+{"k":"conn_open","id":19,"peer":"::1:41038","ts":1793825428520,"rt":1604}
+{"k":"conn_close","id":19,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":0,"ts":1793825428520,"rt":1604}
+{"k":"conn_open","id":20,"peer":"::1:41044","ts":1793825428520,"rt":1604}
+{"k":"conn_route","id":20,"backend":"A","reason":"enc-hello","heldMs":1,"ts":1793825428521,"rt":1605}
+{"k":"conn_sample","id":20,"c2b":41,"b2c":69,"ts":1793825428521,"rt":1605}
+{"k":"conn_close","id":20,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":200,"bytesBe2Cli":239,"durMs":2,"ts":1793825428523,"rt":1606}
+{"k":"conn_open","id":21,"peer":"undefined:undefined","ts":1793825428528,"rt":1611}
+{"k":"conn_open","id":22,"peer":"::1:41068","ts":1793825428528,"rt":1612}
+{"k":"conn_close","id":21,"backend":"A","mode":"phase","routed":false,"bytesCli2Be":0,"bytesBe2Cli":0,"durMs":1,"ts":1793825428528,"rt":1612}
+{"k":"conn_route","id":22,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428528,"rt":1612}
+{"k":"conn_sample","id":22,"c2b":78,"b2c":69,"ts":1793825428528,"rt":1612}
+{"k":"conn_open","id":23,"peer":"::1:41078","ts":1793825428529,"rt":1613}
+{"k":"conn_close","id":22,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":337,"bytesBe2Cli":322,"durMs":1,"ts":1793825428529,"rt":1613}
+{"k":"udp_map","client":"::1:56166","backend":"B","ts":1793825428530,"rt":1614}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 0 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241403","ts":1793825428530,"rt":1614}
+{"k":"conn_open","id":24,"peer":"::1:41086","ts":1793825428530,"rt":1614}
+{"k":"conn_open","id":25,"peer":"::1:41098","ts":1793825428530,"rt":1614}
+{"k":"conn_open","id":26,"peer":"::1:41110","ts":1793825428530,"rt":1614}
+{"k":"conn_route","id":24,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428531,"rt":1614}
+{"k":"conn_route","id":25,"backend":"A","reason":"enc-hello","heldMs":1,"ts":1793825428531,"rt":1615}
+{"k":"conn_route","id":26,"backend":"A","reason":"enc-hello","heldMs":1,"ts":1793825428531,"rt":1615}
+{"k":"conn_cmd","id":23,"backend":"A","line":"HI BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC","ts":1793825428531,"rt":1615}
+{"k":"conn_route","id":23,"backend":"A","reason":"phase:pre(prefix)","heldMs":3,"ts":1793825428532,"rt":1616}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 0 2414033740 [1 0 0]⏎","ts":1793825428532,"rt":1616}
+{"k":"conn_open","id":27,"peer":"::1:41114","ts":1793825428533,"rt":1617}
+{"k":"conn_open","id":28,"peer":"::1:41124","ts":1793825428533,"rt":1617}
+{"k":"conn_route","id":27,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428533,"rt":1617}
+{"k":"conn_route","id":28,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825428533,"rt":1617}
+{"k":"conn_sample","id":25,"c2b":72,"b2c":69,"ts":1793825428534,"rt":1618}
+{"k":"conn_sample","id":27,"c2b":70,"b2c":68,"ts":1793825428534,"rt":1618}
+{"k":"conn_sample","id":24,"c2b":68,"b2c":68,"ts":1793825428534,"rt":1618}
+{"k":"conn_sample","id":26,"c2b":66,"b2c":71,"ts":1793825428534,"rt":1618}
+{"k":"conn_sample","id":28,"c2b":64,"b2c":69,"ts":1793825428542,"rt":1626}
+{"k":"conn_sample","id":23,"c2b":40,"b2c":44,"ts":1793825428542,"rt":1626}
+{"k":"conn_cmd","id":23,"backend":"A","line":"INITPLOSS","ts":1793825428546,"rt":1630}
+{"k":"conn_route","id":23,"backend":"B","reason":"phase:loss","heldMs":19,"prefixBackend":"A","replayed":true,"ts":1793825428548,"rt":1632}
+{"k":"udp_map","client":"::1:36001","backend":"B","ts":1793825428555,"rt":1639}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 0 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428555,"rt":1639}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 1 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241408","ts":1793825428584,"rt":1668}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 1 2414083979 [2 1 0]⏎","ts":1793825428589,"rt":1673}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 1 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428606,"rt":1690}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 2 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241413","ts":1793825428643,"rt":1727}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 2 2414134064 [3 2 0]⏎","ts":1793825428644,"rt":1728}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 2 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428660,"rt":1744}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 3 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241418","ts":1793825428684,"rt":1768}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 3 2414184147 [4 3 0]⏎","ts":1793825428689,"rt":1773}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 3 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428704,"rt":1788}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 4 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241424","ts":1793825428743,"rt":1827}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 4 2414246372 [5 4 0]⏎","ts":1793825428744,"rt":1828}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 4 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428754,"rt":1838}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 5 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241429","ts":1793825428792,"rt":1876}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 5 2414296456 [6 5 0]⏎","ts":1793825428793,"rt":1876}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 5 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428804,"rt":1888}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 6 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241434","ts":1793825428844,"rt":1928}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 6 2414346576 [7 6 0]⏎","ts":1793825428850,"rt":1934}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 6 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428855,"rt":1939}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 7 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241439","ts":1793825428893,"rt":1977}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 7 2414396651 [8 7 0]⏎","ts":1793825428893,"rt":1977}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 7 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428904,"rt":1988}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 8 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241444","ts":1793825428944,"rt":2028}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":26,"head":"RECV 8 2414446826 [9 8 0]⏎","ts":1793825428944,"rt":2028}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 8 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825428954,"rt":2038}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":65,"head":"LOSS 233214512 9 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 241449","ts":1793825428993,"rt":2077}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":27,"head":"RECV 9 2414496913 [10 9 0]⏎","ts":1793825428993,"rt":2077}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":54,"head":"LOSS 826031976 9 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429005,"rt":2089}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 10 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24145","ts":1793825429043,"rt":2127}
+{"k":"conn_sample","id":24,"c2b":549,"b2c":559,"ts":1793825429043,"rt":2127}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 10 2414546990 [11 10 0]⏎","ts":1793825429043,"rt":2127}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 10 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429054,"rt":2138}
+{"k":"conn_sample","id":27,"c2b":195,"b2c":64065604,"ts":1793825429063,"rt":2147}
+{"k":"conn_sample","id":28,"c2b":268,"b2c":115005375,"ts":1793825429065,"rt":2149}
+{"k":"conn_sample","id":25,"c2b":438,"b2c":196390857,"ts":1793825429068,"rt":2152}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 11 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24145","ts":1793825429093,"rt":2177}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 11 2414597100 [12 11 0]⏎","ts":1793825429096,"rt":2180}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 11 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429105,"rt":2189}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 12 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24146","ts":1793825429144,"rt":2228}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 12 2414647170 [13 12 0]⏎","ts":1793825429145,"rt":2229}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 12 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429155,"rt":2239}
+{"k":"conn_sample","id":26,"c2b":282,"b2c":119527078,"ts":1793825429157,"rt":2241}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 13 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24146","ts":1793825429194,"rt":2278}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 13 2414697278 [14 13 0]⏎","ts":1793825429195,"rt":2279}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 13 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429205,"rt":2289}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 14 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24147","ts":1793825429244,"rt":2328}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 14 2414747378 [15 14 0]⏎","ts":1793825429244,"rt":2328}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 14 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429256,"rt":2340}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 15 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24147","ts":1793825429295,"rt":2379}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 15 2414797464 [16 15 0]⏎","ts":1793825429295,"rt":2379}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 15 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429305,"rt":2389}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 16 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24148","ts":1793825429348,"rt":2432}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 16 2414849598 [17 16 0]⏎","ts":1793825429349,"rt":2433}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 16 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429356,"rt":2440}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 17 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24148","ts":1793825429395,"rt":2479}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 17 2414899679 [18 17 0]⏎","ts":1793825429396,"rt":2480}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 17 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429407,"rt":2491}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 18 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24149","ts":1793825429446,"rt":2530}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 18 2414949756 [19 18 0]⏎","ts":1793825429447,"rt":2531}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 18 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429456,"rt":2540}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 19 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24150","ts":1793825429499,"rt":2583}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 19 2415000919 [20 19 0]⏎","ts":1793825429500,"rt":2584}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 19 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429506,"rt":2590}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 20 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24150","ts":1793825429548,"rt":2632}
+{"k":"conn_sample","id":24,"c2b":987,"b2c":1001,"ts":1793825429550,"rt":2634}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 20 2415051028 [21 20 0]⏎","ts":1793825429550,"rt":2634}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 20 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429558,"rt":2642}
+{"k":"conn_sample","id":28,"c2b":346,"b2c":222211403,"ts":1793825429566,"rt":2650}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 21 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24151","ts":1793825429597,"rt":2681}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 21 2415101131 [22 21 0]⏎","ts":1793825429598,"rt":2682}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 21 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429606,"rt":2690}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 22 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24151","ts":1793825429648,"rt":2732}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 22 2415151212 [23 22 0]⏎","ts":1793825429650,"rt":2734}
+{"k":"conn_sample","id":27,"c2b":550,"b2c":320065604,"ts":1793825429654,"rt":2737}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 22 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429656,"rt":2740}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 23 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24152","ts":1793825429698,"rt":2781}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 23 2415201285 [24 23 0]⏎","ts":1793825429698,"rt":2782}
+{"k":"conn_sample","id":26,"c2b":737,"b2c":448065607,"ts":1793825429701,"rt":2785}
+{"k":"conn_sample","id":25,"c2b":782,"b2c":448065605,"ts":1793825429703,"rt":2787}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 23 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429706,"rt":2790}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 24 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24152","ts":1793825429748,"rt":2832}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 24 2415251752 [25 24 0]⏎","ts":1793825429750,"rt":2834}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 24 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429757,"rt":2841}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 25 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24153","ts":1793825429798,"rt":2882}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 25 2415301892 [26 25 0]⏎","ts":1793825429799,"rt":2883}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 25 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429808,"rt":2891}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 26 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24153","ts":1793825429850,"rt":2934}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 26 2415354021 [27 26 0]⏎","ts":1793825429852,"rt":2936}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 26 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429857,"rt":2941}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 27 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24154","ts":1793825429902,"rt":2986}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 27 2415404140 [28 27 0]⏎","ts":1793825429905,"rt":2989}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 27 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429908,"rt":2992}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 28 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24154","ts":1793825429950,"rt":3034}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 28 2415454230 [29 28 0]⏎","ts":1793825429950,"rt":3034}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 28 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825429958,"rt":3041}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 29 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24155","ts":1793825430000,"rt":3084}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 29 2415504371 [30 29 0]⏎","ts":1793825430001,"rt":3085}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 29 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430008,"rt":3092}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 30 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24155","ts":1793825430052,"rt":3136}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 30 2415555740 [31 30 0]⏎","ts":1793825430057,"rt":3141}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 30 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430060,"rt":3144}
+{"k":"conn_sample","id":28,"c2b":603,"b2c":384065605,"ts":1793825430071,"rt":3155}
+{"k":"conn_sample","id":24,"c2b":1486,"b2c":1510,"ts":1793825430098,"rt":3182}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 31 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24156","ts":1793825430102,"rt":3186}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 31 2415605822 [32 31 0]⏎","ts":1793825430102,"rt":3186}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 31 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430107,"rt":3191}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 32 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24156","ts":1793825430152,"rt":3236}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 32 2415655906 [33 32 0]⏎","ts":1793825430152,"rt":3236}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 32 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430157,"rt":3241}
+{"k":"conn_sample","id":27,"c2b":1111,"b2c":726477660,"ts":1793825430193,"rt":3277}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 33 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24157","ts":1793825430202,"rt":3286}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 33 2415706078 [34 33 0]⏎","ts":1793825430202,"rt":3286}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 33 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430209,"rt":3293}
+{"k":"conn_sample","id":25,"c2b":826,"b2c":450883061,"ts":1793825430210,"rt":3294}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 34 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24157","ts":1793825430252,"rt":3336}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 34 2415756120 [35 34 0]⏎","ts":1793825430253,"rt":3337}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 34 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430258,"rt":3342}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 35 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24158","ts":1793825430304,"rt":3388}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 35 2415806208 [36 35 0]⏎","ts":1793825430305,"rt":3389}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 35 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430308,"rt":3392}
+{"k":"conn_sample","id":26,"c2b":821,"b2c":512065607,"ts":1793825430344,"rt":3428}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 36 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24158","ts":1793825430352,"rt":3436}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 36 2415856302 [37 36 0]⏎","ts":1793825430353,"rt":3437}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 36 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430358,"rt":3442}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 37 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24159","ts":1793825430402,"rt":3486}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 37 2415906379 [38 37 0]⏎","ts":1793825430403,"rt":3487}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 37 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430408,"rt":3492}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 38 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24159","ts":1793825430455,"rt":3539}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 38 2415957861 [39 38 0]⏎","ts":1793825430459,"rt":3543}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 38 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430460,"rt":3544}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 39 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24160","ts":1793825430505,"rt":3589}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 39 2416007969 [40 39 0]⏎","ts":1793825430507,"rt":3591}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 39 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430509,"rt":3593}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 40 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24160","ts":1793825430555,"rt":3639}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 40 2416058016 [41 40 0]⏎","ts":1793825430558,"rt":3642}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 40 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430560,"rt":3644}
+{"k":"conn_sample","id":28,"c2b":1146,"b2c":771210476,"ts":1793825430573,"rt":3657}
+{"k":"conn_sample","id":24,"c2b":1895,"b2c":1955,"ts":1793825430599,"rt":3683}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 41 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24161","ts":1793825430605,"rt":3689}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 41 2416108097 [42 41 0]⏎","ts":1793825430608,"rt":3692}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 41 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430609,"rt":3693}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 42 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24161","ts":1793825430655,"rt":3739}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 42 2416158175 [43 42 0]⏎","ts":1793825430656,"rt":3739}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 42 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430659,"rt":3743}
+{"k":"conn_sample","id":27,"c2b":1449,"b2c":928458502,"ts":1793825430696,"rt":3780}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 43 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24162","ts":1793825430705,"rt":3788}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 43 2416208253 [44 43 0]⏎","ts":1793825430705,"rt":3789}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 43 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430709,"rt":3793}
+{"k":"conn_sample","id":25,"c2b":1020,"b2c":611536204,"ts":1793825430742,"rt":3826}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 44 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24162","ts":1793825430754,"rt":3838}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 44 2416258350 [45 44 0]⏎","ts":1793825430755,"rt":3839}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 44 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430764,"rt":3848}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 45 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24163","ts":1793825430804,"rt":3888}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 45 2416308429 [46 45 0]⏎","ts":1793825430804,"rt":3888}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 45 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430809,"rt":3893}
+{"k":"conn_sample","id":26,"c2b":1112,"b2c":704065607,"ts":1793825430845,"rt":3929}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 46 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24163","ts":1793825430854,"rt":3938}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 46 2416358521 [47 46 0]⏎","ts":1793825430856,"rt":3939}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 46 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430859,"rt":3943}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 47 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24164","ts":1793825430904,"rt":3988}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 47 2416408601 [48 47 0]⏎","ts":1793825430905,"rt":3989}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 47 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430909,"rt":3993}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 48 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24164","ts":1793825430954,"rt":4038}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 48 2416458685 [49 48 0]⏎","ts":1793825430955,"rt":4039}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 48 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825430959,"rt":4043}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 49 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24165","ts":1793825431006,"rt":4090}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 49 2416508788 [50 49 0]⏎","ts":1793825431007,"rt":4091}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 49 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431011,"rt":4095}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 50 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24165","ts":1793825431056,"rt":4140}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 50 2416558896 [51 50 0]⏎","ts":1793825431060,"rt":4144}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 50 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431060,"rt":4144}
+{"k":"conn_sample","id":28,"c2b":1289,"b2c":864065605,"ts":1793825431077,"rt":4161}
+{"k":"conn_sample","id":24,"c2b":2316,"b2c":2424,"ts":1793825431100,"rt":4184}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 51 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24166","ts":1793825431105,"rt":4189}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 51 2416609008 [52 51 0]⏎","ts":1793825431105,"rt":4189}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 51 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431109,"rt":4193}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 52 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24166","ts":1793825431156,"rt":4240}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 52 2416659094 [53 52 0]⏎","ts":1793825431159,"rt":4243}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 52 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431160,"rt":4244}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 53 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24167","ts":1793825431206,"rt":4290}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 53 2416709210 [54 53 0]⏎","ts":1793825431207,"rt":4291}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 53 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431212,"rt":4296}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 54 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24167","ts":1793825431255,"rt":4339}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 54 2416759294 [55 54 0]⏎","ts":1793825431255,"rt":4339}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 54 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431260,"rt":4343}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 55 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24168","ts":1793825431307,"rt":4391}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 55 2416809379 [56 55 0]⏎","ts":1793825431307,"rt":4391}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 55 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431310,"rt":4394}
+{"k":"conn_sample","id":25,"c2b":1293,"b2c":768523933,"ts":1793825431325,"rt":4409}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 56 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24168","ts":1793825431355,"rt":4439}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 56 2416859474 [57 56 0]⏎","ts":1793825431355,"rt":4439}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 56 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431360,"rt":4444}
+{"k":"conn_sample","id":27,"c2b":1862,"b2c":1248065604,"ts":1793825431375,"rt":4459}
+{"k":"conn_sample","id":26,"c2b":1413,"b2c":928065607,"ts":1793825431379,"rt":4463}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 57 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24169","ts":1793825431405,"rt":4489}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 57 2416909570 [58 57 0]⏎","ts":1793825431406,"rt":4490}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 57 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431410,"rt":4494}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 58 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24169","ts":1793825431455,"rt":4539}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 58 2416959655 [59 58 0]⏎","ts":1793825431456,"rt":4540}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 58 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431460,"rt":4544}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 59 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24170","ts":1793825431508,"rt":4592}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 59 2417012027 [60 59 0]⏎","ts":1793825431510,"rt":4594}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 59 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431511,"rt":4595}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 60 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24170","ts":1793825431558,"rt":4642}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 60 2417062122 [61 60 0]⏎","ts":1793825431558,"rt":4642}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 60 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431562,"rt":4646}
+{"k":"conn_sample","id":28,"c2b":1561,"b2c":1032585143,"ts":1793825431604,"rt":4688}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 61 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24171","ts":1793825431609,"rt":4693}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 61 2417112308 [62 61 0]⏎","ts":1793825431612,"rt":4696}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 61 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431612,"rt":4696}
+{"k":"conn_sample","id":24,"c2b":2786,"b2c":2956,"ts":1793825431650,"rt":4734}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 62 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24171","ts":1793825431659,"rt":4743}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 62 2417162397 [63 62 0]⏎","ts":1793825431660,"rt":4744}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 62 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431662,"rt":4746}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 63 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24172","ts":1793825431710,"rt":4794}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 63 2417212778 [64 63 0]⏎","ts":1793825431712,"rt":4796}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 63 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431713,"rt":4796}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 64 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24172","ts":1793825431759,"rt":4843}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 64 2417262947 [65 64 0]⏎","ts":1793825431760,"rt":4844}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 64 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431762,"rt":4846}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 65 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24173","ts":1793825431809,"rt":4893}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 65 2417313016 [66 65 0]⏎","ts":1793825431811,"rt":4895}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 65 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431813,"rt":4897}
+{"k":"conn_sample","id":25,"c2b":1395,"b2c":868061755,"ts":1793825431826,"rt":4910}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 66 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24173","ts":1793825431859,"rt":4943}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 66 2417363107 [67 66 0]⏎","ts":1793825431859,"rt":4943}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 66 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431862,"rt":4946}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 67 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24174","ts":1793825431909,"rt":4993}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 67 2417413188 [68 67 0]⏎","ts":1793825431911,"rt":4995}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 67 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431913,"rt":4997}
+{"k":"heartbeat","conns":28,"closed":22,"bytes":{"A":0,"B":0},"ts":1793825431922,"rt":5006}
+{"k":"conn_sample","id":27,"c2b":2226,"b2c":1471455579,"ts":1793825431925,"rt":5009}
+{"k":"conn_sample","id":26,"c2b":1509,"b2c":992196520,"ts":1793825431957,"rt":5041}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 68 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24174","ts":1793825431961,"rt":5045}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 68 2417463288 [69 68 0]⏎","ts":1793825431962,"rt":5046}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 68 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825431962,"rt":5046}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 69 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24175","ts":1793825432010,"rt":5094}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 69 2417513398 [70 69 0]⏎","ts":1793825432011,"rt":5095}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 69 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432013,"rt":5097}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 70 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24175","ts":1793825432062,"rt":5146}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 70 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432063,"rt":5147}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 70 2417565518 [71 70 0]⏎","ts":1793825432064,"rt":5148}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 71 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24176","ts":1793825432112,"rt":5196}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 71 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432112,"rt":5196}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 71 2417615770 [72 71 0]⏎","ts":1793825432114,"rt":5198}
+{"k":"conn_sample","id":24,"c2b":3210,"b2c":3443,"ts":1793825432152,"rt":5236}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 72 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24176","ts":1793825432162,"rt":5245}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 72 2417665876 [73 72 0]⏎","ts":1793825432162,"rt":5246}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 72 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432162,"rt":5246}
+{"k":"conn_sample","id":28,"c2b":1969,"b2c":1337886098,"ts":1793825432173,"rt":5257}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 73 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24177","ts":1793825432213,"rt":5297}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 73 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432213,"rt":5297}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 73 2417715995 [74 73 0]⏎","ts":1793825432215,"rt":5299}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 74 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24177","ts":1793825432263,"rt":5347}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 74 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432263,"rt":5347}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 74 2417766114 [75 74 0]⏎","ts":1793825432265,"rt":5349}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 75 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24178","ts":1793825432312,"rt":5396}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 75 2417816200 [76 75 0]⏎","ts":1793825432312,"rt":5396}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 75 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432313,"rt":5397}
+{"k":"conn_sample","id":25,"c2b":2128,"b2c":1375259131,"ts":1793825432359,"rt":5443}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 76 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24178","ts":1793825432364,"rt":5448}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 76 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432364,"rt":5448}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 76 2417866893 [77 76 0]⏎","ts":1793825432365,"rt":5449}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 77 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24179","ts":1793825432417,"rt":5501}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 77 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432417,"rt":5501}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 77 2417919020 [78 77 0]⏎","ts":1793825432420,"rt":5503}
+{"k":"conn_sample","id":27,"c2b":2454,"b2c":1601702679,"ts":1793825432426,"rt":5510}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 78 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24179","ts":1793825432465,"rt":5549}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 78 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432465,"rt":5549}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 78 2417969113 [79 78 0]⏎","ts":1793825432467,"rt":5550}
+{"k":"conn_sample","id":26,"c2b":1562,"b2c":1017951636,"ts":1793825432485,"rt":5569}
+{"k":"udp_datagram","client":"::1:56166","dir":"cli→be","bytes":66,"head":"LOSS 233214512 79 9B8E24BA-4A0C-412D-BF14-B76AA2717DC4 24180","ts":1793825432515,"rt":5599}
+{"k":"udp_datagram","client":"::1:36001","dir":"cli→be","bytes":55,"head":"LOSS 826031976 79 BFA70FF2-2AB4-44AE-BDF6-8815ADC1C9BC⏎","ts":1793825432515,"rt":5599}
+{"k":"udp_datagram","client":"::1:56166","dir":"be→cli","bytes":29,"head":"RECV 79 2418019202 [80 79 0]⏎","ts":1793825432515,"rt":5599}
+{"k":"conn_sample","id":24,"c2b":3670,"b2c":3937,"ts":1793825432655,"rt":5739}
+{"k":"conn_sample","id":28,"c2b":2421,"b2c":1672453471,"ts":1793825432674,"rt":5758}
+{"k":"conn_sample","id":25,"c2b":2223,"b2c":1440065605,"ts":1793825432890,"rt":5974}
+{"k":"conn_sample","id":27,"c2b":2582,"b2c":1698359143,"ts":1793825433042,"rt":6126}
+{"k":"conn_sample","id":26,"c2b":1715,"b2c":1088851350,"ts":1793825433051,"rt":6135}
+{"k":"conn_sample","id":28,"c2b":3012,"b2c":2080393020,"ts":1793825433175,"rt":6259}
+{"k":"conn_sample","id":24,"c2b":4101,"b2c":4446,"ts":1793825433204,"rt":6288}
+{"k":"conn_sample","id":25,"c2b":2610,"b2c":1728065605,"ts":1793825433475,"rt":6559}
+{"k":"conn_sample","id":27,"c2b":3065,"b2c":2080065604,"ts":1793825433568,"rt":6652}
+{"k":"conn_sample","id":26,"c2b":1793,"b2c":1184065607,"ts":1793825433660,"rt":6744}
+{"k":"conn_sample","id":28,"c2b":3247,"b2c":2240065605,"ts":1793825433702,"rt":6786}
+{"k":"conn_sample","id":24,"c2b":4547,"b2c":4922,"ts":1793825433705,"rt":6789}
+{"k":"conn_sample","id":25,"c2b":2915,"b2c":1916678709,"ts":1793825433976,"rt":7060}
+{"k":"conn_sample","id":26,"c2b":1837,"b2c":1216065607,"ts":1793825434187,"rt":7271}
+{"k":"conn_sample","id":24,"c2b":4975,"b2c":5410,"ts":1793825434209,"rt":7293}
+{"k":"conn_sample","id":28,"c2b":3326,"b2c":2304065605,"ts":1793825434345,"rt":7429}
+{"k":"conn_sample","id":25,"c2b":3601,"b2c":2400065605,"ts":1793825434542,"rt":7626}
+{"k":"conn_sample","id":27,"c2b":3596,"b2c":2464065604,"ts":1793825434563,"rt":7647}
+{"k":"conn_sample","id":26,"c2b":2078,"b2c":1376065607,"ts":1793825434702,"rt":7786}
+{"k":"conn_sample","id":24,"c2b":5455,"b2c":5848,"ts":1793825434713,"rt":7797}
+{"k":"conn_sample","id":28,"c2b":3653,"b2c":2497178763,"ts":1793825434966,"rt":8050}
+{"k":"conn_sample","id":27,"c2b":3894,"b2c":2663273795,"ts":1793825435064,"rt":8148}
+{"k":"conn_sample","id":25,"c2b":3954,"b2c":2656065605,"ts":1793825435155,"rt":8239}
+{"k":"conn_sample","id":26,"c2b":2505,"b2c":1696065607,"ts":1793825435256,"rt":8340}
+{"k":"conn_sample","id":24,"c2b":5966,"b2c":6372,"ts":1793825435263,"rt":8347}
+{"k":"conn_sample","id":27,"c2b":4320,"b2c":2984845811,"ts":1793825435565,"rt":8649}
+{"k":"conn_sample","id":28,"c2b":3842,"b2c":2656065605,"ts":1793825435675,"rt":8759}
+{"k":"conn_sample","id":25,"c2b":4373,"b2c":2933168001,"ts":1793825435688,"rt":8772}
+{"k":"conn_sample","id":26,"c2b":2581,"b2c":1749168003,"ts":1793825435776,"rt":8860}
+{"k":"conn_sample","id":24,"c2b":6387,"b2c":6882,"ts":1793825435812,"rt":8896}
+{"k":"conn_sample","id":27,"c2b":4486,"b2c":3074621128,"ts":1793825436067,"rt":9151}
+{"k":"conn_sample","id":28,"c2b":3883,"b2c":2668581293,"ts":1793825436213,"rt":9297}
+{"k":"conn_sample","id":25,"c2b":4877,"b2c":3268390857,"ts":1793825436225,"rt":9309}
+{"k":"conn_sample","id":24,"c2b":6816,"b2c":7333,"ts":1793825436314,"rt":9397}
+{"k":"conn_sample","id":26,"c2b":2994,"b2c":2048654954,"ts":1793825436359,"rt":9443}
+{"k":"conn_sample","id":27,"c2b":4799,"b2c":3300192667,"ts":1793825436669,"rt":9753}
+{"k":"conn_sample","id":25,"c2b":5256,"b2c":3528585143,"ts":1793825436743,"rt":9827}
+{"k":"conn_sample","id":28,"c2b":4108,"b2c":2848654899,"ts":1793825436758,"rt":9842}
+{"k":"conn_sample","id":24,"c2b":7274,"b2c":7783,"ts":1793825436846,"rt":9930}
+{"k":"conn_sample","id":26,"c2b":3275,"b2c":2240065607,"ts":1793825436862,"rt":9946}
+{"k":"heartbeat","conns":28,"closed":22,"bytes":{"A":0,"B":0},"ts":1793825436942,"rt":10026}
+{"k":"conn_sample","id":27,"c2b":4970,"b2c":3456065604,"ts":1793825437182,"rt":10266}
+{"k":"conn_sample","id":28,"c2b":4264,"b2c":2944654952,"ts":1793825437293,"rt":10377}
+{"k":"conn_sample","id":25,"c2b":5351,"b2c":3616065605,"ts":1793825437329,"rt":10413}
+{"k":"conn_sample","id":26,"c2b":3857,"b2c":2636713948,"ts":1793825437375,"rt":10459}
+{"k":"conn_sample","id":24,"c2b":7780,"b2c":8305,"ts":1793825437381,"rt":10465}
+{"k":"conn_sample","id":27,"c2b":5389,"b2c":3769755256,"ts":1793825437683,"rt":10767}
+{"k":"conn_sample","id":25,"c2b":5725,"b2c":3896625104,"ts":1793825437838,"rt":10922}
+{"k":"conn_sample","id":26,"c2b":4001,"b2c":2752065607,"ts":1793825437894,"rt":10977}
+{"k":"conn_sample","id":24,"c2b":8225,"b2c":8756,"ts":1793825437895,"rt":10979}
+{"k":"conn_sample","id":28,"c2b":4305,"b2c":2950289811,"ts":1793825437989,"rt":11073}
+{"k":"conn_sample","id":27,"c2b":5932,"b2c":4118936041,"ts":1793825438318,"rt":11402}
+{"k":"conn_sample","id":25,"c2b":5818,"b2c":3905899076,"ts":1793825438350,"rt":11434}
+{"k":"conn_close","id":28,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":4678,"bytesBe2Cli":3202357457,"durMs":9826,"ts":1793825438359,"rt":11443}
+{"k":"conn_close","id":26,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":4577,"bytesBe2Cli":3147598997,"durMs":9830,"ts":1793825438360,"rt":11444}
+{"k":"conn_open","id":29,"peer":"::1:37320","ts":1793825438361,"rt":11444}
+{"k":"conn_open","id":30,"peer":"::1:37334","ts":1793825438361,"rt":11445}
+{"k":"conn_open","id":31,"peer":"::1:37338","ts":1793825438362,"rt":11446}
+{"k":"conn_sample","id":23,"c2b":56,"b2c":107,"ts":1793825438362,"rt":11446}
+{"k":"conn_route","id":29,"backend":"A","reason":"enc-hello","heldMs":2,"ts":1793825438363,"rt":11446}
+{"k":"conn_open","id":32,"peer":"::1:37348","ts":1793825438363,"rt":11447}
+{"k":"conn_route","id":30,"backend":"A","reason":"enc-hello","heldMs":2,"ts":1793825438363,"rt":11447}
+{"k":"conn_open","id":33,"peer":"::1:37356","ts":1793825438363,"rt":11447}
+{"k":"conn_sample","id":29,"c2b":80,"b2c":68,"ts":1793825438363,"rt":11447}
+{"k":"conn_route","id":31,"backend":"A","reason":"enc-hello","heldMs":1,"ts":1793825438363,"rt":11447}
+{"k":"conn_sample","id":30,"c2b":74,"b2c":69,"ts":1793825438363,"rt":11447}
+{"k":"conn_route","id":32,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825438363,"rt":11447}
+{"k":"conn_route","id":33,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825438363,"rt":11447}
+{"k":"conn_open","id":34,"peer":"::1:37366","ts":1793825438363,"rt":11447}
+{"k":"conn_route","id":34,"backend":"A","reason":"enc-hello","heldMs":0,"ts":1793825438363,"rt":11447}
+{"k":"udp_map","client":"::1:55780","backend":"B","ts":1793825438364,"rt":11448}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 0 CF477350-18B6-42A8-B056-3589BEAE9F25 24238","ts":1793825438364,"rt":11448}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 0 2423867965 [1 0 0]⏎","ts":1793825438367,"rt":11451}
+{"k":"conn_sample","id":31,"c2b":81,"b2c":67,"ts":1793825438377,"rt":11461}
+{"k":"conn_sample","id":33,"c2b":74,"b2c":67,"ts":1793825438377,"rt":11461}
+{"k":"conn_sample","id":32,"c2b":68,"b2c":67,"ts":1793825438377,"rt":11461}
+{"k":"conn_sample","id":34,"c2b":59,"b2c":69,"ts":1793825438377,"rt":11461}
+{"k":"conn_close","id":27,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":5932,"bytesBe2Cli":4122999308,"durMs":9857,"ts":1793825438390,"rt":11474}
+{"k":"conn_close","id":25,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":5818,"bytesBe2Cli":3906359144,"durMs":9861,"ts":1793825438391,"rt":11475}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 1 CF477350-18B6-42A8-B056-3589BEAE9F25 24239","ts":1793825438414,"rt":11498}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 1 2423918024 [2 1 0]⏎","ts":1793825438414,"rt":11498}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 2 CF477350-18B6-42A8-B056-3589BEAE9F25 24239","ts":1793825438466,"rt":11550}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 2 2423968122 [3 2 0]⏎","ts":1793825438468,"rt":11552}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 3 CF477350-18B6-42A8-B056-3589BEAE9F25 24240","ts":1793825438515,"rt":11599}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 3 2424019165 [4 3 0]⏎","ts":1793825438517,"rt":11601}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 4 CF477350-18B6-42A8-B056-3589BEAE9F25 24240","ts":1793825438565,"rt":11649}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 4 2424069253 [5 4 0]⏎","ts":1793825438566,"rt":11650}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 5 CF477350-18B6-42A8-B056-3589BEAE9F25 24241","ts":1793825438615,"rt":11699}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 5 2424119330 [6 5 0]⏎","ts":1793825438617,"rt":11700}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 6 CF477350-18B6-42A8-B056-3589BEAE9F25 24241","ts":1793825438667,"rt":11751}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 6 2424169417 [7 6 0]⏎","ts":1793825438669,"rt":11753}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 7 CF477350-18B6-42A8-B056-3589BEAE9F25 24242","ts":1793825438716,"rt":11800}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 7 2424219516 [8 7 0]⏎","ts":1793825438716,"rt":11800}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 8 CF477350-18B6-42A8-B056-3589BEAE9F25 24242","ts":1793825438766,"rt":11850}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":26,"head":"RECV 8 2424269617 [9 8 0]⏎","ts":1793825438767,"rt":11851}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":66,"head":"LOSS 1339043518 9 CF477350-18B6-42A8-B056-3589BEAE9F25 24243","ts":1793825438816,"rt":11900}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":27,"head":"RECV 9 2424319807 [10 9 0]⏎","ts":1793825438816,"rt":11900}
+{"k":"conn_close","id":23,"backend":"B","mode":"phase","routed":true,"bytesCli2Be":56,"bytesBe2Cli":107,"durMs":10334,"ts":1793825438863,"rt":11947}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 10 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825438867,"rt":11951}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 10 2424369924 [11 10 0]⏎","ts":1793825438868,"rt":11952}
+{"k":"conn_sample","id":30,"c2b":32000074,"b2c":125,"ts":1793825438887,"rt":11971}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":2225,"ts":1793825438896,"rt":11980}
+{"k":"conn_sample","id":34,"c2b":548,"b2c":579,"ts":1793825438897,"rt":11981}
+{"k":"conn_sample","id":33,"c2b":224000074,"b2c":457,"ts":1793825438914,"rt":11998}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 11 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825438916,"rt":12000}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 11 2424420018 [12 11 0]⏎","ts":1793825438916,"rt":12000}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 12 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825438967,"rt":12051}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 12 2424471278 [13 12 0]⏎","ts":1793825438968,"rt":12052}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 13 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439018,"rt":12102}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 13 2424521371 [14 13 0]⏎","ts":1793825439018,"rt":12102}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 14 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439067,"rt":12151}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 14 2424571481 [15 14 0]⏎","ts":1793825439068,"rt":12152}
+{"k":"conn_sample","id":32,"c2b":32000068,"b2c":123,"ts":1793825439091,"rt":12175}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 15 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439117,"rt":12201}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 15 2424621572 [16 15 0]⏎","ts":1793825439118,"rt":12202}
+{"k":"conn_sample","id":29,"c2b":256000080,"b2c":506,"ts":1793825439119,"rt":12203}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 16 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439167,"rt":12251}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 16 2424671659 [17 16 0]⏎","ts":1793825439168,"rt":12252}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 17 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439222,"rt":12306}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 17 2424721747 [18 17 0]⏎","ts":1793825439224,"rt":12308}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 18 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439269,"rt":12353}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 18 2424771829 [19 18 0]⏎","ts":1793825439270,"rt":12354}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 19 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439344,"rt":12428}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 19 2424846185 [20 19 0]⏎","ts":1793825439347,"rt":12431}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 20 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439392,"rt":12476}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 20 2424896276 [21 20 0]⏎","ts":1793825439392,"rt":12476}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":4083,"ts":1793825439406,"rt":12490}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 21 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439442,"rt":12526}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 21 2424946368 [22 21 0]⏎","ts":1793825439442,"rt":12526}
+{"k":"conn_sample","id":34,"c2b":1026,"b2c":1075,"ts":1793825439443,"rt":12527}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 22 CF477350-18B6-42A8-B056-3589BEAE9F25 2424","ts":1793825439492,"rt":12576}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 22 2424996452 [23 22 0]⏎","ts":1793825439492,"rt":12576}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 23 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439543,"rt":12627}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 23 2425046530 [24 23 0]⏎","ts":1793825439545,"rt":12629}
+{"k":"conn_sample","id":33,"c2b":320000074,"b2c":606,"ts":1793825439574,"rt":12658}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 24 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439593,"rt":12677}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 24 2425096636 [25 24 0]⏎","ts":1793825439596,"rt":12680}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 25 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439645,"rt":12729}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 25 2425146757 [26 25 0]⏎","ts":1793825439649,"rt":12733}
+{"k":"conn_sample","id":29,"c2b":576000080,"b2c":1011,"ts":1793825439668,"rt":12752}
+{"k":"conn_sample","id":32,"c2b":96000068,"b2c":228,"ts":1793825439669,"rt":12753}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 26 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439695,"rt":12779}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 26 2425196839 [27 26 0]⏎","ts":1793825439699,"rt":12783}
+{"k":"conn_sample","id":30,"c2b":224000074,"b2c":458,"ts":1793825439743,"rt":12827}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 27 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439744,"rt":12828}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 27 2425246917 [28 27 0]⏎","ts":1793825439744,"rt":12828}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 28 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439794,"rt":12878}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 28 2425297023 [29 28 0]⏎","ts":1793825439795,"rt":12879}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 29 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439844,"rt":12928}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 29 2425347105 [30 29 0]⏎","ts":1793825439846,"rt":12930}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 30 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439895,"rt":12979}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 30 2425397184 [31 30 0]⏎","ts":1793825439897,"rt":12981}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":6041,"ts":1793825439907,"rt":12991}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 31 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439945,"rt":13028}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 31 2425447291 [32 31 0]⏎","ts":1793825439946,"rt":13030}
+{"k":"conn_sample","id":34,"c2b":1471,"b2c":1572,"ts":1793825439947,"rt":13030}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 32 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825439994,"rt":13078}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 32 2425497375 [33 32 0]⏎","ts":1793825439996,"rt":13080}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 33 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440045,"rt":13129}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 33 2425547452 [34 33 0]⏎","ts":1793825440045,"rt":13129}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 34 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440096,"rt":13180}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 34 2425597532 [35 34 0]⏎","ts":1793825440099,"rt":13183}
+{"k":"conn_sample","id":33,"c2b":416000074,"b2c":769,"ts":1793825440142,"rt":13226}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 35 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440143,"rt":13227}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 35 2425647720 [36 35 0]⏎","ts":1793825440145,"rt":13229}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 36 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440201,"rt":13285}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 36 2425699191 [37 36 0]⏎","ts":1793825440206,"rt":13290}
+{"k":"conn_sample","id":29,"c2b":928000080,"b2c":1606,"ts":1793825440217,"rt":13301}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 37 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440248,"rt":13332}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 37 2425749272 [38 37 0]⏎","ts":1793825440255,"rt":13339}
+{"k":"conn_sample","id":30,"c2b":256000074,"b2c":508,"ts":1793825440281,"rt":13365}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 38 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440296,"rt":13380}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 38 2425799427 [39 38 0]⏎","ts":1793825440297,"rt":13381}
+{"k":"conn_sample","id":32,"c2b":160000068,"b2c":343,"ts":1793825440309,"rt":13393}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 39 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440346,"rt":13430}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 39 2425849534 [40 39 0]⏎","ts":1793825440346,"rt":13430}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 40 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440395,"rt":13479}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 40 2425899605 [41 40 0]⏎","ts":1793825440396,"rt":13480}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":8069,"ts":1793825440423,"rt":13507}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 41 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440445,"rt":13529}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 41 2425949692 [42 41 0]⏎","ts":1793825440446,"rt":13530}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 42 CF477350-18B6-42A8-B056-3589BEAE9F25 2425","ts":1793825440497,"rt":13580}
+{"k":"conn_sample","id":34,"c2b":1961,"b2c":2075,"ts":1793825440497,"rt":13581}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 42 2425999795 [43 42 0]⏎","ts":1793825440497,"rt":13581}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 43 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440546,"rt":13630}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 43 2426049886 [44 43 0]⏎","ts":1793825440547,"rt":13631}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 44 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440598,"rt":13682}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 44 2426099977 [45 44 0]⏎","ts":1793825440600,"rt":13684}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 45 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440646,"rt":13730}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 45 2426150014 [46 45 0]⏎","ts":1793825440648,"rt":13732}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 46 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440697,"rt":13781}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 46 2426200091 [47 46 0]⏎","ts":1793825440699,"rt":13783}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 47 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440747,"rt":13831}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 47 2426250179 [48 47 0]⏎","ts":1793825440750,"rt":13834}
+{"k":"conn_sample","id":30,"c2b":672000074,"b2c":1166,"ts":1793825440796,"rt":13880}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 48 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440796,"rt":13880}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 48 2426300260 [49 48 0]⏎","ts":1793825440797,"rt":13881}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 49 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440846,"rt":13930}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 49 2426350464 [50 49 0]⏎","ts":1793825440847,"rt":13931}
+{"k":"conn_sample","id":32,"c2b":192000068,"b2c":389,"ts":1793825440851,"rt":13935}
+{"k":"conn_sample","id":33,"c2b":544000074,"b2c":968,"ts":1793825440871,"rt":13955}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 50 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440898,"rt":13982}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 50 2426401448 [51 50 0]⏎","ts":1793825440899,"rt":13983}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":10189,"ts":1793825440939,"rt":14023}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 51 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440948,"rt":14032}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 51 2426451534 [52 51 0]⏎","ts":1793825440950,"rt":14034}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 52 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825440999,"rt":14083}
+{"k":"conn_sample","id":34,"c2b":2394,"b2c":2510,"ts":1793825441000,"rt":14084}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 52 2426501627 [53 52 0]⏎","ts":1793825441000,"rt":14084}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 53 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441048,"rt":14132}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 53 2426551707 [54 53 0]⏎","ts":1793825441050,"rt":14134}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 54 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441098,"rt":14182}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 54 2426601853 [55 54 0]⏎","ts":1793825441098,"rt":14182}
+{"k":"conn_sample","id":29,"c2b":1024000080,"b2c":1796,"ts":1793825441109,"rt":14193}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 55 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441154,"rt":14238}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 55 2426651945 [56 55 0]⏎","ts":1793825441159,"rt":14243}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 56 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441198,"rt":14282}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 56 2426702010 [57 56 0]⏎","ts":1793825441198,"rt":14282}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 57 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441249,"rt":14333}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 57 2426752119 [58 57 0]⏎","ts":1793825441251,"rt":14335}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 58 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441302,"rt":14386}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 58 2426804944 [59 58 0]⏎","ts":1793825441304,"rt":14388}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 59 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441352,"rt":14436}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 59 2426855050 [60 59 0]⏎","ts":1793825441353,"rt":14437}
+{"k":"conn_sample","id":32,"c2b":224000068,"b2c":454,"ts":1793825441364,"rt":14448}
+{"k":"conn_close","id":24,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":8616,"bytesBe2Cli":9185,"durMs":12846,"ts":1793825441377,"rt":14460}
+{"k":"conn_sample","id":30,"c2b":928000074,"b2c":1606,"ts":1793825441388,"rt":14472}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 60 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441401,"rt":14485}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 60 2426905139 [61 60 0]⏎","ts":1793825441401,"rt":14485}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":12277,"ts":1793825441443,"rt":14527}
+{"k":"conn_sample","id":33,"c2b":576000074,"b2c":1013,"ts":1793825441449,"rt":14533}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 61 CF477350-18B6-42A8-B056-3589BEAE9F25 2426","ts":1793825441451,"rt":14535}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 61 2426955239 [62 61 0]⏎","ts":1793825441451,"rt":14535}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 62 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441504,"rt":14588}
+{"k":"conn_sample","id":34,"c2b":2798,"b2c":2973,"ts":1793825441507,"rt":14591}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 62 2427005383 [63 62 0]⏎","ts":1793825441507,"rt":14591}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 63 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441556,"rt":14640}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 63 2427055469 [64 63 0]⏎","ts":1793825441558,"rt":14642}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 64 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441603,"rt":14687}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 64 2427105562 [65 64 0]⏎","ts":1793825441606,"rt":14690}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 65 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441654,"rt":14738}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 65 2427155654 [66 65 0]⏎","ts":1793825441663,"rt":14747}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 66 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441705,"rt":14789}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 66 2427206870 [67 66 0]⏎","ts":1793825441706,"rt":14790}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 67 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441754,"rt":14838}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 67 2427256953 [68 67 0]⏎","ts":1793825441760,"rt":14844}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 68 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441803,"rt":14887}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 68 2427307072 [69 68 0]⏎","ts":1793825441805,"rt":14889}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 69 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441854,"rt":14938}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 69 2427357154 [70 69 0]⏎","ts":1793825441855,"rt":14939}
+{"k":"conn_sample","id":29,"c2b":1312000080,"b2c":2260,"ts":1793825441882,"rt":14965}
+{"k":"conn_sample","id":32,"c2b":512000068,"b2c":909,"ts":1793825441899,"rt":14983}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 70 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441904,"rt":14988}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 70 2427407237 [71 70 0]⏎","ts":1793825441910,"rt":14993}
+{"k":"heartbeat","conns":34,"closed":28,"bytes":{"A":0,"B":0},"ts":1793825441943,"rt":15027}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 71 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825441953,"rt":15037}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 71 2427457374 [72 71 0]⏎","ts":1793825441953,"rt":15037}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":14429,"ts":1793825441963,"rt":15047}
+{"k":"conn_sample","id":30,"c2b":1024000074,"b2c":1798,"ts":1793825442000,"rt":15084}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 72 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825442004,"rt":15088}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 72 2427507438 [73 72 0]⏎","ts":1793825442006,"rt":15090}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 73 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825442055,"rt":15139}
+{"k":"conn_sample","id":34,"c2b":3239,"b2c":3484,"ts":1793825442057,"rt":15141}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 73 2427557521 [74 73 0]⏎","ts":1793825442057,"rt":15141}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 74 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825442105,"rt":15188}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 74 2427607609 [75 74 0]⏎","ts":1793825442105,"rt":15189}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 75 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825442156,"rt":15240}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 75 2427657691 [76 75 0]⏎","ts":1793825442158,"rt":15242}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 76 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825442205,"rt":15289}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 76 2427707774 [77 76 0]⏎","ts":1793825442207,"rt":15291}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 77 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825442255,"rt":15339}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 77 2427757857 [78 77 0]⏎","ts":1793825442260,"rt":15344}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 78 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825442310,"rt":15394}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 78 2427810023 [79 78 0]⏎","ts":1793825442312,"rt":15396}
+{"k":"udp_datagram","client":"::1:55780","dir":"cli→be","bytes":67,"head":"LOSS 1339043518 79 CF477350-18B6-42A8-B056-3589BEAE9F25 2427","ts":1793825442358,"rt":15442}
+{"k":"udp_datagram","client":"::1:55780","dir":"be→cli","bytes":29,"head":"RECV 79 2427860109 [80 79 0]⏎","ts":1793825442358,"rt":15442}
+{"k":"conn_sample","id":33,"c2b":768000074,"b2c":1344,"ts":1793825442397,"rt":15481}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":16507,"ts":1793825442480,"rt":15564}
+{"k":"conn_sample","id":29,"c2b":1440000080,"b2c":2483,"ts":1793825442586,"rt":15670}
+{"k":"conn_sample","id":34,"c2b":3712,"b2c":3971,"ts":1793825442606,"rt":15690}
+{"k":"conn_sample","id":30,"c2b":1152000074,"b2c":2005,"ts":1793825442620,"rt":15704}
+{"k":"conn_sample","id":32,"c2b":800000068,"b2c":1385,"ts":1793825442642,"rt":15726}
+{"k":"conn_sample","id":33,"c2b":1056000074,"b2c":1852,"ts":1793825442919,"rt":16003}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":18704,"ts":1793825442986,"rt":16070}
+{"k":"conn_sample","id":29,"c2b":1632000080,"b2c":2784,"ts":1793825443099,"rt":16183}
+{"k":"conn_sample","id":34,"c2b":4150,"b2c":4431,"ts":1793825443113,"rt":16197}
+{"k":"conn_sample","id":30,"c2b":1184000074,"b2c":2053,"ts":1793825443244,"rt":16328}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":20823,"ts":1793825443493,"rt":16577}
+{"k":"conn_sample","id":34,"c2b":4615,"b2c":4888,"ts":1793825443616,"rt":16700}
+{"k":"conn_sample","id":33,"c2b":1184000074,"b2c":2059,"ts":1793825443656,"rt":16740}
+{"k":"conn_sample","id":29,"c2b":1888000080,"b2c":3217,"ts":1793825443702,"rt":16786}
+{"k":"conn_sample","id":32,"c2b":960000068,"b2c":1670,"ts":1793825443773,"rt":16857}
+{"k":"conn_sample","id":30,"c2b":1568000074,"b2c":2684,"ts":1793825443903,"rt":16987}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":22851,"ts":1793825444008,"rt":17092}
+{"k":"conn_sample","id":34,"c2b":5070,"b2c":5365,"ts":1793825444145,"rt":17229}
+{"k":"conn_sample","id":33,"c2b":1248000074,"b2c":2169,"ts":1793825444279,"rt":17363}
+{"k":"conn_sample","id":32,"c2b":1152000068,"b2c":2001,"ts":1793825444348,"rt":17432}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":24791,"ts":1793825444511,"rt":17595}
+{"k":"conn_sample","id":29,"c2b":2112000080,"b2c":3592,"ts":1793825444519,"rt":17603}
+{"k":"conn_sample","id":30,"c2b":1760000074,"b2c":3004,"ts":1793825444595,"rt":17679}
+{"k":"conn_sample","id":34,"c2b":5517,"b2c":5847,"ts":1793825444649,"rt":17733}
+{"k":"conn_sample","id":33,"c2b":1472000074,"b2c":2543,"ts":1793825444794,"rt":17878}
+{"k":"conn_sample","id":32,"c2b":1312000068,"b2c":2257,"ts":1793825444908,"rt":17992}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":27025,"ts":1793825445023,"rt":18107}
+{"k":"conn_sample","id":34,"c2b":5945,"b2c":6307,"ts":1793825445153,"rt":18237}
+{"k":"conn_sample","id":30,"c2b":2048000074,"b2c":3480,"ts":1793825445181,"rt":18265}
+{"k":"conn_sample","id":29,"c2b":2144000080,"b2c":3636,"ts":1793825445350,"rt":18434}
+{"k":"conn_sample","id":33,"c2b":1728000074,"b2c":2958,"ts":1793825445375,"rt":18459}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":29236,"ts":1793825445542,"rt":18626}
+{"k":"conn_sample","id":34,"c2b":6454,"b2c":6808,"ts":1793825445698,"rt":18782}
+{"k":"conn_sample","id":32,"c2b":1472000068,"b2c":2525,"ts":1793825445854,"rt":18938}
+{"k":"conn_sample","id":29,"c2b":2624000080,"b2c":4439,"ts":1793825445975,"rt":19059}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":31261,"ts":1793825446060,"rt":19144}
+{"k":"conn_sample","id":30,"c2b":2144000074,"b2c":3632,"ts":1793825446158,"rt":19242}
+{"k":"conn_sample","id":34,"c2b":6885,"b2c":7311,"ts":1793825446199,"rt":19283}
+{"k":"conn_sample","id":32,"c2b":1824000068,"b2c":3093,"ts":1793825446457,"rt":19540}
+{"k":"conn_sample","id":33,"c2b":1792000074,"b2c":3059,"ts":1793825446474,"rt":19558}
+{"k":"conn_sample","id":29,"c2b":2880000080,"b2c":4854,"ts":1793825446501,"rt":19584}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":33355,"ts":1793825446567,"rt":19651}
+{"k":"conn_sample","id":34,"c2b":7327,"b2c":7767,"ts":1793825446703,"rt":19787}
+{"k":"conn_sample","id":30,"c2b":2368000074,"b2c":4016,"ts":1793825446712,"rt":19796}
+{"k":"heartbeat","conns":34,"closed":28,"bytes":{"A":0,"B":0},"ts":1793825446944,"rt":20027}
+{"k":"conn_sample","id":32,"c2b":1920000068,"b2c":3269,"ts":1793825446978,"rt":20062}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":35437,"ts":1793825447074,"rt":20158}
+{"k":"conn_sample","id":34,"c2b":7785,"b2c":8275,"ts":1793825447255,"rt":20339}
+{"k":"conn_sample","id":33,"c2b":1856000074,"b2c":3167,"ts":1793825447263,"rt":20346}
+{"k":"conn_sample","id":29,"c2b":3072000080,"b2c":5163,"ts":1793825447473,"rt":20557}
+{"k":"conn_sample","id":30,"c2b":2592000074,"b2c":4387,"ts":1793825447489,"rt":20573}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":37536,"ts":1793825447590,"rt":20674}
+{"k":"conn_sample","id":32,"c2b":2272000068,"b2c":3842,"ts":1793825447594,"rt":20678}
+{"k":"conn_sample","id":34,"c2b":8187,"b2c":8714,"ts":1793825447762,"rt":20845}
+{"k":"conn_sample","id":33,"c2b":1984000074,"b2c":3380,"ts":1793825447850,"rt":20934}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":39578,"ts":1793825448091,"rt":21175}
+{"k":"conn_sample","id":32,"c2b":2752000068,"b2c":4631,"ts":1793825448168,"rt":21252}
+{"k":"conn_sample","id":29,"c2b":3136000080,"b2c":5255,"ts":1793825448213,"rt":21297}
+{"k":"conn_sample","id":30,"c2b":2720000074,"b2c":4578,"ts":1793825448262,"rt":21346}
+{"k":"conn_sample","id":34,"c2b":8628,"b2c":9169,"ts":1793825448263,"rt":21347}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":41814,"ts":1793825448597,"rt":21681}
+{"k":"conn_sample","id":32,"c2b":3040000068,"b2c":5103,"ts":1793825448682,"rt":21766}
+{"k":"conn_sample","id":29,"c2b":3296000080,"b2c":5526,"ts":1793825448763,"rt":21847}
+{"k":"conn_sample","id":34,"c2b":9082,"b2c":9646,"ts":1793825448771,"rt":21855}
+{"k":"conn_sample","id":33,"c2b":2080000074,"b2c":3549,"ts":1793825448786,"rt":21870}
+{"k":"conn_sample","id":31,"c2b":172,"b2c":44004,"ts":1793825449099,"rt":22183}
+{"k":"conn_sample","id":30,"c2b":2848000074,"b2c":4778,"ts":1793825449205,"rt":22288}
+{"k":"conn_sample","id":32,"c2b":3168000068,"b2c":5298,"ts":1793825449211,"rt":22295}
+{"k":"conn_sample","id":29,"c2b":3584000080,"b2c":6040,"ts":1793825449292,"rt":22376}
+{"k":"conn_sample","id":34,"c2b":9571,"b2c":10113,"ts":1793825449318,"rt":22402}
+{"k":"conn_sample","id":33,"c2b":2208000074,"b2c":3742,"ts":1793825449456,"rt":22539}
+{"k":"conn_close","id":33,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":2240000074,"bytesBe2Cli":3797,"durMs":11131,"ts":1793825449494,"rt":22578}
+{"k":"conn_close","id":32,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":3200000068,"bytesBe2Cli":5344,"durMs":11134,"ts":1793825449498,"rt":22581}
+{"k":"conn_close","id":31,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":172,"bytesBe2Cli":45644,"durMs":11145,"ts":1793825449507,"rt":22591}
+{"k":"conn_close","id":29,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":3776000080,"bytesBe2Cli":6362,"durMs":11164,"ts":1793825449524,"rt":22608}
+{"k":"conn_close","id":30,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":2897041458,"bytesBe2Cli":4845,"durMs":11167,"ts":1793825449528,"rt":22612}
+{"k":"conn_close","id":34,"backend":"A","mode":"phase","routed":true,"bytesCli2Be":9698,"bytesBe2Cli":10252,"durMs":11165,"ts":1793825449528,"rt":22612}
+{"k":"summary","signal":"SIGTERM","conns":34,"closed":34,"bytesCliToBackends":{"A":0,"B":0},"wallMs":23667,"udpClients":[{"client":"::1:56166","backend":"B","sent":196,"recv":196},{"client":"::1:36001","backend":"B","sent":196,"recv":0},{"client":"::1:55780","backend":"B","sent":221,"recv":221}],"ts":1793825450583,"rt":23667}

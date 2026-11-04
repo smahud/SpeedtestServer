@@ -13,14 +13,17 @@ eksperimen diversion, evidence per-run, dan 9 laporan sesuai format master promp
 
 | Komponen | Status |
 |---|---|
-| Audit dua repositori (Stage 1) | ✅ selesai — lihat `analysis/STAGE1_REPO_AUDIT.md` |
-| Verifikasi binari resmi (SHA-256 vs manifest) | ✅ CLI `5690596c…cfeeb7` = manifest; daemon `ce180aa3…598159` = manifest |
+| Audit dua repositori (Stage 1) + rekonsiliasi evidence & koreksi label | ✅ selesai — `analysis/STAGE1_REPO_AUDIT.md` + **`analysis/EVIDENCE_RECONCILIATION.md`** (sesi-2) |
+| Verifikasi binari resmi (SHA-256 vs manifest) | ✅ CLI `5690596c…cfeeb7`; daemon `ce180aa3…598159` (diverifikasi ulang sesi-2 setelah lab dibangun ulang) |
 | Instrumen **diverter.mjs** (TCP+UDP, 5 policy, replay+swallow) | ✅ tervalidasi 4 mode via klien sintetis (`evidence/synth-validation/`) |
-| Konfig-proxy live-curl + offline (non-publishing) | ✅ live-curl = satu-satunya yang lolos rate-limit CDN (Node https kena 429) |
-| **Kontrol F0** — semua→daemon resmi via diverter | ✅ **PASS** (exit 0, loss 0, 17,18/16,99 GB; NAT tidak mendistorsi; RECV melewati diverter — F-7; kanal loss selalu plaintext) |
-| **Kontrol F1/C1** — semua→STS via diverter | ✅ **PASS** (exit 0, loss 0, 12,09/8,16 GB; atribusi byte cocok) |
-| Matriks F2–F8 + G dengan CLI resmi | ⛔ **BLOCKED** oleh kuota config API (~4 fetch sukses lalu 429 sepanjang sisa sesi; licenseKey wajib live berumur detik) — perintah siap-run di `reports/AGENT_HANDOFF.md` §3 |
-| 9 laporan + handoff | ✅ ditulis (F2+ diperbarui otomatis saat matriks jalan) |
+| Konfig-proxy live-curl + offline (non-publishing) | ✅ live-curl = satu-satunya yang lolos rate-limit CDN |
+| **Kontrol F0** — semua→daemon resmi via diverter | ✅ **PASS** (sesi-1) |
+| **Kontrol F1/C1** — semua→STS via diverter | ✅ **PASS** (sesi-1) |
+| **F2a** — handshake/enc→resmi, loss+UDP→STS (phase) | ✅ **PASS 3/3** (sesi-2) — cross-backend DALAM SATU KONEKSI (prefix replay) |
+| **F5-n22** — firstN: seleksi→resmi, SELURUH pengukuran→STS | ✅ **PASS 3/3** (sesi-2) ★ **arsitektur B terverifikasi**; fallback plaintext per koneksi setelah probe terenkripsi sukses |
+| **F8a** — TCP→A, UDP→B (split loss) | ✅ run exit 0 loss 0 — **temuan: akuntansi loss ter-DECouple senyap** (PLOSS backend tak melihat UDP; 0% tak didukung pengukuran nyata) |
+| F2b, F5 titik lain (n=28/20/12/…), F7b, F8b, G | ⛔ antre kuota (karakter: ~5–6 sukses per ~30–45 menit per egress IP) |
+| 9 laporan + handoff + timeline generator | ✅ ditulis/diperbarui sesi-2 (`harness/gen-timeline.mjs` + `timeline.md`/`timeline.csv` per run) |
 
 ## Struktur
 
@@ -29,12 +32,16 @@ harness/
   diverter.mjs              ★ instrumen utama — gateway diversion level koneksi &
                              per-perintah (policy: all / firstN / phase / cmd /
                              blackhole; UDP A|B|drop; JSONL audit log penuh)
-  offline-config-proxy.mjs  config-proxy lab (snapshot offline, non-publishing,
-                             rewrite-all server entries → diverter)
+  live-config-proxy.mjs     config-proxy fetch LIVE via curl (default — satu-satunya
+                             yang lolos rate-limit CDN; licenseKey harus segar)
+  offline-config-proxy.mjs   varian snapshot (hanya untuk smoke test — kunci snapshot
+                             usang → InvalidLicenseKey)
   run-diversion.sh          orkestrator 1 eksperimen = 1 siklus penuh
                              (preflight → backend fresh → diverter → proxy → CLI → atribusi)
   analyze-run.mjs           analisis atribusi pasca-run (diverter+STS+proxy+CLI)
   analyze-conn-flows.mjs    rekonstruksi urutan perintah NetGauge per koneksi
+  gen-timeline.mjs          timeline lengkap per-run (master prompt §11) →
+                             timeline.md + timeline.csv (kolom wajib + basis fase)
   netgauge-synth.mjs        klien sintetis peniru pola koneksi CLI (validasi instrumen)
   fetch-config.sh           pengambil config live dengan query persis CLI (retry/backoff)
   certs -> ../../harness/certs   (PKI lab yang sama dengan validation/harness)

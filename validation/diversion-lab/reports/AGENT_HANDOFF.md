@@ -2,128 +2,100 @@
 
 > Dokumen ini ditulis agar agent mana pun dapat melanjutkan pekerjaan
 > diversion-lab TANPA membaca histori percakapan. Terakhir diperbarui:
-> 2026-11-04 ~19:35 UTC oleh sesi diversion-lab (audit + instrumen + F0/C1).
+> **2026-11-04 ~21:40 UTC oleh sesi-2** (F2a×3 + F5-n22×3 + F8a + F8b +
+> F5-n28 TERVERIFIKASI; lab dibangun ulang dari nol setelah recycle sandbox).
 
 ## 1. Konteks project (2 paragraf)
 
 Repositori `smahud/SpeedtestServer` adalah implementasi open-source yang
 kompatibel dengan OoklaServer (profil NetGauge + HTTP legacy + UDP loss + TLS),
 sudah tervalidasi end-to-end terhadap CLI resmi (lihat `validation/README` + `validation/FINAL_REPORT.md`).
-Pertanyaan riset yang sedang dikerjakan di direktori ini (`validation/diversion-lab/`):
-**dapatkah CLI resmi yang tidak dimodifikasi melakukan koneksi/handshake awalnya
-ke backend OoklaServer resmi sementara operasi latency/download/upload/packet-loss
+Pertanyaan riset di direktori ini (`validation/diversion-lab/`): **dapatkah CLI
+resmi yang tidak dimodifikasi melakukan koneksi/handshake awalnya ke backend
+OoklaServer resmi sementara operasi latency/download/upload/packet-loss
 berikutnya ditangani backend lain, dan di batas koneksi/protokol mana persisnya
 diversion terjadi tanpa merusak pengukuran?**
 
-Dua backend tersedia di lab: **A** = daemon OoklaServer resmi 2.11.5.2
-(127.0.0.1:18080) dan **B** = SpeedtestServer TS (127.0.0.1:8080). CLI resmi
-diarahkan ke **diverter** (127.0.0.1:9090) via config-proxy yang menimpa
-`servers[].host` pada config asli (satu-satunya cara — CLI hanya menguji server
-dari daftar config engine-nya, dan config dilindungi licenseKey anti-tamper).
+**JAWABAN INTI SUDAH TERVERIFIKASI (sesi-2):** YA — 3/3 (F5-n22): seleksi+
+handshake terenkripsi di daemon resmi (koneksi 1–22), SELURUH pengukuran
+(koneksi 23–34) + UDP di SpeedtestServer TS; exit 0, loss 0, byte konsisten.
+Batas paling tajam = **antara winner-probe (conn 22) dan koneksi pengukuran
+pertama (conn 23)**. CLI membawa pembelajaran enkripsi dari probe (hello biner
+di koneksi pengukuran) TAPI pulih per koneksi setelah ERROR (`«BIN»`→`HI
+<UUID>`→perintah) dan berhenti mencoba enkripsi setelahnya. Laporan utama:
+`reports/EXECUTIVE_CONCLUSION.md` + `reports/BACKEND_DIVERSION_RESULTS.md`.
 
 ## 2. Yang SUDAH selesai (jangan kerjakan ulang)
 
-1. **Stage 1 audit** kedua repo → `analysis/STAGE1_REPO_AUDIT.md`
-   (commit `7b58988b` SpeedtestServer, `bd490eb` SpeedtestHost-Tester).
-2. **Verifikasi binari**: CLI `5690596c…cfeeb7` ✓, daemon `ce180aa3…598159` ✓
-   (cocok `validation/REFERENCE_BINARY_MANIFEST.md`). Binari hidup di
-   `/home/z/my-project/lab/` (LUAR repo — jangan pernah commit).
-3. **Instrumen diverter** (`harness/diverter.mjs`) — 5 policy (all/firstN/
-   phase/cmd/blackhole) + forward UDP + log audit JSONL; **tervalidasi 4 mode**
-   dengan klien sintetis (`evidence/synth-validation/`).
-4. **Orkestrator** (`harness/run-diversion.sh`) — 1 invocation = 1 eksperimen
-   lengkap (backend fresh + diverter + config-proxy + CLI + analisis atribusi).
-5. **Kontrol terverifikasi dengan CLI resmi**:
-   - `evidence/c1-all-b/` — semua→B: **exit 0, loss 0, 12,09/8,16 GB** ✓
-   - `evidence/f0-all-a/` — semua→A via diverter (NAT): **exit 0, loss 0,
-     17,18/16,99 GB** ✓ → F8c terjawab: NAT diverter TIDAK mendistorsi loss
-     (kontras dengan recording-relay F-7 repo; di loopback IP TCP==IP UDP).
-   - F0 juga membuktikan: daemon resmi MENERIMA hello terenkripsi CLI dan
-     seluruh run berjalan terenkripsi (C1 = fallback plaintext).
-6. **Peta protokol per fase** dari run nyata → `reports/NETGAUGE_SESSION_MAP.md`
-   (11 probe + 11 zero-byte + winner + loss + 2 pingmon + 4 dn + upctl + 4 up).
-7. **Karakterisasi config API** (lihat §4 kendala).
+1. **Sesi-1** (2026-11-04 awal): audit repo, verifikasi binari, instrumen
+   diverter + validasi sintetis S1–S4, kontrol C1 (all→B) + F0 (all→A),
+   peta protokol, karakterisasi kuota. Laporan 9 + handoff lama (riwayat
+   commit `fd40c37`).
+2. **Sesi-2** (2026-11-04 20:42→): lab dibangun ulang dari nol (sandbox
+   recycle — `lab/` di luar repo hilang; prosedur: `scripts/rebuild-lab.sh`
+   di luar repo pada mesin sesi, atau ikuti REPRODUCE.md + README lab);
+   binari diverifikasi ulang vs manifest; **F2a PASS 3/3** (`evidence/f2a{,-r2,-r3}`),
+   **F5-n22 PASS 3/3** (`evidence/f5-n22{,-r2,-r3}` — arsitektur B), **F8a**
+   (split loss TCP→A/UDP→B: exit 0, loss 0 SENYAP — akuntansi ter-DECouple),
+   **F8b** (TCP→B/UDP→A: exit 0, **field packetLoss ABSENT** — daemon tanpa
+   INITPLOSS tidak membalas RECV), **F5-n28** (dl→A enc, ul→B fallback, loss+UDP→A:
+   exit 0 loss 0 — batas dl↔ul bersih).
+3. **Stage-1 rekonsiliasi + koreksi label** — `analysis/EVIDENCE_RECONCILIATION.md`
+   (mislabeled "dibuktikan F2a/F4" & "[V]" lama dikoreksi).
+4. **Timeline generator** — `harness/gen-timeline.mjs` → `timeline.md` +
+   `timeline.csv` per run (kolom wajib master prompt §11, basis fase eksplisit,
+   tidak pernah menginfer perintah dari payload terenkripsi).
+5. **Perbaikan instrumen**: `analyze-run.mjs` (bug label rewritten-ids);
+   `run-diversion.sh` header (default live proxy).
 
-## 3. Yang BELUM selesai (urutan prioritas)
+## 3. Yang BELUM selesai (urutan prioritas, semua butuh 1 fetch config)
 
 | # | Eksperimen | Perintah (dari `harness/`) | Pertanyaan |
 |---|---|---|---|
-| 1 | **F2a** (INTI) | `EXP_ID=f2a POLICY="phase:pre=A,enc=A,sel=A,ping=B,loss=B,dn=B,up=B,upctl=B" UDP=B ./run-diversion.sh` | handshake→daemon resmi, pengukuran→STS: apakah test lengkap? Apa loss yang dilaporkan? |
-| 2 | F2b | `EXP_ID=f2b POLICY="phase:pre=B,enc=B,sel=B,ping=A,loss=A,dn=A,up=A,upctl=A" UDP=A ./run-diversion.sh` | arah balik |
-| 3 | F8a | `EXP_ID=f8a POLICY="all:A" UDP=B ./run-diversion.sh` | TCP→A, UDP→B: loss dari mana? |
-| 4 | F7b | `EXP_ID=f7b POLICY="cmd:hi=A,getip=A,caps=A,ping=A,dn=B,up=B,upctl=B,loss=B,ploss=B" UDP=A ./run-diversion.sh` | split per-perintah |
-| 5 | F3 | `EXP_ID=f3 POLICY="phase:pre=A,enc=A,sel=A,ping=A,loss=A,dn=B,up=B,upctl=B" UDP=A ./run-diversion.sh` | latency→A, beban→B |
-| 6 | F5 sweep | `EXP_ID=f5-n1 POLICY="firstN:A:1" UDP=A …` (ulangi n=2,3,5,8,12,16,20) | peta batas indeks koneksi |
-| 7 | F8b | `EXP_ID=f8b POLICY="all:B" UDP=A ./run-diversion.sh` | TCP→B, UDP→A |
-| 8 | G3 | `EXP_ID=g3-udp-drop POLICY="all:B" UDP=drop ./run-diversion.sh` | UDP blackhole |
-| 9 | G1/G2 | `SKIP_B=1 …` / `KILL_A_AT_MS=15000 …` | injeksi kegagalan |
-| 10 | Repetisi ≥3× untuk skenario sukses kunci (F2a, F8a) — master prompt §12 | | |
+| 1 | **F2b** (6× percobaan 429 sepanjang 21:33–21:59 UTC — kuota sesi-2 habis; evidence percobaan di `evidence/f2b-attempt*-blocked/`) | `EXP_ID=f2b POLICY="phase:pre=B,enc=B,sel=B,ping=A,loss=A,dn=A,up=A,upctl=A" UDP=A ./run-diversion.sh` | arah balik: seleksi plaintext di STS, pengukuran di daemon — apakah daemon menerima koneksi pengukuran tanpa pernah melihat probe? (prediksi: ya — UUID stateless) |
+| 2 | F7b | `EXP_ID=f7b POLICY="cmd:hi=A,getip=A,caps=A,ping=A,dn=B,up=B,upctl=B,loss=B,ploss=B" UDP=A ./run-diversion.sh` | split per-perintah pada CLI — diperkirakan hanya koneksi loss (plaintext) yang terlibat cmd-routing; koneksi enc → def=A |
+| 3 | G3 | `EXP_ID=g3-udp-drop POLICY="all:B" UDP=drop ./run-diversion.sh` | UDP blackhole — apa yang dilaporkan CLI tanpa backend UDP sama sekali? |
+| 4 | F5-n20 | `EXP_ID=f5-n20 POLICY="firstN:A:20" UDP=A ./run-diversion.sh` | winner-probe→B (mixed learning: 10 probe enc sukses di A + winner fallback plaintext di B) |
+| 5 | F5-n12, n16 | `firstN:A:12` / `firstN:A:16` | titik tengah sweep (belahan di tengah probe) |
+| 6 | Reproduksi F8a/F8b/F5-n28 (≥3× untuk klaim inti; F2a & F5-n22 sudah 3/3) | | |
+| 7 | G1/G2 (SKIP_B/KILL_*_AT_MS), F8d, F7c (batas etis: hanya yang pasif) | | |
 
-Setelah matriks: lengkapi `reports/BACKEND_DIVERSION_RESULTS.md` (tabel F0–F8),
-`reports/EXECUTIVE_CONCLUSION.md` (15 pertanyaan), perbarui
-`reports/EVIDENCE_INDEX.md`, `analysis/EXPERIMENT_MATRIX.md` (status), dan
-`README.md` (tabel status).
+## 4. KENDALA UTAMA: kuota config API (karakter terukur sesi-2)
 
-## 4. KENDALA UTAMA yang harus kamu ketahui: kuota config API
+- CLI **wajib** config live dari `cli.speedtest.net` (licenseKey anti-tamper,
+  umur ~±15 s; snapshot → InvalidLicenseKey — SUDAH DIBUKTIKAN, jangan coba
+  lagi). Proxy live (`live-config-proxy.mjs`) memakai query CLI sendiri —
+  deviceId beda antar sandbox tidak masalah.
+- Egress sesi-2 (8.212.10.159): **token-bucket bursty** — 3 sukses beruntun
+  bisa terjadi dalam 2 menit, lalu 429 ~10–15 menit. Strategi: 1 attempt per
+  ~7–10 menit; jangan hammer. Total sesi-2: 9 sukses + 8 blocked.
+- curl lolos, Node https kena 429 (TLS fingerprint CDN) — proxy sudah pakai curl.
+- `lab/` DI LUAR REPO hilang saat sandbox recycle → jalankan rebuild dulu
+  (lihat §2 butir 2 / REPRODUCE.md). **Daemon resmi punya child `--ward`
+  watchdog**: selalu hard-clean port 18080/8080/9090/8888 + `pkill -f
+  OoklaServer` sebelum tiap run (loop sampai port bebas — lihat pola
+  `scripts/run-exp.sh` sesi ini, di luar repo).
 
-- CLI resmi **wajib** menerima config engine dari `cli.speedtest.net`
-  (licenseKey anti-tamper per-perangkat; kunci usia >±15 s atau kunci entitas
-  lain → `InvalidLicenseKey` → exit 2). **Fetch HARUS live saat CLI meminta**
-  (via `harness/live-config-proxy.mjs` — default `run-diversion.sh`).
-- Karakter rate-limit yang terukur (2026-11-04, satu egress IP): **~3 fetch
-  sukses per jendela geser 1 jam**; 429 TIDAK memperpanjang blokir (aman
-  retry); **curl lolos, Node https kena 429** (TLS fingerprint CDN) — makanya
-  proxy memanggil curl.
-- Konsekuensi: ~3 eksperimen per jam. **Tunggu ≥240 s antar percobaan gagal**;
-  jangan menghantam API dengan interval pendek (boros waktu saja, tidak
-  memperparah blokir).
-- deviceId+sid CLI stabil antar run (terverifikasi) — tidak perlu memakai
-  ulang query berbeda; proxy selalu memakai query CLI yang sedang berjalan.
+## 5. Cara kerja lab (ringkas)
 
-## 5. Cara kerja lab (ringkas tapi lengkap)
+1. `run-diversion.sh` = 1 eksperimen penuh (backend fresh + diverter +
+   config-proxy + CLI + analisis). Semua user-space, loopback-only, non-publishing.
+2. Atribusi: `analyze-run.mjs` menggabungkan diverter.jsonl + sts-evidence.jsonl
+   + daemon-access.log + proxy.jsonl + cli.json → analysis.json/.txt.
+3. Timeline: `node gen-timeline.mjs ../evidence/<EXP_ID>` → timeline.md/csv.
+4. Build ulang STS: `cd reverse-engineered/typescript && npm ci && npm run build`.
+5. PKI: `validation/harness/gen-pki.sh` + symlink `harness/certs`.
+6. Commit: sanitasi deviceId/hid/sid pada proxy.jsonl yang di-commit; binari
+   vendor & kunci JANGAN di-commit; `*.log` ter-gitignore (daemon-access.log
+   disalin ke evidence sebagai pengecualian? — TIDAK, gitignored; simpan
+   salinan `.txt` bila ingin commit).
 
-1. Semua komponen user-space, tanpa root, loopback-only:
-   `run-diversion.sh` memulai: daemon A (:18080, `~/lab/lab/daemon/`),
-   STS B (:8080, build `reverse-engineered/typescript`), diverter (:9090),
-   live-config-proxy (:8888), lalu CLI (`~/lab/clients/speedtest/speedtest`)
-   dengan `--ca-certificate=certs/cli-ca-bundle.pem --accept-license
-   --accept-gdpr --selection-details -f json-pretty` + `ALL_PROXY`.
-2. **Sandbox mendaur ulang proses antar sesi shell** → satu eksperimen = satu
-   invocation penuh (semua lifecycle di dalam satu bash call).
-3. Non-publishing: proxy MENOLAK `results.speedtest.net` → `persisted:false`
-   (diverifikasi otomatis di analysis.json setiap run).
-4. Atribusi: `analyze-run.mjs` menggabungkan diverter.jsonl (routing+byte),
-   sts-evidence.jsonl (sisi B), daemon-access.log (sisi A), proxy.jsonl
-   (config+blokir), cli.json (hasil) → `analysis.json/.txt`.
-5. Build ulang server bila perlu: `cd reverse-engineered/typescript &&
-   npm ci && npm run build` (Node 24 OK).
-6. PKI: `validation/harness/gen-pki.sh` (certs lab-CA sudah ada; symlink
-   `harness/certs`).
+## 6. Deliverable & definisi selesai
 
-## 6. Jebakan yang sudah ditemukan (jangan ulangi)
-
-- `nc` tidak ada (pakai probe node); `column` tidak ada.
-- Daemon resmi perlu **probe kesiapan fungsional** (HI→HELLO) — listen ≠ siap
-  (run-diversion.sh sudah menanganinya).
-- Diverter: socket **udp6 tidak bisa mengirim ke literal IPv4** → socket
-  upstream dibuat sesuai family alamat backend (sudah diperbaiki).
-- Payload UPLOAD CLI = byte acak (ter-log «BIN») — klasifikasi fase harus
-  mendahulukan perintah teks daripada deteksi biner (sudah diperbaiki di
-  analyze-run.mjs).
-- Koneksi zero-byte CLI (±11 per run) IKUT dihitung indeks firstN.
-- `journalctl`/systemd tidak tersedia di container — log daemon via
-  `daemon-access.log` (FileChannel Poco).
-
-## 7. Deliverable & definisi selesai
-
-- 9 laporan di `reports/` (CLI_CONNECTION_TIMELINE ✓, FIRST_CONNECTION_ANALYSIS ✓,
-  NETGAUGE_SESSION_MAP ✓, DNS_AND_IP_BEHAVIOR ✓, MEASUREMENT_PHASE_MATRIX ✓,
-  CLOUDFLARE_WORKERS_FEASIBILITY ✓, EVIDENCE_INDEX ✓ sebagian,
-  BACKEND_DIVERSION_RESULTS ⏳, EXECUTIVE_CONCLUSION ⏳) + README + matriks.
-- Setiap skenario sukses ≥3 pengulangan (master prompt); skenario gagal
-  didokumentasikan dengan bukti.
-- Commit + push (PAT milik owner; **jangan commit**: binari vendor, kunci
-  lab-CA privat boleh (lab-only) tetapi JANGAN identitas perangkat asli —
-  sanitasi licenseKey/deviceId pada artifact yang di-commit).
-- Setelah selesai: pertimbangkan menghapus binari vendor 4-platform yang
-  tidak disengaja ter-commit di root repo (lihat STAGE1_REPO_AUDIT §1).
+- 9 laporan `reports/` — SEMUA sudah disinkronkan sesi-2 (EXECUTIVE_CONCLUSION,
+  BACKEND_DIVERSION_RESULTS, EVIDENCE_INDEX, MEASUREMENT_PHASE_MATRIX,
+  CLI_CONNECTION_TIMELINE, README lab, matriks).
+- Skenario sukses inti ≥3×: F2a ✅ 3/3, F5-n22 ✅ 3/3. F8a/F8b/F5-n28 1×
+  (temuan diskriminatif — reproduksi bila kuota).
+- Commit + push (PAT milik owner). Setelah selesai: pertimbangkan housekeeping
+  binari vendor 4-platform di root repo (STAGE1_REPO_AUDIT §1).

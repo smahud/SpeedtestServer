@@ -76,3 +76,21 @@ enkripsi-diterima vs fallback (ditentukan oleh backend yang menjawab probe).
   diverter tidak memindahkan koneksi aktif; hanya antar-koneksi).
 - **Tumpang tindih UDP**: datagram LOSS mengalir sejak awal download sampai
   akhir run — 3 endpoint paralel.
+
+## 5. Timeline cross-backend TERVERIFIKASI (sesi-2 — master prompt §11/Stage-5)
+
+Timeline lengkap per run (34 koneksi + 3 endpoint UDP, semua kolom wajib:
+ID, waktu mulai/akhir, protokol, sumber CLI, gateway, backend aktual,
+handshake, UUID, fase + **basis klasifikasi fase**, byte, penutupan, referensi
+evidence) dihasilkan mekanis oleh `harness/gen-timeline.mjs`:
+
+| Run | Policy | File | Sorotan |
+|---|---|---|---|
+| `evidence/f2a/timeline.{md,csv}` | phase enc=A, loss+UDP→B | 34 baris | 22 koneksi terenkripsi→A; **conn 23 loss→B dengan prefix replay lintas backend dalam satu koneksi** (HELLO dari A, INITPLOSS/PLOSS dari B); UUID `DA52B37A…` = `result.id` |
+| `evidence/f5-n22/timeline.{md,csv}` | firstN:A:22, UDP→B | 34 baris | **belahan tajam indeks 22→23**; conn 24 = `«BIN 65B»`→`HI <UUID>`→`DOWNLOAD…` (fallback plaintext per koneksi setelah probe terenkripsi sukses di A) |
+| `evidence/f2a-r{2,3}/`, `f5-n22-r{2,3}/` | idem | idem | reproduksi — pola identik |
+
+Aturan integritas yang dipegang generator: **fase TIDAK PERNAH diinfer dari
+payload terenkripsi** — koneksi terenkripsi dilabel fase via byte-signature
+(arah/volume/durasi) dengan kolom `phase_basis` eksplisit "(inferred)";
+perintah hanya dikutip dari koneksi plaintext (teramati langsung).

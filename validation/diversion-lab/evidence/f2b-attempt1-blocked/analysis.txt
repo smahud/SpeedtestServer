@@ -1,0 +1,21 @@
+# analysis — f2b
+CLI exit=2 type=null | server: ?
+fase: latency=false download=false(NaNGB) upload=false(NaNGB) loss=false(null)
+persisted=null | proxy blocked=[] configServed=0 rewriteIds=-
+
+== koneksi (0) ==
+id | fase                         | backend | alasan routing        | c2b(B)      | b2c(B)      | dur(ms)
+---|------------------------------|---------|-----------------------|-------------|-------------|--------
+
+== atribusi fase ==
+
+== UDP ==
+clients=[] cli→be=0 be→cli=0 contoh=[]
+
+== krobosrasi backend ==
+B(STS): {"netgaugeConns":2,"commands":2,"downloadsDone":0,"uploadsDone":0,"udpRecv":0,"udpCount":0,"bytesSent":0}
+A(daemon): {"note":"log daemon tidak tersedia"}
+
+== volume diverter (be→cli) == A=0.00 GB  B=0.00 GB
+
+== VERDICT == {"cli_exit":2,"complete":false,"non_publishing":false,"backends_used":[]}

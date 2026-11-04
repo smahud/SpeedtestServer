@@ -1,0 +1,6 @@
+{"k":"meta","port":8888,"target":"localhost:9090","mode":"live-curl-fetch","fallbackSnapshot":null,"pid":4512,"ts":1793826485412}
+{"k":"mitm","target":"cli.speedtest.net:443","note":"live curl fetch + rewrite","ts":1793826486387}
+{"k":"mitm_tls_ok","alpn":"none","ts":1793826486396}
+{"k":"config_req","method":"GET","target":"/api/cli/config?deviceId=REDACTED&hid=REDACTED&sid=REDACTED&uname=Linux%205.10.134-013.15.kangaroo.al8.x86_64%20%231%20SMP%20Thu%20Jul%2030%2012%3A54%3A59%20UTC%202026%20x86_64","ua":"ookla-cli/1.2.0.84-1.ea6b6773cf (speedtest-cli-linux-x86_64)","ts":1793826486397}
+{"k":"config_served","source":"live-curl","liveBytes":2674,"servedBytes":2953,"rewritten":["43356","35791","63143","57571","1536","60177","48446","60178","65463","28912"],"ts":1793826486665}
+{"k":"blocked","target":"results.speedtest.net:443","reason":"non-publishing guarantee","ts":1793826512773}

@@ -9,7 +9,9 @@
 #   2. backend A   : daemon OoklaServer resmi di-refresh  (TCP+UDP :18080)
 #   3. backend B   : SpeedtestServer TS di-refresh        (TCP+UDP :8080)
 #   4. diverter    : gateway diversion :9090 dengan POLICY eksperimen
-#   5. config proxy: offline snapshot, semua servers[] → localhost:9090,
+#   5. config proxy: LIVE fetch via curl saat CLI meminta (default; licenseKey
+#                    berumur detik — snapshot offline hanya untuk smoke test),
+#                    semua servers[] → localhost:9090,
 #                    results.speedtest.net DITOLAK (non-publishing)
 #   6. run CLI resmi (unmodified) via ALL_PROXY + --ca-certificate bundle
 #   7. post-run    : atribusi (analisis diverter+STS+proxy+CLI) → analysis.json

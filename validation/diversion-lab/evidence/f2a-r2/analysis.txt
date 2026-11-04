@@ -1,0 +1,58 @@
+# analysis — f2a-r2
+CLI exit=0 type=result | server: localhost:9090 id=60178 name=Sun Mobile
+fase: latency=true download=true(12.71GB) upload=true(16.80GB) loss=true(0)
+persisted=false | proxy blocked=["results.speedtest.net:443"] configServed=1 rewriteIds=43356,35791,63143,57571,1536,65463,48446,28912,60177,60178
+
+== koneksi (34) ==
+id | fase                         | backend | alasan routing        | c2b(B)      | b2c(B)      | dur(ms)
+---|------------------------------|---------|-----------------------|-------------|-------------|--------
+ 1 | zero-byte                    | ?       |                       |           0 |           0 | 2
+ 2 | other                        | A       | enc-hello             |         200 |         252 | 7
+ 3 | zero-byte                    | ?       |                       |           0 |           0 | 1
+ 4 | other                        | A       | enc-hello             |         183 |         253 | 5
+ 5 | zero-byte                    | ?       |                       |           0 |           0 | 0
+ 6 | other                        | A       | enc-hello             |         183 |         253 | 2
+ 7 | zero-byte                    | ?       |                       |           0 |           0 | 0
+ 8 | other                        | A       | enc-hello             |         180 |         254 | 2
+ 9 | zero-byte                    | ?       |                       |           0 |           0 | 0
+10 | other                        | A       | enc-hello             |         214 |         257 | 2
+11 | zero-byte                    | ?       |                       |           0 |           0 | 0
+12 | other                        | A       | enc-hello             |         180 |         254 | 1
+13 | zero-byte                    | ?       |                       |           0 |           0 | 0
+14 | other                        | A       | enc-hello             |         179 |         253 | 1
+15 | zero-byte                    | ?       |                       |           0 |           0 | 0
+16 | other                        | A       | enc-hello             |         218 |         251 | 2
+17 | zero-byte                    | ?       |                       |           0 |           0 | 0
+18 | other                        | A       | enc-hello             |         201 |         258 | 2
+19 | zero-byte                    | ?       |                       |           0 |           0 | 1
+20 | other                        | A       | enc-hello             |         213 |         253 | 2
+21 | zero-byte                    | ?       |                       |           0 |           0 | 0
+22 | other                        | A       | enc-hello             |         297 |         359 | 2
+23 | loss                         | B       | phase:loss            |          56 |         107 | 10252
+24 | other                        | A       | enc-hello             |        4030 |  2771005333 | 9766
+25 | other                        | A       | enc-hello             |        4222 |  2898348814 | 9899
+26 | other                        | A       | enc-hello             |        4388 |  2958154538 | 9749
+27 | other                        | A       | enc-hello             |        6074 |  4192000079 | 9733
+28 | other                        | A       | enc-hello             |        8565 |        9153 | 12721
+29 | other                        | A       | enc-hello             |         172 |       62962 | 15032
+30 | other                        | A       | enc-hello             |       12970 |       13998 | 15054
+31 | other                        | A       | enc-hello             |  3264524180 |        5545 | 15051
+32 | other                        | A       | enc-hello             |  4896000074 |        8261 | 15019
+33 | other                        | A       | enc-hello             |  4448000073 |        7428 | 15048
+34 | other                        | A       | enc-hello             |  4241545173 |        7129 | 15017
+
+== atribusi fase ==
+zero-byte                      →   (11 conn, 0.00 GB be→cli)
+other                          → A  (22 conn, 12.82 GB be→cli)
+loss                           → B  (1 conn, 0.00 GB be→cli)
+
+== UDP ==
+clients=[{"client":"::1:59849","backend":"B"},{"client":"::1:39517","backend":"B"},{"client":"::1:46855","backend":"B"}] cli→be=240 be→cli=160 contoh=["LOSS 1386388336 0 34E9509D-4D4D-431F-890","LOSS 958165643 0 9DFB0BF5-E17F-4819-9AA8","LOSS 1386388336 1 34E9509D-4D4D-431F-890"]
+
+== krobosrasi backend ==
+B(STS): {"netgaugeConns":3,"commands":5,"downloadsDone":0,"uploadsDone":0,"udpRecv":493,"udpCount":194,"bytesSent":0}
+A(daemon): {"note":"log daemon tidak tersedia"}
+
+== volume diverter (be→cli) == A=12.82 GB  B=0.00 GB
+
+== VERDICT == {"cli_exit":0,"complete":true,"non_publishing":true,"backends_used":[null,"A","B"],"diverted":true}

@@ -67,5 +67,13 @@
 | Durasi download/upload | 23 s total run | 22 s total run |
 
 → Pembelajaran enkripsi terjadi pada PROBE SELEKSI dan dipakai untuk seluruh
-run — tetapi per koneksi pengukuran, fallback tetap tersedia (gate repo
-membuktikan CLI pulih per koneksi). F2a menguji kombinasi silangnya.
+run — tetap tersedia pemulihan per koneksi pengukuran. **Kini TERVERIFIKASI
+langsung (sesi-2)**: pada f5-n22, setelah probe terenkripsi SUKSES di daemon
+resmi (A), koneksi pengukuran pertama ke backend TS (B) tetap membuka hello
+biner terenkripsi (`«BIN 65B»`) → dijawab `ERROR` oleh B → CLI fallback
+plaintext per koneksi (`HI <UUID>` → `DOWNLOAD…`) dan koneksi berikutnya
+langsung plaintext — run tetap exit 0. (Koreksi label: versi lama bagian ini
+menulis "gate repo membuktikan CLI pulih per koneksi" — gate hanya membuktikan
+fallback saat SEMUA koneksi mendapat ERROR sejak probe; kasus silang
+"probe-terenkripsi-sukses → backend plaintext" baru terbukti pada f5-n22 —
+lihat `analysis/EVIDENCE_RECONCILIATION.md` §1f.)

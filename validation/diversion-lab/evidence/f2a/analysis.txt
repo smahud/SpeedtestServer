@@ -1,21 +1,58 @@
 # analysis — f2a
-CLI exit=2 type=null | server: ?
-fase: latency=false download=false(NaNGB) upload=false(NaNGB) loss=false(null)
-persisted=null | proxy blocked=[] configServed=0 rewriteIds=-
+CLI exit=0 type=result | server: localhost:9090 id=48446 name=GSL Networks
+fase: latency=true download=true(15.86GB) upload=true(13.26GB) loss=true(0)
+persisted=false | proxy blocked=["results.speedtest.net:443"] configServed=1 rewriteIds=43356,35791,63143,57571,1536,28912,60178,65463,60177,48446
 
-== koneksi (0) ==
+== koneksi (34) ==
 id | fase                         | backend | alasan routing        | c2b(B)      | b2c(B)      | dur(ms)
 ---|------------------------------|---------|-----------------------|-------------|-------------|--------
+ 1 | zero-byte                    | ?       |                       |           0 |           0 | 2
+ 2 | other                        | A       | enc-hello             |         225 |         263 | 6
+ 3 | zero-byte                    | ?       |                       |           0 |           0 | 1
+ 4 | other                        | A       | enc-hello             |         197 |         265 | 2
+ 5 | zero-byte                    | ?       |                       |           0 |           0 | 0
+ 6 | other                        | A       | enc-hello             |         195 |         264 | 3
+ 7 | zero-byte                    | ?       |                       |           0 |           0 | 0
+ 8 | other                        | A       | enc-hello             |         204 |         265 | 2
+ 9 | zero-byte                    | ?       |                       |           0 |           0 | 0
+10 | other                        | A       | enc-hello             |         217 |         267 | 1
+11 | zero-byte                    | ?       |                       |           0 |           0 | 0
+12 | other                        | A       | enc-hello             |         175 |         261 | 2
+13 | zero-byte                    | ?       |                       |           0 |           0 | 0
+14 | other                        | A       | enc-hello             |         191 |         262 | 1
+15 | zero-byte                    | ?       |                       |           0 |           0 | 0
+16 | other                        | A       | enc-hello             |         212 |         263 | 2
+17 | zero-byte                    | ?       |                       |           0 |           0 | 0
+18 | other                        | A       | enc-hello             |         201 |         265 | 2
+19 | zero-byte                    | ?       |                       |           0 |           0 | 0
+20 | other                        | A       | enc-hello             |         192 |         265 | 2
+21 | zero-byte                    | ?       |                       |           0 |           0 | 1
+22 | other                        | A       | enc-hello             |         345 |         353 | 3
+23 | loss                         | B       | phase:loss            |         176 |         405 | 20842
+24 | other                        | A       | enc-hello             |        8953 |        9623 | 13248
+25 | other                        | A       | enc-hello             |        4241 |  2944000066 | 10248
+26 | other                        | A       | enc-hello             |        4659 |  3214811031 | 10266
+27 | other                        | A       | enc-hello             |        8773 |  6094680130 | 10240
+28 | other                        | A       | enc-hello             |        5460 |  3722616755 | 10240
+29 | other                        | A       | enc-hello             |       11027 |       11910 | 12790
+30 | other                        | A       | enc-hello             |  4065032172 |        6968 | 12789
+31 | other                        | A       | enc-hello             |  3634857454 |        6199 | 12788
+32 | other                        | A       | enc-hello             |  2623047065 |        4477 | 12746
+33 | other                        | A       | enc-hello             |  2972477320 |        5059 | 12735
+34 | other                        | A       | enc-hello             |         174 |       52338 | 12734
 
 == atribusi fase ==
+zero-byte                      →   (11 conn, 0.00 GB be→cli)
+other                          → A  (22 conn, 15.98 GB be→cli)
+loss                           → B  (1 conn, 0.00 GB be→cli)
 
 == UDP ==
-clients=[] cli→be=0 be→cli=0 contoh=[]
+clients=[{"client":"::1:50650","backend":"B"},{"client":"::1:52409","backend":"B"},{"client":"::1:40761","backend":"B"}] cli→be=240 be→cli=160 contoh=["LOSS 90689400 0 6795F88E-66FB-4BEF-8F06-","LOSS 1861269117 0 DA52B37A-F832-4DED-B09","LOSS 90689400 1 6795F88E-66FB-4BEF-8F06-"]
 
 == krobosrasi backend ==
-B(STS): {"netgaugeConns":2,"commands":2,"downloadsDone":0,"uploadsDone":0,"udpRecv":0,"udpCount":0,"bytesSent":0}
-A(daemon): {"note":"log daemon tidak tersedia"}
+B(STS): {"netgaugeConns":3,"commands":25,"downloadsDone":0,"uploadsDone":0,"udpRecv":458,"udpCount":204,"bytesSent":0}
+A(daemon): {"tcpUptimeLines":25,"lastCounts":["TCP uptime: 22 - total current: 7, queued: 0, blocked: 0, queueFull: 0, concurrent: 7, currentThreads: 8","TCP uptime: 22 - total current: 8, queued: 0, blocked: 0, queueFull: 0, concurrent: 8, currentThreads: 8","TCP uptime: 22 - total current: 8, queued: 0, blocked: 0, queueFull: 0, concurrent: 8, currentThreads: 8"],"mismatchUdp":0,"disconnectExceptions":[]}
 
-== volume diverter (be→cli) == A=0.00 GB  B=0.00 GB
+== volume diverter (be→cli) == A=15.98 GB  B=0.00 GB
 
-== VERDICT == {"cli_exit":2,"complete":false,"non_publishing":false,"backends_used":[]}
+== VERDICT == {"cli_exit":0,"complete":true,"non_publishing":true,"backends_used":[null,"A","B"],"diverted":true}

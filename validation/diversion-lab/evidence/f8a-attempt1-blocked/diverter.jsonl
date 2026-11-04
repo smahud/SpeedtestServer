@@ -1,0 +1,2 @@
+{"k":"meta","policy":"all:A","parsed":{"mode":"all","be":"A"},"udp":"B","a":"127.0.0.1:18080","b":"127.0.0.1:8080","port":9090,"pid":5510,"ts0":1793827165326,"ts":1793827165326,"rt":0}
+{"k":"summary","signal":"SIGTERM","conns":0,"closed":0,"bytesCliToBackends":{"A":0,"B":0},"wallMs":2418,"udpClients":[],"ts":1793827167745,"rt":2418}

@@ -1,22 +1,20 @@
-Wed Nov  4 20:19:53 UTC 2026
-Linux c-6aeb5ca9-14127d0f-b3045c283a8b 5.10.134-013.15.kangaroo.al8.x86_64 #1 SMP Thu Jul 30 12:54:59 UTC 2026 x86_64 GNU/Linux
-repo HEAD: fd40c378e317b6b9734798c295221136059851dd
+Wed Nov  4 20:42:49 UTC 2026
+Linux c-6aeb912b-14127d0f-a958919da7fc 5.10.134-013.15.kangaroo.al8.x86_64 #1 SMP Thu Jul 30 12:54:59 UTC 2026 x86_64 GNU/Linux
+repo HEAD: 449cb88cfe9fae485baa736794e28806e98c2f64
 policy: phase:pre=A,enc=A,sel=A,ping=B,loss=B,dn=B,up=B,upctl=B | udp: B | diverter port: 9090
 backend A: official OoklaServer 2.11.5.2 (sha ce180aa3…) :18080
-backend B: SpeedtestServer TS (fd40c37) :8080
+backend B: SpeedtestServer TS (449cb88) :8080
 CLI: Speedtest by Ookla 1.2.0.84 (ea6b6773cf) Linux/x86_64-linux-musl 5.10.134-013.15.kangaroo.al8.x86_64 x86_64
 --- listeners before:
-LISTEN 0      64           0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=6211,fd=5))
-LISTEN 0      511                *:8080             *:*    users:(("MainThread",pid=6275,fd=22))
-LISTEN 0      64              [::]:18080         [::]:*    users:(("OoklaServer",pid=6211,fd=6))
+(none)
 --- listeners at run start:
-LISTEN 0      511        127.0.0.1:8888       0.0.0.0:*    users:(("MainThread",pid=6624,fd=22))
-LISTEN 0      64           0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=6511,fd=5))
-LISTEN 0      511                *:8080             *:*    users:(("MainThread",pid=6574,fd=22))
-LISTEN 0      64              [::]:18080         [::]:*    users:(("OoklaServer",pid=6511,fd=6))
-LISTEN 0      511                *:9090             *:*    users:(("MainThread",pid=6609,fd=21))
+LISTEN 0      511        127.0.0.1:8888       0.0.0.0:*    users:(("MainThread",pid=2039,fd=22))
+LISTEN 0      64           0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=1927,fd=5))
+LISTEN 0      64              [::]:18080         [::]:*    users:(("OoklaServer",pid=1927,fd=6))
+LISTEN 0      511                *:9090             *:*    users:(("MainThread",pid=2024,fd=21))
+LISTEN 0      511                *:8080             *:*    users:(("MainThread",pid=1988,fd=22))
 --- udp:
-UNCONN 0      0            0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=6511,fd=10))
-UNCONN 0      0                  *:9090             *:*    users:(("MainThread",pid=6609,fd=23)) 
-UNCONN 0      0                  *:8080             *:*    users:(("MainThread",pid=6574,fd=23)) 
-UNCONN 0      0                  *:18080            *:*    users:(("OoklaServer",pid=6511,fd=11))
+UNCONN 0      0            0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=1927,fd=8)) 
+UNCONN 0      0                  *:9090             *:*    users:(("MainThread",pid=2024,fd=23)) 
+UNCONN 0      0                  *:8080             *:*    users:(("MainThread",pid=1988,fd=23)) 
+UNCONN 0      0                  *:18080            *:*    users:(("OoklaServer",pid=1927,fd=11))

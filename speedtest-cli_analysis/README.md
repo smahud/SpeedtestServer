@@ -4,6 +4,15 @@
 > Installer: `https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-x86_64.tgz`
 > Lingkungan uji: sandbox Linux (jaringan keluar via Hong Kong, ISP terdeteksi: Alibaba)
 
+> 🔄 **PEMBARUAN 2026-11-04/05 (sesi diversion-lab)**: pertanyaan lanjutan
+> *"dapatkah handshake/seleksi tetap di server resmi sementara pengukuran
+> dilayani backend lain dalam SATU run CLI?"* kini **TERJAWAB TERVERIFIKASI
+> (3/3 run)** — lihat bagian baru di bawah + `validation/diversion-lab/`
+> (khususnya `reports/EXECUTIVE_CONCLUSION.md`). Ringkas: YA, pada batas
+> koneksi (paling tajam: antara probe seleksi ke-22 dan koneksi pengukuran
+> pertama), dengan fallback plaintext per koneksi bila backend pengukuran
+> menolak hello terenkripsi.
+
 > 📌 **Dokumen terkait dalam direktori ini**:
 > [`KESIMPULAN-FINAL.md`](KESIMPULAN-FINAL.md) — jawaban akhir kelayakan kombinasi
 > Worker + VPS (client resmi vs custom) dan analisa kontrol koneksi server-side ·
@@ -170,3 +179,34 @@ Poin penghubung:
    dipertahankan di VPS.
 3. Fase **download/upload** adalah fase berat (2.3 GB data untuk satu run!) → inilah beban
    yang ingin dialihkan ke Cloudflare Worker.
+
+## diversion-lab (2026-11-04/05): split backend DALAM SATU run CLI resmi — TERVERIFIKASI
+
+Pertanyaan lanjutan setelah dokumen ini ditulis: dapatkah **handshake/seleksi
+tetap dilayani daemon OoklaServer resmi** sementara **seluruh pengukuran
+(loss, latency-beban, download, upload) dilayani SpeedtestServer TS** — dalam
+satu eksekusi CLI resmi yang tidak dimodifikasi? **JAWABAN: YA — 3/3 run
+exit 0** (`validation/diversion-lab/evidence/f5-n22{,-r2,-r3}`).
+
+Temuan kunci (bukti penuh di `validation/diversion-lab/reports/`):
+
+1. **Batas diversion = batas KONEKSI**, paling tajam tepat setelah probe
+   seleksi terakhir (koneksi 22→23): CLI membuka koneksi baru per fase dan
+   tidak pernah me-reuse maupun me-re-resolve alamat.
+2. **CLI membawa pembelajaran enkripsi lintas koneksi namun pulih per
+   koneksi**: setelah probe terenkripsi sukses di daemon resmi, koneksi
+   pengukuran pertama ke backend TS masih membuka hello biner terenkripsi →
+   dijawab `ERROR` oleh TS → CLI fallback plaintext (`«BIN 65B»` → `HI <UUID>`
+   → `DOWNLOAD 32000000`) dan koneksi berikutnya langsung plaintext.
+3. **UUID sesi portabel** — backend mana pun yang menerima `HI <UUID>` bisa
+   melayani koneksi mana pun (tanpa koordinasi antar backend).
+4. **Satu-satunya keterikatan keras: kanal packet-loss** — koneksi TCP
+   (`INITPLOSS`/`PLOSS`) dan datagram UDP `LOSS` harus berakhir di backend
+   yang sama; bila dipecah: (TCP→resmi, UDP→TS) CLI melaporkan loss 0% senyap
+   tanpa dasar pengukuran; (TCP→TS, UDP→resmi) daemon tidak membalas RECV dan
+   CLI menghilangkan field packetLoss sama sekali.
+5. Implikasi arsitektur: **operasi server Anda sendiri boleh membelah beban
+   di belakang satu endpoint** (daemon resmi untuk identitas/handshake
+   terenkripsi + backend TS untuk beban) — terverifikasi aman secara protokol
+   untuk CLI resmi; Cloudflare Worker tetap TIDAK berperan (transport TCP
+   biner/UDP, bukan HTTP).

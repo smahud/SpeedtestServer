@@ -1,6 +1,6 @@
 {"k":"meta","port":8888,"target":"localhost:9090","mode":"live-curl-fetch","fallbackSnapshot":null,"pid":2745,"ts":1793819453166}
 {"k":"mitm","target":"cli.speedtest.net:443","note":"live curl fetch + rewrite","ts":1793819454139}
 {"k":"mitm_tls_ok","alpn":"none","ts":1793819454148}
-{"k":"config_req","method":"GET","target":"/api/cli/config?deviceId=e08a4aff62aae322b2d21575d630fc705dcf86cf74031fc27c4929c4aecf4336&hid=V%2518%2518A%251D%251A%2518%2519%2519%2514%2508_S%2506%2504V%2507U%2502J%251DKKG%2540%2510AOHLB%2512&sid=5c689e7ba41f8d0e5b1e5e0823c64e62da0916a8e21c0021e0847522f70c59b8&uname=Linux%205.10.134-013.15.kangaroo.al8.x86_64%20%231%20SMP%20Thu%20Jul%2030%2012%3A54%3A59%20UTC%202026%20x86_64","ua":"ookla-cli/1.2.0.84-1.ea6b6773cf (speedtest-cli-linux-x86_64)","ts":1793819454149}
+{"k":"config_req","method":"GET","target":"/api/cli/config?deviceId=REDACTED&hid=REDACTED&sid=REDACTED&uname=Linux%205.10.134-013.15.kangaroo.al8.x86_64%20%231%20SMP%20Thu%20Jul%2030%2012%3A54%3A59%20UTC%202026%20x86_64","ua":"ookla-cli/1.2.0.84-1.ea6b6773cf (speedtest-cli-linux-x86_64)","ts":1793819454149}
 {"k":"config_served","source":"live-curl","liveBytes":2674,"servedBytes":2953,"rewritten":["43356","35791","63143","57571","1536","28912","65463","48446","60178","60177"],"ts":1793819454418}
 {"k":"blocked","target":"results.speedtest.net:443","reason":"non-publishing guarantee","ts":1793819477767}

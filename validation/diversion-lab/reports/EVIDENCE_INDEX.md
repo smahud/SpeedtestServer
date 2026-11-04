@@ -13,18 +13,22 @@
 | `../../evidence/OFFICIAL_CLI_TO_OFFICIAL_SERVER.json` | repo: CLI→daemon direct | PASS 3/3 | [P] |
 | `../../evidence/gate-cli2*.json` | repo: CLI→STS direct | PASS 3/3, loss 0 | [P] |
 
-## Matriks diversion (F)
+## Matriks diversion (F) — sesi-2 (2026-11-04/05, lab dibangun ulang)
 
 | Evidence | Policy | Hasil | Label |
 |---|---|---|---|
-| `evidence/f2a/` | phase: seleksi/handshake→A(daemon), loss/ping/dn/up/upctl→B(STS); UDP→B | (lihat BACKEND_DIVERSION_RESULTS) | [V] |
-| `evidence/f2b/` | kebalikan F2a | " | [V] |
-| `evidence/f3/` | latency→A, dn/up→B | " | [V] |
-| `evidence/f5-n*/` | firstN:A:n (n=1,12) | " | [V] |
-| `evidence/f7b/` | cmd-level split | " | [V] |
-| `evidence/f8a/` | TCP→A, UDP→B | " | [V] |
-| `evidence/f8b/` | TCP→B, UDP→A | " | [V] |
-| `evidence/g3-udp-drop/` | UDP blackhole | " | [V] |
+| `evidence/f2a/` | phase: seleksi/enc→A(daemon), loss→B(STS); UDP→B | **exit 0; DL 15,86/UL 13,26 GB; loss 0; persisted false; 22 conn enc→A + loss-conn→B (prefix replay lintas backend) + UDP→B** | [V] |
+| `evidence/f2a-r2/` | idem | exit 0; DL 12,71/UL 16,80; loss 0; atribusi identik | [V] |
+| `evidence/f2a-r3/` | idem | exit 0; DL 14,34/UL 12,06; loss 0; atribusi identik | [V] |
+| `evidence/f5-n22/` | firstN:A:22; UDP→B | **exit 0; DL 14,12/UL 9,38; loss 0; seleksi→A terenkripsi, SELURUH pengukuran→B (conn 24: «BIN»→HI→DOWNLOAD = fallback per koneksi); STS 1205 cmd/436 dn/296 up** | [V] |
+| `evidence/f5-n22-r2/` | idem | exit 0; DL 10,24/UL 7,16; **loss 9,09%** (teranalisis: 1 datagram drop kernel klien→gateway — diverter/STS 0 loss; lihat BACKEND_DIVERSION_RESULTS §2) | [V] |
+| `evidence/f5-n22-r3/` | idem | exit 0; DL 17,19/UL 8,61; loss 0 | [V] |
+| `evidence/f2a-attempt*-blocked/`, `f5-n22-attempt*-blocked/`, `f8a-attempt*-blocked/` | — | percobaan gagal kuota 429 (bukan kegagalan protokol) | [V] (kendala) |
+| `evidence/f2b/`, `f3/`, `f5-n1/` … `f5-n20/`, `f7b/`, `f8a/` (berhasil), `f8b/`, `g3-udp-drop/` | — | **BELUM ADA run berhasil** (antre kuota; dir hanya berisi percobaan 429 bila ada) — JANGAN dirujuk sebagai bukti | NOT TESTED |
+
+> Koreksi sesi-2 (lihat `analysis/EVIDENCE_RECONCILIATION.md` §1f): tabel lama
+> melabel semua baris F2a…G3 `[V]` padahal dir evidence tidak ada / hanya 429.
+> Label di atas adalah yang benar per status terkini.
 
 ## Validasi instrumen (klien sintetis — bukan CLI resmi)
 

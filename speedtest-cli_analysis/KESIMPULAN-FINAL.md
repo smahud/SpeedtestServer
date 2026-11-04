@@ -112,6 +112,37 @@ memang sebaiknya tidak dipikul Node/VPS (lihat §3).
 >
 > Kombinasi keduanya (client resmi memanfaatkan Worker) **tidak ada di ruang solusi**.
 
+### 1.6 PEMBARUAN (2026-11-04/05, diversion-lab): split DI DALAM endpoint VPS kini TERVERIFIKASI
+
+Penelitian lanjutan `validation/diversion-lab/` (CLI resmi tidak dimodifikasi,
+lab loopback, non-publishing, 3/3 reproduksi) mengubah satu bagian kesimpulan
+di atas: jalur (1) "VPS-only" kini bisa dimodelkan sebagai **"VPS dengan
+backend terbelah"** — dan ini justru MENUTUP gap engine terenkripsi yang
+disebut §1.4:
+
+```
+Client resmi Ookla ──(TCP/UDP, host:port dari config)──▶ endpoint VPS Anda
+   ├── fase seleksi/handshake (koneksi 1–22, hello TERENKRIPSI) ──▶ daemon OoklaServer resmi
+   └── fase pengukuran  (koneksi 23–34 + UDP loss)        ──▶ SpeedtestServer TS (plaintext)
+```
+
+- **TERVERIFIKASI 3/3** (`evidence/f5-n22{,-r2,-r3}`): exit 0, semua fase
+  lengkap, packetLoss 0, atribusi byte konsisten (STS melayani 1205 perintah /
+  436 download / 296 upload per run).
+- CLI membawa hello terenkripsi ke koneksi pengukuran (belajar dari probe di
+  daemon resmi) → dijawab `ERROR` oleh TS → **fallback plaintext per koneksi**
+  (`«BIN 65B»`→`HI <UUID>`→`DOWNLOAD…`) — koneksi berikutnya langsung plaintext.
+- **Syarat keras**: koneksi loss TCP (`INITPLOSS`/`PLOSS`) + datagram UDP `LOSS`
+  wajib backend yang sama (bila dipecah: loss dilaporkan 0% tanpa dasar — F8a;
+  atau field packetLoss hilang sama sekali — F8b).
+- Cloudflare Worker tetap **tidak berperan** (kesimpulan Q1 tidak berubah);
+  yang berubah hanya: di belakang endpoint Anda sendiri, beban boleh dibagi
+  antara daemon resmi dan implementasi TS — pilihan arsitektur operator host
+  yang terdaftar sah.
+
+> Detail lengkap: `validation/diversion-lab/reports/EXECUTIVE_CONCLUSION.md`
+> (jawaban 15 pertanyaan risek) + `BACKEND_DIVERSION_RESULTS.md` (matriks).
+
 ---
 
 ## 2. Apakah Kontrol Koneksi Bisa Di-handle Server Side?
