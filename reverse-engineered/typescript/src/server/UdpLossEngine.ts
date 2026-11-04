@@ -26,6 +26,11 @@ import { LossRegistry, normalizeIp } from './NetGaugeEngine';
 
 export interface UdpLossEngineOptions {
   ports: number[];
+  /** Bind addresses per port (F-28/F-29 parity): one socket per entry; v6
+   *  entries use udp6 sockets. Default: ['::'] (the previous dual-stack
+   *  wildcard). The caller (ServerCore) derives it from useIPv4/useIPv6/
+   *  addresses so TCP and UDP always match. */
+  bindHosts?: string[];
   loss: LossRegistry;
   onEvent?: (kind: string, detail: Record<string, unknown>) => void;
   maxDatagramBytes: number;
@@ -42,24 +47,39 @@ export class UdpLossEngine {
     this.opts = opts;
   }
 
-  /** Bind every UDP port; rejects on the first failure (fail closed). */
+  /** Bind every UDP port on every bind host; rejects on the first failure
+   *  (fail closed). */
   async start(): Promise<void> {
+    // No bindHosts configured → the LEGACY default: one dual-stack [::]
+    // socket per port (the pre-rev5 behavior; keeps standalone-engine
+    // consumers working). An explicit list switches to the F-28/F-29 layout:
+    // one socket per entry, v6 wildcards bound V6ONLY so 0.0.0.0 can coexist
+    // on the same port (parity with the daemon's two-socket shape).
+    const legacy = !this.opts.bindHosts || this.opts.bindHosts.length === 0;
+    const hosts: string[] = legacy ? ['::'] : this.opts.bindHosts!;
     const binds: Promise<void>[] = [];
     for (const port of this.opts.ports) {
-      const sock = dgram.createSocket('udp6');
-      sock.on('message', (msg, rinfo) => this.handle(msg, rinfo, sock));
-      sock.on('error', (err) => this.opts.onEvent?.('udp_error', { port, error: String(err) }));
-      binds.push(
-        new Promise<void>((resolve, reject) => {
-          sock.once('error', reject); // bind failure is fatal (fail closed)
-          sock.bind(port, '::', () => {
-            sock.removeListener('error', reject);
-            this.opts.onEvent?.('listen_udp', { port });
-            resolve();
-          });
-        }),
-      );
-      this.sockets.push(sock);
+      for (const host of hosts) {
+        const v6 = host.includes(':');
+        const sock = legacy
+          ? dgram.createSocket('udp6') // dual-stack [::] (legacy default)
+          : v6
+            ? dgram.createSocket({ type: 'udp6', ipv6Only: true })
+            : dgram.createSocket('udp4');
+        sock.on('message', (msg, rinfo) => this.handle(msg, rinfo, sock));
+        sock.on('error', (err) => this.opts.onEvent?.('udp_error', { port, host, error: String(err) }));
+        binds.push(
+          new Promise<void>((resolve, reject) => {
+            sock.once('error', reject); // bind failure is fatal (fail closed)
+            sock.bind(port, host, () => {
+              sock.removeListener('error', reject);
+              this.opts.onEvent?.('listen_udp', { port, host });
+              resolve();
+            });
+          }),
+        );
+        this.sockets.push(sock);
+      }
     }
     await Promise.all(binds);
   }

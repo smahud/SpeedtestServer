@@ -49,11 +49,17 @@ describe('Configuration parity: shipped template → ConfigManager', () => {
     expect(cfg.httpPorts).toEqual([8080]);
     expect(cfg.useIPv4).toBe(true);
     expect(cfg.useIPv6).toBe(true);
+    // The shipped template sets an explicit wildcard list (template parity);
+    // a properties file that omits the key leaves the DEFAULT at [] which
+    // ServerCore resolves to the useIPv4/useIPv6 wildcards (F-28, F-29).
     expect(cfg.addresses).toEqual(['0.0.0.0', '::']);
     // Access control
     expect(cfg.allowedDomains).toEqual(['*.speedtest.net', '*.ookla.com', '*.speedtestcustom.com']);
     expect(cfg.excludeDefaultDomains).toBe(false);
-    expect(cfg.userAgentFilterEnabled).toBe(true);
+    // F-26 (2026-11-05): the template ships the key COMMENTED — matching the
+    // official OoklaServer.properties.default, whose daemon default is OFF
+    // (verified live: with the key absent, every UA string is served).
+    expect(cfg.userAgentFilterEnabled).toBe(false);
     // Worker pool (parsed; runtime model is the Node event loop)
     expect(cfg.workerThreadPool).toEqual({ capacity: 30000, stackSizeBytes: 102400 });
     // IP tracking

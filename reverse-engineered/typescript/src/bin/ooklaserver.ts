@@ -93,6 +93,10 @@ async function validateConfig(
     tcpPorts: config.tcpPorts,
     udpPorts: config.udpPorts,
     addresses: config.addresses,
+    useIPv4: config.useIPv4,
+    useIPv6: config.useIPv6,
+    userAgentFilterEnabled: config.userAgentFilterEnabled === true,
+    wsFrameSizeLimitBytes: config.websocket?.frameSizeLimitBytes ?? 5242880,
     netgaugeVersionString: config.netgaugeVersionString,
     evidenceLogFile: config.evidenceLogFile || '(disabled)',
   };
