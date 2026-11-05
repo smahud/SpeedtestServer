@@ -7,3 +7,4 @@
 {"ts":1793829564381,"k":"conn_netgauge","id":2,"peer":"::ffff:127.0.0.1:40080","transport":"tcp"}
 {"ts":1793829564381,"k":"ng_cmd","id":2,"peer":"::ffff:127.0.0.1:40080","line":"HI"}
 {"ts":1793829566886,"k":"conn_close","id":2,"peer":"::ffff:127.0.0.1:40080","stats":{"peer":"::ffff:127.0.0.1:40080","peerIp":"::ffff:127.0.0.1","openedAt":1793829564381,"transport":"tcp","bytesDown":44,"bytesUp":0,"commands":0}}
+{"ts":1793829684665,"k":"stopped","connections":2}
