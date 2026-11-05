@@ -103,3 +103,26 @@ actually executed in this audit.
 Gates A, B, C, D, E, F, G, H (EXTERNAL_FLOWS.md), I (with the documented
 systemd-start BLOCKED condition), J, K — see FINAL_REPORT.md for the overall
 release verdict and remaining conditions.
+
+---
+
+## Revision 5 (2026-11-05) — consolidated results
+
+Environment: same lab layout as rev 4 (reference daemon TCP/UDP 18080,
+SpeedtestServer 18081/18082), per-variant matched configs; evidence:
+`validation/evidence/rea-lab-rev5/` + `validation/harness/out/rev5/`.
+
+| Gate | Result | Evidence |
+|---|---|---|
+| typecheck / build (`tsc --noEmit`, `tsc`) | PASS | — |
+| Unit / conformance (`jest`) | **143/143 PASS** | `ConfigParityRev5.test.ts` (18 new) + prior suites |
+| Differential battery (103 probes, live daemon) | **89/103 identical** — zero regression vs rev 4 | `probe-diff.mjs` output, `rea-lab-rev5/probe-diff-results.json` |
+| Per-variant differential: `ua-on` | **0 mismatches** (21-UA battery) | `rea-lab-rev5/config-daemon-uafilter.json` vs `config-sts-uafilter.json` |
+| Per-variant differential: `frameSizeLimitBytes=64` | **0 mismatches** (WS boundary 63/64/65/4096 + RST form) | `rea-lab-rev5/config-daemon-ws64-rst.json` vs `config-sts-ws64-rst.json` |
+| Per-variant differential: `useIPv4=false` / `useIPv6=false` | identical listener inventories + family connects | `rea-lab-rev5/config-*-ipv4off/ipv6off.json` |
+| Per-variant differential: `addresses` | intentional deviation D-9 (shapes captured side by side) | `rea-lab-rev5/config-daemon-addrs.json` vs `config-sts-addrs.json` |
+| Negative battery | **7/7 PASS** (rev 4 was 5/7-effective — F-30 OOM defect) | `out/rev5/negative-tests.json` |
+| Strict TLS battery | 10/10 PASS (re-run) | `out/tls-validation/` |
+| Installer dry-run | PASS | console |
+| Official CLI acceptance | **BLOCKED (upstream 429)** — 5 attempts/40+ min; per-UA+IP throttle of `cli.speedtest.net`; NOT counted as PASS | `out/rev5/*/proxy.jsonl`, `out/rev5/*/cli.stderr` |
+| Lint | 3 pre-existing errors in DECOMMISSIONED legacy files (`OoklaRequestHandler.ts`, `TLSCertificateManager.ts`); no new errors/warnings from rev-5 code | `npm run lint` |

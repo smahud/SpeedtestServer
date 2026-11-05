@@ -71,14 +71,14 @@ const DEFAULT_CONFIG: OoklaServerConfig = {
   httpPorts: [8080],
   netgaugeVersionString: '2.11 (2.11.5) 2026-06-04.1737.7d0993d', // compatibility profile (verified 2026-11-04)
   evidenceLogFile: '',
-  useIPv6: true, // Binary default from properties file
-  addresses: ['0.0.0.0', '::'],
+  useIPv6: true, // Binary default from properties file (verified F-29: independent v4/v6 listener control)
+  addresses: [], // daemon default: the official template ships the key ABSENT — empty = wildcard set from useIPv4/useIPv6 (F-28)
   useIPv4: true,
   host: {
     id: '',
     password: '',
   },
-  userAgentFilterEnabled: true, // Binary default from properties file
+  userAgentFilterEnabled: false, // daemon default OFF (F-26): the official template ships the key commented out — verified live (with the key absent, curl/* and all other UA strings are served)
   performTraceroutes: true,
   binaryAutoUpdate: true,
   enableAutoUpdate: true,

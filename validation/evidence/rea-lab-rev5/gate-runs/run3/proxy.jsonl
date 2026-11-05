@@ -1,0 +1,5 @@
+{"k":"meta","port":8888,"target":"localhost:8080","serverId":null,"publish":false,"pid":7669,"ts":1793823262004}
+{"k":"mitm","target":"cli.speedtest.net:443","ts":1793823262977}
+{"k":"mitm_tls_ok","alpn":"none","ts":1793823262987}
+{"k":"config_req","method":"GET","target":"/api/cli/config?deviceId=423ae58cb59963198c7e097fac2fa46275b3f13fba384180a2b6ded84c273094&hid=SI%251BLO%251EM%2518IH%2506VQ%2505%2507%2509%2509%2508%2508F%2512%2515NHH%251E%2512%251D%251CI%251C%251E&sid=07d6f3d6a1ca3e09d1fcda8bb0991f058e08731f7e7cd0fe45621cf12763809d&uname=Linux%205.10.134-013.15.kangaroo.al8.x86_64%20%231%20SMP%20Thu%20Jul%2030%2012%3A54%3A59%20UTC%202026%20x86_64","ua":"ookla-cli/1.2.0.84-1.ea6b6773cf (speedtest-cli-linux-x86_64)","ts":1793823262988}
+{"k":"config_error","error":"Error: live config status 429","ts":1793823263035}

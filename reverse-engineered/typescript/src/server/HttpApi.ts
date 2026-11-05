@@ -54,6 +54,10 @@ export interface HttpApiOptions {
   allowedDomains: string[];
   /** OoklaServer.excludeDefaultDomains — suppress the default domain union. */
   excludeDefaultDomains: boolean;
+  /** OoklaServer.userAgentFilterEnabled (daemon default: false — the official
+   *  template ships the key commented out; verified F-26). When true, the
+   *  daemon's built-in bad-User-Agent blocklist is enforced. */
+  userAgentFilterEnabled?: boolean;
   onEvent?: (kind: string, detail: Record<string, unknown>) => void;
 }
 
@@ -133,6 +137,46 @@ export function originAllowed(origin: string, allowedDomains: string[], excludeD
 
 /** Loose JWT shape: three dot-separated base64url segments. */
 const JWT_SHAPE_RE = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*$/;
+
+/**
+ * Built-in bad-User-Agent blocklist (verified F-26, 2026-11-05).
+ *
+ * The 11 patterns were located as ordered string literals in the reference
+ * daemon's .rodata and verified live against the running daemon with
+ * `userAgentFilterEnabled = true`: every pattern is a case-sensitive
+ * FULL-STRING regex match on the (OWS-trimmed) User-Agent value — literal
+ * entries match only the exact string, `.*` entries match any continuation.
+ * The HTTP header parser trims surrounding whitespace of the value first
+ * (verified: "check_http " with a trailing space is filtered).
+ */
+export const UA_BLOCKLIST_PATTERNS: string[] = [
+  'libcurl-.*',
+  'AndroidSpeedtest',
+  'Wi-Fi Maximiser',
+  'SPEEDTEST_CLIENT',
+  'Python-urllib',
+  'ubnt-test',
+  'check_http',
+  'curl/.*',
+  'LuaSocket.*',
+  'showwin/speedtest-go.*',
+  'Go-http-client/.*',
+];
+
+const UA_BLOCKLIST_RES: RegExp[] = UA_BLOCKLIST_PATTERNS.map((p) => new RegExp(`^(?:${p})$`));
+
+/** True when the (already trimmed) User-Agent value hits the blocklist. */
+export function isFilteredUserAgent(ua: string): boolean {
+  return UA_BLOCKLIST_RES.some((re) => re.test(ua));
+}
+
+/** Filtered-UA 500 response (verified F-26): unlike the minimal 500 this form
+ *  carries a Date header — exactly `HTTP/1.1 500 Internal Server Error\r\n
+ *  Date: <date>\r\nConnection: Close\r\n\r\n`, no body, connection closed. */
+function filteredUaError(socket: import('node:net').Socket | null | undefined): void {
+  socket?.write(`HTTP/1.1 500 Internal Server Error\r\nDate: ${new Date().toUTCString()}\r\nConnection: Close\r\n\r\n`);
+  socket?.destroy();
+}
 
 export function isHttpHead(bytes: Buffer): boolean {
   const head = bytes.toString('latin1', 0, Math.min(10, bytes.length));
@@ -309,6 +353,16 @@ export function createRequestHandler(opts: HttpApiOptions) {
     if (!('user-agent' in req.headers)) {
       opts.onEvent?.('http_reject', { reason: 'missing_user_agent' });
       minimalError(res.socket, 'Internal Server Error');
+      return;
+    }
+
+    // 3.5. Optional built-in bad-UA blocklist (verified F-26). Runs AFTER the
+    // Host checks (a missing Host wins with the minimal 500 — verified) and
+    // applies to every endpoint with the with-Date 500 form. Node's parser
+    // OWS-trims header values (verified: "check_http " filters).
+    if (opts.userAgentFilterEnabled && ua !== undefined && isFilteredUserAgent(String(ua).trim())) {
+      opts.onEvent?.('http_reject', { reason: 'filtered_user_agent', ua: String(ua).slice(0, 80) });
+      filteredUaError(res.socket);
       return;
     }
 

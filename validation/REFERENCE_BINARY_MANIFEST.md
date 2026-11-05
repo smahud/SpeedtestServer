@@ -11,16 +11,23 @@
   `enableAutoUpdate=false`, lab-CA cert, access logging enabled (full file in the
   session's lab notes; reproduced in `REPRODUCE.md`).
 
-### Relationship to the previously recorded baseline
+### Relationship to the previously recorded baseline — CORRECTED 2026-11-05
 
-MASTER PROMPT v3.0 §4 recorded a *different* tarball SHA-256
-(`f19e5ed240dc185bcaf6ca96e0fa40d5ee53e3a543f4c562082ac0d8d92f027a`, also
-labeled 2.11.5.2) as the earlier baseline. The current stable artifact
-(sha `ce180aa3…`) does **not** match it — the stable channel was updated
-(2026-06-18). Per §4 rules both are recorded separately; **all evidence in
-this audit was produced against `ce180aa3…` / build `2026-06-04.1737.7d0993d`**
-and is labeled as such. If the old artifact is re-obtained, reference tests
-should be re-run and labeled separately.
+The earlier text claimed two *different* 2.11.5.2 artifacts. That was a
+category error, corrected during revision 5 (finding F-M1):
+
+- `ce180aa3…598159` is the SHA-256 of the stable **tarball**.
+- `f19e5ed2…d92f027a` is the SHA-256 of the **binary inside that tarball**.
+- Verified 2026-11-05 by re-downloading the official stable tarball
+  (`https://install.speedtest.net/ooklaserver/stable/OoklaServer-linux-x86_64-static-musl.tgz`,
+  tarball sha256 `ce180aa3…`): the extracted `OoklaServer` binary is
+  **byte-identical** (`cmp` = 0 differing bytes) to the binary committed in
+  this repository as `OoklaServer-linux-x86_64` (sha256 `f19e5ed2…`).
+  There are not two builds — there is one build in two wrappers.
+
+All evidence across revisions was therefore produced against the SAME
+build `2026-06-04.1737.7d0993d`, re-confirmed live in the rev-5 lab (daemon
+log: "OoklaServer version 2.11 (2.11.5.2) build number 2026-06-04.1737.7d0993d").
 
 ## Official Speedtest CLI (the gate client)
 
@@ -31,10 +38,32 @@ should be re-run and labeled separately.
 - License: proprietary Ookla EULA (accepted via `--accept-license` at runtime;
   personal/non-commercial use). No redistribution into this repository.
 
-## Handling rules honored
+## Handling rules honored — corrected 2026-11-05
 
-- No vendor binaries are committed to this repository (`.gitignore`d / kept in
-  the lab only); this manifest is the provenance record.
+The earlier claim "no vendor binaries are committed to this repository" was
+FALSE: the repository has tracked five vendor binaries since the initial
+commit (`OoklaServer-linux-x86_64`, `OoklaServer-linux-aarch64`,
+`OoklaServer-macosx`, `OoklaServer-windows-x86_64.exe`,
+`OoklaServer-windows64.zip`). Recorded facts:
+
+- `OoklaServer-linux-x86_64` (sha256 `f19e5ed2…`) is byte-identical to the
+  current official stable reference (verified, see above) — provenance now
+  confirmed rather than assumed.
+- The other four committed vendor binaries are recorded below; they were
+  NOT re-verified against official sources in this revision (no official
+  channel cross-check performed for aarch64/macosx/windows):
+  - `OoklaServer-linux-aarch64` sha256 `f7fd93c3…a9780edaa`
+  - `OoklaServer-macosx` sha256 `04a1e383…5169badf`
+  - `OoklaServer-windows-x86_64.exe` sha256 `bc715e20…8344a8e9a4`
+  - `OoklaServer-windows64.zip` sha256 `dd0b1baa…4e99efb75955`
+- Redistribution authorization for ANY committed vendor binary is NOT
+  established by this repository's MIT license (which covers this project's
+  code only). Recommendation for the maintainers: exclude vendor binaries
+  from future source releases or obtain explicit redistribution permission;
+  do NOT rewrite existing Git history (per the handling rules).
+- The reference daemon continues to be run only in the isolated lab for
+  behavior observation and differential baselines; it is absent from the
+  SpeedtestServer runtime and from all replacement-profile evidence.
 - The reference daemon was run **only** in the isolated lab for behavior
   observation and differential baselines; it is absent from the
   SpeedtestServer runtime and from all replacement-profile evidence.

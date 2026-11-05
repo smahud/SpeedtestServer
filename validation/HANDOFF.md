@@ -1,62 +1,70 @@
 # HANDOFF — continuation instructions (no conversation history required)
 
-## Where things stand (2026-11-04, revision 2 — branch `audit/typescript-official-parity`)
+## Where things stand (2026-11-05, revision 5 — HEAD of this commit series)
 
-- **The mandatory acceptance criterion remains MET and re-verified on the
-  current code:** unmodified official Speedtest CLI 1.2.0.84 completes full
-  measurements against SpeedtestServer (3/3 isolated gates, packetLoss 0,
-  non-publishing) — `evidence/gate-revision2/`.
-- **v6.0 scope now also delivered:** §9 TLS semantics (fail-closed
-  CertificateManager + ACME provisioner + hot reload; strict battery 10/10),
-  §11 configuration parity (precedence CLI>env>file>defaults fixed; template
-  parity + logging wiring unit-verified; CONFIG_MATRIX.md complete),
-  §8 external-flow audit (EXTERNAL_FLOWS.md), §13 installer (install.sh:
-  dry-run/staged/idempotent/fail-closed verified; systemd start BLOCKED in
-  this container — unit verified offline), §14 README (16 sections), §15
-  validation package restructured (BASELINE/PARITY_MATRIX/CONFIG_MATRIX/
-  TLS_CERTIFICATES/EXTERNAL_FLOWS/TEST_RESULTS + detail docs).
-- Differential 35/37 (2 expected non-differences), host tester 10/10, unit
-  66/66, negative 7/7, publishing battery rev2: 4 distinct server IDs with
-  zero-loss public Result URLs (`PUBLISHED_RESULT_URLS.md` §0).
-- Canonical implementation: `reverse-engineered/typescript` (ServerCore,
-  NetGaugeEngine, UdpLossEngine, HttpApi + NEW CertificateManager,
-  AcmeProvisioner, validated reloadTls). JS twin deprecated/frozen.
-
-## How to re-verify from scratch
-
-Follow `validation/REPRODUCE.md` top-to-bottom (build → PKI → TLS cases →
-gates). Expected: 66/66 unit, 10/10 TLS battery, 7/7 negative, 3/3 isolated
-CLI replacement runs exit 0 with `packetLoss: 0`, host tester 10/10,
-differential 35/37. Installer: `./install.sh --dry-run` then
-`./install.sh --staging-dir /tmp/sts`.
+- Baseline re-verified on the final code: build clean, typecheck clean,
+  **143/143 tests**, differential battery **89/103 byte-identical** (the
+  same 14 as rev 4: 6 expected non-differences + 8 documented deviations),
+  strict TLS battery 10/10, negative battery **7/7** (was 5/7 with the
+  F-30 defect), installer dry-run PASS.
+- New verified behaviors implemented this revision (FINDINGS.md §rev 5):
+  - **F-26** `userAgentFilterEnabled` (11-pattern blocklist, 500-with-Date
+    form, default OFF, Host checks win) — `HttpApi` step 3.5.
+  - **F-27** `websocket.frameSizeLimitBytes` (accept payload ≤ limit;
+    > limit → silent RST via per-frame FrameGuard) — `ServerCore`.
+  - **F-29** `useIPv4`/`useIPv6` independent per-family listeners (TCP+UDP,
+    `[::]` bound V6ONLY, 0.0.0.0+[::] two-socket default) — `ServerCore`
+    + `UdpLossEngine` (`bindHosts`; no-`bindHosts` keeps the legacy
+    dual-stack default).
+  - **F-30** pre-existing rev-4 defect FIXED: >64 KiB header blocks drove
+    `routeHttp` into unbounded recursion (OOM at >3.6 GB/s). The mid-stream
+    hand-off is deferred via `setImmediate`. Two regression tests included.
+  - **F-M1** reference-binary manifest corrected (tarball sha vs binary sha
+    category error; committed x86_64 binary = official stable, verified
+    byte-identical).
+  - Deviation **D-9** added (`addresses`: documented intent vs the daemon's
+    broken v4 handling).
+- Probe tooling added: `validation/harness/probe-config-parity.mjs`
+  (per-server behavioral snapshot: UA battery + WS frame battery + listener
+  inventory + family connects). Per-variant differential evidence:
+  `validation/evidence/rea-lab-rev5/`.
 
 ## Known gaps / next steps (ordered)
 
-1. **systemd service start verification** on a real Debian 13 host (the
-   container cannot run systemd; unit file is `systemd-analyze verify`-clean
-   and the ExecStart command is directly verified).
-2. **ACME real issuance** on a host with an operator-controlled domain
-   (staging directory documented; lab path fail-closed and tested).
-3. **Encrypted-binary engine protocol** (D-2): only relevant if a future CLI
-   drops the plaintext fallback. Deep RE of `Ookla::AESEncryptor` — optional.
-4. Enforce `allowedDomains` / `userAgentFilterEnabled` flag / wire
-   `websocket.frameSizeLimitBytes` / explicit `addresses` binding — currently
-   documented PNA/P in CONFIG_MATRIX.md with rationale.
-5. CI wiring (`run-replacement-test.sh` as an acceptance stage; skips must be
-   reported BLOCKED, never green).
-6. Delete-or-archive the deprecated `javascript/` twin after one stable
-   release cycle; same for the legacy `TLSCertificateManager`/
-   `OoklaRequestHandler` pair (now dev-utility only).
+1. **Official CLI acceptance gate: BLOCKED (upstream)** —
+   `cli.speedtest.net/api/cli/config` answers 429 for the official CLI
+   User-Agent from this lab IP (5 attempts across 40+ minutes; plain-UA
+   fetches return 200). Re-run `run-replacement-test.sh` when the upstream
+   throttle clears; evidence of the blocked state is in
+   `validation/harness/out/rev5/`. The CLI's plaintext-fallback paths are
+   otherwise covered by the 103-probe differential against the live daemon.
+2. Verify the four other committed vendor binaries against official
+   sources (rev 5 only cross-checked the x86_64 stable binary —
+   REFERENCE_BINARY_MANIFEST.md, corrected).
+3. Decide the redistribution story for the five committed vendor binaries
+   (exclusion from source releases is recommended — manifest updated).
+4. `systemd` start verification on a real host (container-blocked, unit
+   verified offline).
+5. ACME real issuance on an operator-controlled domain (fail-closed paths
+   tested).
+6. Encrypted-binary engine (D-2) — only if a future CLI drops the plaintext
+   fallback.
+7. `ipTracking` metrics-bucket machinery remains decommissioned by design.
+
+## How to re-verify from scratch
+
+Follow `validation/REPRODUCE.md` (build → PKI → TLS cases → gates). The
+differential and per-variant batteries: `node validation/harness/probe-diff.mjs 18080 18081`
+and `probe-config-parity.mjs` (see the rev-5 FINDINGS section for the lab
+layout). Expected: 89/103 differential, 143/143 unit, 7/7 negative.
 
 ## Files that hold the knowledge
 
-- Protocol: `validation/PROTOCOL_CONTRACT.md` (single source of truth).
-- TLS semantics + validation: `validation/TLS_CERTIFICATES.md`.
-- Configuration status: `validation/CONFIG_MATRIX.md`.
-- External flows / result-URL lifecycle: `validation/EXTERNAL_FLOWS.md`,
-  `validation/PUBLISHED_RESULT_URLS.md`.
-- Why the design is what it is: `validation/DECISIONS.md`.
-- What was broken (and fixed) this revision: `validation/FINDINGS.md` §C-1…C-6.
-- Raw evidence: `validation/evidence/` (tls/, installer/, gate-revision2/,
-  published/, published-rev2/, + prior-revision files).
+- Protocol: `validation/PROTOCOL_CONTRACT.md` (single source of truth; §4.5
+  and §5 updated with the rev-5 semantics).
+- Configuration status: `validation/CONFIG_MATRIX.md` (rows updated to
+  rev 5; `allowedDomains` row was stale pre-rev-5 — now IV).
+- Why the design is what it is: `validation/DECISIONS.md` (D-1…D-9).
+- What was found/fixed: `validation/FINDINGS.md` (P-*/C-*/F-1…F-30, F-M1).
+- Raw evidence: `validation/evidence/` (`rea-lab-rev5/` is this revision).
 - Harness: `validation/harness/` (fail-closed by design — do not weaken it).

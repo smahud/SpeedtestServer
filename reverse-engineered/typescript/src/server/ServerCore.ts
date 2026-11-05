@@ -64,6 +64,26 @@ export interface ServerCoreOptions {
   allowedDomains: string[];
   /** OoklaServer.excludeDefaultDomains. */
   excludeDefaultDomains: boolean;
+  /** OoklaServer.userAgentFilterEnabled (daemon default false — verified
+   *  F-26: with the key absent the daemon does NOT filter UA strings). */
+  userAgentFilterEnabled?: boolean;
+  /** OoklaServer.websocket.frameSizeLimitBytes (daemon default 5242880 —
+   *  verified F-27). Frames with payload <= limit+1 are processed; a frame
+   *  with payload >= limit+2 is answered with NOTHING and the TCP connection
+   *  is reset (RST), mirroring the daemon's "Payload too big" path. */
+  wsFrameSizeLimitBytes?: number;
+  /** OoklaServer.useIPv4 (daemon default true — verified F-29). */
+  bindIPv4?: boolean;
+  /** OoklaServer.useIPv6 (daemon default true — verified F-29). */
+  bindIPv6?: boolean;
+  /** OoklaServer.addresses — explicit bind list (verified F-28). Empty list
+   *  (daemon default: the official template ships the key absent) means the
+   *  wildcard set implied by useIPv4/useIPv6. Non-empty lists the exact
+   *  addresses to bind (deviation D-9 documented in CONFIG_MATRIX.md/DECISIONS.md: the
+   *  reference daemon's own handling of this key never binds listed IPv4
+   *  addresses and drops the IPv4 wildcard — we implement the documented
+   *  intent instead — deviation D-9, validation/DECISIONS.md). */
+  bindAddresses?: string[];
   onEvent?: (kind: string, detail: Record<string, unknown>) => void;
 }
 
@@ -172,6 +192,7 @@ export class ServerCore {
       hostInfo: this.hostInfo, // mutable: reloadTls refreshes the allow-list
       allowedDomains: opts.allowedDomains,
       excludeDefaultDomains: opts.excludeDefaultDomains,
+      userAgentFilterEnabled: opts.userAgentFilterEnabled === true,
       onEvent: (k, d) => {
         this.counters.httpRequests++;
         this.ev(k, d);
@@ -181,7 +202,12 @@ export class ServerCore {
     this.httpsServer = opts.tls
       ? httpsServerWith(handler, opts.tls)
       : this.httpServer; // no TLS configured: plain only
-    for (const srv of [this.httpServer, this.httpsServer]) {
+    // When no TLS material is configured httpsServer IS httpServer; register
+    // the upgrade/clientError handlers once per distinct server (registering
+    // twice on the same object fired handleUpgrade twice per request —
+    // surfaced by the rev-5 WS tests with tls:null).
+    const upgradeServers = this.httpsServer === this.httpServer ? [this.httpServer] : [this.httpServer, this.httpsServer];
+    for (const srv of upgradeServers) {
       srv.on('upgrade', (req, socket, head) => this.handleUpgrade(req, socket as net.Socket, head));
       srv.on('clientError', (err, socket) => {
         // Daemon parity: parser-level rejections (e.g. a missing Host header
@@ -191,7 +217,14 @@ export class ServerCore {
         socket.destroy();
       });
     }
-    this.wss = new WebSocketServer({ noServer: true, maxPayload: 5 * 1024 * 1024 });
+    this.wss = new WebSocketServer({
+      noServer: true,
+      // F-27 (re-verified with exact-size payloads): accept payload <= limit,
+      // reject > limit. ws applies this per MESSAGE; the per-FRAME daemon
+      // boundary (silent RST, no close frame) is enforced by the FrameGuard
+      // which sees every chunk BEFORE ws's own data listener.
+      maxPayload: opts.wsFrameSizeLimitBytes ?? 5242880,
+    });
     this.wss.on('connection', (ws, req) => this.handleWsConnection(ws, req));
     this.gcTimer = setInterval(() => this.loss.gc(300000), 60000);
     this.gcTimer.unref();
@@ -206,24 +239,40 @@ export class ServerCore {
 
   async start(): Promise<void> {
     if (this.running) throw new Error('ServerCore already running');
+    // Listener set from useIPv4/useIPv6/addresses (verified F-28/F-29).
+    const targets = this.resolveBindTargets();
+    if (targets.length === 0) {
+      throw new Error(
+        'No listen addresses resolved: OoklaServer.useIPv4 and OoklaServer.useIPv6 are both disabled and OoklaServer.addresses is empty',
+      );
+    }
     const binds: Promise<void>[] = [];
     for (const port of this.opts.tcpPorts) {
-      binds.push(
-        new Promise<void>((resolve, reject) => {
-          const srv = net.createServer({ noDelay: true }, (sock) => this.onRawConnection(sock));
-          srv.once('error', reject); // fail closed: bind errors are fatal (P0.1 fix)
-          srv.listen(port, '::', () => {
-            this.ev('listen_tcp', { port, family: 'dual-stack' });
-            resolve();
-          });
-          this.listeners.push(srv);
-        }),
-      );
+      for (const t of targets) {
+        binds.push(
+          new Promise<void>((resolve, reject) => {
+            const srv = net.createServer({ noDelay: true }, (sock) => this.onRawConnection(sock));
+            srv.once('error', reject); // fail closed: bind errors are fatal (P0.1 fix)
+            // The daemon binds 0.0.0.0 and [::] as SEPARATE sockets; with
+            // useIPv4=false its [::] refuses v4 (verified F-29), so the v6
+            // wildcard is bound V6ONLY here too.
+            srv.listen(
+              t.host === '::' ? { port, host: '::', ipv6Only: true } : { port, host: t.host },
+              () => {
+                this.ev('listen_tcp', { port, host: t.host, family: t.family });
+                resolve();
+              },
+            );
+            this.listeners.push(srv);
+          }),
+        );
+      }
     }
     await Promise.all(binds); // rejects (and propagates) on ANY bind failure
     // UDP binds are equally fatal (fail closed — the old code swallowed them).
     this.udp = new UdpLossEngine({
       ports: this.opts.udpPorts,
+      bindHosts: targets.map((t) => t.host),
       loss: this.loss,
       maxDatagramBytes: 2048,
       onEvent: (k, d) => this.ev(k, d),
@@ -233,10 +282,26 @@ export class ServerCore {
     this.ev('started', {
       tcpPorts: this.opts.tcpPorts,
       udpPorts: this.opts.udpPorts,
+      bindTargets: targets.map((t) => t.host),
       version: this.opts.versionString,
       instance: this.instanceUuid,
       pid: process.pid,
     });
+  }
+
+  /** Resolve the listener bind set (verified F-28/F-29):
+   *  - OoklaServer.addresses set  → exactly those addresses (documented intent;
+   *    deviation D-9 vs the daemon's broken v4 handling — see CONFIG_MATRIX.md)
+   *  - otherwise 0.0.0.0 when useIPv4, [::] when useIPv6 (daemon default). */
+  private resolveBindTargets(): { host: string; family: 'v4' | 'v6' }[] {
+    const explicit = (this.opts.bindAddresses ?? []).map((a) => String(a).trim()).filter((a) => a.length > 0);
+    if (explicit.length > 0) {
+      return explicit.map((a) => ({ host: a, family: a.includes(':') ? ('v6' as const) : ('v4' as const) }));
+    }
+    const out: { host: string; family: 'v4' | 'v6' }[] = [];
+    if (this.opts.bindIPv4 !== false) out.push({ host: '0.0.0.0', family: 'v4' });
+    if (this.opts.bindIPv6 !== false) out.push({ host: '::', family: 'v6' });
+    return out;
   }
 
   async stop(): Promise<void> {
@@ -408,7 +473,15 @@ export class ServerCore {
     const chunks: Buffer[] = [firstChunk];
     let total = firstChunk.length;
     const CAP = 65536;
-    const attempt = (): 'route' | 'wait' | 'reject' => {
+    /** Hand the accumulated bytes to Node's HTTP parser. */
+    const route = (): void => {
+      sock.unshift(Buffer.concat(chunks));
+      server.emit('connection', sock);
+      this.ev(transport === 'tcp' ? 'conn_http' : 'conn_https', { id, peer });
+    };
+    /** Decide whether the header block is complete/valid yet. 'reject'
+     *  performs its own minimal-500 write + destroy. */
+    const decide = (): 'route' | 'wait' | 'reject' => {
       const buf = Buffer.concat(chunks);
       const end = buf.indexOf('\r\n\r\n');
       if (end === -1) {
@@ -422,19 +495,36 @@ export class ServerCore {
         sock.destroy();
         return 'reject';
       }
-      sock.unshift(buf);
-      server.emit('connection', sock);
-      this.ev(transport === 'tcp' ? 'conn_http' : 'conn_https', { id, peer });
       return 'route';
     };
-    const first = attempt();
-    if (first !== 'wait') return;
+    const first = decide();
+    if (first === 'route') {
+      route(); // decided within the FIRST data event — same path as before
+      return;
+    }
+    if (first === 'reject') return;
+    // 'wait' — more bytes needed. F-30 (pre-existing rev-4 defect, fixed
+    // 2026-11-05): when the decision is later taken from INSIDE a data
+    // emission, performing sock.unshift()+emit('connection') right there
+    // re-enters the stream mid-emission — rev-4 re-entered its own data
+    // handler infinitely (>3.6 GB/s allocations, OOM-killed). Detaching
+    // before the call instead left the stream stalled. The hand-off is
+    // therefore DEFERRED to a clean stack via setImmediate.
+    let done = false;
     const onData = (chunk: Buffer): void => {
+      if (done) return;
+      done = true;
+      sock.removeListener('data', onData);
       chunks.push(chunk);
       total += chunk.length;
-      const r = attempt();
-      if (r === 'wait') return;
-      sock.removeListener('data', onData);
+      const r = decide();
+      if (r === 'wait') {
+        done = false;
+        sock.on('data', onData);
+        return;
+      }
+      if (r === 'reject') return;
+      setImmediate(route);
     };
     sock.on('data', onData);
   }
@@ -501,6 +591,14 @@ export class ServerCore {
   private handleUpgrade(req: http.IncomingMessage, socket: net.Socket, head: Buffer): void {
     const path = (req.url || '/').split('?')[0];
     if (path === '/ws') {
+      // Attach the frame-size guard BEFORE ws installs its own data listener:
+      // the guard must see each chunk first so an oversized frame header aborts
+      // the connection (RST, no reply — F-27) before ws can process the frame
+      // and answer it (ws's own accept boundary is maxPayload+1, which would
+      // let a limit+2 frame through and reply to it).
+      guardSeed(socket, head, this.opts.wsFrameSizeLimitBytes ?? 5242880, (limit) =>
+        this.ev('ws_frame_too_big', { limit, peer: req.socket.remoteAddress }),
+      );
       this.wss.handleUpgrade(req, socket, head, (ws) => {
         this.wss.emit('connection', ws, req);
       });
@@ -585,8 +683,23 @@ export class ServerCore {
       else this.perIp.set(peerIp, n - 1);
       this.ev('conn_close', { id, peer, ws: true, stats: connStats });
     });
-    ws.on('error', () => {
+    ws.on('error', (e) => {
+      // F-27: a message-level maxPayload violation (fragmented frames) or a
+      // protocol error — the daemon path is a silent abort; resetAndDestroy
+      // sends an RST and suppresses any close handshake.
+      this.ev('ws_error', { id, peer, error: String((e as Error & { code?: string }).code ?? e).slice(0, 80) });
       engine.destroy();
+      const raw = ws as unknown as { _socket?: net.Socket & { resetAndDestroy?: () => void } };
+      const s = raw._socket;
+      if (s && typeof s.resetAndDestroy === 'function') {
+        try {
+          s.resetAndDestroy();
+          return;
+        } catch {
+          /* fall through to terminate */
+        }
+      }
+      ws.terminate();
     });
     this.ev('conn_ws', { id, peer, secure });
   }
@@ -599,6 +712,128 @@ function firstCommandLine(buf: Buffer): Buffer {
   const nl = buf.indexOf(0x0a);
   if (nl === -1) return Buffer.concat([buf, Buffer.from('\n')]);
   return buf.subarray(0, nl + 1);
+}
+
+/**
+ * FrameGuard — per-frame WebSocket size enforcement, daemon parity (F-27).
+ *
+ * The `ws` library enforces `maxPayload` per MESSAGE and answers violations
+ * with a close frame; the reference daemon enforces per FRAME, replies
+ * NOTHING, and resets the TCP connection (client sees ECONNRESET; daemon logs
+ * "WebSocket Exception: Payload too big"). The guard watches the raw
+ * client→server byte stream with its own tiny frame-header parser next to
+ * ws's own data listener and destroys the socket the moment an oversized
+ * frame header is seen — before ws can emit anything or send any close
+ * frame. Accepted boundary (re-verified with exact-size payloads): payload
+ * <= acceptBytes passes; payload > acceptBytes aborts.
+ */
+const frameGuards = new WeakMap<net.Socket, (chunk: Buffer) => void>();
+
+export function guardSeed(
+  socket: net.Socket,
+  head: Buffer,
+  acceptBytes: number,
+  onViolation: (limit: number) => void,
+): void {
+  if (frameGuards.has(socket)) return; // one guard per socket
+  let dead = false;
+  let pending: Buffer = Buffer.alloc(0); // unconsumed prologue bytes
+  let stage: 'h' | 'e16' | 'e64' | 'm' | 'p' = 'h';
+  let payloadRemaining = 0;
+
+  const abort = (): void => {
+    if (dead) return;
+    dead = true;
+    try {
+      onViolation(acceptBytes);
+      // RST, not FIN (F-27): the daemon aborts with an unread payload in the
+      // kernel buffer; Node already drained the chunk into userspace, so a
+      // plain destroy() would FIN. resetAndDestroy() (Node ≥ 18.9) forces the
+      // abortive reset; older runtimes fall back to destroy.
+      const anySock = socket as net.Socket & { resetAndDestroy?: () => void };
+      if (typeof anySock.resetAndDestroy === 'function') anySock.resetAndDestroy();
+      else socket.destroy();
+    } catch {
+      /* socket already gone */
+    }
+  };
+
+  /** Consume the first `n` bytes of (pending + input); leftovers become the
+   *  new `rest`. Returns got.length < n when more bytes are needed (the
+   *  remainder is stashed in `pending`). */
+  const take = (input: Buffer, n: number): { got: Buffer; rest: Buffer } => {
+    const combined = pending.length ? Buffer.concat([pending, input]) : input;
+    if (combined.length < n) {
+      pending = combined;
+      return { got: Buffer.alloc(0), rest: Buffer.alloc(0) };
+    }
+    pending = Buffer.alloc(0);
+    return { got: combined.subarray(0, n), rest: combined.subarray(n) };
+  };
+
+  const feed = (chunk: Buffer): void => {
+    if (dead) return;
+    let rest = chunk;
+    while (rest.length > 0 || (stage === 'h' && pending.length >= 2)) {
+      if (stage === 'h') {
+        const { got, rest: r } = take(rest, 2);
+        if (got.length < 2) return;
+        rest = r;
+        const len7 = got[1] & 0x7f;
+        if (len7 < 126) {
+          payloadRemaining = len7;
+          stage = 'm';
+        } else if (len7 === 126) {
+          stage = 'e16';
+        } else {
+          stage = 'e64';
+        }
+      } else if (stage === 'e16') {
+        const { got, rest: r } = take(rest, 2);
+        if (got.length < 2) return;
+        rest = r;
+        payloadRemaining = got.readUInt16BE(0);
+        stage = 'm';
+      } else if (stage === 'e64') {
+        const { got, rest: r } = take(rest, 8);
+        if (got.length < 8) return;
+        rest = r;
+        const big = got.readBigUInt64BE(0);
+        if (big > 0xffffffffn) {
+          abort(); // absurd length: treat as oversized
+          return;
+        }
+        payloadRemaining = Number(big);
+        stage = 'm';
+      } else if (stage === 'm') {
+        const { got, rest: r } = take(rest, 4);
+        if (got.length < 4) return;
+        rest = r;
+        // Frame header complete — the daemon's decision point (F-27,
+        // re-verified with exact-size payloads): accept payload <= limit,
+        // abort (RST, no reply) when payload > limit.
+        if (payloadRemaining > acceptBytes) {
+          abort();
+          return;
+        }
+        stage = 'p';
+      } else {
+        // 'p': inside the payload of an accepted frame
+        const skip = Math.min(rest.length, payloadRemaining);
+        payloadRemaining -= skip;
+        rest = rest.subarray(skip);
+        if (payloadRemaining === 0) stage = 'h';
+      }
+      if (dead) return;
+      if (rest.length === 0 && pending.length === 0 && stage !== 'h') return;
+      if (rest.length === 0 && stage === 'h') return;
+    }
+  };
+
+  frameGuards.set(socket, feed);
+  if (head.length > 0) feed(head);
+  socket.on('data', feed);
+  socket.on('close', () => frameGuards.delete(socket));
 }
 
 import { ServerResponse } from 'node:http';

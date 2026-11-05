@@ -340,3 +340,120 @@ permissiveness; the deliberate refusal to stream unbounded data for
 unparsable DOWNLOAD sizes). DOWNLOAD reply STRUCTURE (length, prefix,
 trailing newline, ASCII charset) verified byte-exact for 100/1000/100000
 bytes. Full evidence: `validation/evidence/rea-lab-rev4/probe-diff-results.json`.
+
+---
+
+## Revision 5 findings (config-parity lab, 2026-11-05)
+
+Method: the official stable reference daemon (`ce180aa3…` tarball / binary
+`f19e5ed2…`, see REFERENCE_BINARY_MANIFEST.md for the corrected provenance)
+was run live next to the current SpeedtestServer build (daemon TCP/UDP 18080,
+SpeedtestServer 18081/18082) under matched per-variant configurations, then
+compared probe-for-probe. Evidence: `validation/evidence/rea-lab-rev5/`
+(probe JSON per variant) + the harness scripts
+`validation/harness/probe-config-parity.mjs` (new). Baseline re-verified
+first: build clean, **143/143 tests**, differential battery **89/103
+byte-identical** (identical to the rev-4 record — zero regression).
+
+New reference findings and their implementation status:
+
+- **F-26 [V]** `OoklaServer.userAgentFilterEnabled` — semantics fully
+  recovered. Default OFF (the official template ships the key commented;
+  verified live: with the key absent every UA string is served). When ON, the
+  daemon's built-in blocklist applies — located as 11 ordered regex literals
+  in the reference binary's .rodata (`libcurl-.*`, `AndroidSpeedtest`,
+  `Wi-Fi Maximiser`, `SPEEDTEST_CLIENT`, `Python-urllib`, `ubnt-test`,
+  `check_http`, `curl/.*`, `LuaSocket.*`, `showwin/speedtest-go.*`,
+  `Go-http-client/.*`) and verified live: each is a case-sensitive
+  FULL-STRING regex match on the OWS-trimmed UA value (literal entries match
+  only the exact string; `.*` entries any continuation). Rejection is a
+  500 **with Date header** (`HTTP/1.1 500 Internal Server Error\r\nDate:
+  …\r\nConnection: Close\r\n\r\n`) — a DIFFERENT form from the minimal
+  (no-Date) 500; it applies to every endpoint, and the Host checks win
+  (missing Host → minimal 500; Host mismatch → 307). IMPLEMENTED
+  (`HttpApi.isFilteredUserAgent` + step 3.5; TS default corrected false;
+  the repo template now ships the key commented like the official one).
+- **F-27 [V]** `OoklaServer.websocket.frameSizeLimitBytes` — default 5242880
+  (verified), accept iff frame payload ≤ limit, reject iff > limit; rejection
+  = NO reply frame, NO close frame, the TCP connection is RESET (client sees
+  ECONNRESET; the daemon logs "WebSocket Exception: Payload too big").
+  Note: the earlier rev-5 lab note claiming an "accept ≤ limit+1" boundary
+  was an artifact of a probe helper off-by-one (`'PING 1\n'` is 7 bytes, not
+  8) — corrected with exact-size payloads; both boundaries (64/65 at
+  limit 64, and 5242880/5242881 at the default) re-verified against the live
+  daemon. IMPLEMENTED (per-frame `FrameGuard` in ServerCore that sees each
+  chunk before ws's own data listener, RST via `resetAndDestroy()`; ws
+  `maxPayload` = limit retained as the message-level bound; ws-error path
+  terminates with RST).
+- **F-28 [V]** `OoklaServer.addresses` — the daemon's own handling is broken:
+  a listed IPv4 address is NEVER bound (even a real system IP), setting the
+  key at all removes the IPv4 wildcard entirely, listed v6 literals get their
+  own sockets, and the v6 wildcard `[::]` appears whenever any listed entry
+  does not itself produce a v6 literal bind (`127.0.0.1` → `[::]` only;
+  `127.0.0.1, ::1` → `[::]` + `[::1]`; `::1` → `[::1]` only). The documented
+  intent ("only listen on these addresses") is violated. DEVIATION D-9:
+  SpeedtestServer implements the documented intent exactly (bind the listed
+  addresses, both families; empty/absent → the useIPv4/useIPv6 wildcards).
+  Differential evidence: `rea-lab-rev5/config-daemon-addrs.json` vs
+  `config-sts-addrs.json` (listener shapes captured side by side).
+- **F-29 [V]** `OoklaServer.useIPv4` / `useIPv6` — honored independently by
+  the daemon for TCP and UDP: `useIPv4=false` leaves only `[::]` (v4 refused
+  on connect AND for UDP datagrams — verified live); `useIPv6=false` leaves
+  only `0.0.0.0`. Default (both true): TWO sockets per port (0.0.0.0 + [::]).
+  IMPLEMENTED (ServerCore binds per family with `[::]` V6ONLY; UdpLossEngine
+  binds per host with `ipv6Only` — the legacy no-`bindHosts` default keeps
+  the old dual-stack `[::]` socket; the UDP v4/V6ONLY layout matches the
+  daemon exactly).
+- **F-30 [V]** Pre-existing rev-4 defect (reproduced on a clean rev-4 HEAD
+  worktree): a request whose header block crosses 64 KiB before terminating
+  (e.g. a single ~65 KB+ header value) drove `routeHttp` into its
+  `total > CAP` branch from inside a data handler; `sock.unshift()` then
+  synchronously re-emits 'data' to the still-attached handler → infinite
+  recursion → >3.6 GB/s Buffer.concat allocations → OOM-kill (observed at
+  3.6 GB RSS; the kernel OOM-killer terminated the process). Consequence:
+  the rev-4 "negative battery 7/7" claim did NOT reproduce in a
+  memory-constrained lab (the rev-4 lab machine had enough headroom to
+  survive the leak long enough to pass the 1.2 s liveness checks). Root
+  cause captured via inspector pause (stack: attempt → unshift → emit →
+  onData → attempt …). FIXED: the mid-stream hand-off now defers via
+  `setImmediate` (outside the data emission); the first-event path is
+  unchanged. Regression tests: segmented 68 KB header (forced 3-phase
+  segmentation) + single-write 70 KB header — minimal 500, server alive,
+  memory bounded. Post-fix negative battery: **7/7 PASS** (previously
+  5/7 with the server dying on the oversized-header case).
+- **F-M1 [V]** REFERENCE_BINARY_MANIFEST.md recorded two "different"
+  2.11.5.2 artifacts — a category error: `ce180aa3…` is the SHA-256 of the
+  stable TARBALL, `f19e5ed2…` is the SHA-256 of the binary INSIDE it; they
+  are the same build (`cmp` = 0 differing bytes, verified 2026-11-05 by
+  downloading the official stable tarball). The committed
+  `OoklaServer-linux-x86_64` is byte-identical to the official stable
+  reference. The manifest also claimed "no vendor binaries are committed"
+  while the repository tracks five of them — corrected in this revision.
+  Manifest updated with the verified provenance.
+
+Post-revision-5 gate summary (all re-run on the final code):
+
+- Build/typecheck/lint: clean (3 pre-existing lint errors in decommissioned
+  legacy files, unchanged by this revision).
+- Unit/protocol/conformance: **143/143 PASS** (125 rev-4 + 16 rev-5 + 2
+  F-30 regressions; `ConfigParityRev5.test.ts`).
+- Differential battery: **89/103 raw byte-identical** — identical to the
+  rev-4 record; the 14 = 6 expected non-differences + 8 documented
+  deviations (D-2/D-3 + safety refusals).
+- Per-variant differential (new): ua-on / ws-64 / ipv4-off / ipv6-off —
+  **0 mismatches** on every battery (21-UA, WS boundary 63/64/65/4096,
+  family connects, listener inventories) —
+  `validation/evidence/rea-lab-rev5/`.
+- Negative battery: **7/7 PASS** (was 5/7 with the F-30 defect).
+- Strict TLS battery: 10/10 PASS (re-run).
+- Installer dry-run: PASS.
+- Official CLI acceptance gate: **BLOCKED (upstream)** — the live config
+  endpoint (`cli.speedtest.net/api/cli/config`) answers **429** for the
+  official CLI User-Agent from this lab IP (40+ minutes of retries, 5
+  attempts; a plain-UA fetch returns 200, so the throttle is per-UA+IP from
+  the earlier revisions' heavy gate usage). Evidence:
+  `out/rev5/*/proxy.jsonl` (`config_error: live config status 429`) and
+  `out/rev5/*/cli.stderr`. NOT counted as PASS; the pre-flight machinery
+  itself was re-verified (fail-closed daemon detection + port ownership).
+  The CLI's plaintext-fallback paths remain covered by the 103-probe
+  differential against the live reference daemon.

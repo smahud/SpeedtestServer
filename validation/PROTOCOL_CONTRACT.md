@@ -24,6 +24,11 @@ Confidence labels: **[V]** verified by direct observation (capture/probe replay)
   the packet-loss/loaded-latency protocol. **[V]**
 - Per-connection detection by first bytes: TLS ClientHello (`0x16 0x03…`),
   HTTP method (`GET|POST|HEAD|…` + space), anything else → NetGauge. **[V]**
+- Listener binding (rev 5 [V], F-28/F-29): default = TWO sockets per port —
+  `0.0.0.0` (useIPv4) and `[::]` (useIPv6, v6-only); `useIPv4=false` /
+  `useIPv6=false` remove the respective family for TCP and UDP alike. The
+  daemon's `addresses` handling is broken (F-28) — SpeedtestServer implements
+  the documented intent instead (deviation D-9).
 - TLS floor 1.2 (1.0/1.1 → `protocol_version` alert). **[P]**
 
 ## 2. Native NetGauge command protocol (TCP, `\n`-terminated ASCII lines)
@@ -140,6 +145,21 @@ method matrix, minimal 500s and path normalization, all **[V]**.)*
 4. **`Authorization: Bearer <token>`** with a non-JWT-shaped token → minimal
    500; JWT-shaped tokens and other schemes (Basic, empty) are not
    inspected. **[V]**
+4.5. **`userAgentFilterEnabled = true` only (rev 5 [V], F-26)** — the built-in
+   bad-UA blocklist (11 case-sensitive full-string regex patterns from the
+   reference binary: `libcurl-.*`, `AndroidSpeedtest`, `Wi-Fi Maximiser`,
+   `SPEEDTEST_CLIENT`, `Python-urllib`, `ubnt-test`, `check_http`, `curl/.*`,
+   `LuaSocket.*`, `showwin/speedtest-go.*`, `Go-http-client/.*`), applied to
+   the OWS-trimmed UA value on EVERY endpoint. The rejection is a 500 WITH a
+   Date header (`HTTP/1.1 500 Internal Server Error
+Date: …
+
+   Connection: Close
+
+`) — a different form from the minimal 500.
+   Default OFF (the official template ships the key commented out). Steps
+   1–3.5 run in this order (missing Host wins with the minimal 500; Host
+   mismatch wins with the 307) — verified.
 5. `GET /ws` without an upgrade request → **silent close, no response**. **[V]**
 
 ### 4.2 Endpoint matrix (after validation passes)
@@ -221,7 +241,11 @@ Keep-alive: honored (pipelining works); 404s close. `Range` header: ignored
 - **QUIT over WS → `ERROR\n` reply, session stays open (rev 4 [V])** — unlike
   TCP where QUIT closes the connection.
 - **No "three strikes" over WS (rev 4 [V])** — see §2.
-- Frame size limit 5 MiB (`OoklaServer.websocket.frameSizeLimitBytes`). **[P]**
+- Frame size limit `OoklaServer.websocket.frameSizeLimitBytes`, default
+  5242880 (rev 5 [V], F-27): a frame with payload ≤ limit is processed
+  normally; a frame with payload > limit gets NO reply and NO close frame —
+  the TCP connection is reset (client observes ECONNRESET; the daemon logs
+  "WebSocket Exception: Payload too big").
 
 ## 6. Session lifecycle and limits (reference vs this implementation)
 

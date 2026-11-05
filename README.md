@@ -26,17 +26,18 @@ testing. No proprietary code or assets are included; the compatibility
 banner is configurable (`OoklaServer.netgaugeVersionString`). Parity claims
 are bounded to the verified profile — `validation/PARITY_MATRIX.md`.
 
-## 3. Current TypeScript compatibility status (revision 4 — live differential lab, 2026-11-04)
+## 3. Current TypeScript compatibility status (revision 5 — config-parity + defect fix, 2026-11-05)
 
 | Gate | Result |
 |---|---|
-| **Live differential battery vs the running reference daemon** (103 probes: NetGauge/HTTP/TLS/WS/UDP) | **89/103 raw byte-identical**; 6 expected non-differences (timestamps, random payload, own port); 8 documented deviations (D-2/D-3 + safety refusals) — `validation/evidence/rea-lab-rev4/` |
-| Official Speedtest CLI 1.2.0.84 → this server (non-publishing) | **PASS 3/3 isolated runs** — exit 0, latency+download+upload complete, packet loss 0 |
+| **Live differential battery vs the running reference daemon** (103 probes: NetGauge/HTTP/TLS/WS/UDP) | **89/103 raw byte-identical**; 6 expected non-differences (timestamps, random payload, own port); 8 documented deviations (D-2/D-3 + safety refusals) — re-verified on the rev-5 code (zero regression) |
+| **Per-config-variant differential (new, rev 5)**: `userAgentFilterEnabled`, `frameSizeLimitBytes`, `useIPv4`/`useIPv6` | **0 mismatches** on every battery — `validation/evidence/rea-lab-rev5/` |
+| Official Speedtest CLI 1.2.0.84 → this server (non-publishing) | rev 4: **PASS 3/3 isolated runs** · rev 5 re-run: **BLOCKED upstream** (config endpoint throttles the CLI UA from the lab IP — see HANDOFF); plaintext-fallback paths covered by the differential |
 | Publishing opt-in battery (multi-server, forced local) | genuine public speedtest.net Result URLs, e.g. `https://www.speedtest.net/result/c/55713fba-3d50-4558-95f2-7afbde18107a` (`validation/PUBLISHED_RESULT_URLS.md`) |
 | Speedtest Host Tester v1.1.0 | **10/10 PASS** (identical verdict to the official reference daemon) |
-| Unit/protocol/conformance suite | **125/125** |
-| Negative/security battery | 7/7 |
-| Strict TLS battery (§9/§10) | **10/10 PASS** (custom-cert trust, fail-closed misconfiguration, hot reload) |
+| Unit/protocol/conformance suite | **143/143** (125 rev-4 + 18 rev-5 regressions: F-26/F-27/F-28/F-29 wiring + the F-30 security fix) |
+| Negative/security battery | **7/7** (rev 4 shipped 5/7-effective: a >64 KiB header block OOM-killed the server — F-30 fixed; see FINDINGS) |
+| Strict TLS battery (§9/§10) | **10/10 PASS** (re-run on rev-5 code) |
 | Installer (dry-run/staged/idempotent/fail-closed) | PASS (systemd start: container-blocked, documented) |
 
 Revision 4 (2026-11-04) re-verified the protocol **against the live
@@ -177,12 +178,13 @@ URLs (spot-verified against the live result pages). Details:
   documented plaintext fallback (verified 3/3) is used instead (D-2).
 - Automatic issuance requires an operator-controlled domain; real ACME
   issuance is not exercised in the lab (fail-closed paths are).
-- `userAgentFilterEnabled` flag, `frameSizeLimitBytes`
-  override, explicit `addresses` binding are parsed but not applied —
-  documented with rationale in `validation/CONFIG_MATRIX.md`.
-  (`allowedDomains` IS applied — verified semantics: CSP `connect-src`,
-  crossdomain.xml entries and the CORS Origin filter; see
-  `validation/PROTOCOL_CONTRACT.md` §4.5.)
+- `userAgentFilterEnabled`, `frameSizeLimitBytes` override,
+  `useIPv4`/`useIPv6` and `addresses` binding are **applied** as of
+  revision 5 (F-26…F-29, verified against the live daemon). The one
+  deliberate deviation: `addresses` implements the documented intent
+  (deviation D-9) because the reference daemon's own handling never binds
+  listed IPv4 addresses — details in `validation/CONFIG_MATRIX.md` and
+  FINDINGS.md §rev 5. (`allowedDomains` has been applied since rev 4.)
 - HTTP Host validation follows the daemon exactly: only certificate SAN
   entries are accepted (others get a 307 redirect to `https://<cert-CN>`) —
   deploy a certificate whose SANs cover the hostnames/IPs clients will use.

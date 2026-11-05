@@ -1,0 +1,205 @@
+{
+  "label": "sts-ipv4off",
+  "port": 18082,
+  "generatedAt": "2026-11-04T20:12:40.777Z",
+  "listeners": {
+    "tcp": [
+      {
+        "local": "[::]:18082",
+        "process": ""
+      }
+    ],
+    "udp": [
+      {
+        "local": "[::]:18082",
+        "process": ""
+      }
+    ]
+  },
+  "familyConnect": {
+    "v4": {
+      "host": "127.0.0.1",
+      "ok": false,
+      "err": "ECONNREFUSED"
+    },
+    "v6": {
+      "host": "::1",
+      "ok": true
+    }
+  },
+  "uaFilter": [
+    {
+      "tag": "none",
+      "ua": null,
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "empty",
+      "ua": "",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "x",
+      "ua": "x",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "curl",
+      "ua": "curl/8.5.0",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "wget",
+      "ua": "Wget/1.21.4",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "python-requests",
+      "ua": "python-requests/2.31.0",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "go-http",
+      "ua": "Go-http-client/2.0",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "okhttp",
+      "ua": "okhttp/4.12.0",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "java",
+      "ua": "Java/1.8.0_312",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "libwww-perl",
+      "ua": "libwww-perl/6.36",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "chrome",
+      "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "firefox",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "mozilla-token",
+      "ua": "Mozilla",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "speedtest-cli",
+      "ua": "Speedtest/1.2.0.84",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "hackerbot",
+      "ua": "HackerBot/1.0",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "zgrab",
+      "ua": "Mozilla/5.0 zgrab/0.x",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "masscan",
+      "ua": "masscan/1.3",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "sqlmap",
+      "ua": "sqlmap/1.7.2#stable (http://sqlmap.org)",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "nmap",
+      "ua": "nmap-testing",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "long-4k",
+      "ua": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    },
+    {
+      "tag": "spaces",
+      "ua": "   ",
+      "response": "(no response)",
+      "len": 0,
+      "closed": true
+    }
+  ],
+  "wsFrameLimit": [
+    {
+      "size": 63,
+      "handshake": "",
+      "frames": [],
+      "closedByServer": false
+    },
+    {
+      "size": 64,
+      "handshake": "",
+      "frames": [],
+      "closedByServer": false
+    },
+    {
+      "size": 65,
+      "handshake": "",
+      "frames": [],
+      "closedByServer": false
+    },
+    {
+      "size": 4096,
+      "handshake": "",
+      "frames": [],
+      "closedByServer": false
+    }
+  ]
+}

@@ -120,6 +120,15 @@ export class OoklaServer extends EventEmitter {
         ? this.config.allowedDomains
         : ['*'],
       excludeDefaultDomains: this.config.excludeDefaultDomains === true,
+      // F-26/F-27/F-28/F-29 (verified 2026-11-05): config parity wiring.
+      userAgentFilterEnabled: this.config.userAgentFilterEnabled === true,
+      wsFrameSizeLimitBytes:
+        typeof this.config.websocket?.frameSizeLimitBytes === 'number' && this.config.websocket.frameSizeLimitBytes > 0
+          ? this.config.websocket.frameSizeLimitBytes
+          : 5242880,
+      bindIPv4: this.config.useIPv4 !== false,
+      bindIPv6: this.config.useIPv6 !== false,
+      bindAddresses: Array.isArray(this.config.addresses) ? this.config.addresses.map(String) : [],
       onEvent: (kind, detail) => {
         if (kind.startsWith('conn_') || kind === 'listen_tcp' || kind === 'listen_udp' || kind === 'started' || kind === 'stopped'
           || kind.startsWith('tls_')) {

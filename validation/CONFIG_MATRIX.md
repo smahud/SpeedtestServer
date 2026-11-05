@@ -22,17 +22,17 @@ is never a float). `--config` selects the file verbatim.
 | `OoklaServer.tcpPorts` | `tcpPorts: number[]` | `ServerCore` — one multiplexed listener per port (TLS/HTTP/WS/NetGauge) | **IV** — gates listen on 8080+5060; unit test; battery |
 | `OoklaServer.udpPorts` | `udpPorts: number[]` | `UdpLossEngine` (LOSS/RECV) | **IV** — CLI packet-loss accounting works; UDP listeners in inventories |
 | `OoklaServer.httpPorts` | `httpPorts` | none (single-port multiplexer serves HTTP on every TCP port — reference deployment model) | **PNA** — redundant by design; kept parsed for template fidelity |
-| `OoklaServer.useIPv6` / `useIPv4` | `useIPv6` / `useIPv4` | listener binds `::` (dual-stack) always | **P** — dual-stack matches the verified reference default (both true); separate v4/v6 disablement not offered |
-| `OoklaServer.addresses` | `addresses` | none (bind is dual-stack wildcard) | **PNA** — documented limitation: explicit address lists not bound |
+| `OoklaServer.useIPv6` / `useIPv4` | `useIPv6` / `useIPv4` | `ServerCore.resolveBindTargets` → per-family listeners (0.0.0.0 + `[::]` V6ONLY); `UdpLossEngine` mirrors it | **IV** (rev 5, F-29) — `useIPv4=false`/`useIPv6=false` verified against the live daemon (TCP + UDP) |
+| `OoklaServer.addresses` | `addresses` → `bindAddresses` | `ServerCore.resolveBindTargets` → exact listed addresses, both families | **IV (documented intent)** — the daemon's own handling is broken (F-28); deliberate deviation D-9 (DECISIONS.md) |
 | `OoklaServer.netgaugeVersionString` | `netgaugeVersionString` | NetGauge `HELLO` + HTTP `/hi` banner | **IV (EXT)** — differential probe byte-identical; `--version-string` CLI too |
 
 ## Access control
 
 | Property | Maps to | Runtime consumer | Status & evidence |
 |---|---|---|---|
-| `OoklaServer.allowedDomains` | `allowedDomains: string[]` | none | **PNA** — no verified reference semantics observable in the authorized lab (the daemon's domain admission is host-network machinery, §8); enforcing unverified filters would risk the verified interop profile. Standalone servers are not host-registered. |
+| `OoklaServer.allowedDomains` | `allowedDomains: string[]` | `HttpApi` (CSP connect-src, crossdomain.xml entries, CORS Origin filter) | **IV** (rev 4, F-22 — this row was stale before rev 5) |
 | `OoklaServer.excludeDefaultDomains` | `excludeDefaultDomains` | none | **PNA** — same rationale |
-| `OoklaServer.userAgentFilterEnabled` | `userAgentFilterEnabled` | UA-less requests → HTTP 500 is implemented unconditionally in `HttpApi` | **P** — the core UA behavior is verified byte-identical (differential probe "GET /hi WITHOUT User-Agent → 500"); the on/off flag itself is not wired (daemon default true = behavior on) |
+| `OoklaServer.userAgentFilterEnabled` | `userAgentFilterEnabled` | `HttpApi` step 3.5 — built-in 11-pattern bad-UA blocklist, 500-with-Date form | **IV** (rev 5, F-26) — default false (daemon-verified); full-string case-sensitive regex; Host checks win |
 | `OoklaServer.clientAuthToken.denyInvalid` | `clientAuthToken.denyInvalid` | none — the verified profile never requests client tokens (daemon parity: `verificationMode=none`) | **PNA** — see EXTERNAL_FLOWS.md |
 | `OoklaServer.clientAuthToken.additionalValidationFields` | `clientAuthToken` | none | **PNA** — same |
 
@@ -45,7 +45,7 @@ is never a float). `--config` selects the file verbatim.
 | `OoklaServer.ipTracking.gcIntervalMinutes` / `maxIdleAgeMinutes` / `slidingWindowBucketLengthMinutes` / `metricTopIpCount` / `maxConnPerBucketPerIp` | `ipTracking.*` | LossRegistry GC is fixed 300 s; per-bucket admission counters not ported | **P** — maxConnPerIp applied; the metrics-bucket machinery fed the decommissioned metrics uploader (§8) |
 | `OoklaServer.maxConnectionSeconds` | `maxConnectionSeconds` | socket idle timeout (`conn_timeout`), capped at 1 h | **IV** — mirrors daemon default 3600 |
 | `OoklaServer.http.maxHeadersSize` | `http.maxHeadersSize` | none — Node's HTTP parser enforces its own header limits | **PNA** — equivalent protection verified by negative test "oversized HTTP headers → server survives" |
-| `OoklaServer.websocket.frameSizeLimitBytes` | `websocket.frameSizeLimitBytes` | WS `maxPayload` is fixed at 5 MiB (the daemon default) | **P** — default value honored; per-config override not wired |
+| `OoklaServer.websocket.frameSizeLimitBytes` | `websocket.frameSizeLimitBytes` → `wsFrameSizeLimitBytes` | ws `maxPayload` = limit (message-level bound) + per-frame `FrameGuard` (silent RST on `> limit`, daemon parity) | **IV** (rev 5, F-27) — boundary verified against the live daemon at limit 64 and at the 5242880 default |
 
 ## SSL / TLS (v6.0 §9 — all semantics verified this revision)
 
@@ -87,11 +87,11 @@ is never a float). `--config` selects the file verbatim.
 | `OoklaServer.evidenceLogFile` | `evidenceLogFile` | `ServerCore` JSONL evidence log (connections, commands, byte counters) | **IV (EXT)** — the corroboration channel for every gate |
 | (CLI) `--config`, `--ports`, `--udp-ports`, `--evidence-log`, `--version-string`, `--validate-config`, `--role` | config overrides / validation mode | `bin/ooklaserver.ts` | **IV (EXT)** — `--config` + precedence unit-verified; `--validate-config` used by install.sh |
 
-## Summary counts
+## Summary counts (updated rev 5, 2026-11-05)
 
-- **IV (official keys):** tcpPorts, udpPorts, useIPv6/useIPv4 (dual-stack), maxConnPerIp, maxConnectionSeconds, userAgentFilter core behavior, useLetsEncrypt, certificateFile/privateKeyFile (+incomplete-pair fatal), verificationMode (default behavior), minimumTLSProtocol, logging.loggers.\* (name/level/class/path)
-- **P:** userAgentFilterEnabled flag, websocket.frameSizeLimitBytes (default only), ipTracking (partially)
-- **PNA (documented rationale each):** httpPorts (redundant), addresses, allowedDomains/excludeDefaultDomains, clientAuthToken.\*, http.maxHeadersSize (equivalent protection), rotation keys, host/result/stats/traceroute/update keys
+- **IV (official keys):** tcpPorts, udpPorts, **useIPv6/useIPv4 (per-family listeners)**, **addresses (documented intent, D-9)**, **allowedDomains (rev 4 F-22 — row was stale)**, **userAgentFilterEnabled (rev 5 F-26)**, **websocket.frameSizeLimitBytes (rev 5 F-27)**, maxConnPerIp, maxConnectionSeconds, useLetsEncrypt, certificateFile/privateKeyFile (+incomplete-pair fatal), verificationMode (default behavior), minimumTLSProtocol, logging.loggers.\* (name/level/class/path)
+- **P:** ipTracking (partially — maxConnPerIp applied; metrics-bucket machinery decommissioned)
+- **PNA (documented rationale each):** httpPorts (redundant), excludeDefaultDomains semantics beyond allowedDomains union, clientAuthToken.\*, http.maxHeadersSize (equivalent protection), rotation keys, host/result/stats/traceroute/update keys
 - **N/A by design:** workerThreadPool.\*
 - **EXT:** netgaugeVersionString, evidenceLogFile, ssl.acme.\*, ssl.allowSelfSigned, validate-config
 

@@ -79,3 +79,18 @@ connection/command/byte-counter events.
 **Why:** server-side corroboration of client runs (Gate CLI-3/4) without
 packet capture privileges; this is how 24.65 GB sent / 19.11 GB received were
 attributed to SpeedtestServer during the passing CLI run.
+
+## D-9 — `OoklaServer.addresses`: implement the documented intent, not the daemon's defect
+
+**Decision:** SpeedtestServer binds exactly the listed addresses (both
+families); an empty/absent list falls back to the useIPv4/useIPv6 wildcards.
+**Why (F-28, verified 2026-11-05):** the reference daemon's own handling of
+this key is broken — a listed IPv4 address is never bound (even a real
+system IP), setting the key at all silently removes all IPv4 service, and a
+v6 wildcard `[::]` appears as a side effect whenever a listed entry fails to
+match. Reproducing that would break legitimate operator expectations
+(documented in the official template as "the server will only listen on
+these addresses"). As with the unbounded-DOWNLOAD safety refusal, verified
+protocol parity is bounded to sane reference behavior; the daemon's
+observed quirk is recorded in FINDINGS.md F-28 and in the per-variant
+differential evidence (`rea-lab-rev5/config-daemon-addrs.json`).
