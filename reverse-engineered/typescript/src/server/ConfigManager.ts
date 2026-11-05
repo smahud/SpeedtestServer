@@ -71,6 +71,9 @@ const DEFAULT_CONFIG: OoklaServerConfig = {
   httpPorts: [8080],
   netgaugeVersionString: '2.11 (2.11.5) 2026-06-04.1737.7d0993d', // compatibility profile (verified 2026-11-04)
   evidenceLogFile: '',
+  // Independent safety parameters (NOT daemon-parity keys — F-35/F-36):
+  shutdownGraceSeconds: 10, // bounded graceful shutdown (force-destroy after)
+  evidenceMaxBacklogBytes: 32 * 1024 * 1024, // evidence WriteStream backlog cap
   useIPv6: true, // Binary default from properties file (verified F-29: independent v4/v6 listener control)
   addresses: [], // daemon default: the official template ships the key ABSENT — empty = wildcard set from useIPv4/useIPv6 (F-28)
   useIPv4: true,

@@ -18,8 +18,6 @@ import * as dgram from 'dgram';
 import * as tls from 'tls';
 import * as crypto from 'crypto';
 import * as url from 'url';
-import * as fs from 'fs';
-import * as path from 'path';
 import WebSocket from 'ws';
 import { OoklaServerConfig, ClientSessionContext } from '../types/core';
 import { Logger } from './Logger';

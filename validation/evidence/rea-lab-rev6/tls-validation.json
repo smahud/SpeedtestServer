@@ -1,0 +1,12 @@
+{"k":"battery","startedUtc":"2026-11-05T13:36:58Z","port":8443,"node":"v24.22.2","gitSha":"d3098bbb5cc15e565758d79be392588126a44db6"}
+{"id":"T1","verdict":"PASS","expected":"strict HTTPS 200, CN=localhost","observed":"HTTP_200 TLSv1.3 localhost","evidence":""}
+{"id":"T2","verdict":"PASS","expected":"A→B swap serves B; broken write keeps B","observed":"A=D1:A4:76:56:9A:1… B=C5:88:B3:B2:CD:9… after-broken=C5:88:B3:B2:CD:9…","evidence":""}
+{"id":"T3","verdict":"PASS","expected":"TLSv1.2 rejected; TLSv1.3 accepted","observed":"12=rejected 13=accepted-tls13","evidence":""}
+{"id":"N1","verdict":"PASS","expected":"strict HTTPS FAIL (self-signed)","observed":"DEPTH_ZERO_SELF_SIGNED_CERT","evidence":""}
+{"id":"N2","verdict":"PASS","expected":"CERT_HAS_EXPIRED","observed":"CERT_HAS_EXPIRED","evidence":""}
+{"id":"N3","verdict":"PASS","expected":"CERT_ALTNAME/hostname mismatch","observed":"ERR_TLS_CERT_ALTNAME_INVALID","evidence":""}
+{"id":"N4","verdict":"PASS","expected":"server exits non-zero","observed":"exit=1 ","evidence":""}
+{"id":"N5","verdict":"PASS","expected":"server exits non-zero","observed":"exit=1 Refusing to fall back","evidence":""}
+{"id":"N6","verdict":"PASS","expected":"server exits non-zero","observed":"exit=1 Refusing to fall back","evidence":""}
+{"id":"N7","verdict":"PASS","expected":"server exits non-zero","observed":"exit=1 ","evidence":""}
+{"k":"battery","finishedUtc":"2026-11-05T13:37:14Z"}

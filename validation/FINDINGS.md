@@ -457,3 +457,135 @@ Post-revision-5 gate summary (all re-run on the final code):
   itself was re-verified (fail-closed daemon detection + port ownership).
   The CLI's plaintext-fallback paths remain covered by the 103-probe
   differential against the live reference daemon.
+
+---
+
+# Revision 6 — security/reliability hardening + gate re-opened (2026-11-05)
+
+Baseline for this revision: commit `d3098bbb` (rev 5 HEAD), Node v24.22.2,
+Linux x86_64 (container). Audit driven by MASTER PROMPT v8.0 §6: every
+hypothesis was first reproduced with a bounded local probe
+(`6/6 confirmed defects pre-fix`), then fixed in the canonical
+implementation, then covered by regression tests
+(`src/server/HardeningRev6.test.ts`, 17 tests) and the full suite re-run.
+
+## New findings (F-31…F-37)
+
+- **F-31 [V]** Global connection limit blind to pre-protocol sockets —
+  `onRawConnection()` checked `conns.size`, but registration only happened
+  at protocol routing. Sockets that connected and never sent (or drip-fed
+  a header/ClientHello) were invisible to `maxConnections`: probe showed
+  10/10 silent sockets accepted with `maxConnections=5` (per-IP limit
+  caught single-source floods, the global cap did not). FIXED: every
+  accepted socket is registered immediately (transport refined on routing);
+  `conns.size` == live sockets (pre-protocol, mid-TLS, mid-upgrade,
+  HTTP/NetGauge/WS all counted, none double-counted).
+- **F-32 [V]** WebSocket sessions double-counted — the WS upgrade minted a
+  SECOND registration (new id + `connectionsTotal` + per-IP slot) on top of
+  the TCP connection's entry: one live WS session showed
+  `activeConnections=2`, `connectionsTotal=2`, and consumed 2 per-IP slots
+  (halving effective limits; 2 WS sessions were refused under
+  `maxConnections=2`). FIXED: the session REUSES the accept-time
+  registration (`streamIds` maps the raw socket and its TLSSocket wrapper
+  to one id); the raw socket's close handler performs the single decrement
+  and emits `conn_close` with the session's FINAL byte counters.
+- **F-33 [V]** `LossRegistry` unbounded — client-supplied UUIDs were
+  auto-registered without any capacity bound: 100k distinct UUIDs from ONE
+  source IP → +20.5 MB heap, all retained (a distinct-UUID UDP flood at
+  50k pps ≈ multi-GB steady state between GC sweeps). FIXED: per-source-IP
+  cap (default 64) + global cap (default 2048) with least-recently-seen
+  eviction (Map-recency order, O(1) amortized; per-IP bookkeeping map).
+  Official CLI behavior preserved (1 uuid per test; the CLI's
+  LOSS/RECV/PLOSS contract re-verified end-to-end in the acceptance gates
+  and by unit tests).
+- **F-34 [V]** Partial startup left orphaned listeners — `start()` used
+  `Promise.all`, which rejected on the FIRST bind failure while other binds
+  completed afterwards: with portA occupied, `start()` rejected but portB's
+  listener still accepted connections (verified: PING answered on the
+  "failed" server). FIXED: all binds settle (`allSettled`) — on ANY failure
+  every bound TCP listener, UDP socket, accepted-but-unrouted socket and
+  accounting entry is closed/cleared before the error propagates
+  (`abortPartialStartup()`); `UdpLossEngine.start()` got the same
+  all-settled cleanup. A failed `start()` is now fully retriable.
+- **F-35 [V]** Graceful shutdown could hang forever — `stop()` awaited
+  `net.Server`/`http.Server` close callbacks that wait for ALL connections
+  to end: with an in-flight trickle upload `stop()` did not complete within
+  5 s (unbounded). FIXED: bounded graceful shutdown — listeners' close
+  callbacks join a race against `shutdownGraceMs` (default 10 000 ms,
+  configurable via `OoklaServer.shutdownGraceSeconds`); the grace phase
+  closes idle HTTP connections and starts WS close handshakes; after the
+  bound everything still open is force-destroyed (incl. idle NetGauge
+  sessions, which no HTTP-layer close ever touched). stop() is idempotent
+  and always resolves (verified: 1 502 ms with grace 1 500 ms).
+- **F-36 [V]** Evidence-log backlog unbounded — the JSONL WriteStream
+  buffered without bound when the sink stalled (slow disk, unread pipe):
+  1.7 MB queued for 20k events, linear growth, no cap. FIXED: backlog cap
+  (default 32 MiB, `OoklaServer.evidenceMaxBacklogBytes`) — past the cap
+  the stream is destroyed and evidence logging degrades to OFF while the
+  measurement service keeps serving; `stop()`'s evidence flush is also
+  bounded (2 s window, then destroy — an unopenable sink used to hang
+  shutdown too).
+- **F-37 [V]** `Origin: null` reflected under the DEFAULT config —
+  `originAllowed()` short-circuited on the wildcard before the null rule,
+  so with `allowedDomains` unset ("*") we answered
+  `Access-Control-Allow-Origin: null` where the daemon never reflects
+  "null" (newly exposed by running the differential with BOTH servers on
+  default config; the rev-5 lab had `allowedDomains=*.example.org` on both,
+  which masked the 307-vs-200 path entirely). FIXED: the null rejection now
+  runs before the wildcard check. Note: pre-existing logic, not a rev-6
+  regression; the same differential also re-exposed that 307 responses are
+  `Connection: Close` in our implementation while the daemon honors
+  keep-alive on the first pipelined request — left as a DOCUMENTED
+  deviation (harmless to clients; the CLI never follows HTTP redirects),
+  see DECISIONS.md D-10.
+
+## Post-revision-6 gate summary (all on the final code)
+
+- Build/typecheck: clean. Lint: **0 errors** (was 3 errors — unused
+  imports in `OoklaRequestHandler.ts`, `require()` in
+  `TLSCertificateManager.ts`; 16 pre-existing stylistic warnings remain).
+- Unit/protocol/conformance/hardening: **160/160 PASS** (143 rev-5 + 17
+  rev-6: 15 in `HardeningRev6.test.ts` + 2 F-37).
+- F-30 memory-bounded re-verification: ConfigParityRev5 suite under
+  `--max-old-space-size=256` — 18/18 PASS (both F-30 regressions included).
+- Differential battery (both servers on DEFAULT config, same lab CA):
+  **89/103 byte-identical** — the same 14 as rev 5 (6 expected
+  non-differences + 8 documented deviations), NO new mismatches after the
+  F-37 fix (the one new mismatch found pre-fix was F-37 itself).
+  Evidence: `validation/evidence/rea-lab-rev6/probe-diff-results.json`.
+  Lab note: the probe corpus sends `Host: san1.local` — the server
+  certificate must carry that SAN or every HTTP probe takes the 307 path
+  and the comparison degrades to port artifacts (rev-5 evidence was
+  generated with a san1.local-SAN cert; `gen-pki.sh` does not include it —
+  regenerate a cert with SAN `san1.local` for differential reproduction).
+- Official CLI acceptance gate: **PASS 7/7 isolated runs** (unmodified
+  Speedtest CLI 1.2.0.84, sha256-verified tarball, lawfully downloaded from
+  install.speedtest.net; fail-closed preflight: target port owned by
+  SpeedtestServer, official daemon ABSENT — the preflight itself refused
+  twice in this session when a lab daemon was left alive, working as
+  designed). All runs: exit 0, `type:result`, `server.host=localhost`,
+  `persisted=false` (non-publishing enforced at the proxy), full
+  latency+download+upload+packetLoss measurements.
+  `packetLoss=0` in 5/7 runs; 2 runs showed 14–26% — the documented
+  stochastic loopback UDP-loss outlier (PUBLISHED_RESULT_URLS.md §5; the
+  historical official-daemon baseline itself shows a 51.5% outlier —
+  `evidence/baseline-cli-1.json`). Server-side evidence for the outlier
+  runs: contiguous LOSS seq ranges, zero gaps, zero evictions — datagrams
+  were dropped kernel-side before delivery, not by the server.
+  Byte-counter corroboration: server evidence bytes ≈ CLI-reported volumes
+  (ratios 1.002/1.009). Evidence:
+  `validation/evidence/rea-lab-rev6/gate-runs/{run1,run2,run3,final,run6,run7}/`.
+  The rev-5 upstream 429 throttle has cleared (config endpoint HTTP 200
+  with the CLI UA via the proxy).
+- Negative battery: **7/7 PASS** (re-run on rev-6 code).
+- Strict TLS battery: **10/10 PASS** (re-run on rev-6 code).
+- Installer: dry-run PASS + full staged install PASS (`--staging-dir`;
+  `systemd-analyze verify` OK + live protocol probe of the staged server).
+- Reference-binary provenance: ALL FIVE committed vendor binaries
+  re-verified byte-identical against official sources on 2026-11-05
+  (x86_64 tarball+binary, aarch64, macosx, windows64.zip incl. the exe
+  inside it) — REFERENCE_BINARY_MANIFEST.md updated.
+- systemd real service lifecycle: **BLOCKED** (no systemd in the audit
+  container; unit file statically verified).
+- ACME real issuance: **BLOCKED** (no operator-controlled domain from this
+  environment; fail-closed paths covered by TLS N6/N7).

@@ -94,3 +94,32 @@ these addresses"). As with the unbounded-DOWNLOAD safety refusal, verified
 protocol parity is bounded to sane reference behavior; the daemon's
 observed quirk is recorded in FINDINGS.md F-28 and in the per-variant
 differential evidence (`rea-lab-rev5/config-daemon-addrs.json`).
+
+## D-10 — 307 redirect responses close the connection unconditionally
+
+**Decision:** SpeedtestServer's Host-mismatch 307 answers always carry
+`Connection: Close` and close the connection; the reference daemon honors
+keep-alive on the first pipelined request (its FIRST 307 says
+`Keep-Alive`, the second `Close`).
+**Why (observed 2026-11-05, rev-6 differential with both servers on
+default config):** discovered while reproducing the differential battery
+outside the rev-5 lab's SAN-matched layout. Deliberately kept as a
+documented deviation: HTTP clients (browsers, curl, the official CLI's
+fallbacks) handle `Connection: Close` on a redirect by reconnecting — the
+redirect target is a different (TLS) endpoint anyway, so a kept-alive
+plaintext connection has no reuse value. Recorded as a deviation rather
+than parity work to avoid touching the well-verified 307 byte shape
+(F-15/F-16) for a zero-client-impact difference.
+
+## D-11 — Bounded shutdown and bounded evidence logging are independent safety parameters
+
+**Decision:** `OoklaServer.shutdownGraceSeconds` (default 10) and
+`OoklaServer.evidenceMaxBacklogBytes` (default 32 MiB) are SpeedtestServer
+EXTENSION keys (no daemon equivalent) that bound resource usage: shutdown
+always completes within the grace window, and a stalled evidence sink
+degrades evidence logging to OFF instead of buffering without bound.
+**Why (F-35/F-36, verified 2026-11-05):** an operator replacing a daemon
+expects `systemctl stop` to terminate; the previous implementation could
+wait on a single in-flight connection forever. The daemon's own shutdown
+semantics are not observable to the same degree, so these are documented
+as independent safety behavior, not claimed parity.

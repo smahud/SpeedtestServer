@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from 'events';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tls from 'tls';
@@ -208,7 +209,7 @@ export class TLSCertificateManager extends EventEmitter {
    */
   private parseCertificate(certPem: string, keyPem: string, caPem?: string): TLSCertificateInfo {
     // Use Node.js X509Certificate for parsing (supports both RSA and ECDSA)
-    const { X509Certificate } = require('crypto');
+    const { X509Certificate } = crypto;
     const cert = new X509Certificate(certPem);
 
     // Extract SAN from certificate

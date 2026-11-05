@@ -48,7 +48,9 @@ export class UdpLossEngine {
   }
 
   /** Bind every UDP port on every bind host; rejects on the first failure
-   *  (fail closed). */
+   *  (fail closed). F-34 (2026-11-05): every bind settles first — on ANY
+   *  failure all already-bound sockets are closed before rejecting, so a
+   *  rejected start() leaves no orphaned UDP listeners behind. */
   async start(): Promise<void> {
     // No bindHosts configured → the LEGACY default: one dual-stack [::]
     // socket per port (the pre-rev5 behavior; keeps standalone-engine
@@ -81,7 +83,19 @@ export class UdpLossEngine {
         this.sockets.push(sock);
       }
     }
-    await Promise.all(binds);
+    const settled = await Promise.allSettled(binds);
+    const failure = settled.find((r) => r.status === 'rejected');
+    if (failure) {
+      for (const s of this.sockets) {
+        try {
+          s.close();
+        } catch {
+          /* already closed */
+        }
+      }
+      this.sockets = [];
+      throw (failure as PromiseRejectedResult).reason;
+    }
   }
 
   stop(): void {

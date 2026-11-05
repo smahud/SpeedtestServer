@@ -114,6 +114,11 @@ export class OoklaServer extends EventEmitter {
       maxConnections: 4096,
       maxConnectionsPerIp: this.config.ipTracking?.maxConnPerIp || 500,
       idleTimeoutMs: Math.min((this.config.maxConnectionSeconds || 3600) * 1000, 3600_000),
+      // F-35/F-36: bounded shutdown + evidence backlog cap (independent
+      // safety parameters — OoklaServer.shutdownGraceSeconds /
+      // OoklaServer.evidenceMaxBacklogBytes, see CONFIG_MATRIX.md).
+      shutdownGraceMs: Math.max(1, (this.config.shutdownGraceSeconds ?? 10) * 1000),
+      evidenceMaxBacklogBytes: this.config.evidenceMaxBacklogBytes ?? 32 * 1024 * 1024,
       // Verified F-22: the daemon's CSP connect-src reflects allowedDomains
       // (built-in default "*" when the key is absent).
       allowedDomains: this.config.allowedDomains && this.config.allowedDomains.length > 0

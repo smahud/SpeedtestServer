@@ -1,0 +1,5 @@
+pre-flight OK: target owned by SpeedtestServer (pid=3756), official daemon absent.
+[cv-proxy] on 127.0.0.1:8888 | cli.speedtest.net -> crafted config (1 server -> localhost:8080) | results.speedtest.net BLOCKED (non-publishing)
+non-publishing: persisted=false OK
+target: localhost:8080 OK
+replacement run PASS: ./out/rev6/run3/cli.json

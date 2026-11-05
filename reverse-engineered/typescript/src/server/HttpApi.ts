@@ -113,6 +113,12 @@ export function connectSrcList(allowedDomains: string[], excludeDefaultDomains: 
  *  matches subdomains but NOT the bare domain; ports are ignored; matching
  *  is case-insensitive; "null" never matches (it is not a parseable URI). */
 export function originAllowed(origin: string, allowedDomains: string[], excludeDefaultDomains: boolean): boolean {
+  // Verified F-23 + F-37 (differential 2026-11-05, default-config lab):
+  // Origin "null" is NEVER reflected — not a parseable URI — even when the
+  // effective domain list is the wildcard "*". The wildcard short-circuit
+  // used to run first, reflecting "null" under the DEFAULT config while the
+  // daemon never does.
+  if (origin === 'null') return false;
   const domains = effectiveDomains(allowedDomains, excludeDefaultDomains);
   if (domains.includes('*')) return true;
   const m = origin.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/([^/?#]+)/);

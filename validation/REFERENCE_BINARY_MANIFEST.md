@@ -38,7 +38,7 @@ log: "OoklaServer version 2.11 (2.11.5.2) build number 2026-06-04.1737.7d0993d")
 - License: proprietary Ookla EULA (accepted via `--accept-license` at runtime;
   personal/non-commercial use). No redistribution into this repository.
 
-## Handling rules honored — corrected 2026-11-05
+## Handling rules honored — corrected 2026-11-05, provenance complete
 
 The earlier claim "no vendor binaries are committed to this repository" was
 FALSE: the repository has tracked five vendor binaries since the initial
@@ -46,16 +46,21 @@ commit (`OoklaServer-linux-x86_64`, `OoklaServer-linux-aarch64`,
 `OoklaServer-macosx`, `OoklaServer-windows-x86_64.exe`,
 `OoklaServer-windows64.zip`). Recorded facts:
 
-- `OoklaServer-linux-x86_64` (sha256 `f19e5ed2…`) is byte-identical to the
-  current official stable reference (verified, see above) — provenance now
-  confirmed rather than assumed.
-- The other four committed vendor binaries are recorded below; they were
-  NOT re-verified against official sources in this revision (no official
-  channel cross-check performed for aarch64/macosx/windows):
-  - `OoklaServer-linux-aarch64` sha256 `f7fd93c3…a9780edaa`
-  - `OoklaServer-macosx` sha256 `04a1e383…5169badf`
-  - `OoklaServer-windows-x86_64.exe` sha256 `bc715e20…8344a8e9a4`
-  - `OoklaServer-windows64.zip` sha256 `dd0b1baa…4e99efb75955`
+- **Provenance re-verification completed 2026-11-05 (revision 6): ALL FIVE
+  committed vendor binaries were re-downloaded from the official channel
+  (`install.speedtest.net/ooklaserver/stable/…`) and verified
+  byte-identical:**
+  - `OoklaServer-linux-x86_64` — tarball `ce180aa3…598159` → binary
+    `f19e5ed2…d92f027a`, `cmp` = 0 differing bytes.
+  - `OoklaServer-linux-aarch64` — tarball `c72b4f43…` → binary
+    `f7fd93c3…a9780edaa`, `cmp` = 0 differing bytes.
+  - `OoklaServer-macosx` — tarball `cb0d6b18…` → binary
+    `04a1e383…5169badf`, `cmp` = 0 differing bytes.
+  - `OoklaServer-windows64.zip` — `dd0b1baa…4e99efb75955` identical
+    hash; the `OoklaServer.exe` inside it is `bc715e20…8344a8e9a4`,
+    byte-identical to the committed `OoklaServer-windows-x86_64.exe`.
+  Every committed vendor binary is therefore the unmodified official
+  stable build of `2026-06-04.1737.7d0993d`.
 - Redistribution authorization for ANY committed vendor binary is NOT
   established by this repository's MIT license (which covers this project's
   code only). Recommendation for the maintainers: exclude vendor binaries

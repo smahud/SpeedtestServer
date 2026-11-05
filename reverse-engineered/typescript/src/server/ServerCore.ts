@@ -84,6 +84,18 @@ export interface ServerCoreOptions {
    *  addresses and drops the IPv4 wildcard — we implement the documented
    *  intent instead — deviation D-9, validation/DECISIONS.md). */
   bindAddresses?: string[];
+  /** Independent safety parameter (NOT a daemon-parity key): bounded
+   *  graceful-shutdown window in ms (F-35). stop() closes listeners, asks
+   *  live sessions to close, and force-destroys whatever remains after this
+   *  window — shutdown always completes. Configured via
+   *  OoklaServer.shutdownGraceSeconds (default 10 s). */
+  shutdownGraceMs?: number;
+  /** Independent safety parameter (NOT a daemon-parity key): evidence-log
+   *  WriteStream backlog cap in bytes (F-36). When the sink stalls (slow
+   *  disk, unread pipe) and the internal buffer exceeds this cap, evidence
+   *  logging degrades to OFF — the measurement service keeps serving.
+   *  Default 32 MiB. */
+  evidenceMaxBacklogBytes?: number;
   onEvent?: (kind: string, detail: Record<string, unknown>) => void;
 }
 
@@ -153,8 +165,17 @@ export class ServerCore {
   private conns = new Map<number, ConnStats>();
   /** Exact per-IP connection counts (fixes the old string-prefix match). */
   private perIp = new Map<string, number>();
+  /** Every live raw TCP socket (F-31/F-35): the global connection limit and
+   *  force-shutdown act on ALL accepted sockets — pre-protocol, mid-TLS,
+   *  mid-upgrade and established alike — not just routed ones. */
+  private liveSockets = new Set<net.Socket>();
+  /** stream (raw socket or its TLSSocket wrapper) → accept-time connection
+   *  id (F-32): lets the WS upgrade path REUSE the TCP connection's
+   *  registration instead of creating a second one. */
+  private streamIds = new WeakMap<Duplex, number>();
   private connSeq = 0;
   private running = false;
+  private stopStarted = false;
   private gcTimer: NodeJS.Timeout | null = null;
   /** Global evidence counters (read by the validation harness). */
   public readonly counters = {
@@ -234,6 +255,26 @@ export class ServerCore {
     this.opts.onEvent?.(kind, detail);
     if (this.evidence) {
       this.evidence.write(JSON.stringify({ ts: Date.now(), k: kind, ...detail }) + '\n');
+      // F-36: a stalled sink (slow disk, unread pipe, filesystem hiccup)
+      // must not buffer without bound — the WriteStream's internal buffer
+      // grows linearly with queued records otherwise. Past the cap the
+      // stream is destroyed and evidence logging degrades to OFF; the
+      // measurement service keeps serving (same policy as the error path).
+      const cap = this.opts.evidenceMaxBacklogBytes ?? 32 * 1024 * 1024;
+      if (this.evidence.writableLength > cap) {
+        const stalled = this.evidence;
+        const bytes = stalled.writableLength;
+        this.evidence = null;
+        try {
+          stalled.destroy();
+        } catch {
+          /* already gone */
+        }
+        process.stderr.write(
+          `evidence log stalled (${bytes} bytes buffered > cap ${cap}); disabling evidence logging (measurement service continues)\n`,
+        );
+        this.opts.onEvent?.('evidence_backlog_drop', { bytes, cap });
+      }
     }
   }
 
@@ -246,38 +287,50 @@ export class ServerCore {
         'No listen addresses resolved: OoklaServer.useIPv4 and OoklaServer.useIPv6 are both disabled and OoklaServer.addresses is empty',
       );
     }
-    const binds: Promise<void>[] = [];
-    for (const port of this.opts.tcpPorts) {
-      for (const t of targets) {
-        binds.push(
-          new Promise<void>((resolve, reject) => {
-            const srv = net.createServer({ noDelay: true }, (sock) => this.onRawConnection(sock));
-            srv.once('error', reject); // fail closed: bind errors are fatal (P0.1 fix)
-            // The daemon binds 0.0.0.0 and [::] as SEPARATE sockets; with
-            // useIPv4=false its [::] refuses v4 (verified F-29), so the v6
-            // wildcard is bound V6ONLY here too.
-            srv.listen(
-              t.host === '::' ? { port, host: '::', ipv6Only: true } : { port, host: t.host },
-              () => {
-                this.ev('listen_tcp', { port, host: t.host, family: t.family });
-                resolve();
-              },
-            );
-            this.listeners.push(srv);
-          }),
-        );
+    // F-34 (verified 2026-11-05): Promise.all rejected on the FIRST bind
+    // failure while other binds completed afterwards — a rejected start()
+    // left LIVE orphaned listeners answering on the other ports. Every bind
+    // now settles; on ANY failure everything that bound is closed before
+    // start() fails closed.
+    try {
+      const binds: Promise<void>[] = [];
+      for (const port of this.opts.tcpPorts) {
+        for (const t of targets) {
+          binds.push(
+            new Promise<void>((resolve, reject) => {
+              const srv = net.createServer({ noDelay: true }, (sock) => this.onRawConnection(sock));
+              srv.once('error', reject); // fail closed: bind errors are fatal (P0.1 fix)
+              // The daemon binds 0.0.0.0 and [::] as SEPARATE sockets; with
+              // useIPv4=false its [::] refuses v4 (verified F-29), so the v6
+              // wildcard is bound V6ONLY here too.
+              srv.listen(
+                t.host === '::' ? { port, host: '::', ipv6Only: true } : { port, host: t.host },
+                () => {
+                  this.ev('listen_tcp', { port, host: t.host, family: t.family });
+                  resolve();
+                },
+              );
+              this.listeners.push(srv);
+            }),
+          );
+        }
       }
+      const settled = await Promise.allSettled(binds);
+      const failure = settled.find((r) => r.status === 'rejected');
+      if (failure) throw (failure as PromiseRejectedResult).reason;
+      // UDP binds are equally fatal (fail closed — the old code swallowed them).
+      this.udp = new UdpLossEngine({
+        ports: this.opts.udpPorts,
+        bindHosts: targets.map((t) => t.host),
+        loss: this.loss,
+        maxDatagramBytes: 2048,
+        onEvent: (k, d) => this.ev(k, d),
+      });
+      await this.udp.start();
+    } catch (error) {
+      await this.abortPartialStartup();
+      throw error;
     }
-    await Promise.all(binds); // rejects (and propagates) on ANY bind failure
-    // UDP binds are equally fatal (fail closed — the old code swallowed them).
-    this.udp = new UdpLossEngine({
-      ports: this.opts.udpPorts,
-      bindHosts: targets.map((t) => t.host),
-      loss: this.loss,
-      maxDatagramBytes: 2048,
-      onEvent: (k, d) => this.ev(k, d),
-    });
-    await this.udp.start();
     this.running = true;
     this.ev('started', {
       tcpPorts: this.opts.tcpPorts,
@@ -287,6 +340,34 @@ export class ServerCore {
       instance: this.instanceUuid,
       pid: process.pid,
     });
+  }
+
+  /** F-34: close everything a partially-started server may hold — bound
+   *  listeners, UDP sockets, accepted-but-unrouted sockets, accounting —
+   *  then rethrow from start(). Keeps fail-closed semantics leak-free.
+   *  (allSettled upstream means every listener is either listening or dead
+   *  here — close() on a dead listener is a harmless no-op.) */
+  private async abortPartialStartup(): Promise<void> {
+    for (const l of this.listeners) {
+      try {
+        l.close();
+      } catch {
+        /* already closed */
+      }
+    }
+    this.listeners = [];
+    this.udp?.stop();
+    this.udp = null;
+    for (const s of this.liveSockets) {
+      try {
+        s.destroy();
+      } catch {
+        /* already gone */
+      }
+    }
+    this.liveSockets.clear();
+    this.conns.clear();
+    this.perIp.clear();
   }
 
   /** Resolve the listener bind set (verified F-28/F-29):
@@ -304,36 +385,117 @@ export class ServerCore {
     return out;
   }
 
+  /** Bounded graceful shutdown (F-35, verified 2026-11-05: stop() used to
+   *  hang indefinitely on in-flight uploads / keep-alive / never-closing WS
+   * sessions because http.Server.close() waits for ALL connections).
+   *  Semantics now:
+   *    1. stop accepting (listeners closed); UDP stopped.
+   *    2. grace phase: idle HTTP connections are closed, live WS sessions get
+   *       a close handshake, in-flight requests keep running.
+   *    3. after shutdownGraceMs (default 10 s, OoklaServer.shutdownGraceSeconds)
+   *       everything still open is force-destroyed — shutdown ALWAYS completes
+   *       within the bound (plus a short final drain).
+   *  The evidence log gets a bounded flush window for the same reason. */
   async stop(): Promise<void> {
+    if (this.stopStarted) return;
+    this.stopStarted = true;
     this.running = false;
     if (this.gcTimer) {
       clearInterval(this.gcTimer);
       this.gcTimer = null;
     }
     this.udp?.stop();
-    await Promise.all(
-      this.listeners.map(
-        (l) => new Promise<void>((resolve) => l.close(() => resolve())),
-      ),
+    // Initiate listener close (stop accepting). The close callbacks join the
+    // bounded race below: awaiting them DIRECTLY would block on lingering
+    // connections — net.Server.close(cb) waits for all of them (F-35).
+    const listenerClosed = this.listeners.map(
+      (l) => new Promise<void>((resolve) => l.close(() => resolve())),
     );
     this.listeners = [];
-    this.wss.close();
-    // Close the injected-socket HTTP servers too (they never bind, but
-    // closing them waits for in-flight requests and releases the handles).
-    await new Promise<void>((resolve) => this.httpServer.close(() => resolve()));
+
+    // Grace phase: shed idle HTTP connections, ask WS sessions to close.
+    this.httpServer.closeIdleConnections?.();
     if (this.httpsServer !== this.httpServer) {
-      await new Promise<void>((resolve) => this.httpsServer.close(() => resolve()));
+      this.httpsServer.closeIdleConnections?.();
     }
-    this.ev('stopped', { connections: this.counters.connectionsTotal });
-    // Fully flush the evidence log before the caller exits the process —
-    // the old fire-and-forget end() lost the final buffered records.
+    for (const client of this.wss.clients) {
+      try {
+        client.close(1001, 'server shutdown');
+      } catch {
+        /* already closing */
+      }
+    }
+
+    const serversClosed = Promise.all([
+      ...listenerClosed,
+      new Promise<void>((resolve) => this.httpServer.close(() => resolve())),
+      this.httpsServer !== this.httpServer
+        ? new Promise<void>((resolve) => this.httpsServer.close(() => resolve()))
+        : Promise.resolve(),
+      new Promise<void>((resolve) => {
+        this.wss.close(() => resolve());
+      }),
+    ]);
+    const graceMs = Math.max(1, this.opts.shutdownGraceMs ?? 10000);
+    let forced = false;
+    await Promise.race([
+      serversClosed.then(() => undefined),
+      new Promise<void>((resolve) => {
+        const t = setTimeout(() => {
+          forced = true;
+          resolve();
+        }, graceMs);
+        t.unref?.();
+      }),
+    ]);
+
+    if (forced) {
+      // Bound exceeded — force-destroy every remaining connection.
+      this.httpServer.closeAllConnections?.();
+      if (this.httpsServer !== this.httpServer) {
+        this.httpsServer.closeAllConnections?.();
+      }
+      for (const s of this.liveSockets) {
+        try {
+          s.destroy();
+        } catch {
+          /* already gone */
+        }
+      }
+      // Short final drain so the close callbacks (and wss 'close') can run.
+      await Promise.race([
+        serversClosed.then(() => undefined),
+        new Promise<void>((resolve) => {
+          const t = setTimeout(resolve, 1000);
+          t.unref?.();
+        }),
+      ]);
+    }
+
+    this.ev('stopped', { connections: this.counters.connectionsTotal, forced });
+    // Bounded evidence flush (F-36-adjacent): end() on a stalled/unopenable
+    // sink never calls back — give it a window, then destroy the stream.
     if (this.evidence) {
       const stream = this.evidence;
       this.evidence = null;
-      await new Promise<void>((resolve) => {
+      const flushed = new Promise<void>((resolve) => {
         stream.end(() => resolve());
         stream.on('close', () => resolve());
       });
+      const done = await Promise.race([
+        flushed.then(() => true),
+        new Promise<boolean>((resolve) => {
+          const t = setTimeout(() => resolve(false), 2000);
+          t.unref?.();
+        }),
+      ]);
+      if (!done) {
+        try {
+          stream.destroy();
+        } catch {
+          /* already gone */
+        }
+      }
     }
   }
 
@@ -384,6 +546,12 @@ export class ServerCore {
     const peer = `${sock.remoteAddress || '?'}:${sock.remotePort || '?'}`;
     const peerIp = sock.remoteAddress || '?';
     this.counters.connectionsTotal++;
+    // F-31 (verified 2026-11-05): the limit used to act on conns.size, which
+    // only counted ROUTED connections — sockets that connected but never
+    // sent (or drip-fed a header/handshake) were invisible to the global
+    // cap (10/10 silent sockets stayed connected with maxConnections=5).
+    // Every accepted socket is now registered immediately; transport is
+    // refined when the connection is routed. conns.size == live sockets.
     if (this.conns.size >= this.opts.maxConnections) {
       this.ev('conn_rejected_max', { peer });
       sock.destroy();
@@ -398,6 +566,9 @@ export class ServerCore {
       sock.destroy();
       return;
     }
+    this.conns.set(id, { peer, peerIp, openedAt: Date.now(), transport: 'tcp', bytesDown: 0, bytesUp: 0, commands: 0 });
+    this.liveSockets.add(sock);
+    this.streamIds.set(sock, id);
     this.perIp.set(ipKey, perIpCount + 1);
     sock.setNoDelay(true);
     sock.setTimeout(this.opts.idleTimeoutMs, () => {
@@ -421,6 +592,7 @@ export class ServerCore {
       /* teardown via close */
     });
     sock.on('close', () => {
+      this.liveSockets.delete(sock);
       const c = this.conns.get(id);
       this.conns.delete(id);
       const n = this.perIp.get(ipKey) ?? 1;
@@ -438,6 +610,10 @@ export class ServerCore {
       // daemon parity: openSSL.server.minimumTLSProtocol (default 1.2)
       minVersion: this.opts.tlsMinVersion || ("TLSv1.2" as tls.SecureVersion),
     });
+    // F-31/F-32: the TLS-wrapped stream shares the accept-time registration.
+    this.streamIds.set(tlsSock, id);
+    const entry = this.conns.get(id);
+    if (entry) entry.transport = 'tls';
     sock.unshift(firstChunk); // let the TLSSocket consume the ClientHello
     const onPlain = (chunk: Buffer): void => {
       tlsSock.removeListener('data', onPlain);
@@ -469,7 +645,10 @@ export class ServerCore {
     peerIp: string,
     transport: 'tcp' | 'tls',
   ): void {
-    this.conns.set(id, { peer, peerIp, openedAt: Date.now(), transport, bytesDown: 0, bytesUp: 0, commands: 0 });
+    // F-31/F-32: the connection was registered at accept time — refine the
+    // transport label only (no second entry, no counter reset).
+    const entry = this.conns.get(id);
+    if (entry) entry.transport = transport;
     const chunks: Buffer[] = [firstChunk];
     let total = firstChunk.length;
     const CAP = 65536;
@@ -533,8 +712,15 @@ export class ServerCore {
 
   private startNetGauge(stream: Duplex, firstChunk: Buffer, id: number, peer: string, peerIp: string, transport: 'tcp' | 'tls'): void {
     this.counters.netgaugeSessions++;
-    this.conns.set(id, { peer, peerIp, openedAt: Date.now(), transport, bytesDown: 0, bytesUp: 0, commands: 0 });
-    const connStats = this.conns.get(id)!;
+    // F-31/F-32: reuse the accept-time registration (single entry per TCP
+    // connection); refine the transport label only.
+    let connStats = this.conns.get(id);
+    if (!connStats) {
+      connStats = { peer, peerIp, openedAt: Date.now(), transport, bytesDown: 0, bytesUp: 0, commands: 0 };
+      this.conns.set(id, connStats);
+    } else {
+      connStats.transport = transport;
+    }
     let closed = false;
     const hooks: NetGaugeSessionHooks = {
       write: (data) => {
@@ -619,16 +805,35 @@ export class ServerCore {
   }
 
   private handleWsConnection(ws: WebSocket, req: http.IncomingMessage): void {
-    const id = ++this.connSeq;
     const peer = `${req.socket.remoteAddress || '?'}:${req.socket.remotePort || '?'}`;
     const peerIp = req.socket.remoteAddress || '?';
     const secure = (req.socket as tls.TLSSocket).encrypted === true;
-    this.counters.connectionsTotal++;
+    // F-32 (verified 2026-11-05): the WS upgrade used to mint a SECOND
+    // registration (new id + extra connectionsTotal + extra per-IP slot) on
+    // top of the TCP connection's entry — one live WS session counted as 2
+    // active connections and 2 per-IP slots, halving effective limits. The
+    // session now REUSES the accept-time registration: streamIds maps both
+    // the raw socket and its TLSSocket wrapper to the same id, so the raw
+    // socket's close handler performs the single decrement. The fallback
+    // path (injected sockets that never went through onRawConnection) keeps
+    // standalone accounting for robustness.
+    const priorId = this.streamIds.get(req.socket as Duplex);
     this.counters.wsSessions++;
-    this.conns.set(id, { peer, peerIp, openedAt: Date.now(), transport: secure ? 'wss' : 'ws', bytesDown: 0, bytesUp: 0, commands: 0 });
-    const connStats = this.conns.get(id)!;
-    const perIpCount = this.perIp.get(peerIp) ?? 0;
-    this.perIp.set(peerIp, perIpCount + 1);
+    let id: number;
+    let connStats: ConnStats;
+    let ownsAccounting = false;
+    if (priorId !== undefined && this.conns.has(priorId)) {
+      id = priorId;
+      connStats = this.conns.get(priorId) as ConnStats;
+      connStats.transport = secure ? 'wss' : 'ws';
+    } else {
+      id = ++this.connSeq;
+      connStats = { peer, peerIp, openedAt: Date.now(), transport: secure ? 'wss' : 'ws', bytesDown: 0, bytesUp: 0, commands: 0 };
+      this.conns.set(id, connStats);
+      this.counters.connectionsTotal++;
+      this.perIp.set(peerIp, (this.perIp.get(peerIp) ?? 0) + 1);
+      ownsAccounting = true;
+    }
     const send = (data: Buffer | string): boolean => {
       if (ws.readyState !== WebSocket.OPEN) return false;
       ws.send(data, { binary: typeof data !== 'string' });
@@ -677,11 +882,17 @@ export class ServerCore {
     });
     ws.on('close', () => {
       engine.destroy();
-      this.conns.delete(id);
-      const n = this.perIp.get(peerIp) ?? 1;
-      if (n <= 1) this.perIp.delete(peerIp);
-      else this.perIp.set(peerIp, n - 1);
-      this.ev('conn_close', { id, peer, ws: true, stats: connStats });
+      if (ownsAccounting) {
+        // fallback path only — normally the raw socket's close handler owns
+        // the single decrement (see F-32 note above).
+        this.conns.delete(id);
+        const n = this.perIp.get(peerIp) ?? 1;
+        if (n <= 1) this.perIp.delete(peerIp);
+        else this.perIp.set(peerIp, n - 1);
+        this.ev('conn_close', { id, peer, ws: true, stats: connStats });
+      }
+      // For reused registrations the raw socket close handler emits
+      // conn_close with the FINAL shared stats entry (byte counters included).
     });
     ws.on('error', (e) => {
       // F-27: a message-level maxPayload violation (fragmented frames) or a

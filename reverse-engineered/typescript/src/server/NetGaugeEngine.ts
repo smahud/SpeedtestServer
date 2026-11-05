@@ -71,7 +71,22 @@ export interface NetGaugeEngineOptions {
   errorStrikeLimit?: number;
 }
 
-/** Packet-loss session registry shared between the TCP and UDP engines. */
+/** Packet-loss session registry shared between the TCP and UDP engines.
+ *
+ *  Bounded resource management (F-33): the registry accepts client-supplied
+ *  UUIDs, so it is a memory-exhaustion vector — a bounded burst of distinct
+ *  valid session identifiers from a single source used to be retained in
+ *  full (verified 2026-11-05: 100k UUIDs from one IP → +20.5 MB heap, all
+ *  live). The registry now enforces:
+ *    - a per-source-IP session cap (default 64) for fairness — one client
+ *      IP cannot crowd out other clients' sessions;
+ *    - a global session cap (default 2048) — bounds registry memory to well
+ *      under 1 MB regardless of datagram rate.
+ *  Both caps evict the LEAST RECENTLY SEEN session(s), so the newest
+ *  legitimate session always wins. The official CLI registers exactly ONE
+ *  uuid per test, so the defaults leave orders of magnitude of headroom
+ *  while preserving the UDP LOSS/RECV/PLOSS contract verbatim.
+ */
 export interface LossSession {
   uuid: string;
   clientIp: string;
@@ -81,18 +96,90 @@ export interface LossSession {
   lastSeen: number;
 }
 
+export interface LossRegistryOptions {
+  /** Global concurrent-session cap (default 2048). */
+  maxSessions?: number;
+  /** Per-source-IP concurrent-session cap (default 64). */
+  maxSessionsPerIp?: number;
+}
+
 export class LossRegistry {
+  /** uuid → session. Map iteration order == recency order: touched entries
+   *  are re-inserted at the end, so the FIRST entry is the least recently
+   *  seen — the eviction candidate. */
   private sessions = new Map<string, LossSession>();
+  /** Live sessions per normalized source IP (eviction bookkeeping). */
+  private perIpCounts = new Map<string, number>();
+  private maxSessions: number;
+  private maxSessionsPerIp: number;
+
+  constructor(opts: LossRegistryOptions = {}) {
+    this.maxSessions = Math.max(1, Math.floor(opts.maxSessions ?? 2048));
+    this.maxSessionsPerIp = Math.max(1, Math.floor(opts.maxSessionsPerIp ?? 64));
+  }
+
+  /** Number of live tracked sessions (observability/tests). */
+  size(): number {
+    return this.sessions.size;
+  }
+
+  /** Live sessions for one normalized source IP (tests). */
+  sizeForIp(ip: string): number {
+    return this.perIpCounts.get(normalizeIp(ip)) ?? 0;
+  }
+
+  /** Move a session to the most-recent position (Map re-insert). */
+  private touch(s: LossSession): void {
+    this.sessions.delete(s.uuid);
+    this.sessions.set(s.uuid, s);
+  }
+
+  /** Drop a session (map + per-IP bookkeeping). */
+  private remove(s: LossSession): void {
+    this.sessions.delete(s.uuid);
+    const ipKey = normalizeIp(s.clientIp);
+    const n = this.perIpCounts.get(ipKey) ?? 0;
+    if (n <= 1) this.perIpCounts.delete(ipKey);
+    else this.perIpCounts.set(ipKey, n - 1);
+  }
+
+  /** Evict the least-recently-seen session (globally, or within one IP). */
+  private evictOldest(forIp?: string): LossSession | undefined {
+    if (forIp === undefined) {
+      const first = this.sessions.values().next().value;
+      if (!first) return undefined;
+      this.remove(first);
+      return first;
+    }
+    const ipKey = normalizeIp(forIp);
+    for (const s of this.sessions.values()) {
+      if (normalizeIp(s.clientIp) === ipKey) {
+        this.remove(s);
+        return s;
+      }
+    }
+    return undefined;
+  }
 
   /** Get or auto-register a session (permissive: client-supplied UUIDs are
    *  accepted so plaintext-fallback clients — which pick their own UUIDs —
-   *  get working packet-loss accounting). */
+   *  get working packet-loss accounting), subject to the F-33 bounds. */
   ensure(uuid: string, clientIp: string): LossSession {
-    let s = this.sessions.get(uuid);
-    if (!s) {
-      s = { uuid, clientIp, count: 0, dupes: 0, maxSeq: -1, lastSeen: Date.now() };
-      this.sessions.set(uuid, s);
+    const existing = this.sessions.get(uuid);
+    if (existing) {
+      this.touch(existing);
+      return existing;
     }
+    const ipKey = normalizeIp(clientIp);
+    if ((this.perIpCounts.get(ipKey) ?? 0) >= this.maxSessionsPerIp) {
+      this.evictOldest(clientIp); // fairness: the IP's own oldest goes first
+    }
+    if (this.sessions.size >= this.maxSessions) {
+      this.evictOldest(); // then the global oldest (any IP)
+    }
+    const s: LossSession = { uuid, clientIp, count: 0, dupes: 0, maxSeq: -1, lastSeen: Date.now() };
+    this.sessions.set(uuid, s);
+    this.perIpCounts.set(ipKey, (this.perIpCounts.get(ipKey) ?? 0) + 1);
     return s;
   }
 
@@ -118,6 +205,7 @@ export class LossRegistry {
     const s = this.ensure(uuid, clientIp);
     if (normalizeIp(s.clientIp) !== normalizeIp(clientIp)) return null; // anti-spoof (daemon parity)
     s.lastSeen = Date.now();
+    this.touch(s);
     if (seq <= s.maxSeq) s.dupes++;
     else s.maxSeq = seq;
     s.count++;
@@ -127,7 +215,9 @@ export class LossRegistry {
 
   gc(maxIdleMs: number): void {
     const now = Date.now();
-    for (const [k, v] of this.sessions) if (now - v.lastSeen > maxIdleMs) this.sessions.delete(k);
+    for (const s of [...this.sessions.values()]) {
+      if (now - s.lastSeen > maxIdleMs) this.remove(s);
+    }
   }
 }
 

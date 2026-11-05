@@ -1,0 +1,5 @@
+Thu Nov  5 13:53:55 UTC 2026
+LISTEN 0      64           0.0.0.0:18080      0.0.0.0:*    users:(("OoklaServer",pid=5615,fd=4))
+LISTEN 0      64              [::]:18080         [::]:*    users:(("OoklaServer",pid=5615,fd=5))
+z         5607  0.0  0.1  16932  7884 ?        Sl   13:53   0:00 ./OoklaServer
+z         5615  2.5  0.3  24636 15752 ?        Sl   13:53   0:00 /tmp/rea-lab/daemon/OoklaServer --ward --server-id=6e395e91-1c13-41fd-b487-3ccf53a6cc96

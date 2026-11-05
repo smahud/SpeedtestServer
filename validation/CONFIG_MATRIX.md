@@ -96,3 +96,10 @@ is never a float). `--config` selects the file verbatim.
 - **EXT:** netgaugeVersionString, evidenceLogFile, ssl.acme.\*, ssl.allowSelfSigned, validate-config
 
 Every "not applied" row carries its rationale here — no silent acceptance.
+
+## Revision 6 additions (2026-11-05) — independent safety keys (EXT)
+
+| Property | Maps to | Runtime consumer | Status |
+|---|---|---|---|
+| `OoklaServer.shutdownGraceSeconds` | `shutdownGraceSeconds` | `ServerCore.stop()` grace window (default 10 s; force-destroy after) | **IV (EXT, F-35)** — not a daemon-parity key; documented as D-11 |
+| `OoklaServer.evidenceMaxBacklogBytes` | `evidenceMaxBacklogBytes` | evidence WriteStream backlog cap (default 32 MiB; degrade to OFF past cap) | **IV (EXT, F-36)** — not a daemon-parity key; documented as D-11 |

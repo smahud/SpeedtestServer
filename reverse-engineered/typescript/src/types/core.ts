@@ -22,6 +22,14 @@ export interface OoklaServerConfig {
   netgaugeVersionString: string;
   /** Optional JSONL evidence log path (connections, commands, byte counters). */
   evidenceLogFile: string;
+  /** Independent safety parameter (NOT a daemon-parity key): bounded
+   *  graceful-shutdown window in seconds (F-35). After the window,
+   *  remaining connections are force-destroyed. Default 10. */
+  shutdownGraceSeconds?: number;
+  /** Independent safety parameter (NOT a daemon-parity key): evidence-log
+   *  WriteStream backlog cap in bytes (F-36) before evidence logging
+   *  degrades to off. Default 33554432 (32 MiB). */
+  evidenceMaxBacklogBytes?: number;
   useIPv6: boolean;
   addresses: string[];
   useIPv4: boolean;
