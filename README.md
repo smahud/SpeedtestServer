@@ -18,6 +18,26 @@ Out of scope: Ookla host-network admission/certification, proprietary backend
 parity, and any behavior without a publicly observable contract
 (`validation/EXTERNAL_FLOWS.md`).
 
+### Hybrid VPS + Cloudflare Workers (branch `hybrid-vps-workers`)
+
+This repository's `hybrid-vps-workers` branch adds and **experimentally
+validates** a hybrid architecture in which the VPS (SpeedtestServer + a
+control-plane gateway) and a Cloudflare Worker cooperate: the Worker serves
+the bandwidth-intensive plane for web/custom clients — the **full NetGauge
+protocol over WSS**, the daemon HTTP surface, and `__down`/`__up` streaming,
+with payload generated/drained **at the edge** — while the VPS keeps the
+native-socket responsibilities (official-CLI lane, UDP loss/jitter,
+discovery, tokens, results, identity). Headline measured results: host-tester
+suite **10/10 PASS against the Worker** (1.25 GB speed phases through the
+edge); hybrid sessions offload payload at ratio **≈1:16 000** (56 MiB at the
+edge vs 3 653 B on the VPS); the unmodified official CLI **provably cannot**
+use the edge (`Protocol error: Did not receive HELLO` → `NoServers`, exit 2)
+and completes 26 GB runs on the VPS lane instead. Full report:
+[`hybrid/reports/HYBRID_RESEARCH_REPORT.md`](hybrid/reports/HYBRID_RESEARCH_REPORT.md),
+claims register: [`hybrid/reports/WORKERS_LIMITS.md`](hybrid/reports/WORKERS_LIMITS.md),
+quickstart: [`hybrid/README.md`](hybrid/README.md).
+
+
 ## 2. Relationship to the official OoklaServer
 
 The official binary (reference: 2.11.5.2, tarball sha256 `ce180aa3…598159`)
