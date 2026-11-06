@@ -2,6 +2,7 @@
 
 > Research branch `hybrid-vps-workers`. Full findings:
 > [`reports/HYBRID_RESEARCH_REPORT.md`](reports/HYBRID_RESEARCH_REPORT.md) ·
+> rendered PDF: [`reports/Hybrid_VPS_Cloudflare_Workers_Speedtest_Report.pdf`](reports/Hybrid_VPS_Cloudflare_Workers_Speedtest_Report.pdf) ·
 > claims register: [`reports/WORKERS_LIMITS.md`](reports/WORKERS_LIMITS.md) ·
 > experiments: [`lab/`](lab/).
 
