@@ -1,0 +1,25 @@
+name = "speedtest-hybrid-worker"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Non-secret configuration. Set the shared HMAC secret OUTSIDE this file:
+#   wrangler secret put HYBRID_SHARED_SECRET
+# (minted by the VPS gateway — hybrid/gateway — and verified locally here).
+[vars]
+# OoklaServer.netgaugeVersionString compatibility banner.
+VERSION_STRING = "2.11 (2.11.5) 2026-06-04.1737.7d0993d"
+# OoklaServer.allowedDomains — drives CSP connect-src, crossdomain.xml and
+# the CORS Origin filter. "*" (daemon default) or a comma-separated list.
+ALLOWED_DOMAINS = "*"
+# Strict daemon Host validation is redundant behind Cloudflare routing
+# (SNI/Host are enforced before the Worker sees the request) — default off.
+STRICT_HOST_VALIDATION = "false"
+# Daemon websocket.frameSizeLimitBytes (5 MiB default).
+WS_FRAME_LIMIT_BYTES = "5242880"
+
+# Optional overrides:
+# MAX_DOWNLOAD_BYTES = "2147483647"
+# MAX_UPLOAD_BYTES = "2147483647"
+
+[observability]
+enabled = true
