@@ -141,6 +141,14 @@ function respond(
 ): Response {
   const h = new Headers();
   for (const [k, v] of headers) h.set(k, v);
+  // Daemon header set (contract §4.4): Connection: Keep-Alive on normal
+  // responses (capital K-A, daemon casing). Hop-by-hop in Fetch terms —
+  // the runtime may drop it; D-W9 documents the outcome.
+  try {
+    h.set('Connection', 'Keep-Alive');
+  } catch {
+    /* forbidden header — documented deviation */
+  }
   const bodyBytes = typeof body === 'string' ? new TextEncoder().encode(body) : body;
   const length = opts.headLength !== undefined ? opts.headLength : bodyBytes.length;
   if (length > 0 || status === 200) h.set('Content-Length', String(length));
