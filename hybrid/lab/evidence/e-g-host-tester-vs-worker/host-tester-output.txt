@@ -1,0 +1,30 @@
+
+  [1mSpeedtest Host Tester[0m [2mv1.0.1[0m
+  [2mOokla Server validation — same checks as speedtest.net/host-tester[0m
+
+  Target   [36m127.0.0.1:8793[0m
+  Started  [2m11/6/2026, 2:01:59 PM[0m
+
+[2K  IP       [2m127.0.0.1[0m
+[2K  [32m✔[0m Hostname resolution [2m.........................[0m [32mPASS[0m[2m 1ms[0m[2m  127.0.0.1[0m
+[2K  [32m✔[0m OoklaServer daemon connection [2m...............[0m [32mPASS[0m[2m 23ms[0m[2m  OoklaServer daemon detected (HTTP 200)[0m
+[2K  [32m✔[0m OoklaServer daemon version [2m..................[0m [32mPASS[0m[2m 0ms[0m[2m  2.11 (2.11.5) 2026-06-04.1737.7d0993d[0m
+[2K  [32m✔[0m Netgauge / WebSocket (port 8793) [2m............[0m [32mPASS[0m[2m 0ms[0m[2m  wss://127.0.0.1:8793/ws · HI→HELLO, PING→PONG ok, ws ping 1.3 ms[0m
+[2K  [32m✔[0m HTTPS functionality [2m.........................[0m [32mPASS[0m[2m 13ms[0m[2m  HTTPS 200 · TLSv1.3, CN=localhost, valid 825d[0m
+[2K  [32m✔[0m Keep-Alive [2m..................................[0m [32mPASS[0m[2m 0ms[0m[2m  Connection: keep-alive[0m
+[2K  [32m✔[0m Latency file (speedtest/latency.txt) [2m........[0m [32mPASS[0m[2m 6ms[0m[2m  HTTP 200 · "test=test\n"[0m
+[2K  [32m✔[0m Download image files (random*.jpg) [2m..........[0m [32mPASS[0m[2m 90ms[0m[2m  10/10 files (240 KB – 30.2 MB)[0m
+[2K  [32m✔[0m Legacy HTTP upload script (upload.php) [2m......[0m [32mPASS[0m[2m 9ms[0m[2m  HTTP 200 · size=265[0m
+[2K  [32m✔[0m Crossdomain settings (crossdomain.xml) [2m......[0m [32mPASS[0m[2m 5ms[0m[2m  HTTP 200 · policy found[0m
+[2K  [32m↓[0m Download  [1m  487.44[0m Mbps  ██[2m░░░░░░░░░░░░░░░░░░░░░░[0m 6%[2K  [32m↓[0m Download  [1m  478.17[0m Mbps  ███[2m░░░░░░░░░░░░░░░░░░░░░[0m 13%[2K  [32m↓[0m Download  [1m 2552.78[0m Mbps  ████[2m░░░░░░░░░░░░░░░░░░░░[0m 19%[2K  [32m↓[0m Download  [1m 1664.27[0m Mbps  ██████[2m░░░░░░░░░░░░░░░░░░[0m 25%[2K  [32m↓[0m Download  [1m 1649.42[0m Mbps  ███████[2m░░░░░░░░░░░░░░░░░[0m 31%[2K  [32m↓[0m Download  [1m 3585.94[0m Mbps  █████████[2m░░░░░░░░░░░░░░░[0m 38%[2K  [32m↓[0m Download  [1m 1757.88[0m Mbps  ███████████[2m░░░░░░░░░░░░░[0m 44%[2K  [32m↓[0m Download  [1m  972.99[0m Mbps  ████████████[2m░░░░░░░░░░░░[0m 50%[2K  [32m↓[0m Download  [1m 1615.52[0m Mbps  ██████████████[2m░░░░░░░░░░[0m 56%[2K  [32m↓[0m Download  [1m 2576.99[0m Mbps  ███████████████[2m░░░░░░░░░[0m 63%[2K  [32m↓[0m Download  [1m 1880.71[0m Mbps  █████████████████[2m░░░░░░░[0m 69%[2K  [32m↓[0m Download  [1m 2009.45[0m Mbps  ██████████████████[2m░░░░░░[0m 75%[2K  [32m↓[0m Download  [1m  851.59[0m Mbps  ████████████████████[2m░░░░[0m 81%[2K  [32m↓[0m Download  [1m  864.47[0m Mbps  █████████████████████[2m░░░[0m 88%[2K  [32m↓[0m Download  [1m 1399.99[0m Mbps  ███████████████████████[2m░[0m 94%[2K  [32m↓[0m Download  [1m  636.18[0m Mbps  ████████████████████████[2m[0m 100%[2K  [32m↓[0m Download  [1m 1514.35[0m Mbps  ████████████████████████[2m[0m 100%[2K
+[2K  [35m↑[0m Upload    [1m  489.61[0m Mbps  ██[2m░░░░░░░░░░░░░░░░░░░░░░[0m 6%[2K  [35m↑[0m Upload    [1m  590.52[0m Mbps  ███[2m░░░░░░░░░░░░░░░░░░░░░[0m 13%[2K  [35m↑[0m Upload    [1m  522.53[0m Mbps  █████[2m░░░░░░░░░░░░░░░░░░░[0m 19%[2K  [35m↑[0m Upload    [1m  719.01[0m Mbps  ██████[2m░░░░░░░░░░░░░░░░░░[0m 25%[2K  [35m↑[0m Upload    [1m  738.51[0m Mbps  ████████[2m░░░░░░░░░░░░░░░░[0m 32%[2K  [35m↑[0m Upload    [1m  359.44[0m Mbps  █████████[2m░░░░░░░░░░░░░░░[0m 38%[2K  [35m↑[0m Upload    [1m  682.64[0m Mbps  ███████████[2m░░░░░░░░░░░░░[0m 44%[2K  [35m↑[0m Upload    [1m  544.81[0m Mbps  ████████████[2m░░░░░░░░░░░░[0m 51%[2K  [35m↑[0m Upload    [1m  596.00[0m Mbps  ██████████████[2m░░░░░░░░░░[0m 57%[2K  [35m↑[0m Upload    [1m  314.41[0m Mbps  ███████████████[2m░░░░░░░░░[0m 63%[2K  [35m↑[0m Upload    [1m  398.54[0m Mbps  █████████████████[2m░░░░░░░[0m 70%[2K  [35m↑[0m Upload    [1m  504.73[0m Mbps  ██████████████████[2m░░░░░░[0m 76%[2K  [35m↑[0m Upload    [1m  333.67[0m Mbps  ████████████████████[2m░░░░[0m 83%[2K  [35m↑[0m Upload    [1m  623.00[0m Mbps  █████████████████████[2m░░░[0m 89%[2K  [35m↑[0m Upload    [1m  662.37[0m Mbps  ███████████████████████[2m░[0m 95%[2K  [35m↑[0m Upload    [1m  448.87[0m Mbps  ████████████████████████[2m[0m 100%[2K
+
+  [33mPing[0m     [1m      1.3[0m ms[2m   min 1.3 / avg 1.7 / jitter 0.4 (5 samples, netgauge WebSocket PING)[0m
+  [32mDownload[0m[1m  1561.12[0m Mbps[2m   4 threads · random4000x4000.jpg · 814 MB in 4.4s[0m
+  [35mUpload[0m  [1m   824.79[0m Mbps[2m   4 threads · 4.00 MB chunks · 468 MB in 4.1s[0m
+  [2mTraffic[0m  1.25 GB transferred in 10.0s
+
+  [32m[1m✔ Server is publicly available and properly configured.[0m[0m
+
+  [2m10 passed / 0 failed · 127.0.0.1:8793[0m
+

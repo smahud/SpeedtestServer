@@ -1,0 +1,13 @@
+
+ ⛅️ wrangler 4.158.0
+────────────────────
+Your Worker has access to the following bindings:
+Binding                                                                   Resource                  Mode
+env.VERSION_STRING ("2.11 (2.11.5) 2026-06-04.1737.7d0993d")              Environment Variable      local
+env.ALLOWED_DOMAINS ("*")                                                 Environment Variable      local
+env.STRICT_HOST_VALIDATION ("false")                                      Environment Variable      local
+env.WS_FRAME_LIMIT_BYTES ("5242880")                                      Environment Variable      local
+
+⎔ Starting local server...
+[wrangler:info] Ready on http://127.0.0.1:8790
+[wrangler:info] GET /__meta 200 OK (245ms)
