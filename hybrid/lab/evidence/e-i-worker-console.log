@@ -1,0 +1,128 @@
+
+ ⛅️ wrangler 4.158.0
+────────────────────
+Your Worker has access to the following bindings:
+Binding                                                                   Resource                  Mode
+env.VERSION_STRING ("2.11 (2.11.5) 2026-06-04.1737.7d0993d")              Environment Variable      local
+env.ALLOWED_DOMAINS ("*")                                                 Environment Variable      local
+env.STRICT_HOST_VALIDATION ("false")                                      Environment Variable      local
+env.WS_FRAME_LIMIT_BYTES ("5242880")                                      Environment Variable      local
+env.HYBRID_SHARED_SECRET ("(hidden)")                                     Environment Variable      local
+
+⎔ Starting local server...
+[wrangler:info] Ready on http://127.0.0.1:8790
+[wrangler:info] GET /__meta 200 OK (225ms)
+[wrangler:info] GET /__down 200 OK (5ms)
+[wrangler:info] GET /__down 200 OK (5ms)
+[wrangler:info] GET /__down 200 OK (4ms)
+[wrangler:info] GET /__down 200 OK (3ms)
+[wrangler:info] GET /__down 200 OK (2ms)
+[wrangler:info] GET /__down 200 OK (2ms)
+[wrangler:info] GET /__down 200 OK (3ms)
+[wrangler:info] GET /__down 200 OK (14ms)
+[wrangler:info] GET /__down 200 OK (3ms)
+[wrangler:info] GET /__down 200 OK (3ms)
+{"ts":1793972687289,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+[wrangler:info] GET /ws 101 Switching Protocols (9ms)
+{"ts":1793972687297,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+{"ts":1793972687298,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+{"ts":1793972687298,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+{"ts":1793972687298,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+{"ts":1793972687298,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+{"ts":1793972687300,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687301,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+[wrangler:info] GET /ws 101 Switching Protocols (19ms)
+[wrangler:info] GET /ws 101 Switching Protocols (19ms)
+[wrangler:info] GET /ws 101 Switching Protocols (19ms)
+[wrangler:info] GET /ws 101 Switching Protocols (19ms)
+[wrangler:info] GET /ws 101 Switching Protocols (18ms)
+{"ts":1793972687309,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687310,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687311,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687311,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687311,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687311,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687312,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687312,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687313,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687313,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972687318,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972687464,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972687524,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972687583,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972687636,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972687691,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972687745,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688017,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688017,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688017,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688017,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688017,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688019,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972688076,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972688131,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972688185,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972688238,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972688295,"kind":"ng_cmd","line":"DOWNLOAD 4194304"}
+{"ts":1793972688668,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688668,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688668,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688668,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688668,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688668,"kind":"ng_download_done","n":4194304,"frames":64}
+{"ts":1793972688668,"kind":"ng_cmd","line":"QUIT"}
+{"ts":1793972688668,"kind":"ng_cmd","line":"QUIT"}
+{"ts":1793972688668,"kind":"ng_cmd","line":"QUIT"}
+{"ts":1793972688668,"kind":"ng_cmd","line":"QUIT"}
+{"ts":1793972688668,"kind":"ng_cmd","line":"QUIT"}
+{"ts":1793972688668,"kind":"ng_cmd","line":"QUIT"}
+{"ts":1793972688677,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688679,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688679,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688679,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688679,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688679,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688690,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+[wrangler:info] GET /ws 101 Switching Protocols (9ms)
+{"ts":1793972688693,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+{"ts":1793972688693,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+{"ts":1793972688694,"kind":"ws_session_open","ip":"127.0.0.1","instance":"868768a6-62ca-4f89-aa60-78dc3e9a0429"}
+{"ts":1793972688697,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972688698,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+[wrangler:info] GET /ws 101 Switching Protocols (10ms)
+[wrangler:info] GET /ws 101 Switching Protocols (11ms)
+{"ts":1793972688701,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972688701,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972688702,"kind":"ng_cmd","line":"UPLOAD 1048576"}
+{"ts":1793972688702,"kind":"ng_upload_start","declared":1048576,"cmdLen":15}
+[wrangler:info] GET /ws 101 Switching Protocols (14ms)
+{"ts":1793972688708,"kind":"ng_upload_done","declared":1048576}
+{"ts":1793972688712,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972688712,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972688713,"kind":"ng_cmd","line":"HI fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972688713,"kind":"ng_session","uuid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68"}
+{"ts":1793972688716,"kind":"ng_cmd","line":"UPLOAD 1048576"}
+{"ts":1793972688716,"kind":"ng_upload_start","declared":1048576,"cmdLen":15}
+{"ts":1793972688726,"kind":"ng_upload_done","declared":1048576}
+{"ts":1793972688727,"kind":"ng_cmd","line":"UPLOAD 1048576"}
+{"ts":1793972688727,"kind":"ng_upload_start","declared":1048576,"cmdLen":15}
+{"ts":1793972688731,"kind":"ng_cmd","line":"UPLOAD 1048576"}
+{"ts":1793972688731,"kind":"ng_upload_start","declared":1048576,"cmdLen":15}
+{"ts":1793972688735,"kind":"ng_upload_done","declared":1048576}
+{"ts":1793972688735,"kind":"ng_cmd","line":"UPLOAD 1048576"}
+{"ts":1793972688735,"kind":"ng_upload_start","declared":1048576,"cmdLen":15}
+{"ts":1793972688746,"kind":"ng_cmd","line":"UPLOAD 1048576"}
+{"ts":1793972688750,"kind":"ng_upload_start","declared":1048576,"cmdLen":15}
+{"ts":1793972688774,"kind":"ng_upload_done","declared":1048576}
+{"ts":1793972688778,"kind":"ng_upload_done","declared":1048576}
+{"ts":1793972688778,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688780,"kind":"ng_cmd","line":"UPLOAD 1048576"}
+{"ts":1793972688780,"kind":"ng_upload_start","declared":1048576,"cmdLen":15}
+{"ts":1793972688783,"kind":"ng_upload_done","declared":1048576}
+{"ts":1793972688784,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688786,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}
+{"ts":1793972688952,"kind":"ng_upload_done","declared":1048576}
+{"ts":1793972688954,"kind":"ng_cmd","line":"UPLOAD 1048576"}
+{"ts":1793972688955,"kind":"ng_upload_start","declared":1048576,"cmdLen":15}
+{"ts":1793972688957,"kind":"ng_upload_done","declared":1048576}
+{"ts":1793972688960,"kind":"ws_error","error":"Uncaught Error: Network connection lost."}

@@ -1,0 +1,175 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-06T13:49:29Z",
+    "ping": {
+        "jitter": 0.005,
+        "latency": 0.035,
+        "low": 0.031,
+        "high": 0.050
+    },
+    "download": {
+        "bandwidth": 2180942645,
+        "bytes": 9961315292,
+        "elapsed": 4516,
+        "latency": {
+            "iqm": 21.493,
+            "low": 0.371,
+            "high": 97.986,
+            "jitter": 32.225
+        }
+    },
+    "upload": {
+        "bandwidth": 1663312804,
+        "bytes": 15984498574,
+        "elapsed": 9902,
+        "latency": {
+            "iqm": 4.318,
+            "low": 0.146,
+            "high": 35.933,
+            "jitter": 5.733
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 60178,
+        "selectedLatency": 0.025000000000000001,
+        "servers": [
+            {
+                "error": "Latency test failed",
+                "errorCode": 0,
+                "server": {
+                    "id": 43356,
+                    "host": "speed.cloudflare.com",
+                    "port": 8080,
+                    "name": 1010,
+                    "location": "Hong Kong -> HYBRID (speed.cloudflare.com:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.071999999999999995,
+                "server": {
+                    "id": 35791,
+                    "host": "127.0.0.1",
+                    "port": 8080,
+                    "name": "SmarTone",
+                    "location": "Hong Kong -> HYBRID (127.0.0.1:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "error": "Latency test failed",
+                "errorCode": 0,
+                "server": {
+                    "id": 63143,
+                    "host": "speed.cloudflare.com",
+                    "port": 8080,
+                    "name": "Netvigator",
+                    "location": "Hong Kong -> HYBRID (speed.cloudflare.com:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.047,
+                "server": {
+                    "id": 57571,
+                    "host": "127.0.0.1",
+                    "port": 8080,
+                    "name": "CMC Telecom",
+                    "location": "Hong Kong -> HYBRID (127.0.0.1:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "error": "Latency test failed",
+                "errorCode": 0,
+                "server": {
+                    "id": 1536,
+                    "host": "speed.cloudflare.com",
+                    "port": 8080,
+                    "name": "STC",
+                    "location": "Hong Kong -> HYBRID (speed.cloudflare.com:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.028000000000000001,
+                "server": {
+                    "id": 65463,
+                    "host": "127.0.0.1",
+                    "port": 8080,
+                    "name": "HKBN",
+                    "location": "Hong Kong -> HYBRID (127.0.0.1:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "error": "Latency test failed",
+                "errorCode": 0,
+                "server": {
+                    "id": 28912,
+                    "host": "speed.cloudflare.com",
+                    "port": 8080,
+                    "name": "fdcservers.net",
+                    "location": "Hong Kong -> HYBRID (speed.cloudflare.com:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.025000000000000001,
+                "server": {
+                    "id": 60178,
+                    "host": "127.0.0.1",
+                    "port": 8080,
+                    "name": "Sun Mobile",
+                    "location": "Hong Kong -> HYBRID (127.0.0.1:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "error": "Latency test failed",
+                "errorCode": 0,
+                "server": {
+                    "id": 48446,
+                    "host": "speed.cloudflare.com",
+                    "port": 8080,
+                    "name": "GSL Networks",
+                    "location": "Hong Kong -> HYBRID (speed.cloudflare.com:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            },
+            {
+                "latency": 0.033000000000000002,
+                "server": {
+                    "id": 60177,
+                    "host": "127.0.0.1",
+                    "port": 8080,
+                    "name": "Club SIM by HKT",
+                    "location": "Hong Kong -> HYBRID (127.0.0.1:8080) [e-d/e-e experiment]",
+                    "country": "Hong Kong"
+                }
+            }
+        ]
+    },
+    "isp": "Alibaba",
+    "interface": {
+        "internalIp": "127.0.0.1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "127.0.0.1"
+    },
+    "server": {
+        "id": 60178,
+        "host": "127.0.0.1",
+        "port": 8080,
+        "name": "Sun Mobile",
+        "location": "Hong Kong -> HYBRID (127.0.0.1:8080) [e-d/e-e experiment]",
+        "country": "Hong Kong",
+        "ip": "127.0.0.1"
+    },
+    "result": {
+        "id": "33e6e59f-b5ad-4ca4-aa2d-fa038cbe3a82",
+        "persisted": false
+    }
+}

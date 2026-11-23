@@ -1,0 +1,1 @@
+[hybrid-config-proxy] :8888 | cli.speedtest.net → LIVE curl + per-entry rewrite (speed.cloudflare.com:8080 | 127.0.0.1:8080) | results.speedtest.net BLOCKED (non-publishing)

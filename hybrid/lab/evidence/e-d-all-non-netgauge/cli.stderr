@@ -1,0 +1,83 @@
+==============================================================================
+
+You may only use this Speedtest software and information generated
+from it for personal, non-commercial use, through a command line
+interface on a personal computer. Your use of this software is subject
+to the End User License Agreement, Terms of Use and Privacy Policy at
+these URLs:
+
+	https://www.speedtest.net/about/eula
+	https://www.speedtest.net/about/terms
+	https://www.speedtest.net/about/privacy
+
+==============================================================================
+
+License acceptance recorded. Continuing.
+
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [0] Protocol error: Did not receive HELLO; input:SFRUUC8xLjEgNDAwIEJhZCBSZXF1ZXN0DQpDb250ZW50LVR5cGU6IHRleHQvcGxhaW4NCkNvbm5lY3Rpb246IGNsb3NlDQpDb250ZW50LUxlbmd0aDogMjYNCg0KaW52YWxpZCBIVFRQIG1ldGhvZCBwYXJzZWQ= result:WCaXPqgmmOhub34LE5zSGy4bFzP4CEzx8N8Ki6EPgvuPnDpF322TwmbyNCV5yq0pBPoziZpSKJeybBBSjMURglVpgdmeQcE1YK9pTNeMwZhEJzmeEVqTjzgKkNHi1UBvvdZwFZ+4bQ== key:1z/A+PUxyUFctZVmgYk7DEEbsbri33YtNKcbEF2Gx7s=",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [111] Connection refused",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [0] Protocol error: Did not receive HELLO; input:SFRUUC8xLjEgNDAwIEJhZCBSZXF1ZXN0DQpTZXJ2ZXI6IGNsb3VkZmxhcmUNCkRhdGU6IEZyaSwgMDYgTm92IDIwMjYgMTM6NDg6MTcgR01UDQpDb250ZW50LVR5cGU6IHRleHQvaHRtbA0KQ29udGVudC1MZW5ndGg6IDE1NQ0KQ29ubmVjdGlvbjogY2xvc2UNCkNGLVJBWTogLQ0KDQo8aHRtbD4NCjxoZWFkPjx0aXRsZT40MDAgQmFkIFJlcXVlc3Q8L3RpdGxlPjwvaGVhZD4NCjxib2R5Pg0KPGNlbnRlcj48aDE+NDAwIEJhZCBSZXF1ZXN0PC9oMT48L2NlbnRlcj4NCjxocj48Y2VudGVyPmNsb3VkZmxhcmU8L2NlbnRlcj4NCjwvYm9keT4NCjwvaHRtbD4NCg== result:T9cwLzJEf2tP3Rdbc43h5D2p/kvMY0GUHkO6d2eKViHSV1AOZxvrzrd//LbFEyApq/3h2oc+Arcxk8jiIYNBm/wu0H+DZC9AAxwsXHnrbo2oQsKxaA4MTtVodh9M1ym5EJmCTvDJ5qYcNd6na4G6QHYTTiZzMJurdgZfx2+a4zvRuKzfTKxvAZLrehpZ7qQMEljtoJdelr+qCqoWO+WJZ1vu0Sb+Hi3V9C9mxCVHgOT91Gt2Grxba2ZZGUUkkaR8xxqZth+QdltsduT763DND+PTIQG/c0G18pK9/tye7TiYfqBeX0Ce8wOgnHktjWFcv7x1B4dvwy//T2irRHYnk77WgdE2WKNE0wwExK3DqJpTGsp4u7NFgzyO1/rOHSiOiI9p1+vWq9cUeRs= key:mATMfHSgcNvrkWLjwTm1dQ4gvT5jTs+3g4PslR02ScI=",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [0] Protocol error: Did not receive HELLO; input:SFRUUC8xLjEgNDAwIEJhZCBSZXF1ZXN0DQpDb250ZW50LVR5cGU6IHRleHQvcGxhaW4NCkNvbm5lY3Rpb246IGNsb3NlDQpDb250ZW50LUxlbmd0aDogMjYNCg0KaW52YWxpZCBIVFRQIG1ldGhvZCBwYXJzZWQ= result:h+f4CqBeqaxut5p+kutYOghhVa5mlVEzGZA4RwT3O0IHuBkMrQ+tN2bYopaKfqC/+YWbAH36b6AWYIULcmbBQzRaB7PgGCIQ87q7Z60Xlrh781zNPXyqJWPr4Q== key:yzIQ09B5ClGX8NRNtfKHr10WYZHHl7U9/+JaO2n9exg=",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [0] Protocol error: Did not receive HELLO; input:SFRUUC8xLjEgNDAwIEJhZCBSZXF1ZXN0DQpTZXJ2ZXI6IGNsb3VkZmxhcmUNCkRhdGU6IEZyaSwgMDYgTm92IDIwMjYgMTM6NDg6MTcgR01UDQpDb250ZW50LVR5cGU6IHRleHQvaHRtbA0KQ29udGVudC1MZW5ndGg6IDE1NQ0KQ29ubmVjdGlvbjogY2xvc2UNCkNGLVJBWTogLQ0KDQo8aHRtbD4NCjxoZWFkPjx0aXRsZT40MDAgQmFkIFJlcXVlc3Q8L3RpdGxlPjwvaGVhZD4NCjxib2R5Pg0KPGNlbnRlcj48aDE+NDAwIEJhZCBSZXF1ZXN0PC9oMT48L2NlbnRlcj4NCjxocj48Y2VudGVyPmNsb3VkZmxhcmU8L2NlbnRlcj4NCjwvYm9keT4NCjwvaHRtbD4NCg== result:8XtB5GiPzzjVDBHp60Ay7CLU+KpmThcQlsxRl2lFgm8LvSYCs0RSuylT/LGXEyhYLk8SZfkIbw+nNwi6K2ds3XiQ6tUumhNU4KgYfrOJpbGacYuMvhqnQ7OfLdNgKCSC+30wQIERVe2Vjc5C2PSEa3ob1iLg3Puh/gfcL46Q7GmKSaxh90SXuPyKO6/i/Zel1nENZqydMzp2JkiwSp23H1XmP/JmQRSTCd9NYZH5aknW2Kyd4LCHw0umx+YxLb6PWjBfvrwXcsAJZ4T414Yvpuf34kOPACt63wFC68nt8GXWn23pxERdEjr+i+c+2Iej3Bi1h2F7jeNv key:hIXCp3Yxf9TqtMZfXo37xRKhs+Vh38C4gqZIKYKCB3I=",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [111] Connection refused",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [0] Protocol error: Did not receive HELLO; input:SFRUUC8xLjEgNDAwIEJhZCBSZXF1ZXN0DQpTZXJ2ZXI6IGNsb3VkZmxhcmUNCkRhdGU6IEZyaSwgMDYgTm92IDIwMjYgMTM6NDg6MTcgR01UDQpDb250ZW50LVR5cGU6IHRleHQvaHRtbA0KQ29udGVudC1MZW5ndGg6IDE1NQ0KQ29ubmVjdGlvbjogY2xvc2UNCkNGLVJBWTogLQ0KDQo8aHRtbD4NCjxoZWFkPjx0aXRsZT40MDAgQmFkIFJlcXVlc3Q8L3RpdGxlPjwvaGVhZD4NCjxib2R5Pg0KPGNlbnRlcj48aDE+NDAwIEJhZCBSZXF1ZXN0PC9oMT48L2NlbnRlcj4NCjxocj48Y2VudGVyPmNsb3VkZmxhcmU8L2NlbnRlcj4NCjwvYm9keT4NCjwvaHRtbD4NCg== result:1MXS4uidSYypGTys06rHbxQ2T91fpvA1TFcL9NSRkX4IncnRQ4Zf9SrGAHteyQ1T key:At7jY/AgH5tMpVwzPjk0apT6kiHnzqD3JLfSReI2yN0=",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [0] Protocol error: Did not receive HELLO; input:FQMBAAICRg== result: key:I+3MzjIZ9No33BzofzSbQ7XJvYwl90u2X86SnqM7Z/Q=",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [0] Protocol error: Did not receive HELLO; input:SFRUUC8xLjEgNDAwIEJhZCBSZXF1ZXN0DQpTZXJ2ZXI6IGNsb3VkZmxhcmUNCkRhdGU6IEZyaSwgMDYgTm92IDIwMjYgMTM6NDg6MTcgR01UDQpDb250ZW50LVR5cGU6IHRleHQvaHRtbA0KQ29udGVudC1MZW5ndGg6IDE1NQ0KQ29ubmVjdGlvbjogY2xvc2UNCkNGLVJBWTogLQ0KDQo8aHRtbD4NCjxoZWFkPjx0aXRsZT40MDAgQmFkIFJlcXVlc3Q8L3RpdGxlPjwvaGVhZD4NCjxib2R5Pg0KPGNlbnRlcj48aDE+NDAwIEJhZCBSZXF1ZXN0PC9oMT48L2NlbnRlcj4NCjxocj48Y2VudGVyPmNsb3VkZmxhcmU8L2NlbnRlcj4NCjwvYm9keT4NCjwvaHRtbD4NCg== result:dp+ffsqTZJ2jHMUnxyXcDIN3eZlRKLlv6b3yiwZxtLS5Vu54uxbldf9hNhptGD95+JehUNr92WauoGy6mmSrescAvwww2YTSrZ628IJkTe5/eyYPfpbWTjLV/1uepj9Alm7iH+okhHBvJPLxCxAEX0mVAHfevKuvXTzOpzZ+UBj3b84rY5nMqxBgNvskBUiXrHxpkKwTFPWeTU6cNg== key:G1toqea7f9oFBvBZIz+kZ41/GevxVcC2bRR+L/8wWNA=",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Error: [0] Protocol error: Did not receive HELLO; input:FQMBAAICRg== result: key:T6BrQGLDVUmE7OfqFM0hTdmEGgJ1Leol7P5pnMjC3fo=",
+    "level": "error"
+}
+{
+    "type": "log",
+    "timestamp": "2026-11-06T13:48:17Z",
+    "message": "Server Selection - Failed to find a working test server. (NoServers)",
+    "level": "error"
+}
+exit=2

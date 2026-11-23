@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; padding: 0; background: #ffffff; font-family: 'Helvetica Neue', Arial, sans-serif; }
+  .canvas { width: 1120px; height: 660px; position: relative; background: #ffffff; padding: 0; }
+  .lane { position: absolute; top: 24px; height: 580px; width: 300px; border-radius: 10px; }
+  .lane-clients { left: 24px; background: #f1f5f9; border: 1.5px solid #cbd5e1; }
+  .lane-vps { left: 420px; background: #fef6ec; border: 1.5px solid #e7d5b5; }
+  .lane-edge { left: 816px; background: #eef6fb; border: 1.5px solid #c3dbe9; }
+  .lane-title { text-align: center; font-size: 15px; font-weight: 700; color: #334155; padding: 12px 0 2px 0; letter-spacing: 0.4px; }
+  .lane-sub { text-align: center; font-size: 11px; color: #64748b; padding: 0 14px 8px 14px; line-height: 1.35; }
+  .node { position: absolute; left: 24px; right: 24px; background: #ffffff; border: 1.5px solid #94a3b8; border-radius: 7px; padding: 8px 10px; box-sizing: border-box; }
+  .node h4 { margin: 0 0 2px 0; font-size: 12.5px; color: #1e293b; font-weight: 700; }
+  .node p { margin: 0; font-size: 10.5px; color: #475569; line-height: 1.3; }
+  .node.hl-vps { border-color: #b08a3e; background: #fffdf8; }
+  .node.hl-edge { border-color: #4b99b2; background: #f8fcfe; }
+  .arrow-label { position: absolute; font-size: 10.5px; color: #475569; background: #ffffff; padding: 1px 6px; border: 1px solid #e2e8f0; border-radius: 4px; white-space: nowrap; }
+  .arrow-label.no { color: #a45851; border-color: #e5c4c1; }
+  .arrow-label.yes { color: #2f6b45; border-color: #c5dfd0; }
+  .footnote { position: absolute; left: 24px; right: 24px; bottom: 6px; font-size: 10px; color: #94a3b8; text-align: center; line-height: 1.4; }
+  .badge { position: absolute; top: -11px; right: 14px; background: #334155; color: #ffffff; font-size: 10px; padding: 2px 8px; border-radius: 9px; letter-spacing: 0.5px; }
+  svg { position: absolute; inset: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <!-- LANE 1: CLIENTS -->
+  <div class="lane lane-clients">
+    <div class="lane-title">SPEEDTEST CLIENTS</div>
+    <div class="lane-sub">one product, three lanes — each selects its path at the session layer (L1)</div>
+    <div class="node" style="top: 78px;">
+      <h4>Official Ookla CLI</h4>
+      <p>NetGauge binary over raw TCP + UDP — unmodified 1.2.0.84</p>
+    </div>
+    <div class="node" style="top: 168px;">
+      <h4>Official web / host-tester pattern</h4>
+      <p>NetGauge over WebSocket (WSS) — HTML5 clients</p>
+    </div>
+    <div class="node" style="top: 258px;">
+      <h4>Custom engine (TS/HTTP)</h4>
+      <p>__down / __up streaming + hybrid session tokens</p>
+    </div>
+    <div class="node" style="top: 348px; border-style: dashed;">
+      <h4>Discovery &amp; session token</h4>
+      <p>GET /api/servers · POST /api/sessions — all lanes</p>
+    </div>
+  </div>
+
+  <!-- LANE 2: VPS -->
+  <div class="lane lane-vps">
+    <span class="badge" style="background:#8a6d2f;">ORIGIN</span>
+    <div class="lane-title">VPS</div>
+    <div class="lane-sub">native sockets · stable identity · control plane</div>
+    <div class="node hl-vps" style="top: 78px;">
+      <h4>SpeedtestServer :8080</h4>
+      <p>Full NetGauge TCP/TLS + UDP loss/jitter — CLI lane serves 100% of payload (E-E: 26 GB)</p>
+    </div>
+    <div class="node hl-vps" style="top: 168px;">
+      <h4>Hybrid gateway :8090</h4>
+      <p>Discovery map · HMAC tokens · result intake · TTFB ping (E-I: 3,653 B total)</p>
+    </div>
+    <div class="node hl-vps" style="top: 258px;">
+      <h4>Identity &amp; persistence</h4>
+      <p>Operator hostname · ACME/TLS · results storage · stats</p>
+    </div>
+  </div>
+
+  <!-- LANE 3: EDGE -->
+  <div class="lane lane-edge">
+    <span class="badge" style="background:#3d7d94;">EDGE</span>
+    <div class="lane-title">CLOUDFLARE WORKERS</div>
+    <div class="lane-sub">bandwidth-intensive plane — payload never transits the VPS</div>
+    <div class="node hl-edge" style="top: 78px;">
+      <h4>/ws — NetGauge over WSS</h4>
+      <p>HI→HELLO · PING · DOWNLOAD (binary frames) · UPLOAD (drain+count) — host-tester 10/10 (E-G)</p>
+    </div>
+    <div class="node hl-edge" style="top: 168px;">
+      <h4>/__down · /__up</h4>
+      <p>HTTP streaming throughput for custom engines, edge-generated payloads</p>
+    </div>
+    <div class="node hl-edge" style="top: 258px;">
+      <h4>Legacy HTTP surface</h4>
+      <p>/ · /hi · latency.txt · random{N}x{N}.jpg · upload.php · crossdomain.xml</p>
+    </div>
+    <div class="node" style="top: 348px; border-style: dashed;">
+      <h4>Token verify (local HMAC)</h4>
+      <p>Shared secret — zero subrequests, valid in every PoP</p>
+    </div>
+  </div>
+
+  <!-- Connectors (SVG): adjacent lanes only, no lines through nodes -->
+  <svg width="1120" height="660">
+    <!-- CLI -> VPS (green, payload path) -->
+    <line x1="326" y1="103" x2="418" y2="103" stroke="#438d5c" stroke-width="2.5"/>
+    <polygon points="418,98 428,103 418,108" fill="#438d5c"/>
+    <!-- web -> edge (green, routed through the gap between VPS subtitle and first node) -->
+    <path d="M 326 194 C 380 194 380 92 470 92 L 810 92" stroke="#438d5c" stroke-width="2.5" fill="none"/>
+    <polygon points="810,87 820,92 810,97" fill="#438d5c"/>
+    <!-- CLI -> edge: BLOCKED (red stub with X, dies mid-gap before the VPS lane) -->
+    <line x1="326" y1="215" x2="368" y2="215" stroke="#a45851" stroke-width="2.5" stroke-dasharray="6,4"/>
+    <line x1="362" y1="209" x2="374" y2="221" stroke="#a45851" stroke-width="2.5"/>
+    <line x1="374" y1="209" x2="362" y2="221" stroke="#a45851" stroke-width="2.5"/>
+    <!-- clients discovery box -> VPS gateway (grey control, elbow up to the gateway box) -->
+    <path d="M 326 383 L 372 383 L 372 224 L 414 224" stroke="#64748b" stroke-width="2.5" fill="none"/>
+    <polygon points="414,219 424,224 414,229" fill="#64748b"/>
+    <!-- edge token box -> VPS gateway (grey control: result intake, mirrored elbow) -->
+    <path d="M 816 383 L 764 383 L 764 224 L 722 224" stroke="#64748b" stroke-width="2.5" fill="none"/>
+    <polygon points="722,219 712,224 722,229" fill="#64748b"/>
+  </svg>
+
+  <!-- Labels -->
+  <div class="arrow-label yes" style="left: 320px; top: 74px;">TCP+UDP ✓ E-E</div>
+  <div class="arrow-label no" style="left: 340px; top: 233px;">to edge ✗ E-D</div>
+  <div class="arrow-label yes" style="left: 500px; top: 70px;">WSS / HTTPS — 100% of web/custom payload (E-G · E-I)</div>
+  <div class="arrow-label" style="left: 330px; top: 296px;">control KBs</div>
+  <div class="arrow-label" style="left: 716px; top: 296px;">results KBs</div>
+
+  <div class="footnote">Hybrid session flow (E-I): discovery → token → VPS pings → edge throughput → result intake — 56 MiB of payload at the edge vs 3,653 B on the VPS (offload ≈ 1 : 16,000). Solid green = verified payload path · red dashed = path proven impossible for the official CLI (E-D).</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,3 @@
+{"kind":"gateway_started","port":8090,"workerBase":"http://127.0.0.1:8790","vpsBase":"http://127.0.0.1:8090","stsBase":"http://127.0.0.1:8080","secretConfigured":true}
+{"ts":1793972687211,"kind":"session_minted","guid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68","ip":"127.0.0.1","expMs":1793973287211}
+{"ts":1793972688966,"kind":"result_accepted","guid":"fd1c3d7f-e7d2-4316-8ed4-50e8719a1a68","ip":"127.0.0.1"}

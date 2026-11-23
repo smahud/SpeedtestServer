@@ -1,0 +1,11 @@
+Fri Nov  6 13:48:14 UTC 2026
+Linux c-6aedc104-14127d0f-d2593a41c42c 5.10.134-013.15.kangaroo.al8.x86_64 #1 SMP Thu Jul 30 12:54:59 UTC 2026 x86_64 GNU/Linux
+repo HEAD: d6b5f1e668502b99c29ac95e8a30d755036e9ec6
+experiment: e-d-all-non-netgauge
+SERVERS: speed.cloudflare.com:8080,speed.cloudflare.com:443,127.0.0.1:8790,127.0.0.1:9443
+CLI: Speedtest by Ookla 1.2.0.84 (ea6b6773cf) Linux/x86_64-linux-musl 5.10.134-013.15.kangaroo.al8.x86_64 x86_64
+listeners before:
+(none)
+listeners at run start:
+LISTEN 0      4096       127.0.0.1:8790       0.0.0.0:*    users:(("workerd",pid=5106,fd=13))   
+LISTEN 0      511        127.0.0.1:8888       0.0.0.0:*    users:(("MainThread",pid=5113,fd=22))

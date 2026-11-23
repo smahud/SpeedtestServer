@@ -1,0 +1,104 @@
+{
+  "label": "e-i-hybrid-session",
+  "startedAt": "2026-11-06T13:44:47.168Z",
+  "gateway": "http://127.0.0.1:8090",
+  "worker": "http://127.0.0.1:8790",
+  "totalMs": 1800,
+  "phases": [
+    {
+      "phase": "discovery-vps",
+      "ms": 39,
+      "status": 200,
+      "roles": [
+        "control",
+        "latency",
+        "throughput"
+      ]
+    },
+    {
+      "phase": "session-token-vps",
+      "ms": 5,
+      "status": 200
+    },
+    {
+      "phase": "latency-vps",
+      "ms": 14,
+      "samples": [
+        1.8,
+        1.38,
+        1.55,
+        1.21,
+        1.62,
+        2.06,
+        1.35,
+        1.22,
+        1.04,
+        0.82
+      ],
+      "min": 0.82,
+      "median": 1.38
+    },
+    {
+      "phase": "latency-edge-ttfb",
+      "ms": 58,
+      "samples": [
+        6.03,
+        6.05,
+        4.84,
+        4.76,
+        4.01,
+        3.68,
+        3.58,
+        17.5,
+        3.54,
+        3.95
+      ],
+      "min": 3.54
+    },
+    {
+      "phase": "download-edge-ws",
+      "connections": 6,
+      "perConnection": 8388608,
+      "ms": 1392,
+      "bytes": 50331648,
+      "throughputMBps": 34.48,
+      "throughputMbps": 289.3
+    },
+    {
+      "phase": "upload-edge-ws",
+      "connections": 4,
+      "perConnection": 2097152,
+      "ms": 284,
+      "bytes": 8388608,
+      "throughputMBps": 28.17,
+      "throughputMbps": 236.3
+    },
+    {
+      "phase": "result-intake-vps",
+      "ms": 6,
+      "status": 200,
+      "ok": true
+    }
+  ],
+  "accounting": {
+    "vps": {
+      "requests": 13,
+      "bytesIn": 2688,
+      "bytesOut": 965
+    },
+    "edge": {
+      "requests": 10,
+      "bytesIn": 50331648,
+      "bytesOut": 8388608,
+      "wsSessions": 10
+    }
+  },
+  "summary": {
+    "vpsBytes": 3653,
+    "edgeBytes": 58720256,
+    "payloadBytes": 58720256,
+    "vpsShareOfPayload": 0.000062,
+    "offloadRatio": 16074.5,
+    "interpretation": "payloadBytes flowed client↔edge (Worker); the VPS served only the control plane (discovery+token+pings+results = 3653 B). Offload ratio: 1:16075 (payload/control bytes)."
+  }
+}

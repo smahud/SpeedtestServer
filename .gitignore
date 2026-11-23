@@ -6,8 +6,8 @@ dist/
 certs/
 *.log
 validation/harness/out/
-clients/
-lab/
+/clients/
+/lab/
 *.pem
 *.key
 validation/harness/tls-cases/
