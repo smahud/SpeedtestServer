@@ -248,7 +248,18 @@ function hostMatches(host: string | undefined, allowedHosts: string[]): boolean 
   const colon = h.lastIndexOf(':');
   if (colon !== -1 && h.indexOf(':') === colon) h = h.slice(0, colon); // strip :port (not ::1)
   for (const allowed of allowedHosts) {
-    if (allowed.toLowerCase() === h) return true;
+    const name = allowed.toLowerCase();
+    if (name === h) return true;
+    // A certificate wildcard covers one DNS label. The reference's wildcard
+    // certificate also admitted unrelated Hosts in the 2026-11-23 lab; retain
+    // the certificate boundary rather than copying that permissive behavior.
+    if (name.startsWith('*.')) {
+      const suffix = name.slice(1);
+      if (h.endsWith(suffix)) {
+        const label = h.slice(0, -suffix.length);
+        if (label.length > 0 && !label.includes('.')) return true;
+      }
+    }
   }
   return false;
 }
@@ -267,6 +278,9 @@ export function createRequestHandler(opts: HttpApiOptions) {
     const method = req.method || 'GET';
     const url = req.url || '/';
     const { target, path } = requestTargetPath(url);
+    // The reference dispatches these legacy endpoints by final path component,
+    // including /upload, /speedtest/upload and prefixed crossdomain.xml aliases.
+    const filename = path.slice(path.lastIndexOf('/') + 1);
     const ua = req.headers['user-agent'];
     const origin = req.headers['origin'] as string | undefined;
     const host = req.headers['host'];
@@ -434,12 +448,13 @@ export function createRequestHandler(opts: HttpApiOptions) {
       notFound();
       return;
     }
-    if (path === '/crossdomain.xml') {
+    if (filename === 'crossdomain.xml') {
       if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') {
         // Verified F-23: one allow-access-from entry per effective domain
-        // (allowedDomains ∪ defaults), with the request's local port.
+        // (allowedDomains ∪ defaults), advertising the entire configured TCP
+        // listener set. A single-port fixture hid this distinction previously.
         const domains = effectiveDomains(opts.allowedDomains, opts.excludeDefaultDomains);
-        const ports = String(req.socket.localPort ?? opts.crossDomainPorts);
+        const ports = opts.crossDomainPorts || String(req.socket.localPort ?? 8080);
         const entries = domains
           .map((d) => `<allow-access-from domain="${d}" to-ports="${ports}"/>\n`)
           .join('');
@@ -450,7 +465,11 @@ export function createRequestHandler(opts: HttpApiOptions) {
       notFound();
       return;
     }
-    if (path === '/speedtest/upload.php' || path === '/upload.php') {
+    if (filename === 'upload' || filename === 'upload.php') {
+      if (method === 'OPTIONS') {
+        respond(200, '', [...commonHeaders(), ['Content-Type', 'text/plain; charset=UTF-8']], connMode, 'options');
+        return;
+      }
       if (method !== 'POST') {
         notFound();
         return;

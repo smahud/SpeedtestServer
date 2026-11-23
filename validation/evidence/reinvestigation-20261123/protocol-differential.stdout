@@ -1,0 +1,185 @@
+TOTAL: 103 cases | identical: 57 | DIFFERING: 46
+
+=== [netgauge-tcp] INITPLOSS bare (no HI) ===
+  daemon: {"closed":false,"len":6,"preview":"ERROR\n"}
+  sts   : {"closed":false,"len":3,"preview":"OK\n"}
+
+=== [netgauge-tcp] DOWNLOAD 100 ===
+  daemon: {"closed":false,"len":100,"preview":"DOWNLOAD<prefix9> <100 bytes total>"}
+  sts   : {"closed":false,"len":100,"preview":"DOWNLOAD<prefix9> <100 bytes total>"}
+
+=== [netgauge-tcp] DOWNLOAD with args ===
+  daemon: {"closed":false,"len":100000,"preview":"DOWNLOAD<prefix9> <220 bytes total>"}
+  sts   : {"closed":false,"len":100000,"preview":"DOWNLOAD<prefix9> <220 bytes total>"}
+
+=== [netgauge-tcp] DOWNLOAD negative ===
+  daemon: {"closed":false,"len":3145728,"preview":"DOWNLOAD<prefix9> <220 bytes total>"}
+  sts   : {"closed":false,"len":6,"preview":"ERROR\n"}
+
+=== [netgauge-tcp] DOWNLOAD notanumber ===
+  daemon: {"closed":false,"len":3145728,"preview":"DOWNLOAD<prefix9> <220 bytes total>"}
+  sts   : {"closed":false,"len":6,"preview":"ERROR\n"}
+
+=== [netgauge-tcp] DOWNLOAD huge ===
+  daemon: {"closed":false,"len":3145728,"preview":"DOWNLOAD<prefix9> <220 bytes total>"}
+  sts   : {"closed":false,"len":6,"preview":"ERROR\n"}
+
+=== [http] GET / ===
+  daemon: {"closed":true,"len":146,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/⏎⏎"}
+  sts   : {"closed":true,"len":146,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/⏎⏎"}
+
+=== [http] GET /hi ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] GET /hi?query=1 ===
+  daemon: {"closed":true,"len":152,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi?x=1⏎⏎"}
+  sts   : {"closed":true,"len":152,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi?x=1⏎⏎"}
+
+=== [http] HEAD /hi ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] GET /HI (case) ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/HI⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/HI⏎⏎"}
+
+=== [http] GET /hi/ (trailing slash) ===
+  daemon: {"closed":true,"len":149,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi/⏎⏎"}
+  sts   : {"closed":true,"len":149,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi/⏎⏎"}
+
+=== [http] GET //hi (double slash) ===
+  daemon: {"closed":true,"len":149,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080//hi⏎⏎"}
+  sts   : {"closed":true,"len":149,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081//hi⏎⏎"}
+
+=== [http] GET /./hi (dot segment) ===
+  daemon: {"closed":true,"len":150,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/./hi⏎⏎"}
+  sts   : {"closed":true,"len":150,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/./hi⏎⏎"}
+
+=== [http] OPTIONS * ===
+  daemon: {"closed":true,"len":146,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080*⏎⏎"}
+  sts   : {"closed":true,"len":146,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081*⏎⏎"}
+
+=== [http] OPTIONS /hi ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] TRACE /hi ===
+  daemon: {"closed":true,"len":118,"preview":"{[ð5gxf²Ôºêuüàª¾/ôÒÐú*(\u0003êT}ZÛüö\nVÁ{Ü\u0002Lt5ÀjS0&YKØ¶Ó-ÅÜ/KiSO\n]vç5\u001bP÷ò¥Ç$Ü\u001aSBÈ2ù\u0019\u000b÷ßSÞàç\u0007Qï\u000eÎÕÂÏ\\]\u000f\u001b\n"}
+  sts   : {"closed":true,"len":18,"preview":"ERROR\nERROR\nERROR\n"}
+
+=== [http] PUT /hi ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] DELETE /hi ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] PATCH /hi ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] no User-Agent ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] empty UA value ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] GET unknown path ===
+  daemon: {"closed":true,"len":150,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/nope⏎⏎"}
+  sts   : {"closed":true,"len":150,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/nope⏎⏎"}
+
+=== [http] GET /speedtest/latency.txt ===
+  daemon: {"closed":true,"len":167,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/latency.txt⏎⏎"}
+  sts   : {"closed":true,"len":167,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/latency.txt⏎⏎"}
+
+=== [http] GET /latency.txt ===
+  daemon: {"closed":true,"len":157,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/latency.txt⏎⏎"}
+  sts   : {"closed":true,"len":157,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/latency.txt⏎⏎"}
+
+=== [http] GET /crossdomain.xml ===
+  daemon: {"closed":true,"len":161,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/crossdomain.xml⏎⏎"}
+  sts   : {"closed":true,"len":161,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/crossdomain.xml⏎⏎"}
+
+=== [http] GET random250x250.jpg ===
+  daemon: {"closed":true,"len":173,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/random250x250.jpg⏎⏎"}
+  sts   : {"closed":true,"len":173,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/random250x250.jpg⏎⏎"}
+
+=== [http] HEAD random250x250.jpg ===
+  daemon: {"closed":true,"len":173,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/random250x250.jpg⏎⏎"}
+  sts   : {"closed":true,"len":173,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/random250x250.jpg⏎⏎"}
+
+=== [http] GET random250x500.jpg (mismatch) ===
+  daemon: {"closed":true,"len":173,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/random250x500.jpg⏎⏎"}
+  sts   : {"closed":true,"len":173,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/random250x500.jpg⏎⏎"}
+
+=== [http] GET random123x123.jpg (unknown size) ===
+  daemon: {"closed":true,"len":173,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/random123x123.jpg⏎⏎"}
+  sts   : {"closed":true,"len":173,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/random123x123.jpg⏎⏎"}
+
+=== [http] GET random250x250.jpg weird prefix ===
+  daemon: {"closed":true,"len":171,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/foo/bar/random250x250.jpg⏎⏎"}
+  sts   : {"closed":true,"len":171,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/foo/bar/random250x250.jpg⏎⏎"}
+
+=== [http] Range on /hi ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] Origin reflection ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] Origin null ===
+  daemon: {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] POST /speedtest/upload.php body ===
+  daemon: {"closed":true,"len":166,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/upload.php⏎⏎"}
+  sts   : {"closed":true,"len":166,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/upload.php⏎⏎"}
+
+=== [http] POST /speedtest/upload.php empty ===
+  daemon: {"closed":true,"len":166,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/upload.php⏎⏎"}
+  sts   : {"closed":true,"len":166,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/upload.php⏎⏎"}
+
+=== [http] GET /speedtest/upload.php ===
+  daemon: {"closed":true,"len":166,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/upload.php⏎⏎"}
+  sts   : {"closed":true,"len":166,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/upload.php⏎⏎"}
+
+=== [http] POST chunked upload.php ===
+  daemon: {"closed":true,"len":166,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/speedtest/upload.php⏎⏎"}
+  sts   : {"closed":true,"len":166,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/speedtest/upload.php⏎⏎"}
+
+=== [http] keep-alive two requests ===
+  daemon: {"closed":true,"len":301,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Keep-Alive⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎HTTP/1.1 307 Temporary Redirect⏎Date: Mon, 23 Nov 2026 11:34:44 GMT⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] absolute-form URI ===
+  daemon: {"closed":true,"len":164,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080http://localhost/hi⏎⏎"}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/hi⏎⏎"}
+
+=== [http] long URL 2KB ===
+  daemon: {"closed":true,"len":2194,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18080/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+  sts   : {"closed":true,"len":2194,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+
+=== [http] GET /ws (plain GET not upgrade) ===
+  daemon: {"closed":true,"len":0,"preview":""}
+  sts   : {"closed":true,"len":148,"preview":"HTTP/1.1 307 Temporary Redirect⏎Date: <date>⏎Connection: Close⏎Content-Length: 0⏎Location: https://localhost:18081/ws⏎⏎"}
+
+=== [ws] WS PING ===
+  daemon: {"handshake":"HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>","frames":[{"opcode":1,"bin":false,"len":19,"preview":"PONG 1795433704233\n"}],"closedByServer":false}
+  sts   : {"handshake":"HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: <hash>","frames":[{"opcode":1,"bin":false,"len":19,"preview":"PONG 1795433705407\n"}],"closedByServer":false}
+
+=== [udp] LOSS 5-field loaded ===
+  daemon: []
+  sts   : [{"from":"127.0.0.1:<port>","data":"RECV 1 456 [2 1 0]\n","bytes":19}]
+
+=== [udp] LOSS out-of-order + dupe ===
+  daemon: []
+  sts   : [{"from":"127.0.0.1:<port>","data":"RECV 5 10 [3 5 0]\n","bytes":18},{"from":"127.0.0.1:<port>","data":"RECV 3 20 [4 3 1]\n","bytes":18},{"from":"127.0.0.1:<port>","data":"RECV 3 30 [5 3 2]\n","bytes":18}]
+
+=== [udp] PLOSS after 2 UDP pkts (5 then 3) ===
+  daemon: "PLOSS 0 0 0\n"
+  sts   : "PLOSS 2 1 5\n"

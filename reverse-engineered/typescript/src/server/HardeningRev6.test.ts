@@ -31,9 +31,20 @@ import { WebSocket } from 'ws';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 jest.setTimeout(25000);
 
-/** Random high port. */
-function freePort(): number {
-  return 25000 + Math.floor(Math.random() * 20000);
+/** Ask the OS for an unused port; random guesses collided with live lab sockets. */
+const allocatedPorts = new Set<number>();
+async function freePort(): Promise<number> {
+  const port = await new Promise<number>((resolve, reject) => {
+    const probe = net.createServer();
+    probe.once('error', reject);
+    probe.listen(0, '127.0.0.1', () => {
+      const chosen = (probe.address() as net.AddressInfo).port;
+      probe.close(err => err ? reject(err) : resolve(chosen));
+    });
+  });
+  if (allocatedPorts.has(port)) return freePort();
+  allocatedPorts.add(port);
+  return port;
 }
 
 function coreOpts(port: number, extra: Record<string, unknown> = {}): Record<string, unknown> {
@@ -67,6 +78,9 @@ function silentConnect(port: number, settleMs = 250): Promise<{ alive: boolean; 
     const t = setTimeout(finish, settleMs);
     sock.on('close', () => { alive = false; finish(); });
     sock.on('error', () => { alive = false; finish(); });
+    // A paused readable socket does not consume FIN/EOF until it is read.
+    // Observe the remote close rather than mistaking unread EOF for a live socket.
+    sock.resume();
   });
 }
 
@@ -125,7 +139,7 @@ const uuid = (i: number): string =>
 
 describe('F-31 — global connection limit counts pre-protocol sockets', () => {
   test('silent sockets consume the global limit; data connection refused past it', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port, { maxConnections: 3, maxConnectionsPerIp: 100 }) as never);
     await core.start();
     try {
@@ -156,7 +170,7 @@ describe('F-31 — global connection limit counts pre-protocol sockets', () => {
 
 describe('F-32 — WebSocket sessions count once (no double accounting)', () => {
   test('one live WS session → 1 active connection, 1 connectionsTotal, 1 wsSession', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port) as never);
     await core.start();
     const ws = new WebSocket(`ws://127.0.0.1:${port}/ws`);
@@ -179,7 +193,7 @@ describe('F-32 — WebSocket sessions count once (no double accounting)', () => 
   });
 
   test('two WS sessions fit under maxConnections=2 (pre-fix the first alone exhausted it)', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port, { maxConnections: 2, maxConnectionsPerIp: 10 }) as never);
     await core.start();
     const wss: WebSocket[] = [];
@@ -247,7 +261,7 @@ describe('F-33 — LossRegistry bounded session management', () => {
   });
 
   test('UDP LOSS burst through the engine stays bounded (integration)', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port, { udpPorts: [port] }) as never);
     await core.start();
     try {
@@ -282,8 +296,8 @@ describe('F-33 — LossRegistry bounded session management', () => {
 
 describe('F-34 — failed startup closes every partially-bound listener', () => {
   test('EADDRINUSE on one port → start() rejects AND the other port is closed', async () => {
-    const portA = freePort();
-    const portB = freePort();
+    const portA = await freePort();
+    const portB = await freePort();
     const squatter = net.createServer();
     await new Promise<void>((res) => squatter.listen(portA, '127.0.0.1', res));
     try {
@@ -292,7 +306,7 @@ describe('F-34 — failed startup closes every partially-bound listener', () => 
       const b = await portAccepting(portB);
       expect(b.accepted).toBe(false); // no orphaned listener on the OTHER port
       // the core is reusable after a failed start (no stale state)
-      const portC = freePort();
+      const portC = await freePort();
       (core as unknown as { opts: { tcpPorts: number[] } }).opts.tcpPorts = [portC];
       await core.start();
       const r = await rawRequest(portC, 'PING 1\n');
@@ -304,8 +318,8 @@ describe('F-34 — failed startup closes every partially-bound listener', () => 
   });
 
   test('UDP bind failure after successful TCP binds leaves no TCP orphans', async () => {
-    const portA = freePort();
-    const udpTaken = freePort();
+    const portA = await freePort();
+    const udpTaken = await freePort();
     const squatter: dgram.Socket = await new Promise((res) => {
       const s = dgram.createSocket('udp4');
       s.bind(udpTaken, '127.0.0.1', () => res(s));
@@ -325,7 +339,7 @@ describe('F-34 — failed startup closes every partially-bound listener', () => 
 
 describe('F-35 — stop() completes within the shutdown grace bound', () => {
   test('in-flight trickle upload: stop() resolves at the bound and destroys the socket', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port, { shutdownGraceMs: 1200 }) as never);
     await core.start();
     const up = net.connect({ host: '127.0.0.1', port }, () => {
@@ -347,7 +361,7 @@ describe('F-35 — stop() completes within the shutdown grace bound', () => {
   });
 
   test('idle NetGauge connection and open WS session are closed by stop()', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port, { shutdownGraceMs: 1200 }) as never);
     await core.start();
     const ng = net.connect({ host: '127.0.0.1', port }, () => ng.write('PING 1\n'));
@@ -375,7 +389,7 @@ describe('F-36 — stalled evidence sink degrades to OFF past the backlog cap', 
     const fifo = path.join(os.tmpdir(), `f36evi-${process.pid}.fifo`);
     try { fs.unlinkSync(fifo); } catch { /* not present */ }
     execSync(`mkfifo ${JSON.stringify(fifo)}`);
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port, { evidenceLogPath: fifo, evidenceMaxBacklogBytes: 64 * 1024 }) as never);
     await core.start();
     try {
@@ -413,7 +427,7 @@ describe('F-37 — Origin "null" is never reflected, even under allowedDomains=[
   });
 
   test('wire: GET /hi with Origin: null carries NO Access-Control-Allow-Origin (default config)', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port) as never);
     await core.start();
     try {
@@ -434,7 +448,7 @@ describe('F-37 — Origin "null" is never reflected, even under allowedDomains=[
 
 describe('§6.7 — malformed request line / partial TLS handshake leave the server responsive', () => {
   test('unparseable HTTP version → parser rejection (minimal 500), server alive', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port) as never);
     await core.start();
     try {
@@ -452,7 +466,7 @@ describe('§6.7 — malformed request line / partial TLS handshake leave the ser
   });
 
   test('non-HTTP garbage line → NetGauge ERROR replies (daemon-parity routing), server alive', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port) as never);
     await core.start();
     try {
@@ -468,7 +482,7 @@ describe('§6.7 — malformed request line / partial TLS handshake leave the ser
   });
 
   test('partial TLS ClientHello then abrupt close: no crash, accounting released', async () => {
-    const port = freePort();
+    const port = await freePort();
     const core = new ServerCore(coreOpts(port) as never);
     await core.start();
     try {

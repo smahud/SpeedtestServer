@@ -1,0 +1,94 @@
+Loaded config file: /root/project/SpeedtestServer/lab/reinvestigation-20261123/OoklaServer.properties
+OoklaServer version 2.11 (2.11.5.2) build number 2026-06-04.1737.7d0993d
+OoklaServer instance ID 8943c3bf-f52e-4911-a1d5-37dbd47c1e6c
+Loaded config file: /root/project/SpeedtestServer/lab/reinvestigation-20261123/OoklaServer.properties
+OoklaServer version 2.11 (2.11.5.2) build number 2026-06-04.1737.7d0993d
+OoklaServer instance ID 8943c3bf-f52e-4911-a1d5-37dbd47c1e6c
+Generating 2097152 bytes of download data
+Listening on TCP socket: 0.0.0.0:18080
+Listening on TCP socket: [::]:18080
+Listening on UDP socket: 0.0.0.0:18080
+Listening on UDP socket: [::]:18080
+TCP port: 18080 - current: 0, queued: 0, blocked: 0, queueFull: 0, concurrent: 0, currentThreads: 0
+TCP port: 18080 - current: 0, queued: 0, blocked: 0, queueFull: 0, concurrent: 0, currentThreads: 0
+Initializing TLS context with provided certificate '/root/project/SpeedtestServer/validation/harness/certs/server.pem'
+Server updates were disabled.
+Successfully loaded certificate chain with 0 intermediate certificate(s)
+Initializing TLS context with provided key '/root/project/SpeedtestServer/validation/harness/certs/server.key'
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 1, currentThreads: 1
+CA bundle is empty; skipping
+No configuration setting for minimumTLSProtocol found. Defaulting to 1.2
+Server is configured to require minimum TLS version of 1.2
+CA bundle is empty; skipping
+TLS context initialized using user-defined certificate <c5:70:10:f0:cc:df:b3:4f:1d:ca:f5:c0:e3:30:16:8a:21:31:1f:91>
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 0 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+Disconnect NetException: Connection reset by peer
+Exception caught: Connection reset by peer on connection on port 18080
+TCP uptime: 1 - total current: 1, queued: 0, blocked: 0, queueFull: 0, concurrent: 2, currentThreads: 3
+TCP uptime: 1 - total current: 2, queued: 1, blocked: 0, queueFull: 0, concurrent: 3, currentThreads: 5
+TCP uptime: 1 - total current: 3, queued: 0, blocked: 0, queueFull: 0, concurrent: 4, currentThreads: 6
+TCP uptime: 1 - total current: 4, queued: 0, blocked: 0, queueFull: 0, concurrent: 5, currentThreads: 6
+Disconnect NetException: Connection reset by peer
+TCP uptime: 1 - total current: 6, queued: 0, blocked: 0, queueFull: 0, concurrent: 7, currentThreads: 9
+TCP uptime: 1 - total current: 6, queued: 0, blocked: 0, queueFull: 0, concurrent: 7, currentThreads: 8
+TCP uptime: 1 - total current: 6, queued: 0, blocked: 0, queueFull: 0, concurrent: 7, currentThreads: 8
+Disconnect NetException: Connection reset by peer
+Disconnect NetException: Connection reset by peer
+Disconnect NetException: Connection reset by peer
+Disconnect NetException: Connection reset by peer
+TCP uptime: 8 - total current: 3, queued: 0, blocked: 0, queueFull: 0, concurrent: 7, currentThreads: 7
+TCP uptime: 8 - total current: 4, queued: 0, blocked: 0, queueFull: 0, concurrent: 7, currentThreads: 7
+TCP uptime: 8 - total current: 5, queued: 0, blocked: 0, queueFull: 0, concurrent: 7, currentThreads: 8
+TCP uptime: 8 - total current: 6, queued: 0, blocked: 0, queueFull: 0, concurrent: 7, currentThreads: 9
+TCP uptime: 8 - total current: 7, queued: 0, blocked: 0, queueFull: 0, concurrent: 8, currentThreads: 9
+TCP uptime: 8 - total current: 8, queued: 0, blocked: 0, queueFull: 0, concurrent: 9, currentThreads: 10
+Disconnect NetException: Connection reset by peer
+Disconnect NetException: Connection reset by peer
+Connection reset by peer
+Disconnect NetException: Net Exception: Socket is not connected
+Connection reset by peer
+Disconnect NetException: Net Exception: Socket is not connected
+Connection reset by peer
+Disconnect NetException: Net Exception: Socket is not connected
+Connection reset by peer
+Disconnect NetException: Net Exception: Socket is not connected
+Disconnect NetException: Connection reset by peer
+Disconnect NetException: Connection reset by peer
+Shutdown Requested.
+Waiting for UDP threads to exit.
+Waiting for traceroute threads to exit.
+Traceroute threads have exited.
+Shutdown Requested.
+Closing UDP socket: 0.0.0.0:18080
+Closing UDP socket: [::]:18080
+System exception: cannot unlock named mutex: OoklaSerMu_5d30f41f
+terminate called after throwing an instance of 'Poco::SystemException'
+  what():  System exception

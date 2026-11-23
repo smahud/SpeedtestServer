@@ -1,0 +1,92 @@
+[
+  {
+    "certificate": "exact",
+    "results": [
+      {
+        "host": "speedtest.lumajangnetworks.my.id",
+        "status": 307,
+        "location": "https://localhost:18080/hi"
+      },
+      {
+        "host": "x.y.lumajangnetworks.my.id",
+        "status": 307,
+        "location": "https://localhost:18080/hi"
+      },
+      {
+        "host": "evil-lumajangnetworks.my.id",
+        "status": 307,
+        "location": "https://localhost:18080/hi"
+      },
+      {
+        "host": "totally-unrelated.example",
+        "status": 307,
+        "location": "https://localhost:18080/hi"
+      },
+      {
+        "host": "localhost",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "127.0.0.1",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "[::1]",
+        "status": 307,
+        "location": "https://localhost:18080/hi"
+      },
+      {
+        "host": "[::1]:8080",
+        "status": 307,
+        "location": "https://localhost:18080/hi"
+      }
+    ]
+  },
+  {
+    "certificate": "wildcard",
+    "results": [
+      {
+        "host": "speedtest.lumajangnetworks.my.id",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "x.y.lumajangnetworks.my.id",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "evil-lumajangnetworks.my.id",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "totally-unrelated.example",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "localhost",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "127.0.0.1",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "[::1]",
+        "status": 200,
+        "location": null
+      },
+      {
+        "host": "[::1]:8080",
+        "status": 200,
+        "location": null
+      }
+    ]
+  }
+]

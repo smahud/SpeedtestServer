@@ -1,0 +1,25 @@
+{
+  "backend": "remote",
+  "hostname": "speedtest.lumajangnetworks.my.id",
+  "publishing": false,
+  "selection": "lab-config-endpoint-rewrite",
+  "cli_sha256": "31f1124c5ab8acdae6b9fe1741e704df420f9f2e7d429679fabe62075453c051",
+  "reference_sha256": "f19e5ed240dc185bcaf6ca96e0fa40d5ee53e3a543f4c562082ac0d8d92f027a",
+  "target": "speedtest.lumajangnetworks.my.id:8080",
+  "exit_code": 0,
+  "server": {
+    "id": 72945,
+    "host": "speedtest.lumajangnetworks.my.id",
+    "port": 8080,
+    "name": "BLiP Integrator Provider",
+    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+    "country": "Indonesia",
+    "ip": "45.126.249.250"
+  },
+  "result_type": "result",
+  "packet_loss": 0.33444816053511706,
+  "persisted": false,
+  "target_verified": true,
+  "owned_processes_stopped": true,
+  "submission_block_observed": true
+}

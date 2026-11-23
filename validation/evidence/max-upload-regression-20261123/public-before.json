@@ -1,0 +1,285 @@
+{
+  "host": "speedtest.lumajangnetworks.my.id",
+  "port": 8080,
+  "required_ports": [
+    "5060",
+    "8080"
+  ],
+  "tls_verification": "system trust + hostname validation",
+  "summary": {
+    "passed": 29,
+    "failed": 2,
+    "total": 31
+  },
+  "results": [
+    {
+      "name": "http GET /crossdomain.xml",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 344,
+        "required_ports": [
+          "5060",
+          "8080"
+        ]
+      }
+    },
+    {
+      "name": "http GET /speedtest/crossdomain.xml",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 344,
+        "required_ports": [
+          "5060",
+          "8080"
+        ]
+      }
+    },
+    {
+      "name": "http GET /foo/crossdomain.xml",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 344,
+        "required_ports": [
+          "5060",
+          "8080"
+        ]
+      }
+    },
+    {
+      "name": "http POST /upload",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=12\n"
+      }
+    },
+    {
+      "name": "http POST /speedtest/upload",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=12\n"
+      }
+    },
+    {
+      "name": "http POST /speedtest/upload.php",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=12\n"
+      }
+    },
+    {
+      "name": "http POST /foo/upload.php",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=12\n"
+      }
+    },
+    {
+      "name": "http OPTIONS /upload",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": ""
+      }
+    },
+    {
+      "name": "http OPTIONS /speedtest/upload.php",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": ""
+      }
+    },
+    {
+      "name": "http POST /upload bytes=515798",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=515798\n"
+      }
+    },
+    {
+      "name": "http POST /speedtest/upload.php bytes=515798",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=515798\n"
+      }
+    },
+    {
+      "name": "http POST /upload bytes=1980998",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=1980998\n"
+      }
+    },
+    {
+      "name": "http POST /speedtest/upload.php bytes=1980998",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=1980998\n"
+      }
+    },
+    {
+      "name": "https GET /crossdomain.xml",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 344,
+        "required_ports": [
+          "5060",
+          "8080"
+        ]
+      }
+    },
+    {
+      "name": "https GET /speedtest/crossdomain.xml",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 344,
+        "required_ports": [
+          "5060",
+          "8080"
+        ]
+      }
+    },
+    {
+      "name": "https GET /foo/crossdomain.xml",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "bytes": 344,
+        "required_ports": [
+          "5060",
+          "8080"
+        ]
+      }
+    },
+    {
+      "name": "https POST /upload",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=12\n"
+      }
+    },
+    {
+      "name": "https POST /speedtest/upload",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=12\n"
+      }
+    },
+    {
+      "name": "https POST /speedtest/upload.php",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=12\n"
+      }
+    },
+    {
+      "name": "https POST /foo/upload.php",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=12\n"
+      }
+    },
+    {
+      "name": "https OPTIONS /upload",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": ""
+      }
+    },
+    {
+      "name": "https OPTIONS /speedtest/upload.php",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": ""
+      }
+    },
+    {
+      "name": "https POST /upload bytes=515798",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=515798\n"
+      }
+    },
+    {
+      "name": "https POST /speedtest/upload.php bytes=515798",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=515798\n"
+      }
+    },
+    {
+      "name": "https POST /upload bytes=1980998",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=1980998\n"
+      }
+    },
+    {
+      "name": "https POST /speedtest/upload.php bytes=1980998",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "body": "size=1980998\n"
+      }
+    },
+    {
+      "name": "legacy port 80 upload 12",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "sent": 12,
+        "body": "size=514"
+      }
+    },
+    {
+      "name": "legacy port 80 upload 515798",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "sent": 515798,
+        "body": "size=516300"
+      }
+    },
+    {
+      "name": "legacy port 80 upload 1980998",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "sent": 1980998,
+        "body": "size=1981500"
+      }
+    },
+    {
+      "name": "legacy port 80 percent-encoded bytes=1",
+      "passed": false,
+      "error": "HTTP 200, received b'size=514', expected b'size=512'"
+    },
+    {
+      "name": "legacy port 80 percent-encoded bytes=1980989",
+      "passed": false,
+      "error": "[Errno 32] Broken pipe"
+    }
+  ]
+}

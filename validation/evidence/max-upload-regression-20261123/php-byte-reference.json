@@ -1,0 +1,110 @@
+[
+  {
+    "case": "ascii-small",
+    "wire_bytes": 12,
+    "php": {
+      "status": 200,
+      "body": "size=514"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=514"
+    }
+  },
+  {
+    "case": "ascii-upload",
+    "wire_bytes": 515798,
+    "php": {
+      "status": 200,
+      "body": "size=516300"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=516300"
+    }
+  },
+  {
+    "case": "ascii-max",
+    "wire_bytes": 1980998,
+    "php": {
+      "status": 200,
+      "body": "size=1981500"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=1981500"
+    }
+  },
+  {
+    "case": "percent-max",
+    "wire_bytes": 5942976,
+    "php": {
+      "status": 200,
+      "body": "size=1981500"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=1981500"
+    }
+  },
+  {
+    "case": "invalid-utf8-percent",
+    "wire_bytes": 13,
+    "php": {
+      "status": 200,
+      "body": "size=513"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=513"
+    }
+  },
+  {
+    "case": "raw-invalid-utf8",
+    "wire_bytes": 10,
+    "php": {
+      "status": 200,
+      "body": "size=512"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=512"
+    }
+  },
+  {
+    "case": "utf8-percent",
+    "wire_bytes": 15,
+    "php": {
+      "status": 200,
+      "body": "size=513"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=513"
+    }
+  },
+  {
+    "case": "duplicate",
+    "wire_bytes": 14,
+    "php": {
+      "status": 200,
+      "body": "size=511"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=511"
+    }
+  },
+  {
+    "case": "malformed-percent",
+    "wire_bytes": 5,
+    "php": {
+      "status": 200,
+      "body": "size=507"
+    },
+    "replacement": {
+      "status": 200,
+      "body": "size=507"
+    }
+  }
+]

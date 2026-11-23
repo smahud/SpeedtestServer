@@ -1,0 +1,6 @@
+{
+    "type": "log",
+    "timestamp": "2026-11-23T11:28:28Z",
+    "message": "Configuration - No servers defined (NoServersException)",
+    "level": "error"
+}

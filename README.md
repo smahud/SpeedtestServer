@@ -10,6 +10,21 @@ Speedtest CLI*.
 
 ## 1. Project overview and scope
 
+Fresh 2026-11-23 analysis with the unmodified official CLI and reference binary,
+using `speedtest.lumajangnetworks.my.id` as the remote endpoint:
+[`validation/REINVESTIGATION_2026-11-23.md`](validation/REINVESTIGATION_2026-11-23.md).
+This distinguishes CLI interoperability, host-tester HTTP behavior, and official
+server discovery. The wildcard Host fix was subsequently deployed to the VPS;
+the public-subdomain host tester passed 19/19 (see
+[`validation/DEPLOYMENT_WILDCARD_2026-11-23.md`](validation/DEPLOYMENT_WILDCARD_2026-11-23.md)).
+Subsequent original-binary analysis found additional multi-port policy and upload
+alias/OPTIONS gaps that the 19-check tester missed. See
+[`validation/HTTP_COMPATIBILITY_REPAIR_2026-11-23.md`](validation/HTTP_COMPATIBILITY_REPAIR_2026-11-23.md)
+for those fixes and stricter acceptance evidence.
+The subsequent maximum-upload byte/encoding regression and combined 31-case
+gate are documented in
+[`validation/MAX_UPLOAD_REGRESSION_2026-11-23.md`](validation/MAX_UPLOAD_REGRESSION_2026-11-23.md).
+
 SpeedtestServer replaces the *observable server-side behavior* of the official
 OoklaServer daemon for legitimate OoklaServer-compatible clients: the native
 NetGauge measurement protocol (TCP, TLS-wrapped, WebSocket), the HTTP legacy
@@ -75,6 +90,46 @@ installed server answers (`HELLO …` probe), and reports TLS readiness.
 Staged/portable installs: `./install.sh --staging-dir /tmp/sts`.
 
 ## 6. Manual installation
+
+### HTTP fallback required by host testers
+
+The native daemon on ports 5060/8080 and the HTTP legacy fallback on port 80
+are separate services. Installing the daemon alone does not install the legacy
+site. The legacy site needs actual JPEG files and the PHP-style form upload
+accounting (`500 + sum(byteLength(key) + byteLength(value) + 3)`); the daemon
+continues to return the raw POST body length on its own ports.
+
+After the standard installer, run `sudo bash install-legacy.sh`. It downloads
+the reference fallback asset bundle over HTTPS, verifies its pinned SHA-256,
+extracts only the ten known JPEG files, and enables `speedtestserver-legacy`
+on port 80. You can supply a pre-downloaded archive as its first argument.
+The separately distributed bundle is not included or relicensed in this repo.
+Requirements: curl, python3, sha256sum, and the standard `/opt/speedtestserver`
+installation. If port 80 is already occupied, the installer refuses to replace
+the existing web server; configure that server's legacy paths instead.
+
+The fallback has bounded wire uploads (8 MiB, to accommodate percent encoding
+of the maximum test payload), request/header timeouts, persistent
+HTTP connections, and streams the real JPEG bytes from disk. It runs under the
+dedicated service user, with only the capability required to bind port 80.
+
+Both the daemon and fallback must be reachable at the hostname entered into
+the tester. Verify public A/AAAA records point to the intended VPS, and verify
+inbound TCP 80/8080 and UDP 5060/8080. A locally pinned DNS test proves the VPS
+implementation, not public DNS routing or the official hosted tester verdict.
+
+When sharing a host with nPerf, check nftables redirect rules as well as
+`ss`: nPerf can redirect external port 80 to 8081 even when no process listens
+on 80. Allocate port 80 to the fallback and keep nPerf on 8081/8443 (and 443),
+or use a web proxy to share the legacy paths. Set nPerf's `REDIRECT_PORT_80=0`
+in its operator configuration before removing the existing port-80 redirect,
+otherwise nPerf can recreate it on restart. Back up the configuration/rules
+first; the generic fallback installer never changes another service's firewall.
+
+Logs: `journalctl -u speedtestserver -u speedtestserver-legacy`.
+To remove the fallback listener: `systemctl disable --now speedtestserver-legacy`.
+
+### Native daemon
 
 ```bash
 cd reverse-engineered/typescript
@@ -185,9 +240,11 @@ URLs (spot-verified against the live result pages). Details:
   (deviation D-9) because the reference daemon's own handling never binds
   listed IPv4 addresses — details in `validation/CONFIG_MATRIX.md` and
   FINDINGS.md §rev 5. (`allowedDomains` has been applied since rev 4.)
-- HTTP Host validation follows the daemon exactly: only certificate SAN
-  entries are accepted (others get a 307 redirect to `https://<cert-CN>`) —
-  deploy a certificate whose SANs cover the hostnames/IPs clients will use.
+- HTTP Host validation accepts exact certificate SAN entries and single-label
+  wildcard SANs (e.g. `*.example.com` covers `speedtest.example.com`). Others
+  get a 307 redirect to `https://<cert-CN>`. The reference's more permissive
+  wildcard-certificate behavior is deliberately restricted (decision D-12).
+  Deploy a certificate whose SANs cover the hostnames/IPs clients will use.
 - Single-process serving tops out at ~18–22 Gbps loopback (informational).
 - systemd service start verified on Debian 13 only via offline unit checks +
   direct-launch probes (container limitation, documented).

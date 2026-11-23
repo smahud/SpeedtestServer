@@ -1,0 +1,6 @@
+{"k":"meta","port":18888,"target":"localhost:18081","mode":"live-curl-fetch","fallbackSnapshot":null,"pid":130654,"ts":1795433407806}
+{"k":"mitm","target":"cli.speedtest.net:443","note":"live curl fetch + rewrite","ts":1795433407897}
+{"k":"mitm_tls_ok","alpn":"none","ts":1795433407940}
+{"k":"config_req","method":"GET","target":"/api/cli/config?deviceId=38fbdde984330e50c02382e647c576b71f41cc5c45b193d4f3177e6ee8f22a78&hid=%255C%2508%250E%255E%250CU&sid=81d93757457f988523814ae0009837ae893f38d3fe123f2c37896f118b4c7804&uname=Linux%206.1.0-56-amd64%20%231%20SMP%20PREEMPT_DYNAMIC%20Debian%206.1.192-2%20(2026-11-16)%20x86_64","ua":"ookla-cli/1.2.0.84-1.ea6b6773cf (speedtest-cli-linux-x86_64)","ts":1795433407941}
+{"k":"config_served","source":"live-curl","liveBytes":2770,"servedBytes":3073,"rewritten":["74964","61853","62314","66281","65429","68214","73025","72945","48532","55749"],"ts":1795433408345}
+{"k":"blocked","target":"results.speedtest.net:443","reason":"non-publishing guarantee","ts":1795433430480}

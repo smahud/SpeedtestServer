@@ -140,6 +140,12 @@ method matrix, minimal 500s and path normalization, all **[V]**.)*
    The redirect target host is the certificate CN (verified with
    CN=cnhost.local + SANs=san1/san2: Location uses cnhost.local while only
    san1/san2 are accepted).
+   **2026-11-23 correction for wildcard certificates:** the exact-name fixture
+   above does not establish wildcard behavior. A fresh wildcard fixture admitted
+   `speedtest.lumajangnetworks.my.id` and also unrelated Hosts in the reference
+   binary. SpeedtestServer now accepts the legitimate single-label wildcard
+   match, but keeps unrelated Hosts rejected (D-12). See
+   `REINVESTIGATION_2026-11-23.md` for the bounded observations and evidence.
 3. **User-Agent header REQUIRED** — missing → minimal 500; an EMPTY value
    (`User-Agent: `) counts as present (served). **[V]**
 4. **`Authorization: Bearer <token>`** with a non-JWT-shaped token → minimal
@@ -169,9 +175,9 @@ Date: …
 | `GET /` | 200 `text/html` (109 B) | `<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n` |
 | `GET /hi` | 200 `text/plain; charset=UTF-8` (44 B) | `hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n` |
 | `GET /speedtest/latency.txt` (alias `/latency.txt`) | 200 (10 B) | `test=test\n` |
-| `GET /crossdomain.xml` | 200 `text/xml` | **one `<allow-access-from domain="<d>" to-ports="<local-port>"/>` line per effective domain** (allowedDomains ∪ defaults; `*` when unset → the single classic `domain="*"` entry) **[V]** |
+| `GET */crossdomain.xml` | 200 `text/xml` | **one `<allow-access-from domain="<d>" to-ports="<all-configured-TCP-ports>"/>` line per effective domain** (allowedDomains ∪ defaults; `*` when unset → the single classic `domain="*"` entry). Multi-port behavior reverified 2026-11-23; the previous single-port fixture incorrectly suggested `<local-port>`. Dispatch is by final path component. **[V]** |
 | `GET/HEAD/OPTIONS /speedtest/random{N}x{N}.jpg` (N ∈ {250,350,500,750,1000,1500,2000,2500,3000,3500,4000,5000,6000,7000}) | 200 `image/jpeg`, fixed sizes | deterministic size map (245388 / 505544 / … / 96912152 B); other N or NxM mismatch → 404 **[V]**; the `random{N}x{N}.jpg` suffix matches on any path prefix **[V]**; payload is the printable-ASCII pool **[V]** |
-| `POST /speedtest/upload.php` (alias `/upload.php`) | 200 `text/plain; charset=UTF-8` | `size=<exact body byte count>\n`; GET/HEAD → 404 **[V]**; **chunked body → NO response at all** (connection held until timeout — daemon parser behavior) **[V]** |
+| `POST */upload.php` or `POST */upload` | 200 `text/plain; charset=UTF-8` | `size=<exact body byte count>\n`; GET/HEAD → 404; OPTIONS → 200 with Content-Length 0. Basename aliases and OPTIONS reverified 2026-11-23. **[V]**; **chunked body → NO response at all** (connection held until timeout — daemon parser behavior) **[V]** |
 | `PUT/DELETE/PATCH` on text endpoints | 404 | only GET/HEAD/OPTIONS serve content; POST is 404 outside upload.php **[V]** |
 | `OPTIONS <endpoint>` | 200, headers only, `Content-Length: 0` | served like HEAD but with CL 0 **[V]** |
 | `HEAD <endpoint>` | 200 with the real `Content-Length`, no body | **[V]** |

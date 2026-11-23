@@ -1,0 +1,145 @@
+130983 connect(3, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130983 connect(3, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130983 connect(3, {sa_family=AF_INET, sin_port=htons(9), sin_addr=inet_addr("104.17.148.22")}, 16) = 0
+130984 connect(4, {sa_family=AF_INET, sin_port=htons(41887), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130984 connect(3, {sa_family=AF_INET, sin_port=htons(18888), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130984 +++ exited with 0 +++
+130987 connect(3, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130987 connect(3, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130988 connect(4, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130988 connect(4, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130989 connect(5, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130989 connect(5, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130990 connect(6, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130990 connect(6, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130989 connect(5, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130990 connect(3, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130989 <... connect resumed>)           = 0
+130987 connect(4, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130990 <... connect resumed>)           = 0
+130988 connect(6, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130987 <... connect resumed>)           = 0
+130988 <... connect resumed>)           = 0
+130989 connect(4, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130987 connect(5, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28 <unfinished ...>
+130988 connect(6, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28 <unfinished ...>
+130987 <... connect resumed>)           = 0
+130988 <... connect resumed>)           = 0
+130991 connect(4, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130991 connect(4, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130989 connect(6, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130987 connect(5, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130989 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+130987 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+130988 connect(7, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130991 connect(4, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+130991 connect(4, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130991 connect(4, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130990 connect(3, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130990 connect(3, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130992 connect(8, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130992 connect(8, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130992 connect(8, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+130992 connect(8, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130992 connect(8, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130993 connect(9, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130993 connect(9, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130993 connect(9, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+130993 connect(9, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130993 connect(9, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130994 connect(10, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130994 connect(10, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130989 connect(4, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130988 connect(5, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130987 connect(7, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130991 connect(10, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130988 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+130987 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+130991 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+130994 connect(6, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+130994 connect(6, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28 <unfinished ...>
+130990 connect(3, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+130994 <... connect resumed>)           = 0
+130990 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+130994 connect(6, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130995 connect(11, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130995 connect(11, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130995 connect(11, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+130995 connect(11, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130995 connect(11, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130996 connect(12, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130996 connect(12, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130992 connect(8, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130996 connect(12, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+130996 connect(12, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130996 connect(12, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130993 connect(9, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130994 connect(6, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130996 connect(12, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130990 +++ exited with 0 +++
+130989 +++ exited with 0 +++
+130988 +++ exited with 0 +++
+130991 +++ exited with 0 +++
+130992 +++ exited with 0 +++
+130993 +++ exited with 0 +++
+130994 +++ exited with 0 +++
+130996 +++ exited with 0 +++
+130995 connect(3, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+130987 +++ exited with 0 +++
+130995 +++ exited with 0 +++
+131090 connect(3, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+131090 connect(3, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+131090 connect(3, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+131090 connect(3, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:45.126.249.250", &sin6_addr), sin6_scope_id=0}, 28) = 0
+131090 connect(3, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131090 connect(3, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131094 connect(5, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131095 connect(6, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131096 connect(7, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131097 connect(8, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131098 connect(9, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131100 connect(10, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131090 +++ exited with 0 +++
+131095 +++ exited with 0 +++
+131098 +++ exited with 0 +++
+131096 +++ exited with 0 +++
+131097 +++ exited with 0 +++
+131162 connect(3, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+131163 connect(6, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16 <unfinished ...>
+131162 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+131163 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+131164 connect(7, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131165 connect(8, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131166 connect(9, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131168 connect(10, {sa_family=AF_INET, sin_port=htons(8080), sin_addr=inet_addr("45.126.249.250")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131160 +++ exited with 0 +++
+131099 +++ exited with 0 +++
+131103 +++ exited with 0 +++
+131094 +++ exited with 0 +++
+131100 +++ exited with 0 +++
+131102 +++ exited with 0 +++
+131101 +++ exited with 0 +++
+131166 +++ exited with 0 +++
+131161 +++ exited with 0 +++
+130983 connect(3, {sa_family=AF_INET, sin_port=htons(9), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+131194 +++ exited with 0 +++
+130983 connect(3, {sa_family=AF_INET, sin_port=htons(9), sin_addr=inet_addr("45.126.249.250")}, 16) = 0
+130983 connect(3, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130983 connect(3, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+131170 +++ exited with 0 +++
+131167 +++ exited with 0 +++
+131169 +++ exited with 0 +++
+131168 +++ exited with 0 +++
+130983 connect(3, {sa_family=AF_INET, sin_port=htons(9), sin_addr=inet_addr("104.17.148.22")}, 16) = 0
+131164 +++ exited with 0 +++
+130983 connect(3, {sa_family=AF_INET, sin_port=htons(65535), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+130983 connect(3, {sa_family=AF_INET6, sin6_port=htons(65535), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+130983 connect(3, {sa_family=AF_INET, sin_port=htons(9), sin_addr=inet_addr("104.17.148.22")}, 16) = 0
+131195 connect(4, {sa_family=AF_INET, sin_port=htons(33733), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+131195 connect(3, {sa_family=AF_INET, sin_port=htons(18888), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)
+131195 +++ exited with 0 +++
+131163 +++ exited with 0 +++
+131165 +++ exited with 0 +++
+131162 +++ exited with 0 +++
+131171 +++ exited with 0 +++
+130983 +++ exited with 0 +++

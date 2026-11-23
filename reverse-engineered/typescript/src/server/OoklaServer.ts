@@ -109,7 +109,7 @@ export class OoklaServer extends EventEmitter {
       versionString,
       tls: { cert: Buffer.from(tls.cert), key: Buffer.from(tls.key) },
       tlsMinVersion: minimumTlsProtocolToMinVersion(this.config.ssl?.minimumTLSProtocol) as import('tls').SecureVersion,
-      crossDomainPorts: String(tcpPorts[0] ?? 8080),
+      crossDomainPorts: tcpPorts.join(','),
       evidenceLogPath: this.config.evidenceLogFile || undefined,
       maxConnections: 4096,
       maxConnectionsPerIp: this.config.ipTracking?.maxConnPerIp || 500,

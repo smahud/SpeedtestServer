@@ -111,6 +111,19 @@ plaintext connection has no reuse value. Recorded as a deviation rather
 than parity work to avoid touching the well-verified 307 byte shape
 (F-15/F-16) for a zero-client-impact difference.
 
+## D-12 — Wildcard Host acceptance stays within certificate scope
+
+**Decision (2026-11-23):** accept a single DNS label covered by a wildcard SAN,
+case-insensitively and with the request port removed. Continue redirecting
+unrelated hostnames and multi-label names outside that certificate scope.
+**Why:** the old exact-only comparison redirected the valid production hostname
+`speedtest.lumajangnetworks.my.id` to the literal wildcard CN. Fresh controlled
+probes of the original binary accepted that legitimate hostname, but the same
+wildcard-certificate fixture also accepted unrelated names. Do not reproduce
+that expansion of trust. This is an explicit safety deviation from the observed
+fixture, not a claim that every certificate/configuration has that behavior.
+See REINVESTIGATION_2026-11-23.md and the wildcard comparison/live-validation JSON.
+
 ## D-11 — Bounded shutdown and bounded evidence logging are independent safety parameters
 
 **Decision:** `OoklaServer.shutdownGraceSeconds` (default 10) and

@@ -1,0 +1,1 @@
+[live-config-proxy] :18888 | cli.speedtest.net → LIVE curl fetch + rewrite (all servers → speedtest.lumajangnetworks.my.id:8080) | results.speedtest.net BLOCKED (non-publishing)

@@ -1,0 +1,123 @@
+{
+  "cases": 23,
+  "matched": 23,
+  "normalization": "Only each backend configured TCP port numbers in crossdomain XML",
+  "scope": "HTTP status and body; headers are retained but not counted as byte-identical; chunked timeout is observed, not a successful upload",
+  "results": [
+    {
+      "name": "GET /crossdomain.xml",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "GET /speedtest/crossdomain.xml",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "GET /foo/crossdomain.xml",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "GET /CROSSDOMAIN.XML",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "GET /crossdomain.xml/",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /speedtest/upload.php",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /upload.php",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /speedtest/upload",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /upload",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /foo/upload.php",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /speedtest/upload.asp",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /speedtest/upload.aspx",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /speedtest/upload.jsp",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST /speedtest/upload.php/",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "GET upload",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "HEAD upload",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "OPTIONS upload",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "PUT upload",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST type=text/plain",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST type=application/octet-stream",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST type=",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST type=application/x-www-form-urlencoded",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": false
+    },
+    {
+      "name": "POST chunked",
+      "status_body_equal_after_port_mapping": true,
+      "timeout_case": true
+    }
+  ]
+}

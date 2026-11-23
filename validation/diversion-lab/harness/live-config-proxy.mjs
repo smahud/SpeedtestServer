@@ -40,8 +40,9 @@ fs.mkdirSync(path.dirname(a.log), { recursive: true });
 const LOG = fs.createWriteStream(a.log, { flags: 'w' });
 function log(o) { o.ts = Date.now(); LOG.write(JSON.stringify(o) + '\n'); }
 
-const MITM_CERT = fs.readFileSync(path.join(LAB, 'certs', 'mitm.pem'));
-const MITM_KEY = fs.readFileSync(path.join(LAB, 'certs', 'mitm.key'));
+const CERTS = process.env.CV_CERTS_DIR || path.join(LAB, 'certs');
+const MITM_CERT = fs.readFileSync(path.join(CERTS, 'mitm.pem'));
+const MITM_KEY = fs.readFileSync(path.join(CERTS, 'mitm.key'));
 const BLOCKED = new Set(['results.speedtest.net']); // non-publishing guarantee
 log({ k: 'meta', port: a.port, target: a.target, mode: 'live-curl-fetch', fallbackSnapshot: a.snapshot, pid: process.pid });
 

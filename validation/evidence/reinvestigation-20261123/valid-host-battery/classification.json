@@ -1,0 +1,524 @@
+{
+  "counts": {
+    "harness-identical": 89,
+    "documented-protocol-or-safety-deviation": 8,
+    "variable-payload-timestamp-or-port": 6
+  },
+  "cases": [
+    {
+      "group": "netgauge-tcp",
+      "name": "HI",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "HI with uuid",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "HI with NON-uuid",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "HI extra spaces",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "HI trailing space",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "lowercase hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "GETIP",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "CAPABILITIES",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPTIME",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "PING",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "PING 1",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "PING extra",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD_STATS",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "INITPLOSS bare (no HI)",
+      "classification": "documented-protocol-or-safety-deviation"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "PLOSS no session",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "QUIT",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "unknown cmd",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "empty line",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "CRLF line ending",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "pipelined burst",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "GETIP twice",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "GETIP trailing space",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "GETIP extra arg",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "SERVERID uuid case/format",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD 0",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD 9 (prefix only)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD 10",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD 100",
+      "classification": "variable-payload-timestamp-or-port"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD with args",
+      "classification": "variable-payload-timestamp-or-port"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD negative",
+      "classification": "documented-protocol-or-safety-deviation"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD notanumber",
+      "classification": "documented-protocol-or-safety-deviation"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD huge",
+      "classification": "documented-protocol-or-safety-deviation"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "DOWNLOAD lowercase",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD exact line len",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD shorter than line",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD 100 + 89B",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD with extra args",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD 0",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD negative",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "UPLOAD garbage arg",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "cmd after QUIT",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "binary garbage",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "netgauge-tcp",
+      "name": "long-ish line (500B)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /hi?query=1",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "HEAD /hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /HI (case)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /hi/ (trailing slash)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET //hi (double slash)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /./hi (dot segment)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "OPTIONS *",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "OPTIONS /hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "TRACE /hi",
+      "classification": "documented-protocol-or-safety-deviation"
+    },
+    {
+      "group": "http",
+      "name": "PUT /hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "DELETE /hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "PATCH /hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "no User-Agent",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "empty UA value",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "HTTP/1.0 GET /hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "no Host header",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET unknown path",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /speedtest/latency.txt",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /latency.txt",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /crossdomain.xml",
+      "classification": "variable-payload-timestamp-or-port"
+    },
+    {
+      "group": "http",
+      "name": "GET random250x250.jpg",
+      "classification": "variable-payload-timestamp-or-port"
+    },
+    {
+      "group": "http",
+      "name": "HEAD random250x250.jpg",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET random250x500.jpg (mismatch)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET random123x123.jpg (unknown size)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET random250x250.jpg weird prefix",
+      "classification": "variable-payload-timestamp-or-port"
+    },
+    {
+      "group": "http",
+      "name": "Range on /hi",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "Origin reflection",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "Origin null",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "POST /speedtest/upload.php body",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "POST /speedtest/upload.php empty",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /speedtest/upload.php",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "POST chunked upload.php",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "keep-alive two requests",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "HTTP/2 preface",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "absolute-form URI",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "long URL 2KB",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "http",
+      "name": "GET /ws (plain GET not upgrade)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "tls",
+      "name": "TLS GETIP (netgauge over TLS)",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "tls",
+      "name": "TLS HI",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "tls",
+      "name": "TLS1.0 handshake rejected",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "tls",
+      "name": "TLS1.1 handshake rejected",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "ws",
+      "name": "WS HI",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "ws",
+      "name": "WS HI no newline",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "ws",
+      "name": "WS GETIP",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "ws",
+      "name": "WS HI+GETIP one frame",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "ws",
+      "name": "WS HI then separate GETIP",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "ws",
+      "name": "WS garbage text",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "ws",
+      "name": "WS QUIT",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "ws",
+      "name": "WS PING",
+      "classification": "variable-payload-timestamp-or-port"
+    },
+    {
+      "group": "udp",
+      "name": "LOSS 4-field init",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "udp",
+      "name": "LOSS 5-field loaded",
+      "classification": "documented-protocol-or-safety-deviation"
+    },
+    {
+      "group": "udp",
+      "name": "LOSS out-of-order + dupe",
+      "classification": "documented-protocol-or-safety-deviation"
+    },
+    {
+      "group": "udp",
+      "name": "LOSS bad uuid",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "udp",
+      "name": "LOSS wrong field count",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "udp",
+      "name": "LOSS 6 fields",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "udp",
+      "name": "garbage datagram",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "udp",
+      "name": "empty datagram",
+      "classification": "harness-identical"
+    },
+    {
+      "group": "udp",
+      "name": "PLOSS after 2 UDP pkts (5 then 3)",
+      "classification": "documented-protocol-or-safety-deviation"
+    }
+  ]
+}

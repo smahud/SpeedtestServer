@@ -1,0 +1,132 @@
+[
+  {
+    "host": "speedtest.lumajangnetworks.my.id",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 307,
+      "location": "https://*.lumajangnetworks.my.id:18083/hi",
+      "body": ""
+    }
+  },
+  {
+    "host": "lumajangnetworks.my.id",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    }
+  },
+  {
+    "host": "x.y.lumajangnetworks.my.id",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 307,
+      "location": "https://*.lumajangnetworks.my.id:18083/hi",
+      "body": ""
+    }
+  },
+  {
+    "host": "evil-lumajangnetworks.my.id",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 307,
+      "location": "https://*.lumajangnetworks.my.id:18083/hi",
+      "body": ""
+    }
+  },
+  {
+    "host": "localhost",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    }
+  },
+  {
+    "host": "127.0.0.1",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    }
+  },
+  {
+    "host": "[::1]",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 307,
+      "location": "https://*.lumajangnetworks.my.id:18083/hi",
+      "body": ""
+    }
+  },
+  {
+    "host": "[::1]:8080",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 307,
+      "location": "https://*.lumajangnetworks.my.id:18083/hi",
+      "body": ""
+    }
+  },
+  {
+    "host": "SPEEDTEST.LUMAJANGNETWORKS.MY.ID",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 307,
+      "location": "https://*.lumajangnetworks.my.id:18083/hi",
+      "body": ""
+    }
+  },
+  {
+    "host": "speedtest.lumajangnetworks.my.id.",
+    "reference": {
+      "status": 200,
+      "location": null,
+      "body": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n"
+    },
+    "replacement": {
+      "status": 307,
+      "location": "https://*.lumajangnetworks.my.id:18083/hi",
+      "body": ""
+    }
+  }
+]

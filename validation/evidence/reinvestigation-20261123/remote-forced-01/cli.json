@@ -1,0 +1,170 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-23T11:31:13Z",
+    "ping": {
+        "jitter": 1.023,
+        "latency": 57.136,
+        "low": 56.121,
+        "high": 57.758
+    },
+    "download": {
+        "bandwidth": 7521404,
+        "bytes": 80911767,
+        "elapsed": 11317,
+        "latency": {
+            "iqm": 169.781,
+            "low": 75.213,
+            "high": 333.275,
+            "jitter": 27.458
+        }
+    },
+    "upload": {
+        "bandwidth": 4512598,
+        "bytes": 26636756,
+        "elapsed": 5803,
+        "latency": {
+            "iqm": 151.918,
+            "low": 58.402,
+            "high": 471.228,
+            "jitter": 27.972
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 73025,
+        "selectedLatency": 53.840000000000003,
+        "servers": [
+            {
+                "latency": 54.743000000000002,
+                "server": {
+                    "id": 74964,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "somedigit.net",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 56.262999999999998,
+                "server": {
+                    "id": 61853,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "PT XLSMART Telecom Sejahtera",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 55.823,
+                "server": {
+                    "id": 62314,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "PT. Pratama Hasta Utama Solusindo",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 55.426000000000002,
+                "server": {
+                    "id": 65429,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "Atharva",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 56.180999999999997,
+                "server": {
+                    "id": 66281,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "PT. Tuxsindo Cyber Networks",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 54.767000000000003,
+                "server": {
+                    "id": 68214,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "PT. ERA NETWORK INDONESIA",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 53.840000000000003,
+                "server": {
+                    "id": 73025,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "LINTAS MEDIA SOLUSINDO",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 54.654000000000003,
+                "server": {
+                    "id": 72945,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "BLiP Integrator Provider",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 56.918999999999997,
+                "server": {
+                    "id": 48532,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "Faznet",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 58.218000000000004,
+                "server": {
+                    "id": 55749,
+                    "host": "speedtest.lumajangnetworks.my.id",
+                    "port": 8080,
+                    "name": "RingNet",
+                    "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            }
+        ]
+    },
+    "isp": "Cloudflare Warp",
+    "interface": {
+        "internalIp": "172.16.0.2",
+        "name": "CloudflareWARP",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "45.126.249.249"
+    },
+    "server": {
+        "id": 73025,
+        "host": "speedtest.lumajangnetworks.my.id",
+        "port": 8080,
+        "name": "LINTAS MEDIA SOLUSINDO",
+        "location": "Surabaya -> LAB (speedtest.lumajangnetworks.my.id:8080) [diversion audit]",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+    },
+    "result": {
+        "id": "20047e9b-25a2-482e-876d-10bbc3e15042",
+        "persisted": false
+    }
+}

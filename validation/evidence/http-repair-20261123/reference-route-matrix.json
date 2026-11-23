@@ -1,0 +1,1001 @@
+[
+  {
+    "name": "GET /crossdomain.xml",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/xml",
+        "Content-Length": "276"
+      },
+      "body": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"18082,18085\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"18082,18085\"/>\n<allow-access-from domain=\"*.speedtestcustom.com\" to-ports=\"18082,18085\"/>\n</cross-domain-policy>\n",
+      "bytes": 276
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/xml",
+        "Content-Length": "276"
+      },
+      "body": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"18083,18086\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"18083,18086\"/>\n<allow-access-from domain=\"*.speedtestcustom.com\" to-ports=\"18083,18086\"/>\n</cross-domain-policy>\n",
+      "bytes": 276
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "548"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/crossdomain.xml</code> was not found on this server.</p></body></html>",
+      "bytes": 548
+    }
+  },
+  {
+    "name": "GET /speedtest/crossdomain.xml",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/xml",
+        "Content-Length": "276"
+      },
+      "body": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"18082,18085\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"18082,18085\"/>\n<allow-access-from domain=\"*.speedtestcustom.com\" to-ports=\"18082,18085\"/>\n</cross-domain-policy>\n",
+      "bytes": 276
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/xml",
+        "Content-Length": "276"
+      },
+      "body": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"18083,18086\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"18083,18086\"/>\n<allow-access-from domain=\"*.speedtestcustom.com\" to-ports=\"18083,18086\"/>\n</cross-domain-policy>\n",
+      "bytes": 276
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "558"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/speedtest/crossdomain.xml</code> was not found on this server.</p></body></html>",
+      "bytes": 558
+    }
+  },
+  {
+    "name": "GET /foo/crossdomain.xml",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/xml",
+        "Content-Length": "276"
+      },
+      "body": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"18082,18085\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"18082,18085\"/>\n<allow-access-from domain=\"*.speedtestcustom.com\" to-ports=\"18082,18085\"/>\n</cross-domain-policy>\n",
+      "bytes": 276
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/xml",
+        "Content-Length": "276"
+      },
+      "body": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"18083,18086\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"18083,18086\"/>\n<allow-access-from domain=\"*.speedtestcustom.com\" to-ports=\"18083,18086\"/>\n</cross-domain-policy>\n",
+      "bytes": 276
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "552"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/foo/crossdomain.xml</code> was not found on this server.</p></body></html>",
+      "bytes": 552
+    }
+  },
+  {
+    "name": "GET /CROSSDOMAIN.XML",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "548"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/CROSSDOMAIN.XML</code> was not found on this server.</p></body></html>",
+      "bytes": 548
+    }
+  },
+  {
+    "name": "GET /crossdomain.xml/",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "549"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/crossdomain.xml/</code> was not found on this server.</p></body></html>",
+      "bytes": 549
+    }
+  },
+  {
+    "name": "POST /speedtest/upload.php",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=514",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "POST /upload.php",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "543"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/upload.php</code> was not found on this server.</p></body></html>",
+      "bytes": 543
+    }
+  },
+  {
+    "name": "POST /speedtest/upload",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "549"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/speedtest/upload</code> was not found on this server.</p></body></html>",
+      "bytes": 549
+    }
+  },
+  {
+    "name": "POST /upload",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "539"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/upload</code> was not found on this server.</p></body></html>",
+      "bytes": 539
+    }
+  },
+  {
+    "name": "POST /foo/upload.php",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=12\n",
+      "bytes": 8
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "547"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/foo/upload.php</code> was not found on this server.</p></body></html>",
+      "bytes": 547
+    }
+  },
+  {
+    "name": "POST /speedtest/upload.asp",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "553"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/speedtest/upload.asp</code> was not found on this server.</p></body></html>",
+      "bytes": 553
+    }
+  },
+  {
+    "name": "POST /speedtest/upload.aspx",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "554"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/speedtest/upload.aspx</code> was not found on this server.</p></body></html>",
+      "bytes": 554
+    }
+  },
+  {
+    "name": "POST /speedtest/upload.jsp",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 404,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Content-Length": "553"
+      },
+      "body": "<!doctype html><html><head><title>404 Not Found</title><style>\nbody { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\nh1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\nh1, p { padding-left: 10px; }\ncode.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n</style>\n</head><body><h1>Not Found</h1><p>The requested resource <code class=\"url\">/speedtest/upload.jsp</code> was not found on this server.</p></body></html>",
+      "bytes": 553
+    }
+  },
+  {
+    "name": "POST /speedtest/upload.php/",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=514",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "GET upload",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=500",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "HEAD upload",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "",
+      "bytes": 0
+    }
+  },
+  {
+    "name": "OPTIONS upload",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "0"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "0"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=500",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "PUT upload",
+    "original": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "replacement": {
+      "status": 404,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests"
+      },
+      "body": "",
+      "bytes": 0
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=500",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "POST type=text/plain",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "7"
+      },
+      "body": "size=3\n",
+      "bytes": 7
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "7"
+      },
+      "body": "size=3\n",
+      "bytes": 7
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=500",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "POST type=application/octet-stream",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "7"
+      },
+      "body": "size=3\n",
+      "bytes": 7
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "7"
+      },
+      "body": "size=3\n",
+      "bytes": 7
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=500",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "POST type=",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "7"
+      },
+      "body": "size=3\n",
+      "bytes": 7
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "7"
+      },
+      "body": "size=3\n",
+      "bytes": 7
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=500",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "POST type=application/x-www-form-urlencoded",
+    "original": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=25\n",
+      "bytes": 8
+    },
+    "replacement": {
+      "status": 200,
+      "headers": {
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "Close",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Content-Length": "8"
+      },
+      "body": "size=25\n",
+      "bytes": 8
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:39 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=520",
+      "bytes": 8
+    }
+  },
+  {
+    "name": "POST chunked",
+    "original": {
+      "error": "TimeoutError",
+      "details": "timed out"
+    },
+    "replacement": {
+      "error": "TimeoutError",
+      "details": "timed out"
+    },
+    "official_php": {
+      "status": 200,
+      "headers": {
+        "Host": "speedtest.lumajangnetworks.my.id",
+        "Date": "Mon, 23 Nov 2026 12:42:43 GMT",
+        "Connection": "close",
+        "X-Powered-By": "PHP/8.2.36",
+        "Content-type": "text/html; charset=UTF-8"
+      },
+      "body": "size=514",
+      "bytes": 8
+    }
+  }
+]

@@ -1,0 +1,170 @@
+{
+    "type": "result",
+    "timestamp": "2026-11-23T11:39:23Z",
+    "ping": {
+        "jitter": 0.059,
+        "latency": 0.263,
+        "low": 0.213,
+        "high": 0.336
+    },
+    "download": {
+        "bandwidth": 1026476408,
+        "bytes": 9470023787,
+        "elapsed": 9402,
+        "latency": {
+            "iqm": 6.338,
+            "low": 0.338,
+            "high": 126.286,
+            "jitter": 17.501
+        }
+    },
+    "upload": {
+        "bandwidth": 919867826,
+        "bytes": 11931880435,
+        "elapsed": 14511,
+        "latency": {
+            "iqm": 12.361,
+            "low": 0.274,
+            "high": 51.807,
+            "jitter": 4.046
+        }
+    },
+    "packetLoss": 0,
+    "serverSelection": {
+        "selectedServerId": 55749,
+        "selectedLatency": 0.21199999999999999,
+        "servers": [
+            {
+                "latency": 0.314,
+                "server": {
+                    "id": 74964,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "somedigit.net",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.23300000000000001,
+                "server": {
+                    "id": 61853,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "PT XLSMART Telecom Sejahtera",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.25600000000000001,
+                "server": {
+                    "id": 62314,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "PT. Pratama Hasta Utama Solusindo",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.26700000000000002,
+                "server": {
+                    "id": 66281,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "PT. Tuxsindo Cyber Networks",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.253,
+                "server": {
+                    "id": 65429,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "Atharva",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.25900000000000001,
+                "server": {
+                    "id": 68214,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "PT. ERA NETWORK INDONESIA",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.255,
+                "server": {
+                    "id": 73025,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "LINTAS MEDIA SOLUSINDO",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.214,
+                "server": {
+                    "id": 72945,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "BLiP Integrator Provider",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.224,
+                "server": {
+                    "id": 48532,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "Faznet",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            },
+            {
+                "latency": 0.21199999999999999,
+                "server": {
+                    "id": 55749,
+                    "host": "localhost",
+                    "port": 18081,
+                    "name": "RingNet",
+                    "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+                    "country": "Indonesia"
+                }
+            }
+        ]
+    },
+    "isp": "Cloudflare Warp",
+    "interface": {
+        "internalIp": "::1",
+        "name": "lo",
+        "macAddr": "00:00:00:00:00:00",
+        "isVpn": false,
+        "externalIp": "::1"
+    },
+    "server": {
+        "id": 55749,
+        "host": "localhost",
+        "port": 18081,
+        "name": "RingNet",
+        "location": "Surabaya -> LAB (localhost:18081) [diversion audit]",
+        "country": "Indonesia",
+        "ip": "::1"
+    },
+    "result": {
+        "id": "28ffbc9b-1908-44ea-9a29-c462db2feb2b",
+        "persisted": false
+    }
+}

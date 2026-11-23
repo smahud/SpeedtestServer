@@ -1,0 +1,15 @@
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] Starting SpeedtestServer (independent implementation) {"pid":130524,"role":"standalone","config":"/root/project/SpeedtestServer/lab/reinvestigation-20261123/replacement.properties"}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] TLS material resolved {"mode":"custom","source":"custom pair /root/project/SpeedtestServer/validation/harness/certs/server.pem + /root/project/SpeedtestServer/validation/harness/certs/server.key (effectiveUseLetsEncrypt=false)","effectiveUseLetsEncrypt":false}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] [net] listen_tcp {"port":18081,"host":"127.0.0.1","family":"v4"}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] [net] listen_tcp {"port":18081,"host":"::1","family":"v6"}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] [net] listen_udp {"port":18081,"host":"127.0.0.1"}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] [net] listen_udp {"port":18081,"host":"::1"}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] [net] started {"tcpPorts":[18081],"udpPorts":[18081],"bindTargets":["127.0.0.1","::1"],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","instance":"e142a2a8-9532-454c-bc2b-51e1f02ca4ee","pid":130524}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] Watching custom certificate for changes (hot reload) {"file":"/root/project/SpeedtestServer/validation/harness/certs/server.pem"}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] SpeedtestServer started (canonical ServerCore) {"tcpPorts":[18081],"udpPorts":[18081],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d","tlsMode":"custom","effectiveUseLetsEncrypt":false,"tlsMinimumProtocol":"1.2","role":"standalone"}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] SpeedtestServer started successfully {"tcpPorts":[18081],"udpPorts":[18081],"version":"2.11 (2.11.5) 2026-06-04.1737.7d0993d"}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] This is an INDEPENDENT open-source implementation — not an Ookla product.
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] Received SIGTERM, shutting down...
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] [net] stopped {"connections":1,"forced":false}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] [net] conn_close {"id":1,"peer":"127.0.0.1:37754","stats":{"peer":"127.0.0.1:37754","peerIp":"127.0.0.1","openedAt":1795433390822,"transport":"tcp","bytesDown":0,"bytesUp":0,"commands":0}}
+2026-11-23 18:29:50 [130524 - 130494] [INFORMATION] SpeedtestServer stopped

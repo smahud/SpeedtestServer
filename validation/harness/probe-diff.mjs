@@ -11,10 +11,14 @@ import * as net from 'node:net';
 import * as tls from 'node:tls';
 import * as dgram from 'node:dgram';
 import * as crypto from 'node:crypto';
+import path from 'node:path';
 
 const DAEMON_PORT = parseInt(process.argv[2] || '18080', 10);
 const STS_PORT = parseInt(process.argv[3] || '18081', 10);
 const HOST = '127.0.0.1';
+// The fixture Host must be covered by the active lab certificate; otherwise
+// HTTP route tests only exercise redirects and never reach upload/latency.
+const HTTP_HOST = process.env.PROBE_HTTP_HOST || 'san1.local';
 const ONLY = process.argv[4] || '';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -60,7 +64,8 @@ function tcpProbe(port, payload, { tlsMode = false, waitMs = 900, maxBytes = 3 *
 
 /** HTTP probe: send raw request, capture raw response bytes. */
 async function httpProbe(port, raw, { tlsMode = false } = {}) {
-  const r = await tcpProbe(port, Buffer.from(raw, 'latin1'), { tlsMode, waitMs: 700 });
+  const request = raw.replaceAll('Host: san1.local\r\n', `Host: ${HTTP_HOST}\r\n`);
+  const r = await tcpProbe(port, Buffer.from(request, 'latin1'), { tlsMode, waitMs: 700 });
   return r;
 }
 
@@ -319,7 +324,7 @@ async function runWs() {
   const wsProbe = async (port, frames, { secure = false } = {}) =>
     new Promise((resolve) => {
       const key = crypto.randomBytes(16).toString('base64');
-      const head = `GET /ws HTTP/1.1\r\nHost: san1.local\r\n${UA}Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: ${key}\r\nSec-WebSocket-Version: 13\r\n\r\n`;
+      const head = `GET /ws HTTP/1.1\r\nHost: ${HTTP_HOST}\r\n${UA}Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: ${key}\r\nSec-WebSocket-Version: 13\r\n\r\n`;
       const sock = secure
         ? tls.connect({ host: HOST, port, rejectUnauthorized: false, servername: 'localhost' }, () => sock.write(head))
         : net.connect({ host: HOST, port }, () => sock.write(head));
@@ -412,7 +417,9 @@ async function runWs() {
   if (!ONLY || ONLY === '--udp-only') await runUdp();
   const out = { generatedAt: new Date().toISOString(), daemonPort: DAEMON_PORT, stsPort: STS_PORT, results };
   const fs = await import('node:fs');
-  fs.writeFileSync('/home/z/my-project/rea-lab/evidence/probe-diff-results.json', JSON.stringify(out, null, 2));
+  const destination = process.env.PROBE_OUT || path.join(path.dirname(new URL(import.meta.url).pathname), 'out', 'probe-diff-results.json');
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.writeFileSync(destination, JSON.stringify(out, null, 2));
   const identical = results.filter((r) => r.identical).length;
   console.log(`TOTAL: ${results.length} cases | identical: ${identical} | DIFFERING: ${results.length - identical}`);
   for (const r of results.filter((x) => !x.identical)) {

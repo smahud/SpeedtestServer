@@ -1,0 +1,332 @@
+{
+  "source": "replacement-02/server-events.jsonl",
+  "command_counts": {
+    "HI": 23,
+    "GETIP": 11,
+    "PING": 462,
+    "DOWNLOAD": 238,
+    "INITPLOSS": 1,
+    "PLOSS": 1,
+    "UPLOAD": 340,
+    "CAPABILITIES": 1,
+    "UPLOAD_STATS": 1
+  },
+  "connections": [
+    {
+      "connection_id": 3,
+      "command_count": 6,
+      "prefix": [
+        "8\u00fc\u009a|\u00ff\u008d\u001f\u0085\u000e\u00b7\u00918\u00c0\u00f0f_t\u0005\u00a1\u00d1.f\u00d3){fP#\u00b5",
+        "HI",
+        "GETIP",
+        "PING 24851776533",
+        "PING 24851776924",
+        "PING 24851777478"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 5,
+      "command_count": 6,
+      "prefix": [
+        "\u00d7\u00ceP\u0014^T\u0003i\u009e\u00d1\u0003\u00b8sP\"l\u00ef\u0001\u00a4G\u00c0*\f\u0014",
+        "HI",
+        "GETIP",
+        "PING 24851787098",
+        "PING 24851787581",
+        "PING 24851788158"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 7,
+      "command_count": 6,
+      "prefix": [
+        ";\u0007\u0086\u00b8\u00c9\u0014\u00a9\u00a3m\u00b0\u00977\u00dc\u00c8\u00d9\t\u00a8\u0086\u00e5Z\u00b9",
+        "HI",
+        "GETIP",
+        "PING 24851799249",
+        "PING 24851799583",
+        "PING 24851799894"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 9,
+      "command_count": 6,
+      "prefix": [
+        "\u0092mF\u0019\u0094'\u00d77\u0097S\u000f\u00c4\u00fd\u000b\u00120\u0010\u00b3\u0019\u007f*",
+        "HI",
+        "GETIP",
+        "PING 24851829917",
+        "PING 24851830244",
+        "PING 24851830656"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 11,
+      "command_count": 6,
+      "prefix": [
+        "Y1\u0014\u00b5\f\u00e1\u0080\u00aa\u00bbX\u008e\u00d5Hn\u0006\u0084\u00b3\u00d29 \u000e",
+        "HI",
+        "GETIP",
+        "PING 24851844295",
+        "PING 24851845287",
+        "PING 24851845605"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 13,
+      "command_count": 6,
+      "prefix": [
+        "e\u00ff\u0089c\u008f\u00d6\u00cb\u00e9\u00e4or#\u00f3\u00a5\u00ecFI\u0002\t\\W\u00cd\u00aa\u0086\u00ed\u00c7",
+        "HI",
+        "GETIP",
+        "PING 24851859596",
+        "PING 24851860062",
+        "PING 24851861800"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 15,
+      "command_count": 6,
+      "prefix": [
+        "7T\u00cf\u0017\u00ad\u00e7t\u00b0\u00c2\u0085\u0082\u00a6\u00f5p\t\u00e1\u0088[r\u00e3,\u00e5\u00a4*,\u00d05\u0006\u008ced\u00c2\u00f73",
+        "HI",
+        "GETIP",
+        "PING 24851874638",
+        "PING 24851875018",
+        "PING 24851875429"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 17,
+      "command_count": 6,
+      "prefix": [
+        "\u007f\u00f0\u00bd\u00fd\u0003\u0017a\u0095r\u0013\u00f8\u0080\u0080u\u00cf\u00b4\u00e9|\u00a9\u00b3\u00e6\u009dz\u00f7MW2",
+        "HI",
+        "GETIP",
+        "PING 24851895338",
+        "PING 24851895602",
+        "PING 24851895889"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 19,
+      "command_count": 6,
+      "prefix": [
+        "5o\\\u00e8\u00cb\u00a3U\u00a0\u0002w\u00ee4\u00a0\u0007\u0086\u00ef\u0017\u00f2\u0004\u00b5\u00c3\u0084\u009c\u0086,^'\u0090l\u00f8\u00e0\u009e\u0095\u00c5\u00bd\u00e3\u00c5!",
+        "HI",
+        "GETIP",
+        "PING 24851911735",
+        "PING 24851912057",
+        "PING 24851912354"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 21,
+      "command_count": 6,
+      "prefix": [
+        "\u0004Bt\u0015A\u009b\u0007\u0014\u00e9\u0006\u00b3t\u00bb'\u00a8\"\u00bd\u00d0\u00d9\u008b\u009f\u00c0:\u0082\u0010\u00e3 V\u00c7o\u00c1\u0017",
+        "HI",
+        "GETIP",
+        "PING 24851925977",
+        "PING 24851926241",
+        "PING 24851926575"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 23,
+      "command_count": 8,
+      "prefix": [
+        "b_\u0014\u00a4\u00ef\u000e\u00f2_\u0099cQ\u00e1\u00eeI\u00968~A!k\u00f8\u0005\u00de\u0010\u00ed\u00a2\u00e7\u00b1\u0082\f\u00c4\u00b73\u00d8\u00d7\u00a4\"]g \u00b9#\u008f\u0093\u00b7\u00d0\u00d9\u0086\"p!\u00ae\u0015%\u009d\u00eb;\u00c0\u00ff\u00ebU\u00fc\u000b\u00d7\u0080b",
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "GETIP",
+        "PING 24851960582",
+        "PING 24851961032",
+        "PING 24851961472",
+        "PING 24851961918",
+        "PING 24851962319"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 24,
+      "command_count": 3,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "INITPLOSS",
+        "PLOSS"
+      ],
+      "phase": "packet-loss"
+    },
+    {
+      "connection_id": 25,
+      "command_count": 54,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000"
+      ],
+      "phase": "download"
+    },
+    {
+      "connection_id": 26,
+      "command_count": 59,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000"
+      ],
+      "phase": "download"
+    },
+    {
+      "connection_id": 27,
+      "command_count": 64,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000"
+      ],
+      "phase": "download"
+    },
+    {
+      "connection_id": 28,
+      "command_count": 65,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000",
+        "DOWNLOAD 32000000"
+      ],
+      "phase": "download"
+    },
+    {
+      "connection_id": 29,
+      "command_count": 149,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "PING 24852100181",
+        "PING 24852150533",
+        "PING 24852200929",
+        "PING 24852251253",
+        "PING 24852301517",
+        "PING 24852352097",
+        "PING 24852402429"
+      ],
+      "phase": "selection/latency/control"
+    },
+    {
+      "connection_id": 30,
+      "command_count": 86,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16"
+      ],
+      "phase": "upload"
+    },
+    {
+      "connection_id": 31,
+      "command_count": 87,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16"
+      ],
+      "phase": "upload"
+    },
+    {
+      "connection_id": 32,
+      "command_count": 85,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16"
+      ],
+      "phase": "upload"
+    },
+    {
+      "connection_id": 33,
+      "command_count": 86,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16",
+        "UPLOAD 32000000 15000 16"
+      ],
+      "phase": "upload"
+    },
+    {
+      "connection_id": 34,
+      "command_count": 3,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "CAPABILITIES",
+        "UPLOAD_STATS 15000 16 0"
+      ],
+      "phase": "capabilities/control"
+    },
+    {
+      "connection_id": 35,
+      "command_count": 280,
+      "prefix": [
+        "HI 84FF8A08-F362-487F-B34C-4C5F17E77714",
+        "PING 24859612304",
+        "PING 24859662555",
+        "PING 24859712821",
+        "PING 24859763203",
+        "PING 24859813511",
+        "PING 24859863756",
+        "PING 24859914104"
+      ],
+      "phase": "selection/latency/control"
+    }
+  ],
+  "note": "Observed on TypeScript server with unmodified official CLI; does not decrypt the original daemon binary engine."
+}

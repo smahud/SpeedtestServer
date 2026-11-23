@@ -1,0 +1,106 @@
+[
+  {
+    "client": "45.126.249.249:14869",
+    "server": "45.126.249.250:8080",
+    "started_utc": "2026-11-23T13:13:40.150799+00:00",
+    "request_line": "POST /speedtest/upload.php HTTP/1.1",
+    "content_length": 515699,
+    "header_complete_in_first_packet": true,
+    "headers": [
+      "Host: speedtest.lumajangnetworks.my.id:8080",
+      "User-Agent: UploadResponseComparison/1",
+      "Content-Length: 515699",
+      "Content-Type: application/x-www-form-urlencoded",
+      "Connection: close"
+    ],
+    "responses": [
+      {
+        "seconds": 0.43288,
+        "status": "HTTP/1.1 200 OK"
+      }
+    ],
+    "client_close_seconds": 0.466088,
+    "last_payload_seconds": 0.432675,
+    "server_acknowledged_body_bytes": 515700,
+    "contiguous_body_bytes": 515699,
+    "body_complete": true
+  },
+  {
+    "client": "45.126.249.249:15048",
+    "server": "45.126.249.250:18092",
+    "started_utc": "2026-11-23T13:13:40.281144+00:00",
+    "request_line": "POST /speedtest/upload.php HTTP/1.1",
+    "content_length": 515699,
+    "header_complete_in_first_packet": true,
+    "headers": [
+      "Host: speedtest.lumajangnetworks.my.id:18092",
+      "User-Agent: UploadResponseComparison/1",
+      "Content-Length: 515699",
+      "Content-Type: application/x-www-form-urlencoded",
+      "Connection: close"
+    ],
+    "responses": [
+      {
+        "seconds": 0.604726,
+        "status": "HTTP/1.1 200 OK"
+      }
+    ],
+    "client_close_seconds": 1.149107,
+    "last_payload_seconds": 0.60468,
+    "server_acknowledged_body_bytes": 515700,
+    "contiguous_body_bytes": 515699,
+    "body_complete": true
+  },
+  {
+    "client": "45.126.249.249:15056",
+    "server": "45.126.249.250:18092",
+    "started_utc": "2026-11-23T13:13:40.714531+00:00",
+    "request_line": "POST /speedtest/upload.php HTTP/1.1",
+    "content_length": 1980899,
+    "header_complete_in_first_packet": true,
+    "headers": [
+      "Host: speedtest.lumajangnetworks.my.id:18092",
+      "User-Agent: UploadResponseComparison/1",
+      "Content-Length: 1980899",
+      "Content-Type: application/x-www-form-urlencoded",
+      "Connection: close"
+    ],
+    "responses": [
+      {
+        "seconds": 0.562818,
+        "status": "HTTP/1.1 200 OK"
+      }
+    ],
+    "client_close_seconds": 0.591343,
+    "last_payload_seconds": 0.562769,
+    "server_acknowledged_body_bytes": 1980900,
+    "contiguous_body_bytes": 1980899,
+    "body_complete": true
+  },
+  {
+    "client": "45.126.249.249:14877",
+    "server": "45.126.249.250:8080",
+    "started_utc": "2026-11-23T13:13:42.200030+00:00",
+    "request_line": "POST /speedtest/upload.php HTTP/1.1",
+    "content_length": 1980899,
+    "header_complete_in_first_packet": true,
+    "headers": [
+      "Host: speedtest.lumajangnetworks.my.id:8080",
+      "User-Agent: UploadResponseComparison/1",
+      "Content-Length: 1980899",
+      "Content-Type: application/x-www-form-urlencoded",
+      "Connection: close"
+    ],
+    "responses": [
+      {
+        "seconds": 0.80193,
+        "status": "HTTP/1.1 200 OK"
+      }
+    ],
+    "client_close_seconds": 0.945921,
+    "last_payload_seconds": 0.801784,
+    "server_acknowledged_body_bytes": 1980900,
+    "contiguous_body_bytes": 1980899,
+    "body_complete": true
+  }
+]
