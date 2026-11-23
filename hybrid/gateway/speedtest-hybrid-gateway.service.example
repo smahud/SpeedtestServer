@@ -1,0 +1,28 @@
+[Unit]
+Description=Speedtest Hybrid Gateway (control plane VPS — Jalur B)
+Documentation=file:/opt/speedtest-hybrid/gateway/README
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=speedtest-hybrid
+Group=speedtest-hybrid
+# Environment file holds HYBRID_SHARED_SECRET (0600 root:speedtest-hybrid).
+EnvironmentFile=/etc/speedtest-hybrid/gateway.env
+WorkingDirectory=/opt/speedtest-hybrid/gateway
+ExecStart=/usr/local/bin/node /opt/speedtest-hybrid/gateway/gateway.mjs
+Restart=on-failure
+RestartSec=3
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/speedtest-hybrid
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target
