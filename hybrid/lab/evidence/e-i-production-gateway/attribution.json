@@ -1,0 +1,19 @@
+{
+  "window": {"start": "2026-11-23T19:52:11.295Z", "end": "2026-11-23T19:52:22.331Z", "durationS": 11.0},
+  "vps": {
+    "interface": "eth0",
+    "rxBytes": {"c0": 4426288051, "c1": 4426321651, "delta": 33600},
+    "txBytes": {"c0": 7976057070, "c1": 7976091441, "delta": 34371},
+    "interfaceDeltaTotal": 67971,
+    "gatewayCountersDelta": {"servers": 1, "sessions": 1, "results": 2, "pings": 10, "bytesIn": 884, "bytesOut": 3414}
+  },
+  "client": {
+    "payloadBytes": 117440512,
+    "vpsControlBytes": 4199,
+    "offloadRatio": 27968.7,
+    "phasesPassed": 10, "phasesTotal": 10,
+    "receipts": {"httpUp": 1, "wsAcks": 8, "mismatches": 0}
+  },
+  "edge": "local workerd stand-in (127.0.0.1:18790) — real Cloudflare edge pending credentials",
+  "conclusion": "No bulk payload transited the VPS: interface delta 67,971 B vs payload 117,440,512 B (payload = 1,728x interface delta). VPS served control plane only."
+}
