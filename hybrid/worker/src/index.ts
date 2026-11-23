@@ -17,7 +17,7 @@
  * The VPS never sees a payload byte for sessions served here.
  */
 
-import { Env, DEFAULTS, num } from './config';
+import { Env, DEFAULTS, num, bool } from './config';
 import { NetGaugeEngine, firstCommandLine } from './netgauge';
 import { handleLegacyHttp, poolResponse, countBody } from './http-legacy';
 import { verifyToken, extractToken } from './token';
@@ -28,7 +28,7 @@ import { fillFromPool } from './pool';
 // timers at global scope.
 let isolateStartedAt = 0;
 let instanceUuid: string | null = null;
-const ISOLATE_COUNTERS = { sessions: 0, wsSessions: 0, httpDown: 0, httpUp: 0 };
+const ISOLATE_COUNTERS = { sessions: 0, wsSessions: 0, httpDown: 0, httpUp: 0, upRejected: 0 };
 
 function startedAt(): number {
   if (!isolateStartedAt) isolateStartedAt = Date.now();
@@ -53,15 +53,17 @@ function peerIp(request: Request): string {
 // Hybrid throughput endpoints (speed.cloudflare.com-style)
 // ---------------------------------------------------------------------------
 
-function downResponse(bytes: number, env: Env): Response {
+function downResponse(bytes: number, env: Env, signal?: AbortSignal): Response {
   const headers: [string, string][] = [
-    ['Cache-Control', 'no-store'],
+    ['Cache-Control', 'no-store, no-transform'],
     ['X-Content-Type-Options', 'nosniff'],
     ['Content-Type', 'application/octet-stream'],
-    ['X-Hybrid-Server', 'speedtest-hybrid-worker/1.0'],
+    ['X-Hybrid-Server', 'speedtest-hybrid-worker/1.1'],
   ];
   if (bytes === 0) return new Response(null, { status: 200, headers }); // TTFB ping
-  return poolResponse(bytes, headers);
+  // G-5: client cancel (disconnect) aborts generation via request.signal
+  // when the runtime provides it.
+  return poolResponse(bytes, headers, signal);
 }
 
 async function handleDown(request: Request, url: URL, env: Env): Promise<Response> {
@@ -79,19 +81,31 @@ async function handleDown(request: Request, url: URL, env: Env): Promise<Respons
     return new Response(null, { status: 200, headers: { 'Content-Length': String(bytes), 'Cache-Control': 'no-store' } });
   }
   ISOLATE_COUNTERS.httpDown++;
-  return downResponse(bytes, env);
+  return downResponse(bytes, env, request.signal);
 }
 
 async function handleUp(request: Request, url: URL, env: Env): Promise<Response> {
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'method not allowed' }), { status: 405 });
   }
-  const received = await countBody(request.body);
+  const max = num(env.MAX_UPLOAD_BYTES, DEFAULTS.maxUploadBytes);
+  // G-4: reject oversized uploads EARLY on Content-Length (no body read).
+  const declared = Number(request.headers.get('content-length') || '');
+  if (Number.isFinite(declared) && declared > max) {
+    ISOLATE_COUNTERS.upRejected++;
+    return new Response(JSON.stringify({ error: 'upload too large', limit: max }), { status: 413, headers: { 'Cache-Control': 'no-store' } });
+  }
+  // Streaming count with cap — chunked bodies over the cap are cancelled.
+  const received = await countBody(request.body, max);
+  if (received < 0) {
+    ISOLATE_COUNTERS.upRejected++;
+    return new Response(JSON.stringify({ error: 'upload too large', limit: max }), { status: 413, headers: { 'Cache-Control': 'no-store' } });
+  }
   ISOLATE_COUNTERS.httpUp++;
   const h = new Headers({
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-store',
-    'X-Hybrid-Server': 'speedtest-hybrid-worker/1.0',
+    'Cache-Control': 'no-store, no-transform',
+    'X-Hybrid-Server': 'speedtest-hybrid-worker/1.1',
   });
   const origin = request.headers.get('origin');
   if (origin) h.set('Access-Control-Allow-Origin', origin);
@@ -159,7 +173,12 @@ function handleWsUpgrade(request: Request, url: URL, env: Env): Response {
     peerIp: () => ip,
     instanceUuid: () => getInstanceUuid(),
     startedAt: () => startedAt(),
-    onEvent: (kind: string, detail: Record<string, unknown>): void => logEvent('ng_' + kind, detail),
+    onEvent: (kind: string, detail: Record<string, unknown>): void => {
+      // G-6/Free-CPU: the per-command 'cmd' event is hot — only log it in
+      // verbose mode. Sessions, transfers and errors always log.
+      if (kind === 'cmd' && !bool(env.WORKER_VERBOSE_LOGS)) return;
+      logEvent('ng_' + kind, detail);
+    },
   };
   const engine = new NetGaugeEngine(hooks, {
     versionString,
@@ -250,9 +269,28 @@ export default {
       }
 
       // Daemon-parity legacy HTTP surface (/, /hi, latency.txt, random*.jpg,
-      // upload.php, crossdomain.xml, 404 shape).
-      const legacy = await handleLegacyHttp(request, url, env);
-      if (legacy) return legacy;
+      // upload.php, crossdomain.xml, 404 shape) — G-7: OFF by default in
+      // code. Production (K-7) keeps it off; local conformance and the
+      // [env.test] Worker set LEGACY_HTTP_ENABLED="true".
+      if (!bool(env.LEGACY_HTTP_ENABLED)) {
+        // Legacy paths return the daemon 404 shape when the surface is off,
+        // so probing /hi, /upload.php, random*.jpg yields nothing usable.
+        const legacyPaths = ['/', '/hi', '/latency.txt', '/crossdomain.xml', '/upload.php'];
+        const p = url.pathname.replace(/\/+$/, '') || '/';
+        const isLegacy =
+          legacyPaths.includes(p) ||
+          p.startsWith('/speedtest/') ||
+          /random[0-9]+x[0-9]+\.jpg$/.test(p);
+        if (isLegacy) {
+          return new Response(null, {
+            status: 404,
+            headers: { Connection: 'Close', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' },
+          });
+        }
+      } else {
+        const legacy = await handleLegacyHttp(request, url, env);
+        if (legacy) return legacy;
+      }
 
       // Unknown path → daemon 404 shape.
       return new Response(null, {

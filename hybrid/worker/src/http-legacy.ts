@@ -164,30 +164,79 @@ function minimal500(reason = 'Internal Server Error'): Response {
   });
 }
 
-/** Stream `size` bytes of pool data with a fixed Content-Length. */
-export function poolResponse(size: number, headers: [string, string][]): Response {
+/** Stream `size` bytes of pool data with a fixed Content-Length.
+ * G-5: backpressure-safe — chunks are produced on demand (pull-based for
+ * the plain-stream fallback, awaited writer.write() with FixedLengthStream
+ * when the runtime provides it), so a slow client cannot balloon the
+ * isolate buffer. A client disconnect errors the stream and stops
+ * generation (nothing more is enqueued after cancel/abort). */
+export function poolResponse(size: number, headers: [string, string][], signal?: AbortSignal): Response {
   const h = new Headers();
   for (const [k, v] of headers) h.set(k, v);
   h.set('Content-Length', String(size));
-  const stream = new ReadableStream({
-    start(controller) {
-      const CHUNK = 256 * 1024;
+  const CHUNK = 256 * 1024;
+  const aborted = () => Boolean(signal && signal.aborted);
+  if (typeof (globalThis as unknown as { FixedLengthStream?: unknown }).FixedLengthStream !== 'undefined') {
+    // Runtime knows the exact length → no chunked framing.
+    const FLS = (globalThis as unknown as { FixedLengthStream: new (n: number) => { readable: ReadableStream; writable: WritableStream } }).FixedLengthStream;
+    const fls = new FLS(size);
+    const writer = fls.writable.getWriter();
+    if (signal) {
+      signal.addEventListener(
+        'abort',
+        () => {
+          // G-5: client cancelled — stop generating and tear down the pipe.
+          try {
+            writer.abort();
+          } catch {
+            /* already closed */
+          }
+        },
+        { once: true },
+      );
+    }
+    void (async () => {
       let off = 0;
-      const push = (): void => {
-        while (off < size) {
+      try {
+        while (off < size && !aborted()) {
           const len = Math.min(CHUNK, size - off);
           const out = new Uint8Array(len);
           fillFromPool(out, off);
           off += len;
-          controller.enqueue(out);
-          if (off % (CHUNK * 8) === 0) {
-            setTimeout(push, 0); // yield periodically
-            return;
-          }
+          await writer.ready; // backpressure: wait until the consumer wants more
+          await writer.write(out);
         }
+        await writer.close();
+      } catch {
+        // Client cancelled/disconnect or stream errored — stop generating.
+        try {
+          writer.releaseLock();
+          await fls.writable.abort();
+        } catch {
+          /* already closed */
+        }
+      }
+    })();
+    return new Response(fls.readable, { status: 200, headers: h });
+  }
+  // Fallback: pull()-based ReadableStream (workerd local dev without
+  // FixedLengthStream) — pull is only invoked when the consumer can take
+  // more data, which is backpressure by construction.
+  let off = 0;
+  const stream = new ReadableStream({
+    pull(controller) {
+      if (off >= size || aborted()) {
         controller.close();
-      };
-      push();
+        return;
+      }
+      const len = Math.min(CHUNK, size - off);
+      const out = new Uint8Array(len);
+      fillFromPool(out, off);
+      off += len;
+      controller.enqueue(out);
+    },
+    cancel() {
+      /* client aborted — generation simply stops (off no longer advances) */
     },
   });
   return new Response(stream, { status: 200, headers: h });
@@ -309,18 +358,25 @@ export async function handleLegacyHttp(request: Request, url: URL, env: Env): Pr
   if (path === '/speedtest/upload.php' || path === '/upload.php') {
     if (method !== 'POST') return notFound();
     // D-W6: the Worker cannot distinguish chunked framing; always drain+count.
-    // Streaming count — never buffers the body (128 MB isolate budget).
+    // G-4: early Content-Length rejection, and stop draining once the cap is
+    // exceeded (returns 413; does NOT buffer the body).
     const maxBody = num(env.MAX_UPLOAD_BYTES, 0x7fffffff);
-    const received = await countBody(request.body);
-    if (received > maxBody) return new Response(null, { status: 413, headers: { Connection: 'Close' } });
+    const declared = Number(request.headers.get('content-length') || '');
+    if (Number.isFinite(declared) && declared > maxBody) {
+      return new Response(null, { status: 413, headers: { Connection: 'Close' } });
+    }
+    const received = await countBody(request.body, maxBody);
+    if (received < 0) return new Response(null, { status: 413, headers: { Connection: 'Close' } });
     return respond(200, `size=${received}\n`, [...common(), ['Content-Type', 'text/plain; charset=UTF-8'] as [string, string]]);
   }
   return null; // not a legacy path
 }
 
 /** Drain a request body, counting bytes without buffering (edge-terminated
- * upload streams — the payload never transits the VPS). */
-export async function countBody(body: ReadableStream<Uint8Array> | null): Promise<number> {
+ * upload streams — the payload never transits the VPS).
+ * G-4: when `maxBytes` is exceeded the stream is CANCELLED immediately
+ * (the rest of the body is not read) and the sentinel -1 is returned. */
+export async function countBody(body: ReadableStream<Uint8Array> | null, maxBytes = Infinity): Promise<number> {
   let received = 0;
   if (!body) return 0;
   const reader = body.getReader();
@@ -328,6 +384,14 @@ export async function countBody(body: ReadableStream<Uint8Array> | null): Promis
     const { done, value } = await reader.read();
     if (done) break;
     received += value.byteLength;
+    if (received > maxBytes) {
+      try {
+        await reader.cancel();
+      } catch {
+        /* already closed */
+      }
+      return -1; // sentinel: cap exceeded
+    }
   }
   return received;
 }
