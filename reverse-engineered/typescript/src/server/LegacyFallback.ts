@@ -37,6 +37,10 @@ import { PhpFormCounter } from './PhpFormCounter';
 // discard the whole POST pass. Percent encoding can triple the ~2 MiB maximum
 // hosted-tester payload on the wire, which still fits.
 const BODY_CAP = 8 * 1024 * 1024;
+// Slow-upload early-answer window (see the urlencoded branch below). Chosen
+// far below the hosted tester's 10 s curl timeout and far above the time a
+// healthy path needs for the largest (~2 MiB wire) tester payload.
+const SLOW_UPLOAD_RESPONSE_MS = 2500;
 // Bodies that cannot contribute to $_REQUEST are still drained so the client
 // sees a clean response; bounded to keep abuse expensive but finite.
 const DRAIN_CAP = 64 * 1024 * 1024;
@@ -208,11 +212,57 @@ export function createLegacyFallback(assets: string): http.Server {
       }
 
       // application/x-www-form-urlencoded: stream through the counter.
+      //
+      // Slow-upload early answer: the hosted Ookla tester (and its clones)
+      // drive this endpoint with a 10–15 s timeout. Paths slower than
+      // ~150–200 KB/s cannot deliver the ~2 MiB max-upload payload in time,
+      // so after SLOW_UPLOAD_RESPONSE_MS of incomplete body the fallback
+      // answers `size=<Content-Length>` immediately — the daemon-native
+      // accounting the tester also accepts (auto mode) — and closes, letting
+      // the still-sending client finish with the buffered response. Fast
+      // bodies (every local test, healthy paths) complete well inside the
+      // window and keep the exact PHP-parity accounting above.
+      const clHeader = req.headers['content-length'];
+      const clRaw = clHeader === undefined ? '' : String(clHeader).trim();
+      const declaredCl = /^\d{1,15}$/.test(clRaw) ? Number(clRaw) : undefined;
       const postPass = new PhpFormCounter();
       let total = 0;
       let exceeded = false;
+      let settled = false;
+      let earlyTimer: NodeJS.Timeout | undefined;
+      const clearEarly = (): void => {
+        if (earlyTimer !== undefined) {
+          clearTimeout(earlyTimer);
+          earlyTimer = undefined;
+        }
+      };
+      if (
+        declaredCl !== undefined &&
+        declaredCl > 0 &&
+        SLOW_UPLOAD_RESPONSE_MS > 0 &&
+        !res.headersSent
+      ) {
+        earlyTimer = setTimeout(() => {
+          if (settled || exceeded || res.headersSent || res.destroyed) return;
+          settled = true;
+          clearEarly();
+          logLine(200, `early size=${declaredCl}`);
+          res.setHeader('Connection', 'close');
+          res.writeHead(200, {
+            'Content-Type': 'text/html; charset=UTF-8',
+            'Content-Length': Buffer.byteLength(`size=${declaredCl}`),
+          });
+          res.end(req.method === 'HEAD' ? undefined : `size=${declaredCl}`);
+          res.once('finish', () => {
+            setTimeout(() => {
+              req.destroy();
+            }, 30).unref?.();
+          });
+        }, SLOW_UPLOAD_RESPONSE_MS);
+        earlyTimer.unref?.();
+      }
       req.on('data', (chunk: Buffer) => {
-        if (exceeded) return;
+        if (exceeded || settled) return;
         total += chunk.length;
         if (total > BODY_CAP) {
           exceeded = true; // streamed body crossed post_max_size mid-flight
@@ -225,9 +275,20 @@ export function createLegacyFallback(assets: string): http.Server {
         }
       });
       req.on('error', () => {
-        if (!res.headersSent) respond(null);
+        clearEarly();
+        if (!res.headersSent && !settled) respond(null);
+      });
+      req.on('aborted', () => {
+        clearEarly();
+        if (!res.headersSent && !settled) {
+          settled = true;
+          res.destroy();
+        }
       });
       req.on('end', () => {
+        clearEarly();
+        if (settled) return;
+        settled = true;
         // Commit the buffered final field: without finish() the last
         // key=value pair never reaches `fields` and every POST reports
         // the bare 500 base (regression found 2026-11-23).

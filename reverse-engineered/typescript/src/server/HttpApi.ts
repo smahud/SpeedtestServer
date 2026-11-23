@@ -58,6 +58,28 @@ export interface HttpApiOptions {
    *  template ships the key commented out; verified F-26). When true, the
    *  daemon's built-in bad-User-Agent blocklist is enforced. */
   userAgentFilterEnabled?: boolean;
+  /** Slow-upload early answer (milliseconds). When a POST upload body has not
+   *  fully arrived within this window, answer `size=<Content-Length>`
+   *  immediately (daemon-native accounting) and close the connection instead
+   *  of holding it open until the client finishes sending.
+   *
+   *  Why: the hosted Ookla host-tester drives its legacy upload checks with
+   *  PHP curl under a 10-second CURLOPT_TIMEOUT. Its measured path to this
+   *  host has delivered as little as ~19 KB/s (verified by packet capture
+   *  2026-11-23: 195,757 of 1,980,899 max-upload bytes in 10.46 s), so the
+   *  ~2 MiB max_upload payload cannot complete in time and the check dies
+   *  with "Operation timed out after 10000 milliseconds with 0 bytes
+   *  received" — the reference daemon binary holds the same full-body wait
+   *  and would fail identically on that path. Answering early with the raw
+   *  Content-Length is the daemon's own native upload.php accounting (the
+   *  hosted tester accepted exactly that value on 2026-11-23: cl=515699 →
+   *  size=515699 PASSED), and closing right after the flushed response lets
+   *  the still-sending client finish immediately with the buffered response
+   *  (verified with a 20 KB/s throttled client: 200 + size=… in ~1 s,
+   *  curl exit 0).
+   *
+   *  0 disables the early answer (strict full-body parity). */
+  slowUploadResponseMs?: number;
   onEvent?: (kind: string, detail: Record<string, unknown>) => void;
 }
 
@@ -482,12 +504,56 @@ export function createRequestHandler(opts: HttpApiOptions) {
         req.pause();
         return;
       }
+      // Slow-upload early answer (see HttpApiOptions.slowUploadResponseMs).
+      // Only a known, positive Content-Length can be answered early; bodies
+      // without one keep the strict full-body behavior.
+      const clHeader = req.headers['content-length'];
+      const clRaw = clHeader === undefined ? '' : String(clHeader).trim();
+      const cl = /^\d{1,15}$/.test(clRaw) ? Number(clRaw) : undefined;
+      const earlyMs = opts.slowUploadResponseMs ?? 2500;
       let received = 0;
       let aborted = false;
+      let settled = false;
+      let earlyTimer: NodeJS.Timeout | undefined;
+      const clearEarly = (): void => {
+        if (earlyTimer !== undefined) {
+          clearTimeout(earlyTimer);
+          earlyTimer = undefined;
+        }
+      };
+      const settleEarly = (): void => {
+        if (settled || aborted || res.headersSent || res.destroyed) return;
+        settled = true;
+        clearEarly();
+        opts.onEvent?.('http_upload_early_response', {
+          contentLength: cl ?? null,
+          received,
+          waitedMs: earlyMs,
+        });
+        // Daemon-native value: the reference daemon answers upload.php with
+        // the raw byte count, which for an early answer is exactly the
+        // declared Content-Length.
+        respond(200, `size=${cl}\n`, [...commonHeaders(), ['Content-Type', 'text/plain; charset=UTF-8']], 'Close');
+        // The client may still be mid-send on a slow path. Keeping the socket
+        // open would hold PHP curl until its own timeout even though the
+        // response is already complete; closing right after the response
+        // flush lets the client finish immediately with the buffered reply.
+        res.once('finish', () => {
+          setTimeout(() => {
+            req.destroy();
+          }, 30).unref?.();
+        });
+      };
+      if (cl !== undefined && cl > 0 && earlyMs > 0) {
+        earlyTimer = setTimeout(settleEarly, earlyMs);
+        earlyTimer.unref?.();
+      }
       req.on('data', (chunk: Buffer) => {
+        if (settled) return;
         received += chunk.length;
         if (received > opts.maxBodyBytes && !aborted) {
           aborted = true;
+          clearEarly();
           res.setHeader('Connection', 'Close');
           res.writeHead(413);
           res.end();
@@ -495,16 +561,24 @@ export function createRequestHandler(opts: HttpApiOptions) {
         }
       });
       req.on('end', () => {
-        if (aborted) return;
+        clearEarly();
+        if (aborted || settled) return;
+        settled = true;
         respond(200, `size=${received}\n`, [...commonHeaders(), ['Content-Type', 'text/plain; charset=UTF-8']], connMode);
       });
-      req.on('error', () => {
-        if (!aborted && !res.headersSent) {
-          aborted = true;
-          res.writeHead(400);
-          res.end();
+      // A client that aborts mid-body (FIN or RST) can no longer receive a
+      // meaningful answer: drop the connection silently — same as the daemon,
+      // which cannot reply to a vanished client either.
+      const dropOnAbort = (): void => {
+        clearEarly();
+        if (!aborted && !settled) {
+          settled = true;
+          res.destroy();
+          req.destroy();
         }
-      });
+      };
+      req.on('error', dropOnAbort);
+      req.on('aborted', dropOnAbort);
       return;
     }
     notFound();
