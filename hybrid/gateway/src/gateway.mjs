@@ -13,28 +13,47 @@
  * The payload data plane (DOWNLOAD/UPLOAD bytes) NEVER transits this
  * service — that is the entire point of the hybrid split.
  *
- * Zero dependencies: node:http + node:crypto only.
+ * Zero dependencies: node:http + node:crypto (+ node:tls for HTTPS).
  *
  * Env:
  *   HYBRID_GATEWAY_PORT       default 8090
+ *   HYBRID_GATEWAY_BIND       default 127.0.0.1 (use 0.0.0.0 to expose; pair with TLS)
+ *   HYBRID_GATEWAY_TLS_CERT   optional path to PEM cert — enables HTTPS listener
+ *   HYBRID_GATEWAY_TLS_KEY    optional path to PEM key (required when cert set)
  *   HYBRID_SHARED_SECRET      HMAC secret (same value as the Worker secret)
  *   HYBRID_WORKER_BASE        default http://127.0.0.1:8790 (edge stand-in)
  *   HYBRID_VPS_PUBLIC_BASE    default http://127.0.0.1:8090 (this gateway)
  *   HYBRID_STS_BASE           default http://127.0.0.1:8080 (SpeedtestServer)
- *   HYBRID_TOKEN_TTL_MS       default 600000 (10 min)
+ *   HYBRID_TOKEN_TTL_MS       default 300000 (5 min; G-1)
+ *   HYBRID_TOKEN_BIND_IP      default false. true = bind token to the peer
+ *                             socket IP (pre-G-1 behaviour; breaks clients
+ *                             behind proxies / dual-stack mismatches)
+ *   HYBRID_DISCOVERY_FALLBACK default false. true = advertise the STS /ws
+ *                             fallback in discovery (K-7: off in production)
  *   HYBRID_RESULTS_FILE       optional JSONL result log
+ *   HYBRID_RESULTS_DEDUP_MS   default 3600000 — duplicate result POSTs for the
+ *                             same guid within this window get the same
+ *                             response and are logged once (G-9)
  */
 
 import http from 'node:http';
+import https from 'node:https';
+import fs from 'node:fs';
 import crypto from 'node:crypto';
 
 const PORT = Number(process.env.HYBRID_GATEWAY_PORT || 8090);
+const BIND = process.env.HYBRID_GATEWAY_BIND || '127.0.0.1';
+const TLS_CERT = process.env.HYBRID_GATEWAY_TLS_CERT || '';
+const TLS_KEY = process.env.HYBRID_GATEWAY_TLS_KEY || '';
 const SECRET = process.env.HYBRID_SHARED_SECRET || '';
 const WORKER_BASE = process.env.HYBRID_WORKER_BASE || 'http://127.0.0.1:8790';
 const VPS_BASE = process.env.HYBRID_VPS_PUBLIC_BASE || 'http://127.0.0.1:8090';
 const STS_BASE = process.env.HYBRID_STS_BASE || 'http://127.0.0.1:8080';
-const TTL_MS = Number(process.env.HYBRID_TOKEN_TTL_MS || 600000);
+const TTL_MS = Number(process.env.HYBRID_TOKEN_TTL_MS || 300000);
+const TOKEN_BIND_IP = String(process.env.HYBRID_TOKEN_BIND_IP || '') === 'true';
+const DISCOVERY_FALLBACK = String(process.env.HYBRID_DISCOVERY_FALLBACK || '') === 'true';
 const RESULTS_FILE = process.env.HYBRID_RESULTS_FILE || '';
+const RESULTS_DEDUP_MS = Number(process.env.HYBRID_RESULTS_DEDUP_MS || 3600000);
 
 // Evidence counters — how many control-plane bytes the VPS actually served.
 const counters = { servers: 0, sessions: 0, results: 0, pings: 0, bytesIn: 0, bytesOut: 0 };
@@ -46,12 +65,17 @@ function log(kind, detail = {}) {
   console.log(JSON.stringify({ ts: Date.now(), kind, ...detail }));
 }
 
-// --- token minting (format shared with hybrid/worker/src/token.ts) --------
+// --- token minting (format shared with hybrid/worker/src/token.ts) ---------
+// G-1: by default the token is NOT bound to a socket IP ('*'), so clients
+// behind proxies/NAT or with v4↔v6 path asymmetry (IPv4 to the VPS, IPv6 to
+// Cloudflare) are not rejected with ip-mismatch. Set HYBRID_TOKEN_BIND_IP=true
+// to restore strict binding.
 function mintToken(ip) {
   const guid = crypto.randomUUID();
   const expMs = Date.now() + TTL_MS;
-  const sig = crypto.createHmac('sha256', SECRET).update(`v1|${guid}|${expMs}|${ip}`).digest('hex');
-  return { token: `v1~${guid}~${expMs}~${ip}~${sig}`, guid, expMs };
+  const tip = TOKEN_BIND_IP ? ip : '*';
+  const sig = crypto.createHmac('sha256', SECRET).update(`v1|${guid}|${expMs}|${tip}`).digest('hex');
+  return { token: `v1~${guid}~${expMs}~${tip}~${sig}`, guid, expMs };
 }
 
 function verifyToken(token, ip) {
@@ -93,16 +117,25 @@ function json(res, status, obj) {
   res.writeHead(status, {
     'Content-Type': 'application/json',
     'Content-Length': body.length,
-    'Cache-Control': 'no-store',
-    'X-Hybrid-Gateway': '1.0',
+    'Cache-Control': 'no-store, no-transform',
+    'X-Hybrid-Gateway': '1.1',
   });
   res.end(body);
 }
 
-// --- the discovery document: the role split of the hybrid architecture ---
+// --- the discovery document: the role split of the hybrid architecture -----
 function serversDocument() {
+  const throughput = {
+    primary: { url: `${WORKER_BASE}/ws`, transport: 'wss-netgauge', description: 'NetGauge over WebSocket at the edge' },
+    http: { url: `${WORKER_BASE}/__down`, upload: `${WORKER_BASE}/__up`, transport: 'http-streaming' },
+  };
+  // G-3 / K-7: the STS /ws fallback is opt-in and OFF by default — no mass
+  // fallback of throughput traffic to the VPS.
+  if (DISCOVERY_FALLBACK) {
+    throughput.fallback = { url: `${STS_BASE}/ws`, transport: 'ws-netgauge', description: 'OPT-IN: VPS fallback when the edge is unavailable (not for production discovery)' };
+  }
   return {
-    version: 1,
+    version: 2,
     issuedAt: new Date().toISOString(),
     roles: {
       control: { url: VPS_BASE, description: 'discovery, session tokens, result intake' },
@@ -112,17 +145,26 @@ function serversDocument() {
         edgeTtfb: `${WORKER_BASE}/__down?bytes=0`,
         description: 'UDP jitter/loss and stable-identity latency stay on the VPS; edge TTFB is a comparative metric',
       },
-      throughput: {
-        primary: { url: `${WORKER_BASE}/ws`, transport: 'wss-netgauge', description: 'NetGauge over WebSocket at the edge' },
-        http: { url: `${WORKER_BASE}/__down`, upload: `${WORKER_BASE}/__up`, transport: 'http-streaming' },
-        fallback: { url: `${STS_BASE}/ws`, transport: 'ws-netgauge', description: 'VPS fallback when the edge is unavailable' },
-      },
+      throughput,
     },
     notes: 'Official Ookla CLI clients: use the VPS NetGauge TCP endpoint (SpeedtestServer :8080) — the CLI cannot speak HTTP/WebSocket transports.',
   };
 }
 
-const server = http.createServer(async (req, res) => {
+// G-9: result deduplication per guid — replays within the window get the
+// identical response and are persisted once.
+const resultMemory = new Map(); // guid -> { expiresAt, response }
+function rememberResult(guid, response) {
+  const now = Date.now();
+  for (const [k, v] of resultMemory) if (v.expiresAt < now) resultMemory.delete(k);
+  resultMemory.set(guid, { expiresAt: now + RESULTS_DEDUP_MS, response });
+  if (resultMemory.size > 4096) {
+    const first = resultMemory.keys().next().value;
+    resultMemory.delete(first);
+  }
+}
+
+const requestHandler = async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let ip = req.socket.remoteAddress || '127.0.0.1';
   if (ip.startsWith('::ffff:')) ip = ip.slice(7); // normalize IPv4-mapped IPv6
@@ -139,7 +181,7 @@ const server = http.createServer(async (req, res) => {
     if (!SECRET) return json(res, 500, { error: 'HYBRID_SHARED_SECRET not configured' });
     counters.sessions++;
     const { token, guid, expMs } = mintToken(ip);
-    log('session_minted', { guid, ip, expMs });
+    log('session_minted', { guid, ip, expMs, bound: TOKEN_BIND_IP });
     return json(res, 200, { token, guid, expiresAt: new Date(expMs).toISOString(), endpoints: serversDocument().roles });
   }
 
@@ -160,36 +202,68 @@ const server = http.createServer(async (req, res) => {
     }
     const v = verifyToken(payload.token, ip);
     if (!v.ok) return json(res, 401, { error: 'unauthorized', reason: v.reason });
+    const guid = v.guid || payload.guid || null;
+    const mem = guid ? resultMemory.get(guid) : null;
+    if (mem && mem.expiresAt > Date.now()) {
+      counters.results++; // counted, but NOT re-persisted
+      return json(res, 200, mem.response);
+    }
     counters.results++;
     const record = {
       receivedAt: new Date().toISOString(),
-      guid: v.guid || payload.guid || null,
+      guid,
       ip,
       metrics: payload.metrics || {},
       accounting: payload.accounting || {},
       client: payload.client || {},
     };
-    log('result_accepted', { guid: record.guid, ip });
+    const response = { ok: true, guid };
+    rememberResult(guid, response);
+    log('result_accepted', { guid, ip });
     if (RESULTS_FILE) {
-      const fs = await import('node:fs');
       fs.appendFileSync(RESULTS_FILE, JSON.stringify(record) + '\n');
     }
-    return json(res, 200, { ok: true, guid: record.guid });
+    return json(res, 200, response);
   }
 
   if (path === '/api/health' && req.method === 'GET') {
     return json(res, 200, {
-      server: 'hybrid-gateway/1.0',
+      server: 'hybrid-gateway/1.1',
       instanceId,
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
       counters,
-      config: { workerBase: WORKER_BASE, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: TTL_MS, secretConfigured: Boolean(SECRET) },
+      config: { workerBase: WORKER_BASE, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: TTL_MS, tokenBindIp: TOKEN_BIND_IP, discoveryFallback: DISCOVERY_FALLBACK, tls: Boolean(TLS_CERT), resultsDedupMs: RESULTS_DEDUP_MS, secretConfigured: Boolean(SECRET) },
     });
   }
 
   return json(res, 404, { error: 'not found', path });
-});
+};
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(JSON.stringify({ kind: 'gateway_started', port: PORT, workerBase: WORKER_BASE, vpsBase: VPS_BASE, stsBase: STS_BASE, secretConfigured: Boolean(SECRET) }));
+if (TLS_CERT) {
+  if (!TLS_KEY) {
+    console.error(JSON.stringify({ kind: 'gateway_error', error: 'HYBRID_GATEWAY_TLS_CERT set without HYBRID_GATEWAY_TLS_KEY' }));
+    process.exit(2);
+  }
+}
+const listener = TLS_CERT
+  ? https.createServer(
+      { cert: fs.readFileSync(TLS_CERT), key: fs.readFileSync(TLS_KEY), minVersion: 'TLSv1.2' },
+      requestHandler,
+    )
+  : http.createServer(requestHandler);
+
+listener.listen(PORT, BIND, () => {
+  console.log(JSON.stringify({
+    kind: 'gateway_started',
+    port: PORT,
+    bind: BIND,
+    tls: Boolean(TLS_CERT),
+    workerBase: WORKER_BASE,
+    vpsBase: VPS_BASE,
+    stsBase: STS_BASE,
+    tokenTtlMs: TTL_MS,
+    tokenBindIp: TOKEN_BIND_IP,
+    discoveryFallback: DISCOVERY_FALLBACK,
+    secretConfigured: Boolean(SECRET),
+  }));
 });
