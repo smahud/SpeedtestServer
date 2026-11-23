@@ -136,7 +136,7 @@ export class OoklaServer extends EventEmitter {
       bindAddresses: Array.isArray(this.config.addresses) ? this.config.addresses.map(String) : [],
       onEvent: (kind, detail) => {
         if (kind.startsWith('conn_') || kind === 'listen_tcp' || kind === 'listen_udp' || kind === 'started' || kind === 'stopped'
-          || kind.startsWith('tls_')) {
+          || kind.startsWith('tls_') || kind.startsWith('http_')) {
           this.logger.info(`[net] ${kind}`, detail as Record<string, unknown>);
         }
       },
