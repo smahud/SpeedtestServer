@@ -2,14 +2,15 @@
   "name": "speedtest-hybrid-worker",
   "version": "1.0.0",
   "private": true,
-  "description": "Cloudflare Worker: NetGauge-over-WSS + HTTP legacy + hybrid throughput endpoints (SpeedtestServer hybrid research)",
+  "description": "Cloudflare Worker: NetGauge-over-WSS + hybrid __down/__up endpoints (SpeedtestServer hybrid \u2014 Free-plan hardened)",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "node test/conformance.mjs"
+    "test": "bash test/run-tests.sh"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "@cloudflare/workers-types": "^5.20261123.1"
   }
 }
