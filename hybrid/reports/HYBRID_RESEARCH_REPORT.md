@@ -214,3 +214,9 @@ bash hybrid/lab/harness/run-hybrid-lab.sh
 EXP_ID=e-d-… NEED_WORKER=1 SERVERS="speed.cloudflare.com:8080,…" \
   bash hybrid/lab/harness/run-cli-experiment.sh
 ```
+
+## Errata — 24 November 2026 (sesi agent UAEG)
+
+- E-G: tester yang dipakai adalah clone z.ai **v1.0.1**, bukan "Speedtest Host Tester v1.1.0".
+- E-G: upload berjalan lewat `upload.php` (213 POST), bukan WS NetGauge UPLOAD.
+- E-G: front uji menyajikan TLS dan HTTP pada satu port secara LOKAL — hasil 10/10 tidak dapat direproduksi di hostname Cloudflare nyata (edge menolak NetGauge mentah dengan HTTP 400 dan 8080 hanya HTTP). Rincian: docs/SPEEDTEST_HYBRID_CLOUDFLARE_FREE.md §2.1 dan §7.2.

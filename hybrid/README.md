@@ -6,6 +6,8 @@
 > claims register: [`reports/WORKERS_LIMITS.md`](reports/WORKERS_LIMITS.md) ·
 > experiments: [`lab/`](lab/).
 
+> **Errata — 24 November 2026 (sesi agent UAEG):** label "research branch" sudah usang — `hybrid/` telah di-merge ke `master` sejak `836f7de` dan kini menjadi basis kode Jalur B yang aktif dipelihara (status per kriteria: docs/HYBRID_STATUS.md). Klaim "host-tester suite passes 10/10 against the Worker" berasal dari E-G yang memakai front lokal (TLS+HTTP satu port) dengan clone z.ai v1.0.1 — bukan edge Cloudflare nyata; upload E-G lewat `upload.php`, bukan WS. Acuan yang berlaku: docs/SPEEDTEST_HYBRID_CLOUDFLARE_FREE.md (v2) dan docs/HYBRID_DEPLOYMENT_RUNBOOK.md.
+
 A hybrid Ookla-compatible speedtest architecture where **both components have
 measured, meaningful responsibilities**:
 

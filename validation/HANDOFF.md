@@ -1,5 +1,7 @@
 # HANDOFF — continuation instructions (no conversation history required)
 
+> **Pembaruan 24 November 2026 (sesi agent UAEG):** dokumen ini (revisi 6, 5 November) sudah usang untuk VPS operator. Rujukan yang berlaku: `docs/SPEEDTEST_HYBRID_CLOUDFLARE_FREE.md` (v2), `docs/HYBRID_STATUS.md`, `docs/HYBRID_DEPLOYMENT_RUNBOOK.md`, `docs/HOST_TESTER_RUNBOOK.md`, serta `validation/DEPLOYMENT_WILDCARD_2026-11-23.md`, `validation/OBSERVABILITY_AND_LEGACY_FIX_2026-11-23.md`, dan `validation/SLOW_UPLOAD_EARLY_ANSWER_2026-11-24.md`.
+
 ## Where things stand (2026-11-05, revision 6 — HEAD of this commit series)
 
 - Baseline re-verified from scratch on rev-6 code: build clean, typecheck

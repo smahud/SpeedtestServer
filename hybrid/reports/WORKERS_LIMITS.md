@@ -62,3 +62,7 @@ documentation/infrastructure during this research (2026-11-06),
 | Durable Objects | **Not needed for correctness** (stateless speedtest; stateless HMAC tokens). Optional for WS-hibernation at scale and for cross-chunk upload accounting if a future client needs it | design |
 | Cache/CDN | **Optional micro-optimization** for the legacy HTTP image paths on a real zone (cacheable static sizes); irrelevant to WS/NetGauge lanes | [D] |
 | Turnstile / WAF / rate limiting | **Recommended for production hardening** of the public Worker endpoints (abuse control beyond tokens) | [D] |
+
+## Errata — 24 November 2026 (sesi agent UAEG)
+
+- **W-9 (koreksi):** frasa "468 MB up via WS-NetGauge UPLOAD" menyesatkan. Log Worker E-G memuat 213 `POST /speedtest/upload.php` dan 0 event `ng_upload` — upload E-G berjalan lewat `upload.php` (HTTP), bukan WS UPLOAD. Angka 10/10 dan total ~1,25 GB tetap benar sebagai hasil clone (z.ai v1.0.1) terhadap front lokal.
