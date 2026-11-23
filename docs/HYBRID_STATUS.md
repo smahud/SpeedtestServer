@@ -73,6 +73,6 @@ Dokumen ini memuat: (1) temuan awal Fase 0–1, (2) gap analysis per celah G-1..
 | B4 | Sesi E2E eksternal + atribusi byte | **VERIFIED-AUTO (evidence interim)** | Payload 117.440.512 B client↔edge; delta interface VPS 67.971 B; gateway app bytes 4.298 B ≈ client vpsBytes 4.199 B; offload ≈1:28.000; receipts cocok; replay idempoten. Edge = workerd lokal (stand-in) — edge nyata menunggu B1. Evidence: `hybrid/lab/evidence/e-i-production-gateway/`. |
 | B5 | Uji negatif token di edge; legacy tertutup | **BLOCKED (edge nyata)** — lokal **VERIFIED-AUTO** | Token battery 11/11 + hardening 16/16 (caps 400/413, legacy 404, Bearer) lulus di workerd lokal DAN di VPS (total 82/82). Uji edge nyata menunggu B1. |
 | C1 | Dokumentasi lengkap | **IMPLEMENTED** | Spec v2 + HYBRID_STATUS + HYBRID_DEPLOYMENT_RUNBOOK + HOST_TESTER_RUNBOOK + errata bertanggal (README/W-9/E-G/HANDOFF). |
-| C2 | Commit lokal VPS tanpa push | **IMPLEMENTED** | 12 commit lokal (`5841b1a`..`1b33e89`), working tree bersih, tidak ada push.
+| C2 | Commit lokal VPS tanpa push | **IMPLEMENTED** | 16 commit lokal (`5841b1a`..`011c495`), working tree bersih, tidak ada push.
 
 Pekerjaan lanjutan (butuh operator): (1) credential Cloudflare valid — token terbatas template "Edit Cloudflare Workers" + Zone:Read + DNS:Read, atau Global API Key yang benar; (2) deploy Worker uji → ukur CPU → Worker produksi (langkah di HYBRID_DEPLOYMENT_RUNBOOK §4); (3) isi `HYBRID_WORKER_BASE` + restart gateway; (4) ulangi E2E ke edge nyata; (5) jalankan host tester resmi (A3).
