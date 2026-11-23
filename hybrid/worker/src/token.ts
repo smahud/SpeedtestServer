@@ -72,7 +72,14 @@ export async function verifyToken(
   return { ok: true, claims: { guid, expMs, ip } };
 }
 
-/** Extract a token from query param `token` or header `X-Hybrid-Token`. */
+/** Extract a token from header `Authorization: Bearer` (preferred — keeps
+ * tokens out of URLs/logs, G-8), header `X-Hybrid-Token`, or query param
+ * `token` (WS clients cannot set headers on the upgrade in browsers). */
 export function extractToken(request: Request, url: URL): string | null {
+  const auth = request.headers.get('authorization');
+  if (auth && auth.toLowerCase().startsWith('bearer ')) {
+    const t = auth.slice(7).trim();
+    if (t) return t;
+  }
   return url.searchParams.get('token') || request.headers.get('x-hybrid-token');
 }

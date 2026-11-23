@@ -31,6 +31,15 @@ export interface Env {
   MAX_UPLOAD_BYTES?: string;
   /** WS message size limit (daemon websocket.frameSizeLimitBytes default). */
   WS_FRAME_LIMIT_BYTES?: string;
+  /** G-7: serve the daemon-parity legacy HTTP surface (/, /hi, latency.txt,
+   *  random*.jpg, upload.php, crossdomain.xml). Default in CODE is FALSE —
+   *  production keeps it off (K-7); local tests and the [env.test] Worker
+   *  set it to "true". */
+  LEGACY_HTTP_ENABLED?: string;
+  /** Verbose per-command JSONL logging (dev/evidence mode). Default off —
+   *  G-6/Free CPU: per-command console.log on hot paths costs CPU. Session
+   *  open/close, transfers and errors are always logged. */
+  WORKER_VERBOSE_LOGS?: string;
 }
 
 export const DEFAULTS = {
