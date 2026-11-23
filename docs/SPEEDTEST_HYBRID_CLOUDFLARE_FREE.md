@@ -21,9 +21,9 @@ Versi 1 (21 November 2026) mengaudit `master@8912b07`. Pada commit itu, `hybrid/
 | Fallback HTTP legacy | `speedtestserver-legacy.service` | Ter-deploy | Port 80, perhitungan `size=` model PHP. [Observability][obs-fix] |
 | Capture host tester | `ookla-capture.service` | Aktif | tcpdump 80/5060/8080 ke `/var/lib/ookla-capture/`. Evidence daemon di `/var/lib/speedtestserver/evidence.jsonl`. |
 | nPerf (layanan lain milik operator) | `nperf-server.service` | Aktif | 8081/8443 dan redirect 443. **Bukan bagian proyek ini.** Jangan disentuh. |
-| Worker Hybrid | `hybrid/worker` | Lulus tes lokal (wrangler 4.158.0/workerd, 62/62). **Belum pernah di-deploy ke Cloudflare nyata.** | Dirancang dengan asumsi Workers Paid. Perlu hardening dan pengukuran untuk Free (§5, §6). [Worker][hybrid-worker] |
-| Gateway Hybrid (control plane VPS) | `hybrid/gateway/src/gateway.mjs` | Lulus lab lokal. Belum ada unit systemd. | Bind `127.0.0.1:8090` lewat HTTP biasa. Binding IP token belum aman untuk produksi (§3.3). [Gateway][hybrid-gateway] |
-| Probe client | `hybrid/probe-client/src/hybrid-probe.mjs` | Lulus lab lokal | Sudah menerima base URL terpisah untuk VPS dan edge. Throughput hanya lewat WS. Byte dihitung dari estimasi sisi client. [Probe][hybrid-probe] |
+| Worker Hybrid | `hybrid/worker` | Hardening Fase B selesai (G-1..G-12 tertutup; 82/82 tes di workerd lokal dan di VPS). **Deploy ke edge nyata MENUNGGU credential Cloudflare yang valid.** | Caps 25 MiB di [vars], legacy default off, Bearer, backpressure, pool murah CPU. [Runbook][hybrid-runbook] |
+| Gateway Hybrid (control plane VPS) | `hybrid/gateway/src/gateway.mjs` | **TERDEPLOY 24 Nov 2026**: unit `speedtest-hybrid-gateway.service`, TLS wildcard (LoadCredential), port 8790, user non-root | Token `ip='*'` TTL 5 menit, dedup guid, discovery tanpa fallback STS. [Runbook][hybrid-runbook] |
+| Probe client | `hybrid/probe-client/src/hybrid-probe.mjs` | Lulus lab lokal + E2E produksi (gateway VPS) | Mode WS + HTTP `__down`/`__up`, receipt Worker tersimpan di evidence (G-11) |
 
 Status host tester resmi untuk `speedtest.lumajangnetworks.my.id:8080`:
 
@@ -598,6 +598,21 @@ Ini belum merupakan bukti edge nyata untuk Worker proyek ini. [Laporan hybrid][h
 - ketentuan Cloudflare untuk rollout publik bervolume besar;
 - persetujuan host Ookla dan visibilitasnya di discovery CLI.
 
+### 7.1a Bukti uji baru — 24 November 2026 (sesi agent UAEG)
+
+**Jalur A (regression + client resmi):**
+
+- Gate publik 31/31 dan clone chatgpt 19/19 lulus sebelum dan sesudah deploy gateway. Varian `--legacy-port 8080` (run pertama) 9/19 — hanya magic-byte JPEG (daemon TS menyajikan pool ASCII; tester resmi hanya HEAD). Temuan awal, bukan regresi.
+- Build `master@aac909a` identik byte-per-byte dengan runtime `dist` (96 file).
+- **CLI resmi Ookla 1.2.0.84: 9/9 server ID Surabaya menyelesaikan sesi penuh ke VPS** melalui redirect hosts (namespace + bind-mount; binary statis tidak bisa LD_PRELOAD). Semua `persisted:false` (results.speedtest.net diblokir). Byte upload CLI cocok dengan `evidence.jsonl` VPS.
+
+**Jalur B (hardening + deploy + E2E):**
+
+- G-1..G-12 tertutup; 82/82 tes (conformance 55 + token 11 + hardening 16) lulus di workerd lokal DAN di VPS.
+- Gateway ter-deploy di VPS (unit systemd, TLS, port 8790) — lihat B3 di `docs/HYBRID_STATUS.md`.
+- E2E dari client eksternal (gateway produksi VPS + edge workerd lokal): payload 117.440.512 B, delta interface eth0 VPS 67.971 B, gateway app bytes 4.298 B, offload ≈1:28.000, receipts `__up` dan WS ack cocok, replay idempoten. Evidence: `hybrid/lab/evidence/e-i-production-gateway/`.
+- **BLOCKED:** deploy Worker ke edge nyata — Global API Key operator ditolak Cloudflare (9103, semua varian email). Token certbot VPS hanya Zone-DNS. Tidak ada kredensial Workers lain di VPS.
+
 ### 7.2 Errata atas dokumen lain
 
 | Dokumen | Klaim | Koreksi |
@@ -621,6 +636,7 @@ Ini belum merupakan bukti edge nyata untuk Worker proyek ini. [Laporan hybrid][h
 [repo-server]: https://github.com/smahud/SpeedtestServer/tree/8912b0754510dd0c61b0e1b5def7c5b11d05dde9
 [repo-tester]: https://github.com/smahud/SpeedtestHost-Tester/tree/eab16976a4dbf48f36b0d81da5413cf2860e3cfa
 [hybrid-worker]: https://github.com/smahud/SpeedtestServer/tree/942b94761c0986231d269e305c526f8b1e295d1b/hybrid/worker
+[hybrid-runbook]: https://github.com/smahud/SpeedtestServer/blob/master/docs/HYBRID_DEPLOYMENT_RUNBOOK.md
 [hybrid-gateway]: https://github.com/smahud/SpeedtestServer/blob/942b94761c0986231d269e305c526f8b1e295d1b/hybrid/gateway/src/gateway.mjs
 [hybrid-probe]: https://github.com/smahud/SpeedtestServer/blob/942b94761c0986231d269e305c526f8b1e295d1b/hybrid/probe-client/src/hybrid-probe.mjs
 [hybrid-deploy]: https://github.com/smahud/SpeedtestServer/blob/942b94761c0986231d269e305c526f8b1e295d1b/hybrid/worker/DEPLOY.md
