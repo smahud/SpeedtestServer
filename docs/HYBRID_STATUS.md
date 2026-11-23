@@ -60,6 +60,19 @@ Dokumen ini memuat: (1) temuan awal Fase 0–1, (2) gap analysis per celah G-1..
 5. Fase 7: menunggu operator host tester (A3 NOT TESTED sampai itu).
 6. Fase 8: runbook + errata + laporan akhir.
 
-## Status akhir
+## Status akhir (24 November 2026, akhir sesi agent UAEG)
 
-(diperbarui di akhir sesi — lihat bagian bawah dokumen ini setelah Fase 8)
+| # | Kriteria | Status | Bukti |
+|---|---|---|---|
+| A1 | Layanan existing tetap aktif | **VERIFIED-AUTO** | PID tidak berubah sepanjang sesi: speedtestserver 283954, legacy 283944, nperf 278476 (NRestarts=1 pra-sesi), capture 281912. Listener baru hanya 8790 (gateway). |
+| A2 | Gate 31/31 + 19/19 dua varian | **VERIFIED-AUTO** | 31/31 dan 19/19 (default) lulus sebelum dan sesudah semua deploy. Varian `--legacy-port 8080` = 9/19: deviasi magic-byte JPEG (T-7), sama dengan baseline, tidak memburuk. |
+| A3 | Host tester resmi lulus semua check | **NOT TESTED** | Operator belum menjalankan ulang setelah deploy early answer. CAPTCHA tidak boleh diotomasi. Pengganti terdekat: CLI resmi 9/9 server ID (T-8). |
+| B1 | Worker di-deploy ke Workers Free | **BLOCKED (credential Cloudflare)** | Global API Key yang diberikan ditolak Cloudflare (9103, semua varian email; format cfk_ 52 char valid). Token certbot di VPS scope-nya hanya Zone-DNS (tidak bisa Workers). Kode+konfigurasi+runbook siap deploy. |
+| B2 | Pengukuran CPU/invocation edge nyata | **BLOCKED (credential Cloudflare)** | Menunggu B1. |
+| B3 | Gateway systemd + TLS + binding IP | **DEPLOYED** | `speedtest-hybrid-gateway.service` aktif (user non-root, LoadCredential TLS wildcard, port 8790); token `ip='*'` TTL 5 menit; dedup guid; discovery tanpa fallback STS. Verifikasi eksternal TLS ketat lulus. |
+| B4 | Sesi E2E eksternal + atribusi byte | **VERIFIED-AUTO (evidence interim)** | Payload 117.440.512 B client↔edge; delta interface VPS 67.971 B; gateway app bytes 4.298 B ≈ client vpsBytes 4.199 B; offload ≈1:28.000; receipts cocok; replay idempoten. Edge = workerd lokal (stand-in) — edge nyata menunggu B1. Evidence: `hybrid/lab/evidence/e-i-production-gateway/`. |
+| B5 | Uji negatif token di edge; legacy tertutup | **BLOCKED (edge nyata)** — lokal **VERIFIED-AUTO** | Token battery 11/11 + hardening 16/16 (caps 400/413, legacy 404, Bearer) lulus di workerd lokal DAN di VPS (total 82/82). Uji edge nyata menunggu B1. |
+| C1 | Dokumentasi lengkap | **IMPLEMENTED** | Spec v2 + HYBRID_STATUS + HYBRID_DEPLOYMENT_RUNBOOK + HOST_TESTER_RUNBOOK + errata bertanggal (README/W-9/E-G/HANDOFF). |
+| C2 | Commit lokal VPS tanpa push | **IMPLEMENTED** | 12 commit lokal (`5841b1a`..`1b33e89`), working tree bersih, tidak ada push.
+
+Pekerjaan lanjutan (butuh operator): (1) credential Cloudflare valid — token terbatas template "Edit Cloudflare Workers" + Zone:Read + DNS:Read, atau Global API Key yang benar; (2) deploy Worker uji → ukur CPU → Worker produksi (langkah di HYBRID_DEPLOYMENT_RUNBOOK §4); (3) isi `HYBRID_WORKER_BASE` + restart gateway; (4) ulangi E2E ke edge nyata; (5) jalankan host tester resmi (A3).
