@@ -1,0 +1,23 @@
+# E-K speedtest front — atribusi byte (sesi 3, 24 Nov 2026)
+
+window      vps rx(MB)  vps tx(MB)  front out(B)  front in(B)
+t1              265.61      621.00             0            0
+t1b             249.75      575.57             0            0
+t2                1.95        0.73           792       131072
+t3                0.01        0.02             0            0
+t4                0.01        0.02             0            0
+post              0.01        0.03             0            0
+pre2              0.18        0.12          -853      -131072
+t2r             154.40        6.90           779    146685952
+t3r               0.16        0.33           146            0
+t4r               0.01        0.02             0            0
+pre4              0.20        0.12             0            0
+t4v3              0.15        0.31            30            0
+t3final           0.27        0.40           146            0
+
+# keterangan jendela:
+t1 = CLI resmi 74964 (Jalur A) | t1b = CLI resmi 66281 (Jalur A)
+t2 = stock mini pra-fix (upload early-answer) | pre2..t2r = stock mini fix (drain penuh)
+t3 = pra-fix wrapper | t3r = wrapper mock domain | t4v3 = wrapper --server 74964 domain list
+
+Label uji final: t1, t1b, t2r, t3r, t4v3 (lihat docs/SPEEDTEST_FRONT_TEST_REPORT_2026-11-24.md).

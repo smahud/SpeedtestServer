@@ -1,0 +1,7 @@
+---- getent hosts (names -> IP) ----
+speedtest-mock.lumajangnetworks.my.id -> 45.126.249.250 
+speedtest.lumajangnetworks.my.id -> ::ffff:45.126.249.250 
+speedtest.somedigit.net -> 45.126.249.250 
+speedtest.tuxsnet.id -> 45.126.249.250 
+sby.speedtest.ring.net.id -> 2401:13e0:2:1::2 
+results.speedtest.net -> 2a04:4e42:99::731 
