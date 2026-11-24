@@ -1,0 +1,15 @@
+speedtest.somedigit.net: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+speedtest-sby.xl.co.id: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+speedtest.patas.id: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+speedtest.tuxsnet.id: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+ookla.sub.atharva.co.id: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+speedtest.era.net.id: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+speedtest2.lintasmediasolusindo.com: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+v137170.faznet.co.id: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+sby.speedtest.ring.net.id: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+speedtest-mock.lumajangnetworks.my.id: 45.126.249.250 (getaddrinfo first result, inside test namespace)
+results.speedtest.net: 127.0.0.1 (blocked inside test namespace)
+# All 9 Surabaya hostnames + mock domain resolve to the VPS 45.126.249.250 inside the test namespace
+# (/etc/hosts bind-mount via unshare --user --map-root-user --mount). The official CLI result JSON
+# additionally reports server.ip=45.126.249.250 for all 9 runs. results.speedtest.net is blocked
+# per invariant (forced-endpoint tests must not send results to Ookla).

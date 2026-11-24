@@ -1,0 +1,14 @@
+# Connection map of an official-CLI run at the VPS daemon (smoke test 74964, 05:31:52-05:32:17 UTC)
+# From journalctl -u speedtestserver, conn_close stats aggregated by /tmp/analyze_journal.py:
+connections: 48 | total bytesDown: 652750527 | total bytesUp: 239752517
+conn roles (matching diversion-lab NETGAUGE_SESSION_MAP):
+  - 11 zero-byte warm-up/probe connections (open-close, no data)
+  - 10 selection probes (encrypted hello -> ERROR -> HI -> GETIP -> PING x3)
+  - 1 winner probe (HI <UUID> -> GETIP -> PING x5)
+  - 1 loss connection (HI <UUID> -> INITPLOSS -> PLOSS every ~500ms, 263 cmds)
+  - 2 monitor-ping connections (PING during download/upload phases)
+  - 4 download workers (DOWNLOAD 32000000 repeated; bytesDown 25-42 MB each; 11 total down conns)
+  - 1 upload control (CAPABILITIES -> UPLOAD_STATS)
+  - 4 upload workers (UPLOAD 32000000 15000 16 + ~62 MB payload each)
+  - 1 WebSocket connection (conn_ws, 44 B down, 0 commands)
+All measurement transport: raw TCP NetGauge to 45.126.249.250:8080. No HTTP, no redirects.

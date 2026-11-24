@@ -1,0 +1,38 @@
+# E-M attribution — byte accounting per test (session 5, 2026-11-24 05:35-05:52 UTC)
+# VPS counters: /sys/class/net/eth0/statistics/{rx,tx}_bytes before/after each window
+# daemon journal: journalctl -u speedtestserver (conn_close stats, window +15s tail)
+# worker: Cloudflare GraphQL workersInvocationsAdaptive per test window (+-1 min)
+# (*) A-mode raw per-minute buckets overlap the immediately-following B test (tests run
+# back-to-back); the ISOLATED A run below (quiet gaps, no adjacent traffic) is the
+# authoritative proof: 0 worker requests while the VPS carries the full session.
+
+   srv    mode exit  vps_rx_MB  vps_tx_MB  cli_dl_MB  cli_ul_MB  dmon_down_MB  dmon_up_MB  wreq
+ 74964  A-ofcl    0      257.9      764.3      722.3      221.7         799.6       223.5    0*
+ 74964  B-hybr    0       0.14       0.31      387.7      151.5             -           -   182
+ 61853  A-ofcl    0      121.1      683.6      633.8       93.1         709.4        95.1    0*
+ 61853  B-hybr    0       0.16       0.32      387.7      151.5             -           -    91
+ 62314  A-ofcl    0      226.7      663.8      617.0      195.0         680.0       196.7    0*
+ 62314  B-hybr    0       0.15       0.31      387.7      151.5             -           -   193
+ 66281  A-ofcl    0      199.3      598.7      562.6      170.7         636.5       172.5    0*
+ 66281  B-hybr    0       0.16       0.32      387.7      151.5             -           -   364
+ 65429  A-ofcl    0      243.9      618.0      575.5      212.9         652.7       214.6    0*
+ 65429  B-hybr    0       0.15       0.31      387.7      151.5             -           -   273
+ 68214  A-ofcl    0      260.4      655.3      615.6      226.5         686.8       229.0    0*
+ 68214  B-hybr    0       0.15       0.31      380.7      151.5             -           -   182
+ 73025  A-ofcl    0      147.9      522.5      489.3      123.9         567.3       125.6    0*
+ 73025  B-hybr    0       0.16       0.32      387.7      151.5             -           -   182
+ 48532  A-ofcl    0      231.8      571.5      529.2      203.0         606.1       204.4    0*
+ 48532  B-hybr    0       0.15       0.31      387.7      151.5             -           -   182
+ 55749  A-ofcl    0      144.6      557.0      513.3      118.4         583.5       121.6    0*
+ 55749  B-hybr    0       0.16       0.32      387.7      151.5             -           -   104
+
+ISOLATED official-CLI run 66281: 2026-11-24T05:46:57Z -> 2026-11-24T05:47:21Z exit=0
+  cli dl 511.9 MB, ul 224.2 MB; VPS eth0 carried the full session;
+  Cloudflare Worker requests in window 05:46-05:49 UTC: 0 (GraphQL workersInvocationsAdaptive returned no rows).
+
+Interpretation:
+- A (official CLI, mock DNS -> VPS): the ENTIRE NetGauge session lands on the VPS daemon :8080;
+  eth0 deltas ~= client payload bytes; the Worker receives ZERO requests (isolated proof).
+- B (hybrid transport, same server ids): VPS eth0 delta stays < 0.5 MB while the client measures
+  387.7 MB down + 151.5 MB up at the Cloudflare edge; worker requests 91-364 per test; gateway
+  results.jsonl receives a receipt (guid) per run.

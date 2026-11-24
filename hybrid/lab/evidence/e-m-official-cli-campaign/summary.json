@@ -1,0 +1,344 @@
+[
+  {
+    "server_id": 74964,
+    "a": {
+      "ping_ms": 59.119,
+      "download_mbps": 508.1,
+      "upload_mbps": 125.0,
+      "exit": 0,
+      "download_bytes": 722275202,
+      "upload_bytes": 221720152,
+      "vps_mb": 1022.2,
+      "vps_rx_mb": 257.9,
+      "vps_tx_mb": 764.3,
+      "server": {
+        "id": 74964,
+        "host": "speedtest.somedigit.net",
+        "port": 8080,
+        "name": "somedigit.net",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:35:23.545037+00:00",
+      "t1": "2026-11-24T05:35:53.168715+00:00"
+    },
+    "b": {
+      "ping_ms": 129.1,
+      "download_mbps": 501.4,
+      "upload_mbps": 702.3,
+      "exit": 0,
+      "download_bytes": 387730072,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.45,
+      "worker_requests": 182,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:50:33.743967+00:00",
+      "t1": "2026-11-24T05:50:43.556923+00:00"
+    }
+  },
+  {
+    "server_id": 61853,
+    "a": {
+      "ping_ms": 62.121,
+      "download_mbps": 465.5,
+      "upload_mbps": 60.6,
+      "exit": 0,
+      "download_bytes": 633830310,
+      "upload_bytes": 93097675,
+      "vps_mb": 804.7,
+      "vps_rx_mb": 121.1,
+      "vps_tx_mb": 683.6,
+      "server": {
+        "id": 61853,
+        "host": "speedtest-sby.xl.co.id",
+        "port": 8080,
+        "name": "PT XLSMART Telecom Sejahtera",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:37:28.703549+00:00",
+      "t1": "2026-11-24T05:37:57.252632+00:00"
+    },
+    "b": {
+      "ping_ms": 126.5,
+      "download_mbps": 405.0,
+      "upload_mbps": 725.9,
+      "exit": 0,
+      "download_bytes": 387730072,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.48,
+      "worker_requests": 91,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:38:01.669289+00:00",
+      "t1": "2026-11-24T05:38:14.932644+00:00"
+    }
+  },
+  {
+    "server_id": 62314,
+    "a": {
+      "ping_ms": 60.73,
+      "download_mbps": 475.9,
+      "upload_mbps": 147.6,
+      "exit": 0,
+      "download_bytes": 616952312,
+      "upload_bytes": 195027825,
+      "vps_mb": 890.5,
+      "vps_rx_mb": 226.7,
+      "vps_tx_mb": 663.8,
+      "server": {
+        "id": 62314,
+        "host": "speedtest.patas.id",
+        "port": 8080,
+        "name": "PT. Pratama Hasta Utama Solusindo",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:38:29.428053+00:00",
+      "t1": "2026-11-24T05:38:57.756542+00:00"
+    },
+    "b": {
+      "ping_ms": 128.7,
+      "download_mbps": 566.6,
+      "upload_mbps": 229.5,
+      "exit": 0,
+      "download_bytes": 387730072,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.47,
+      "worker_requests": 193,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:39:01.649131+00:00",
+      "t1": "2026-11-24T05:39:15.068994+00:00"
+    }
+  },
+  {
+    "server_id": 66281,
+    "a": {
+      "ping_ms": 63.715,
+      "download_mbps": 496.1,
+      "upload_mbps": 116.7,
+      "exit": 0,
+      "download_bytes": 562619628,
+      "upload_bytes": 170727362,
+      "vps_mb": 798.0,
+      "vps_rx_mb": 199.3,
+      "vps_tx_mb": 598.7,
+      "server": {
+        "id": 66281,
+        "host": "speedtest.tuxsnet.id",
+        "port": 8080,
+        "name": "PT. Tuxsindo Cyber Networks",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:39:20.954106+00:00",
+      "t1": "2026-11-24T05:39:45.024171+00:00"
+    },
+    "b": {
+      "ping_ms": 124.1,
+      "download_mbps": 443.7,
+      "upload_mbps": 707.2,
+      "exit": 0,
+      "download_bytes": 387730072,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.48,
+      "worker_requests": 364,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:39:52.242904+00:00",
+      "t1": "2026-11-24T05:40:06.195067+00:00"
+    }
+  },
+  {
+    "server_id": 65429,
+    "a": {
+      "ping_ms": 62.132,
+      "download_mbps": 481.9,
+      "upload_mbps": 142.5,
+      "exit": 0,
+      "download_bytes": 575468954,
+      "upload_bytes": 212887695,
+      "vps_mb": 862.0,
+      "vps_rx_mb": 243.9,
+      "vps_tx_mb": 618.0,
+      "server": {
+        "id": 65429,
+        "host": "ookla.sub.atharva.co.id",
+        "port": 8080,
+        "name": "Atharva",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:40:12.077721+00:00",
+      "t1": "2026-11-24T05:40:37.039105+00:00"
+    },
+    "b": {
+      "ping_ms": 128.3,
+      "download_mbps": 413.5,
+      "upload_mbps": 757.6,
+      "exit": 0,
+      "download_bytes": 387730072,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.46,
+      "worker_requests": 273,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:40:40.943433+00:00",
+      "t1": "2026-11-24T05:40:53.877832+00:00"
+    }
+  },
+  {
+    "server_id": 68214,
+    "a": {
+      "ping_ms": 61.693,
+      "download_mbps": 455.1,
+      "upload_mbps": 146.9,
+      "exit": 0,
+      "download_bytes": 615622842,
+      "upload_bytes": 226468292,
+      "vps_mb": 915.7,
+      "vps_rx_mb": 260.4,
+      "vps_tx_mb": 655.3,
+      "server": {
+        "id": 68214,
+        "host": "speedtest.era.net.id",
+        "port": 8080,
+        "name": "PT. ERA NETWORK INDONESIA",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:41:03.006166+00:00",
+      "t1": "2026-11-24T05:41:32.409775+00:00"
+    },
+    "b": {
+      "ping_ms": 128.1,
+      "download_mbps": 622.4,
+      "upload_mbps": 589.9,
+      "exit": 0,
+      "download_bytes": 380652184,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.46,
+      "worker_requests": 182,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:50:44.445985+00:00",
+      "t1": "2026-11-24T05:50:53.260429+00:00"
+    }
+  },
+  {
+    "server_id": 73025,
+    "a": {
+      "ping_ms": 63.754,
+      "download_mbps": 473.7,
+      "upload_mbps": 70.2,
+      "exit": 0,
+      "download_bytes": 489295438,
+      "upload_bytes": 123920000,
+      "vps_mb": 670.5,
+      "vps_rx_mb": 147.9,
+      "vps_tx_mb": 522.5,
+      "server": {
+        "id": 73025,
+        "host": "speedtest2.lintasmediasolusindo.com",
+        "port": 8080,
+        "name": "LINTAS MEDIA SOLUSINDO",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:41:59.171861+00:00",
+      "t1": "2026-11-24T05:42:25.146885+00:00"
+    },
+    "b": {
+      "ping_ms": 125.8,
+      "download_mbps": 414.8,
+      "upload_mbps": 715.7,
+      "exit": 0,
+      "download_bytes": 387730072,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.49,
+      "worker_requests": 182,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:42:29.687399+00:00",
+      "t1": "2026-11-24T05:42:43.384545+00:00"
+    }
+  },
+  {
+    "server_id": 48532,
+    "a": {
+      "ping_ms": 60.458,
+      "download_mbps": 477.2,
+      "upload_mbps": 141.0,
+      "exit": 0,
+      "download_bytes": 529183330,
+      "upload_bytes": 203025029,
+      "vps_mb": 803.2,
+      "vps_rx_mb": 231.8,
+      "vps_tx_mb": 571.5,
+      "server": {
+        "id": 48532,
+        "host": "v137170.faznet.co.id",
+        "port": 8080,
+        "name": "Faznet",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:42:49.289070+00:00",
+      "t1": "2026-11-24T05:43:14.540016+00:00"
+    },
+    "b": {
+      "ping_ms": 124.1,
+      "download_mbps": 527.6,
+      "upload_mbps": 716.6,
+      "exit": 0,
+      "download_bytes": 387730072,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.46,
+      "worker_requests": 182,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:43:18.429375+00:00",
+      "t1": "2026-11-24T05:43:28.172785+00:00"
+    }
+  },
+  {
+    "server_id": 55749,
+    "a": {
+      "ping_ms": 62.47,
+      "download_mbps": 464.5,
+      "upload_mbps": 58.6,
+      "exit": 0,
+      "download_bytes": 513289958,
+      "upload_bytes": 118448213,
+      "vps_mb": 701.5,
+      "vps_rx_mb": 144.6,
+      "vps_tx_mb": 557.0,
+      "server": {
+        "id": 55749,
+        "host": "sby.speedtest.ring.net.id",
+        "port": 8080,
+        "name": "RingNet",
+        "location": "Surabaya",
+        "country": "Indonesia",
+        "ip": "45.126.249.250"
+      },
+      "t0": "2026-11-24T05:43:37.151294+00:00",
+      "t1": "2026-11-24T05:44:05.010371+00:00"
+    },
+    "b": {
+      "ping_ms": 128.3,
+      "download_mbps": 526.3,
+      "upload_mbps": 487.3,
+      "exit": 0,
+      "download_bytes": 387730072,
+      "upload_bytes": 151519232,
+      "vps_mb": 0.48,
+      "worker_requests": 104,
+      "receipt": "guid recorded in b-*.cli.stderr + /var/lib/speedtest-hybrid/results.jsonl",
+      "t0": "2026-11-24T05:44:09.397567+00:00",
+      "t1": "2026-11-24T05:44:21.008070+00:00"
+    }
+  }
+]
