@@ -132,3 +132,24 @@ Pekerjaan sesi 3 (semua Jalur B; Jalur A tidak disentuh):
 Temuan baru sesi 3: T-10 (early-answer memutus kirim upload di RTT nyata → drain penuh), T-11 (random4000x4000 31,6 MB melebihi cap 25 MiB edge → front memangkas `bytes`), T-12 (daftar server Python speedtest-cli kini geo-lokal → `--server` ID Surabaya perlu injeksi `HYBRID_SERVER_LIST_FILE`). Batasan terdokumentasi: upload klien stock urllib tidak bisa dialihkan via redirect (body dikirim ke hop pertama sebelum respons dibaca); mock domain publik menunggu credential `Zone › DNS › Edit` (API token aktif tapi tanpa izin DNS; Global Key ditolak Cloudflare).
 
 Sisa pekerjaan operator: (1) A3 host tester resmi; (2) keputusan T-9 (nPerf port 80); (3) record DNS `A speedtest-mock.lumajangnetworks.my.id → 45.126.249.250` (DNS-only) bila mock domain ingin aktif di DNS publik; (4) push ke GitHub bila ingin menerbitkan (agent tidak push sesuai §6.6).
+
+---
+
+## Status akhir sesi 4 (24 November 2026, push + verifikasi pasca-push)
+
+Operator memerintahkan **push** (pengecualian eksplisit §6.6 master prompt). Yang dilakukan:
+
+1. Scan rahasia atas diff `origin/master..HEAD` sebelum push: 6.107 baris tambahan, 0 hit (pola token UAEG/PAT/CF/HMAC/private-key/password); tanpa file `.env`, `node_modules`, `.wrangler`, `dist`, pcap baru; blob >2 MB hanya milik origin lama.
+2. Divergensi kecil direkonsiliasi tanpa force/rebase/reset: `git fetch` (operator menambah commit `4045b9b` — upload tarball `speedtest-cli_official/` via web UI), `git merge origin/master` → `f8b7c57` (bersih, tanpa konflik), lalu `git push origin master` fast-forward `4045b9b..f8b7c57` (PAT via `GIT_ASKPASS`, file kredensial 0600 dihapus setelahnya).
+3. Verifikasi independen dari klon segar: origin/master = `f8b7c57`, 7 dokumen `docs/` terpublikasi (termasuk laporan sesi 3).
+4. **Verifikasi E2E pasca-push** dari client eksternal (evidence `hybrid/lab/evidence/e-l-post-push-verification/`):
+   - T2 stock: dl 544,8 Mbps edge / ul 132,4 Mbps drain VPS / ping 129,6 ms VPS.
+   - T3 hybrid mock domain: dl 452,2 Mbps + ul 778,6 Mbps keduanya EDGE; ping 124,5 ms VPS; guid 18a34eef.
+   - T4 hybrid domain list `--server 74964`: dl 573,0 Mbps + ul 757,5 Mbps EDGE; server tampil `somedigit.net [74964] Surabaya`; ping 129,4 ms VPS; guid 36fb7bf2.
+   - Atribusi byte: eth0 tx VPS hanya 14,7 MB untuk 1,55 GB download client (download tidak transit VPS); `uploadsDrained` hanya bertambah dari 2 run stock; offload hybrid konservatif ~1:617.000; `rateLimited` delta 0; hasil masuk `results.jsonl` (counter results 1→3).
+   - Keamanan tetap: `__up`/`__down` tanpa token → 401 di edge.
+5. Layanan produksi tidak tersentuh: keempat unit Jalur A tetap PID 283954/283944/292073/281912, NRestarts 0; baseline read-only disimpan di `/root/speedtest-hybrid-work/baseline-20261124T042512Z/`.
+
+Catatan: evidence sesi 3 berisi IP egress sandbox client (47.57.x.x, 21.0.9.23 internal) yang sengaja didokumentasikan di README-nya; evidence sesi 4 menyanitasi kolom `client.ip` (47.57.x.x / 8.212.x.x). Temuan lingkungan: baris hosts `127.0.0.1 results.speedtest.net` pada namespace uji tidak efektif di sandbox ini (resolv masih ke fastly) — tanpa dampak karena speedtest-cli sivel tanpa `--share` tidak mengirim hasil ke results.speedtest.net; hasil dikirim ke gateway (sesi tercatat di `results.jsonl`).
+
+Sisa pekerjaan operator tetap: (1) A3 host tester resmi; (2) keputusan T-9 (redirect nPerf port 80); (3) record DNS `A speedtest-mock → 45.126.249.250` bila mock domain ingin aktif di DNS publik (butuh token `Zone › DNS › Edit`).

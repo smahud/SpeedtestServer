@@ -1,0 +1,11 @@
+DNS PROOF (getent dalam namespace uji, dari stderr run):
+45.126.249.250  speedtest-mock.lumajangnetworks.my.id speedtest.lumajangnetworks.my.id
+45.126.249.250  speedtest.somedigit.net speedtest-sby.xl.co.id speedtest.patas.id speedtest.tuxsnet.id ookla.sub.atharva.co.id speedtest.era.net.id speedtest2.lintasmediasolusindo.com v137170.faznet.co.id sby.speedtest.ring.net.id
+2a04:4e42:99::731 dualstack.zd.map.fastly.net results.speedtest.net
+45.126.249.250  speedtest-mock.lumajangnetworks.my.id speedtest.lumajangnetworks.my.id
+
+HOP PROOF:
+latency.txt: http=200 remote_ip=::ffff:45.126.249.250 (VPS)
+random1000x1000.jpg: HTTP/1.1 302 -> Location https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/__down?bytes=1986284&token=<MASKED>
+final: HTTP/2 200 server:cloudflare cf-ray:a5f5b07d8bcc220f-HKG
+__up POST tanpa token: 401; __down tanpa token: 401

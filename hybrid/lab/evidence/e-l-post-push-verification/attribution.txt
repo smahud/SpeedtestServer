@@ -1,0 +1,21 @@
+ATTRIBUTION — verifikasi pasca-push (jendela 4 run speedtest dari sandbox eksternal)
+Baseline diambil SETELAH push git, SEBELUM semua uji. 4 run dalam jendela:
+  run0 = T3 salah-konfigurasi (tanpa env HYBRID_*; berperilaku stock: down edge + up drain VPS) — dipakai sebagai uji stock tambahan
+  T2   = stock speedtest-cli 2.1.3 --mini (down edge via 302, up drain VPS)
+  T3   = hybrid mock domain (down + up edge)
+  T4   = hybrid domain list --server 74964 (down + up edge)
+
+eth0 rx delta = 314,516,053 B (314.5 MB)  — inbound VPS
+eth0 tx delta = 14,655,883 B (14.7 MB)  — outbound VPS (seluruh jendela)
+front deltas: {'latency': 12, 'downRedirects': 160, 'downCapped': 16, 'uploadsDrained': 102, 'miniProbes': 3, 'tokensMinted': 160, 'rateLimited': 0, 'bytesIn': 298344448, 'bytesOut': 1747}
+
+front bytesIn delta = 298,344,448 B vs 2x upload stock drain = 303,038,464 B -> selisih 1.5% (framing TLS) — drain tercatat akurat
+download client total = 4 x 387,730,072 = 1,550,920,288 B; eth0 tx hanya 14,655,883 B -> download TIDAK transit VPS (fisik mustahil: tx << payload)
+uploadsDrained delta = 102 = 2 run stock x 51 POST — T3/T4 tidak menambah (upload hybrid tak pernah menyentuh VPS)
+rateLimited delta = 0 (tidak ada 429 baru)
+
+Payload hybrid (T3+T4) di edge = 1,078,498,608 B; front bytesOut delta seluruh jendela = 1,747 B
+offload konservatif (semua bytesOut diasumsikan milik T3/T4) ~ 1 : 617,343
+
+Hasil gateway results.jsonl: 2 entri baru (guid 18a34eef T3, 36fb7bf2 T4), counter results 1 -> 3.
+Bukti hop: latency.txt 200 dari 45.126.249.250; random1000x1000.jpg -> 302 Location __down Worker -> HTTP/2 200 server:cloudflare cf-ray HKG; __up/__down tanpa token -> 401.
