@@ -68,7 +68,21 @@ HYBRID_RESULTS_DEDUP_MS=3600000   # G-9
 2. `systemctl restart speedtest-hybrid-gateway` (unit lain TIDAK ikut restart)
 3. Verifikasi PID keempat unit produksi tidak berubah: `systemctl show speedtestserver speedtestserver-legacy nperf-server ookla-capture -p MainPID,NRestarts`
 
-## 4. Worker di Cloudflare (MENUNGGU credential — langkah siap pakai)
+## 4. Worker di Cloudflare (TERDEPLOY 24 November 2026 - status produksi)
+
+**Status produksi saat ini:**
+
+- Subdomain workers.dev: `lumajangnetworks` (terdaftar via API 24 Nov 2026).
+- Worker produksi: `speedtest-hybrid-worker` -> https://speedtest-hybrid-worker.lumajangnetworks.workers.dev
+  - Versi: `28e2f5cc-9bd3-4c17-a5d1-cdb26574b567` (v1 `b54b744d` + G-4b `request.body.cancel()` early-413).
+  - Cap: MAX_DOWNLOAD/MAX_UPLOAD 25 MiB; LEGACY_HTTP_ENABLED=false; secret `HYBRID_SHARED_SECRET` terpasang (nilai sama dengan gateway).
+  - Bukti edge nyata: conformance 55/55 (worker uji), token 11/11, hardening 17/17, CPU terukur - `hybrid/lab/evidence/e-j-real-edge/README.md`.
+- Worker uji `speedtest-hybrid-worker-test`: dipakai untuk conformance + pengukuran CPU, **sudah dihapus** (wajib).
+- Gateway VPS: `HYBRID_WORKER_BASE` menunjuk URL produksi di atas.
+- Platform-hold (terverifikasi): respons Worker ditahan sampai body request selesai; "413 early" lying-CL tidak teramati klien - perlindungan via real-body 413 (TEST_OVERCAP_BODY=1).
+- Kuota 24 Nov UTC: produksi 110 request + uji ~94 (dihapus) - jauh di bawah budget uji agent 20.000/hari.
+
+Langkah di bawah tetap berlaku untuk deploy ulang / update versi:
 
 Konfigurasi acuan sudah ada di `hybrid/worker/wrangler.toml` (production) dan `[env.test]` (worker uji, cap 32 MiB, legacy ON, open mode). Urutan Fase C:
 

@@ -20,10 +20,10 @@ Versi 1 (21 November 2026) mengaudit `master@8912b07`. Pada commit itu, `hybrid/
 | Daemon TypeScript (jalur Ookla) | `reverse-engineered/typescript`. Di VPS: source `/opt/SpeedtestServer-src`, runtime `/opt/speedtestserver/dist`, unit `speedtestserver.service`. | Ter-deploy. Deploy terakhir 23 Nov ±23:51 WIB (`f1ed207`). | TCP+UDP 5060/8080 dengan TLS, HTTP, WebSocket, dan NetGauge di port yang sama. Konfigurasi di `/etc/speedtestserver/OoklaServer.properties`. [Slow-upload][slow-upload] |
 | Fallback HTTP legacy | `speedtestserver-legacy.service` | Ter-deploy | Port 80, perhitungan `size=` model PHP. [Observability][obs-fix] |
 | Capture host tester | `ookla-capture.service` | Aktif | tcpdump 80/5060/8080 ke `/var/lib/ookla-capture/`. Evidence daemon di `/var/lib/speedtestserver/evidence.jsonl`. |
-| nPerf (layanan lain milik operator) | `nperf-server.service` | Aktif | 8081/8443 dan redirect 443. **Bukan bagian proyek ini.** Jangan disentuh. |
-| Worker Hybrid | `hybrid/worker` | Hardening Fase B selesai (G-1..G-12 tertutup; 82/82 tes di workerd lokal dan di VPS). **Deploy ke edge nyata MENUNGGU credential Cloudflare yang valid.** | Caps 25 MiB di [vars], legacy default off, Bearer, backpressure, pool murah CPU. [Runbook][hybrid-runbook] |
+| nPerf (layanan lain milik operator) | `nperf-server.service` | Aktif | 8081/8443 dan redirect 443. **Bukan bagian proyek ini.** Jangan disentuh. **Temuan 24 Nov (T-9, lihat 7.1b): setelah restart nPerf (PID 278476 menjadi 292073) muncul rule baru `tcp dport 80 redirect to :8081` - trafik eksternal port 80 kini diterima nPerf, bukan legacy speedtest.** |
+| Worker Hybrid | `hybrid/worker` | Hardening Fase B selesai (G-1..G-12 tertutup; 82/82 tes di workerd lokal dan di VPS). **TERDEPLOY 24 Nov 2026 di edge nyata (Workers Free)**: `speedtest-hybrid-worker.lumajangnetworks.workers.dev`, versi `28e2f5cc`. Conformance 55/55 (worker uji), token 11/11, hardening 17/17, CPU per invokasi terukur (lihat 7.1b). | Caps 25 MiB di [vars], legacy default off, Bearer, backpressure, pool murah CPU. [Runbook][hybrid-runbook] |
 | Gateway Hybrid (control plane VPS) | `hybrid/gateway/src/gateway.mjs` | **TERDEPLOY 24 Nov 2026**: unit `speedtest-hybrid-gateway.service`, TLS wildcard (LoadCredential), port 8790, user non-root | Token `ip='*'` TTL 5 menit, dedup guid, discovery tanpa fallback STS. [Runbook][hybrid-runbook] |
-| Probe client | `hybrid/probe-client/src/hybrid-probe.mjs` | Lulus lab lokal + E2E produksi (gateway VPS) | Mode WS + HTTP `__down`/`__up`, receipt Worker tersimpan di evidence (G-11) |
+| Probe client | `hybrid/probe-client/src/hybrid-probe.mjs` | Lulus lab lokal + E2E produksi (gateway VPS) **+ E2E edge nyata 24 Nov** (offload ~1:27.337, lihat 7.1b) | Mode WS + HTTP `__down`/`__up`, receipt Worker tersimpan di evidence (G-11) |
 
 Status host tester resmi untuk `speedtest.lumajangnetworks.my.id:8080`:
 
@@ -33,6 +33,7 @@ Status host tester resmi untuk `speedtest.lumajangnetworks.my.id:8080`:
 - Hasil clone independen (bukan verdict Ookla):
   - Setelah early answer: gate publik 31/31 dan z.ai 10/10.
   - Clone chatgpt 19/19 terakhir tercatat pukul 20:01 WIB, sebelum deploy observability dan early answer. Run itu memakai `legacy_port` default 80.
+- 24 Nov sesi kedua (08:45-09:20 WIB): gate publik **26/31** - 5 kegagalan upload legacy port 80 semuanya karena redirect nPerf T-9 (respons `Server: nPerf/2.2.11`, body kosong); **semua 26 check port 8080 (jalur tester resmi) lulus**. Clone chatgpt default (legacy 80) 4/19 (port 80 diterima nPerf); varian `--legacy-port 8080` tetap 9/19 (deviasi magic-byte JPEG yang sudah diketahui). Identik sebelum dan sesudah seluruh kerja Jalur B - tidak ada regresi.
 
 [Slow-upload][slow-upload] · [Perbaikan HTTP][http-repair]
 
@@ -45,7 +46,7 @@ Status host tester resmi untuk `speedtest.lumajangnetworks.my.id:8080`:
 | K-3 | Token pilot memakai **HMAC v1** yang sudah ada. Ed25519/JOSE (§3.4) adalah v2 opsional. | Verifikasi lokal tanpa subrequest, sudah ada 7 tes, dan kedua sisi dikelola satu operator. |
 | K-4 | Edge pilot memakai `workers.dev`. Custom Domain (misalnya `bandwidth.lumajangnetworks.my.id`) hanya dipasang bila zona aktif di Cloudflare **dan** operator menyetujuinya. | Pilot tidak perlu mengubah DNS operator. |
 | K-5 | Gateway **tidak** memakai port 80, 443, 5060, 8080, 8081, atau 8443. Gateway mendapat port sendiri dengan TLS dari sertifikat wildcard yang sudah ada dan unit systemd sendiri. | Port 443 dipakai redirect nPerf. Port lain dipakai daemon, legacy, atau nPerf. |
-| K-6 | Transport utama dan ukuran chunk di Workers Free **ditentukan dari pengukuran edge nyata**. Nilai awalnya chunk HTTP 16–25 MiB. | Belum ada data CPU di edge nyata. Batas default kode (~2 GiB per perintah) tidak realistis untuk 10 ms CPU. |
+| K-6 | Transport utama dan ukuran chunk di Workers Free **ditentukan dari pengukuran edge nyata** (24 Nov 2026, 7.1b): **transport utama WS NetGauge**, caps `MAX_*` 25 MiB dipertahankan. Nilai awal sementaranya chunk HTTP 16–25 MiB. | Data terukur 24 Nov (7.1b): WS UPLOAD 25 MiB = 85 ms CPU vs HTTP `__up` 25 MiB = 259 ms; WS DOWNLOAD 32 MiB = 88 ms; HTTP `__down` 25 MiB = 51 ms; semua `success` tanpa 1102 pada 3 repetisi. Batas default kode (~2 GiB per perintah) tidak realistis untuk 10 ms CPU. |
 | K-7 | Tidak ada fallback massal ke VPS. Permukaan HTTP legacy Worker dimatikan di produksi. | Fallback ke VPS membatalkan tujuan offload. Endpoint legacy tanpa token membuka penyalahgunaan kuota. |
 | K-8 | Client MVP adalah probe client Node. UI browser, halaman hasil publik `/r/<id>`, dan receipt bertanda tangan adalah pekerjaan lanjutan. | Perubahan minimal yang tetap lengkap secara fungsional. |
 
@@ -612,6 +613,22 @@ Ini belum merupakan bukti edge nyata untuk Worker proyek ini. [Laporan hybrid][h
 - Gateway ter-deploy di VPS (unit systemd, TLS, port 8790) — lihat B3 di `docs/HYBRID_STATUS.md`.
 - E2E dari client eksternal (gateway produksi VPS + edge workerd lokal): payload 117.440.512 B, delta interface eth0 VPS 67.971 B, gateway app bytes 4.298 B, offload ≈1:28.000, receipts `__up` dan WS ack cocok, replay idempoten. Evidence: `hybrid/lab/evidence/e-i-production-gateway/`.
 - **BLOCKED:** deploy Worker ke edge nyata — Global API Key operator ditolak Cloudflare (9103, semua varian email). Token certbot VPS hanya Zone-DNS. Tidak ada kredensial Workers lain di VPS.
+
+### 7.1b Bukti uji edge nyata - 24 November 2026 (sesi credential Cloudflare)
+
+Credential: API token Cloudflare dengan akses Workers (diberikan operator di sesi ini; tidak pernah ditulis ke repo/disk VPS - hanya via environment proses). Subdomain workers.dev `lumajangnetworks` terdaftar via API oleh agent (prasyarat pilot B1; keputusan dilaporkan ke operator).
+
+**B1 - Worker deploy (DEPLOYED).** Worker uji `speedtest-hybrid-worker-test` versi `c564820b` (open mode, legacy ON, cap 32 MiB): conformance **55/55 PASS** di edge nyata; **dihapus** setelah pengukuran (wajib). Worker produksi `speedtest-hybrid-worker` versi `b54b744d` lalu `28e2f5cc` (G-4b `request.body.cancel()` pada jalur early-413): cap 25 MiB, legacy OFF, secret `HYBRID_SHARED_SECRET` terpasang (nilai sama dengan gateway). URL `https://speedtest-hybrid-worker.lumajangnetworks.workers.dev`; `HYBRID_WORKER_BASE` gateway diarahkan ke sana (restart hanya unit gateway; PID keempat unit produksi tidak berubah).
+
+**B2 - Pengukuran CPU edge nyata (VERIFIED-AUTO).** Battery 14 titik uji via Workers Analytics GraphQL (`workersInvocationsAdaptive`, quantile CPU per detik): cold start 17-23 ms; `__down` 25 MiB 51 ms; `__up` 25 MiB 259 ms; WS DOWNLOAD 32 MiB 88 ms; WS UPLOAD 25 MiB 85 ms. Semua `success`, 0 error, tidak ada `exceededCpu`/1102/1027/429/413. Batas Free diverifikasi ulang 24 Nov 2026 dari dokumentasi resmi (10 ms CPU/invokasi dengan fleksibilitas untuk pelanggaran infrequent, 128 MB/isolate, 100.000 request/hari, body 100 MB). Tabel lengkap: `hybrid/lab/evidence/e-j-real-edge/README.md`.
+
+**B5 - Token & hardening di edge nyata (VERIFIED-AUTO).** `token-tests.mjs` **11/11** (401 tanpa token; valid/query/Bearer/`ip=*` OK; tampered/expired/wrong-secret 401; WS ditolak tanpa token). `free-hardening-tests.mjs` **17/17** (cap `__down` 400; HEAD di MAX; **body nyata MAX+1 menjadi 413**; seluruh permukaan legacy 404). **Temuan platform (diverifikasi 2x, sebelum & sesudah G-4b):** edge Cloudflare (dan workerd) MENAHAN respons Worker sampai body request selesai - "413 early" atas lying-Content-Length tidak teramati dari klien. Perlindungan tetap terbukti lewat body nyata di atas cap menjadi 413 dan cancel-at-cap (G-4). Kontrak ini dienkode ke dalam battery test.
+
+**B4 - E2E edge nyata + atribusi byte (VERIFIED-AUTO).** Client eksternal (sandbox, bukan VPS), mode `both`: payload 117.440.512 B client-ke-edge; kontrol VPS 4.296 B; gateway app 4.404 B (in 885 + out 3.519); delta interface eth0 pada jendela 81 s (batas atas seluruh trafik VPS) 183.393 B; **offload sekitar 1:27.337**; receipts `__up`/WS-ack cocok; hasil dipersist di `results.jsonl` (guid `0b3dd684`); replay dedup OK (G-9). Throughput teramati: DL WS ~600 Mbps, UL WS ~369 Mbps. Evidence: `hybrid/lab/evidence/e-j-real-edge/e-j-e2e-sandbox-both.json` dan `e-j-byte-attribution-sandbox.json`.
+
+**T-9 - Temuan nPerf port 80 (sisi operator; bukan regresi Jalur A maupun B).** Diff nftables baseline 02:03 WIB vs 08:42 WIB menunjukkan rule baru `tcp dport 80 redirect to :8081 comment "nPerfServer"` yang muncul setelah nperf-server restart (PID 278476 menjadi 292073, antara 03:15-08:42 WIB). Akibat: 5 check upload legacy port 80 pada gate publik gagal (respons `Server: nPerf/2.2.11`, body kosong), clone chatgpt default 4/19. **Port 8080 - jalur host tester resmi - tidak terpengaruh** (26/26 check 8080 lulus, termasuk upload 1,98 MB HTTP dan HTTPS). Rule TIDAK disentuh agent (invarian master prompt: jangan sentuh nPerf dan rule redirect-nya). Keputusan mempertahankan/menghapus redirect port 80 milik operator.
+
+**Kuota.** 24 Nov UTC: worker produksi 110 request (0 error, semua `success`) + worker uji ~94 request sebelum dihapus - di bawah 1,5% dari budget uji agent 20.000/hari.
 
 ### 7.2 Errata atas dokumen lain
 

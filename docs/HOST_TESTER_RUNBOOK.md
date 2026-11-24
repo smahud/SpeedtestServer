@@ -56,6 +56,8 @@ Tester resmi HANYA memakai **port 8080**. Urutan check yang terekam:
 | 23 Nov 19:09 UTC | Clone (chatgpt, `--legacy-port 8080`) | 9/19 | Run pertama varian ini. 10 check gambar gagal HANYA pada validasi magic-byte JPEG (`ff d8`) karena daemon TS menyajikan byte pool ASCII. Ukuran/status/Content-Type benar. Tester resmi hanya melakukan HEAD pada gambar → magic byte tidak pernah diamati resmi. Deviasi clone-vs-resmi, bukan kegagalan Jalur A |
 | 23 Nov 19:12–19:18 UTC | CLI resmi Ookla 1.2.0.84 (redirect hosts) | 9/9 server ID Surabaya selesai penuh ke VPS | 74964/61853/48532/55749/62314/66281/65429/68214/73025; contoh 74964: ping 62 ms, DL ~491 Mbps, UL ~141 Mbps, loss 0; semua `persisted:false` (results.speedtest.net diblokir) |
 | 24 Nov (setelah deploy gateway) | Clone (gate publik + chatgpt) | 31/31 dan 19/19 | Setelah deploy gateway :8790 — tidak ada regresi |
+| 24 Nov 01:45-01:52 UTC (sesi 2, baseline) | Clone (gate publik + chatgpt 2 varian) | 26/31; 4/19 (default); 9/19 (8080) | 5 kegagalan upload legacy port 80: respons `Server: nPerf/2.2.11` body kosong - trafik port 80 dialihkan nPerf oleh rule nftables baru `tcp dport 80 redirect to :8081` setelah restart nperf-server (T-9, sisi operator). Port 8080: 26/26 lulus |
+| 24 Nov 02:20-02:25 UTC (sesi 2, final) | Clone (gate publik + chatgpt 2 varian) | 26/31; 4/19 (default); 9/19 (8080) | Identik dengan baseline sesi 2 - seluruh kerja Jalur B (deploy Worker edge nyata, restart gateway) tidak menimbulkan regresi Jalur A |
 
 ## 6. Registrasi/visibilitas di Ookla
 

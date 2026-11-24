@@ -76,3 +76,30 @@ Dokumen ini memuat: (1) temuan awal Fase 0–1, (2) gap analysis per celah G-1..
 | C2 | Commit lokal VPS tanpa push | **IMPLEMENTED** | 16 commit lokal (`5841b1a`..`011c495`), working tree bersih, tidak ada push.
 
 Pekerjaan lanjutan (butuh operator): (1) credential Cloudflare valid — token terbatas template "Edit Cloudflare Workers" + Zone:Read + DNS:Read, atau Global API Key yang benar; (2) deploy Worker uji → ukur CPU → Worker produksi (langkah di HYBRID_DEPLOYMENT_RUNBOOK §4); (3) isi `HYBRID_WORKER_BASE` + restart gateway; (4) ulangi E2E ke edge nyata; (5) jalankan host tester resmi (A3).
+
+## Status akhir sesi 2 (24 November 2026, sesi credential Cloudflare - edge nyata)
+
+Sesi ini menyelesaikan sisa B1/B2/B4/B5 dengan API token Workers dari operator. Basis: 17 commit lokal sesi 1 (origin/master = aac909a, tanpa divergensi).
+
+| # | Kriteria | Status | Bukti |
+|---|---|---|---|
+| A1 | Layanan existing tetap aktif | VERIFIED-AUTO | PID keempat unit tidak berubah sepanjang sesi 1 dan 2: speedtestserver 283954, legacy 283944, nperf 292073, capture 281912. Satu-satunya restart adalah unit Jalur B (speedtest-hybrid-gateway) saat pengisian HYBRID_WORKER_BASE. |
+| A2 | Gate 31/31 + 19/19 dua varian | VERIFIED-AUTO (dengan temuan T-9) | 26/31 dan 4/19 (default) / 9/19 (8080) - identik sebelum & sesudah seluruh kerja sesi ini. 5 kegagalan port 80 + 15 kegagalan clone default SEMUANYA karena redirect nPerf port 80 (T-9, sisi operator; spec 7.1b). Port 8080 (jalur tester resmi): 26/26 lulus. |
+| A3 | Host tester resmi | NOT TESTED | Operator belum menjalankan ulang. Sebelum run resmi tidak ada prasyarat dari Jalur B; tester resmi hanya memakai 8080 sehingga tidak terdampak T-9. |
+| B1 | Worker deploy Workers Free | **DEPLOYED** | speedtest-hybrid-worker.lumajangnetworks.workers.dev versi 28e2f5cc (legacy OFF, cap 25 MiB, secret terpasang). Worker uji c564820b untuk conformance 55/55 lalu DIHAPUS. Subdomain workers.dev lumajangnetworks terdaftar via API. |
+| B2 | Pengukuran CPU edge nyata | **VERIFIED-AUTO** | e-j-real-edge: 14 titik uji, semua success tanpa exceededCpu/1102. Keputusan: transport utama WS NetGauge; MAX_* tetap 25 MiB. Batas Free diverifikasi 24 Nov 2026. |
+| B3 | Gateway systemd + TLS | DEPLOYED (sesi 1) | Tidak berubah; HYBRID_WORKER_BASE kini menunjuk Worker produksi (speedtest-hybrid-worker.lumajangnetworks.workers.dev). |
+| B4 | E2E eksternal + atribusi byte | **VERIFIED-AUTO (edge nyata)** | Payload 117.440.512 B client<->edge; kontrol VPS 4.296 B; gateway app 4.404 B; delta interface (batas atas) 183.393 B; offload ~1:27.337; receipts cocok; replay dedup OK (guid 0b3dd684). |
+| B5 | Uji negatif token di edge | **VERIFIED-AUTO** | token-tests 11/11 + free-hardening 17/17 di edge produksi (termasuk body nyata MAX+1 -> 413). Temuan platform-hold dienkode ke battery. |
+| C1 | Dokumentasi | IMPLEMENTED | Spec 7.1b + 0.1/K-6 diperbarui; runbook 4 diisi kondisi terdeploy; HOST_TESTER_RUNBOOK riwayat + T-9; e-j-real-edge README. |
+| C2 | Commit lokal tanpa push | IMPLEMENTED | Commit topik sesi ini ditambahkan (lihat git log); tidak ada push. |
+
+Temuan baru sesi 2:
+- T-9 (nPerf port 80 redirect) - lihat spec 7.1b. Keputusan di tangan operator; agent tidak boleh menyentuh (invarian).
+- Platform-hold: edge Cloudflare menahan respons Worker sampai body request selesai; "413 early" atas lying-CL tidak teramati klien. Perlindungan via real-body 413 + cancel-at-cap terbukti. G-4b (request.body.cancel()) dipertahankan.
+- Egress VPS ke Cloudflare: 45.126.249.131 (dipakai sebagai TOKEN_TEST_IP).
+
+Sisa pekerjaan untuk operator:
+1. A3: jalankan host tester resmi (speedtest.net/host-tester) untuk speedtest.lumajangnetworks.my.id:8080; kirim hasil + jam mulai ke agent untuk analisis capture (Fase 7).
+2. Putuskan T-9: pertahankan redirect nPerf port 80 (nPerf mengambil port 80) atau kembalikan (legacy speedtest port 80 pulih). Bukan wewenang agent.
+3. Push ke GitHub bila ingin menerbitkan commit lokal (dilakukan operator/agent lain, sesuai workflow git master prompt).
