@@ -85,3 +85,15 @@ Point DNS: `speed.example.net` → the Worker (zone route), `origin.example.net`
 
 Not affiliated with Ookla. "Speedtest"/"OoklaServer" are Ookla marks; this is
 an independent interoperability research project (see the root README).
+| **Speedtest front** (`hybrid/gateway/src/front.mjs`, sesi 3) | plane ping legacy (`latency.txt`) + offload download (302 → `__down`) + kompat klien stock (`upload.php` drain) di gateway :8790; klien hybrid `hybrid/probe-client/speedtest-cli-hybrid.py` (engine ukur speedtest-cli stock) mengarahkan upload langsung ke `__up` edge |
+
+### speedtest front + klien speedtest-cli (sesi 3, 24 Nov 2026)
+
+```bash
+# stock: download via edge, upload jalur VPS (batas urllib)
+speedtest-cli --json --mini https://speedtest.lumajangnetworks.my.id:8790
+
+# hybrid penuh (mock domain via /etc/hosts; domain list operator via
+# HYBRID_SERVER_LIST_FILE + --server <ID>): download+upload di edge,
+# ping/seleksi di VPS. Bukti & angka: docs/SPEEDTEST_FRONT_TEST_REPORT_2026-11-24.md
+```

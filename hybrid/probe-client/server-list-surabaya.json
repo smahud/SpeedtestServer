@@ -1,0 +1,11 @@
+[
+  {"id": 74964, "sponsor": "somedigit.net", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "speedtest.somedigit.net", "ip": "103.134.66.6", "lat": "-7.2492", "lon": "112.7508"},
+  {"id": 61853, "sponsor": "PT XLSMART (XL)", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "speedtest-sby.xl.co.id", "ip": "2400:9800:b010:120::4", "lat": "-7.2492", "lon": "112.7508"},
+  {"id": 62314, "sponsor": "PT. Pratama Hasta Utama", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "speedtest.patas.id", "ip": "103.1.51.67", "lat": "-7.2492", "lon": "112.7508"},
+  {"id": 66281, "sponsor": "PT. Tuxsindo Cyber Networks", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "speedtest.tuxsnet.id", "ip": "160.25.58.7", "lat": "-7.2492", "lon": "112.7508"},
+  {"id": 65429, "sponsor": "Atharva", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "ookla.sub.atharva.co.id", "ip": "2001:df1:7340:396::83", "lat": "-7.2492", "lon": "112.7508"},
+  {"id": 68214, "sponsor": "PT. ERA NETWORK INDONESIA", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "speedtest.era.net.id", "ip": "157.20.239.243", "lat": "-7.2492", "lon": "112.7508"},
+  {"id": 73025, "sponsor": "LINTAS MEDIA SOLUSINDO", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "speedtest2.lintasmediasolusindo.com", "ip": "2001:df4:cc0:3:20c:29ff:fe8b:c0b2", "lat": "-7.2492", "lon": "112.7508"},
+  {"id": 48532, "sponsor": "Faznet", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "v137170.faznet.co.id", "ip": "103.111.137.170", "lat": "-7.2492", "lon": "112.7508"},
+  {"id": 55749, "sponsor": "RingNet", "name": "Surabaya", "country": "Indonesia", "cc": "ID", "host": "sby.speedtest.ring.net.id", "ip": "2401:13e0:2:1::2", "lat": "-7.2492", "lon": "112.7508"}
+]
