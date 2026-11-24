@@ -40,6 +40,7 @@ import http from 'node:http';
 import https from 'node:https';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import { createFront } from './front.mjs';
 
 const PORT = Number(process.env.HYBRID_GATEWAY_PORT || 8090);
 const BIND = process.env.HYBRID_GATEWAY_BIND || '127.0.0.1';
@@ -54,6 +55,11 @@ const TOKEN_BIND_IP = String(process.env.HYBRID_TOKEN_BIND_IP || '') === 'true';
 const DISCOVERY_FALLBACK = String(process.env.HYBRID_DISCOVERY_FALLBACK || '') === 'true';
 const RESULTS_FILE = process.env.HYBRID_RESULTS_FILE || '';
 const RESULTS_DEDUP_MS = Number(process.env.HYBRID_RESULTS_DEDUP_MS || 3600000);
+
+// --- speedtest front (legacy HTTP surface with edge offload) ---
+const FRONT_ENABLED = String(process.env.HYBRID_FRONT_ENABLED || '') === 'true';
+const FRONT_RATE_LIMIT_MPM = Number(process.env.HYBRID_FRONT_RATE_LIMIT_MPM ?? 90);
+const FRONT_MAX_DOWN_BYTES = Number(process.env.HYBRID_FRONT_MAX_DOWN_BYTES ?? 26214400);
 
 // Evidence counters — how many control-plane bytes the VPS actually served.
 const counters = { servers: 0, sessions: 0, results: 0, pings: 0, bytesIn: 0, bytesOut: 0 };
@@ -164,10 +170,28 @@ function rememberResult(guid, response) {
   }
 }
 
+// The front router (only when enabled). Shares mintToken/counters/logging.
+const front = FRONT_ENABLED
+  ? createFront({ mintToken, log, counters, workerBase: WORKER_BASE, rateLimitMpm: FRONT_RATE_LIMIT_MPM, maxDownBytes: FRONT_MAX_DOWN_BYTES })
+  : null;
+
 const requestHandler = async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let ip = req.socket.remoteAddress || '127.0.0.1';
   if (ip.startsWith('::ffff:')) ip = ip.slice(7); // normalize IPv4-mapped IPv6
+
+  // The speedtest front MUST run before any body buffering: it answers
+  // redirects/drains on its own and never buffers payload in memory.
+  if (front) {
+    let handled = false;
+    try {
+      handled = front(req, res, url, ip);
+    } catch (e) {
+      log('front_error', { error: String(e).slice(0, 200) });
+    }
+    if (handled) return;
+  }
+
   const body = ['POST', 'PUT'].includes(req.method) ? await readBody(req) : null;
   if (body) counters.bytesIn += body.length;
   const path = url.pathname.replace(/\/+$/, '') || '/';
@@ -232,6 +256,23 @@ const requestHandler = async (req, res) => {
       instanceId,
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
       counters,
+      front: front
+        ? {
+            enabled: true,
+            rateLimitMpm: FRONT_RATE_LIMIT_MPM,
+            counters: {
+              latency: counters.frontLatency || 0,
+              downRedirects: counters.frontDownRedirects || 0,
+              downCapped: counters.frontDownCapped || 0,
+              uploadsDrained: counters.frontUploads || 0,
+              miniProbes: counters.frontMiniProbe || 0,
+              tokensMinted: counters.frontTokensMinted || 0,
+              rateLimited: counters.frontRateLimited || 0,
+              bytesIn: counters.frontBytesIn || 0,
+              bytesOut: counters.frontBytesOut || 0,
+            },
+          }
+        : { enabled: false },
       config: { workerBase: WORKER_BASE, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: TTL_MS, tokenBindIp: TOKEN_BIND_IP, discoveryFallback: DISCOVERY_FALLBACK, tls: Boolean(TLS_CERT), resultsDedupMs: RESULTS_DEDUP_MS, secretConfigured: Boolean(SECRET) },
     });
   }
@@ -258,6 +299,8 @@ listener.listen(PORT, BIND, () => {
     port: PORT,
     bind: BIND,
     tls: Boolean(TLS_CERT),
+    front: FRONT_ENABLED,
+    frontRateLimitMpm: FRONT_RATE_LIMIT_MPM,
     workerBase: WORKER_BASE,
     vpsBase: VPS_BASE,
     stsBase: STS_BASE,
@@ -267,3 +310,4 @@ listener.listen(PORT, BIND, () => {
     secretConfigured: Boolean(SECRET),
   }));
 });
+
