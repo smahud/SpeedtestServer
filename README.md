@@ -52,6 +52,124 @@ and completes 26 GB runs on the VPS lane instead. Full report:
 claims register: [`hybrid/reports/WORKERS_LIMITS.md`](hybrid/reports/WORKERS_LIMITS.md),
 quickstart: [`hybrid/README.md`](hybrid/README.md).
 
+## Hybrid mode quickstart — run with or without the Cloudflare Worker
+
+The project runs **with or without** a Cloudflare Worker. The default is
+native mode (VPS only, no Cloudflare dependency). Adding the Worker switches
+web/custom-client traffic to hybrid mode: heavy download/upload payload is
+generated and drained at the Cloudflare edge while the VPS keeps only the
+light control plane. Status log: [`docs/HYBRID_STATUS.md`](docs/HYBRID_STATUS.md);
+architecture detail: [`hybrid/README.md`](hybrid/README.md). The subsection
+above is the research summary; this section is the operator quickstart.
+
+### The two operating modes
+
+| Aspect | NATIVE (no Worker) | HYBRID (with Worker) |
+|---|---|---|
+| VPS runs | `speedtestserver.service` — the OoklaServer-compatible daemon (TCP+UDP 5060/8080; TLS/HTTP/WebSocket/NetGauge multiplexed on one port) | the daemon, plus the light plane: `speedtest-hybrid-gateway.service` on port 8790 (TLS with the existing wildcard cert) — server selection, `latency.txt` ping, token minting, session/results accounting |
+| Heavy DL/UL payload | at the VPS | at the Cloudflare Worker `speedtest-hybrid-worker`: `GET /__down?bytes=N` (download streaming), `POST /__up` (upload drain), NetGauge over WSS (`/ws`), plus HTTP legacy surface mirrors |
+| Official Ookla CLI | the only mode the official CLI binary can use — its measurement protocol is raw TCP NetGauge on the host:port from the Ookla server list, so the payload always transits the VPS. Verified: 9/9 official-CLI runs exit 0 ([`docs/OFFICIAL_CLI_MOCK_CAMPAIGN_2026-11-24.md`](docs/OFFICIAL_CLI_MOCK_CAMPAIGN_2026-11-24.md)) | unchanged — the CLI keeps the VPS lane; web/custom clients get the edge |
+| Measured offload | — | ~1:1000+ VPS control bytes vs edge payload bytes ([`hybrid/lab/evidence/e-k-speedtest-front/`](hybrid/lab/evidence/e-k-speedtest-front/), [`e-l-post-push-verification/`](hybrid/lab/evidence/e-l-post-push-verification/), [`e-m-official-cli-campaign/`](hybrid/lab/evidence/e-m-official-cli-campaign/)) |
+
+### Install summary
+
+- **Native (no Worker):** follow sections 5 and 6 — `install.sh` (Debian 13 +
+  systemd) or manual install — starting from
+  [`config/OoklaServer.properties.template`](config/OoklaServer.properties.template).
+  No Cloudflare account is involved.
+- **Hybrid control plane on the VPS:** follow
+  [`docs/HYBRID_DEPLOYMENT_RUNBOOK.md`](docs/HYBRID_DEPLOYMENT_RUNBOOK.md) —
+  gateway unit `speedtest-hybrid-gateway.service`, env file
+  `/etc/speedtest-hybrid/gateway.env` holding `HYBRID_SHARED_SECRET`,
+  speedtest front enabled via `HYBRID_FRONT_ENABLED=true`, listening on
+  port 8790 (TLS).
+
+### Creating the Cloudflare Worker
+
+Prerequisites: a Cloudflare account (the Free plan works), Node.js + wrangler
+(`npx wrangler`), an API token with Workers edit permission (Account >
+Workers Scripts: Edit; the "Edit Cloudflare Workers" template), and the
+account ID.
+
+1. `cd hybrid/worker`
+2. Set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the shell —
+   never commit them to the repository.
+3. Register a workers.dev subdomain if the account has none
+   (`npx wrangler whoami`, or the dashboard).
+4. `npx wrangler secret put HYBRID_SHARED_SECRET` — the value must equal
+   the VPS gateway's `HYBRID_SHARED_SECRET`.
+5. `npx wrangler deploy` — uses
+   [`hybrid/worker/wrangler.toml`](hybrid/worker/wrangler.toml): worker name
+   `speedtest-hybrid-worker`, `workers_dev = true`, `preview_urls = false`,
+   vars `MAX_DOWNLOAD_BYTES`/`MAX_UPLOAD_BYTES` (25 MiB caps for the Free
+   plan), `LEGACY_HTTP_ENABLED=false` by default.
+6. Optional first-time conformance test worker (`[env.test]`: legacy surface
+   on, 32 MiB cap): `npx wrangler deploy --env test`; run
+   `node test/conformance.mjs https://speedtest-hybrid-worker-test.<subdomain>.workers.dev`;
+   then **delete it**: `npx wrangler delete --env test` (mandatory — an open
+   test worker can burn account quota).
+7. Verify: `curl` the `/__down` endpoint without a token → expect `401`;
+   with a gateway-minted token → `200` and streamed bytes.
+8. Point the VPS gateway at the worker: set
+   `HYBRID_WORKER_BASE=https://speedtest-hybrid-worker.<subdomain>.workers.dev`
+   in `/etc/speedtest-hybrid/gateway.env`, then
+   `systemctl restart speedtest-hybrid-gateway`.
+9. Dashboard alternative (no wrangler): create a Worker in the Cloudflare
+   dashboard, paste/upload the built worker bundle from `hybrid/worker`
+   (wrangler build output), set the same vars and secret, and note the URL.
+   Keep this path for exceptions — wrangler is the reproducible one.
+
+Quota note: Workers Free = 100,000 requests/day and 10 ms CPU per
+invocation; keep the test worker deleted whenever it is not in use.
+
+### Running a speedtest
+
+- **Official Ookla CLI — native mode only:** `speedtest --server-id=<ID>`
+  (or `--host`). Mock-DNS example (test lab only): map the server hostname
+  to the VPS IP in `/etc/hosts` and block `results.speedtest.net` when
+  testing forced endpoints. Reference:
+  [`docs/OFFICIAL_CLI_MOCK_CAMPAIGN_2026-11-24.md`](docs/OFFICIAL_CLI_MOCK_CAMPAIGN_2026-11-24.md).
+- **HTTP speedtest clients (sivel `speedtest-cli` family), stock client:**
+  `speedtest-cli --json --mini https://<front-host>:8790` — download is
+  already offloaded via a 302; upload drains at the VPS because urllib
+  cannot follow redirects with a request body.
+- **Hybrid-aware client (full offload, DL + UL):**
+
+  ```bash
+  HYBRID_GATEWAY_BASE=https://<front-host>:8790 \
+  HYBRID_WORKER_BASE=https://speedtest-hybrid-worker.<subdomain>.workers.dev \
+  HYBRID_FRONT_BASE=https://<front-host>:8790 \
+  HYBRID_SERVER_LIST_FILE=hybrid/probe-client/server-list-surabaya.json \
+  python3 hybrid/probe-client/speedtest-cli-hybrid.py --json --server <ID>
+  ```
+
+  The engine is 100% stock sivel `speedtest-cli`; the wrapper
+  ([`hybrid/probe-client/speedtest-cli-hybrid.py`](hybrid/probe-client/speedtest-cli-hybrid.py))
+  adds only transport routing hooks.
+- **Custom clients:** gateway API `/api/servers`, `/api/sessions` (token
+  mint), `/api/ping`, `/api/results`; worker endpoints
+  `/__down?bytes=N&token=...` and `POST /__up` with
+  `Authorization: Bearer <token>`.
+
+### Architecture in one picture
+
+```
+official Ookla CLI ----------------> VPS daemon :8080/:5060
+                                     (raw TCP NetGauge + UDP loss;
+                                      payload always at the VPS)
+
+web / custom clients --> VPS front :8790 (server list, latency.txt ping,
+                                        token mint -- light plane only)
+                          |
+                          +-- 302 redirect (stock HTTP clients: download)
+                          +-- Bearer token, direct call (hybrid-aware
+                              clients: download + upload)
+                                      |
+                                      v
+                     Cloudflare Worker speedtest-hybrid-worker
+                     /__down?bytes=N - POST /__up - /ws (NetGauge over WSS)
+                     (payload generated/drained at the edge)
+```
 
 ## 2. Relationship to the official OoklaServer
 
