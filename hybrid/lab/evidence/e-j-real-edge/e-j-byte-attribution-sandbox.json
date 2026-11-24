@@ -1,0 +1,79 @@
+{
+  "evidence": "e-j-real-edge — E2E byte attribution (kriteria B4, edge nyata)",
+  "date": "2026-11-24",
+  "window": {
+    "start": "2026-11-24T02:11:37Z",
+    "end": "2026-11-24T02:12:58Z",
+    "duration_s": 81
+  },
+  "client": "sandbox eksternal z.ai (bukan VPS) — egress berbeda dari VPS",
+  "gateway": "https://speedtest.lumajangnetworks.my.id:8790 (produksi, TLS wildcard LE)",
+  "worker": "https://speedtest-hybrid-worker.lumajangnetworks.workers.dev (produksi, versi 28e2f5cc-9bd3-4c17-a5d1-cdb26574b567)",
+  "c0_interface": {
+    "eth0_rx": 4820889013,
+    "eth0_tx": 8501773397
+  },
+  "c1_interface": {
+    "eth0_rx": 4821008488,
+    "eth0_tx": 8501837315
+  },
+  "c0_gateway_counters": {
+    "bytesIn": 0,
+    "bytesOut": 1901,
+    "sessions": 0,
+    "results": 0,
+    "pings": 0
+  },
+  "c1_gateway_counters": {
+    "bytesIn": 885,
+    "bytesOut": 5420,
+    "sessions": 1,
+    "results": 2,
+    "pings": 10
+  },
+  "deltas": {
+    "eth0_rx_bytes": 119475,
+    "eth0_tx_bytes": 63918,
+    "eth0_total_upper_bound_all_vps_traffic": 183393,
+    "gateway_app_bytes_in": 885,
+    "gateway_app_bytes_out": 3519,
+    "gateway_app_total": 4404
+  },
+  "client_accounting": {
+    "payloadBytes_edge": 117440512,
+    "vpsBytes_control": 4296,
+    "phases": {
+      "download-edge-ws": "48 MiB (6 conns)",
+      "upload-edge-ws": "8 MiB (4 conns)",
+      "download-edge-http": "48 MiB (3 chunks)",
+      "upload-edge-http": "8 MiB (1 chunk)"
+    }
+  },
+  "ratios": {
+    "payload_vs_gateway_app_control": "1:26670",
+    "payload_vs_probe_vpsbytes": "1:27337",
+    "payload_vs_interface_upper_bound": "1:640"
+  },
+  "interpretation": "Delta interface eth0 pada jendela 81 s hanyalah 183.393 B (batas atas — mencakup SEMUA trafik VPS: sesi MCP agent, Ookla/nPerf produksi, dst.), sedangkan payload 117.440.512 B mengalir client<->edge Cloudflare. Trafik kontrol Jalur B di gateway eksak 4.404 B. Hasil sesi dipersist di /var/lib/speedtest-hybrid/results.jsonl (guid 0b3dd684-9f1a-495c-994b-f96844759164, replay dedup OK).",
+  "worker_invocations_today_utc": {
+    "speedtest-hybrid-worker": {
+      "requests": 110,
+      "errors": 0,
+      "statuses": [
+        "success"
+      ]
+    },
+    "speedtest-hybrid-worker-test": {
+      "note": "dihapus setelah pengukuran; ~94 request hari ini sebelum dihapus (bucket __unknown__ di analytics)",
+      "agent_test_budget": 20000
+    }
+  },
+  "workers_free_limits_verified": {
+    "source": "developers.cloudflare.com/workers/platform/limits/",
+    "date": "2026-11-24",
+    "cpu_ms_per_invocation": 10,
+    "memory_mb": 128,
+    "requests_per_day": 100000,
+    "body_mb": 100
+  }
+}

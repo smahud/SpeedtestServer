@@ -1,0 +1,1050 @@
+{
+  "meta": {
+    "measuredAt": "2026-11-24T01:57:50.889Z",
+    "base": "https://speedtest-hybrid-worker-test.lumajangnetworks.workers.dev",
+    "script": "speedtest-hybrid-worker-test",
+    "coloHint": "client VPS 45.126.249.250 (SIN edge)",
+    "analyticsSource": "Workers Analytics GraphQL workersInvocationsAdaptive",
+    "note": "cpuP50/P99 in microseconds, per-second quantiles aggregated per window (max taken)"
+  },
+  "tests": [
+    {
+      "label": "cold-small",
+      "start": "2026-11-24T01:57:50.889Z",
+      "end": "2026-11-24T01:59:31.209Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 191,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 118,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 120,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 3,
+          "wallMs": 118,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 4,
+          "wallMs": 122,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 5,
+          "wallMs": 121,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 6,
+          "wallMs": 109,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 7,
+          "wallMs": 129,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 8,
+          "wallMs": 119,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        },
+        {
+          "i": 9,
+          "wallMs": 134,
+          "status": 200,
+          "bytes": 1000,
+          "ok": true
+        }
+      ],
+      "clientOk": 10,
+      "clientTotal": 10,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:57:51Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 1675,
+          "cpuP99us": 1675
+        },
+        {
+          "second": "2026-11-24T01:58:02Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 2272,
+          "cpuP99us": 2272
+        },
+        {
+          "second": "2026-11-24T01:58:13Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 472,
+          "cpuP99us": 472
+        },
+        {
+          "second": "2026-11-24T01:58:24Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 2430,
+          "cpuP99us": 2430
+        },
+        {
+          "second": "2026-11-24T01:58:35Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 764,
+          "cpuP99us": 764
+        },
+        {
+          "second": "2026-11-24T01:58:46Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 397,
+          "cpuP99us": 397
+        },
+        {
+          "second": "2026-11-24T01:58:57Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 2199,
+          "cpuP99us": 2199
+        },
+        {
+          "second": "2026-11-24T01:59:08Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 2412,
+          "cpuP99us": 2412
+        },
+        {
+          "second": "2026-11-24T01:59:20Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 387,
+          "cpuP99us": 387
+        },
+        {
+          "second": "2026-11-24T01:59:31Z",
+          "status": "success",
+          "requests": 3,
+          "errors": 0,
+          "cpuP50us": 16883,
+          "cpuP99us": 23424
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 12,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 16883,
+        "cpuP99us_max": 23424
+      }
+    },
+    {
+      "label": "http-down-1mib",
+      "start": "2026-11-24T01:59:31.209Z",
+      "end": "2026-11-24T01:59:33.490Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 259,
+          "status": 200,
+          "bytes": 1048576,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 212,
+          "status": 200,
+          "bytes": 1048576,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 67,
+          "status": 200,
+          "bytes": 1048576,
+          "ok": true
+        },
+        {
+          "i": 3,
+          "wallMs": 87,
+          "status": 200,
+          "bytes": 1048576,
+          "ok": true
+        },
+        {
+          "i": 4,
+          "wallMs": 56,
+          "status": 200,
+          "bytes": 1048576,
+          "ok": true
+        }
+      ],
+      "clientOk": 5,
+      "clientTotal": 5,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:31Z",
+          "status": "success",
+          "requests": 3,
+          "errors": 0,
+          "cpuP50us": 16883,
+          "cpuP99us": 23424
+        },
+        {
+          "second": "2026-11-24T01:59:32Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 2307,
+          "cpuP99us": 2784
+        },
+        {
+          "second": "2026-11-24T01:59:33Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 1909,
+          "cpuP99us": 1909
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 6,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 16883,
+        "cpuP99us_max": 23424
+      }
+    },
+    {
+      "label": "http-down-4mib",
+      "start": "2026-11-24T01:59:33.491Z",
+      "end": "2026-11-24T01:59:35.736Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 116,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 100,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 169,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 3,
+          "wallMs": 142,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 4,
+          "wallMs": 116,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        }
+      ],
+      "clientOk": 5,
+      "clientTotal": 5,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:33Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 1909,
+          "cpuP99us": 1909
+        },
+        {
+          "second": "2026-11-24T01:59:34Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 6347,
+          "cpuP99us": 9965
+        },
+        {
+          "second": "2026-11-24T01:59:35Z",
+          "status": "success",
+          "requests": 3,
+          "errors": 0,
+          "cpuP50us": 7151,
+          "cpuP99us": 19660
+        },
+        {
+          "second": "2026-11-24T01:59:36Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 28302,
+          "cpuP99us": 28302
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 7,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 28302,
+        "cpuP99us_max": 28302
+      }
+    },
+    {
+      "label": "http-down-16mib",
+      "start": "2026-11-24T01:59:35.736Z",
+      "end": "2026-11-24T01:59:37.606Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 384,
+          "status": 200,
+          "bytes": 16777216,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 393,
+          "status": 200,
+          "bytes": 16777216,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 291,
+          "status": 200,
+          "bytes": 16777216,
+          "ok": true
+        }
+      ],
+      "clientOk": 3,
+      "clientTotal": 3,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:36Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 28302,
+          "cpuP99us": 28302
+        },
+        {
+          "second": "2026-11-24T01:59:37Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 24535,
+          "cpuP99us": 35141
+        },
+        {
+          "second": "2026-11-24T01:59:38Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 51128,
+          "cpuP99us": 51128
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 4,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 51128,
+        "cpuP99us_max": 51128
+      }
+    },
+    {
+      "label": "http-down-25mib",
+      "start": "2026-11-24T01:59:37.606Z",
+      "end": "2026-11-24T01:59:39.854Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 742,
+          "status": 200,
+          "bytes": 26214400,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 354,
+          "status": 200,
+          "bytes": 26214400,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 353,
+          "status": 200,
+          "bytes": 26214400,
+          "ok": true
+        }
+      ],
+      "clientOk": 3,
+      "clientTotal": 3,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:38Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 51128,
+          "cpuP99us": 51128
+        },
+        {
+          "second": "2026-11-24T01:59:39Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 49545,
+          "cpuP99us": 49545
+        },
+        {
+          "second": "2026-11-24T01:59:40Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 24868,
+          "cpuP99us": 34027
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 4,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 51128,
+        "cpuP99us_max": 51128
+      }
+    },
+    {
+      "label": "http-up-4mib",
+      "start": "2026-11-24T01:59:39.854Z",
+      "end": "2026-11-24T01:59:41.640Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 371,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 428,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 186,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        }
+      ],
+      "clientOk": 3,
+      "clientTotal": 3,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:40Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 24868,
+          "cpuP99us": 34027
+        },
+        {
+          "second": "2026-11-24T01:59:41Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 36194,
+          "cpuP99us": 36194
+        },
+        {
+          "second": "2026-11-24T01:59:42Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 74258,
+          "cpuP99us": 74258
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 4,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 74258,
+        "cpuP99us_max": 74258
+      }
+    },
+    {
+      "label": "http-up-16mib",
+      "start": "2026-11-24T01:59:41.640Z",
+      "end": "2026-11-24T01:59:45.161Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 749,
+          "status": 200,
+          "bytes": 16777216,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 1029,
+          "status": 200,
+          "bytes": 16777216,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 941,
+          "status": 200,
+          "bytes": 16777216,
+          "ok": true
+        }
+      ],
+      "clientOk": 3,
+      "clientTotal": 3,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:42Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 74258,
+          "cpuP99us": 74258
+        },
+        {
+          "second": "2026-11-24T01:59:43Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 138522,
+          "cpuP99us": 138522
+        },
+        {
+          "second": "2026-11-24T01:59:44Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 123448,
+          "cpuP99us": 123448
+        },
+        {
+          "second": "2026-11-24T01:59:45Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 160041,
+          "cpuP99us": 160041
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 4,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 160041,
+        "cpuP99us_max": 160041
+      }
+    },
+    {
+      "label": "http-up-25mib",
+      "start": "2026-11-24T01:59:45.161Z",
+      "end": "2026-11-24T01:59:49.743Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 929,
+          "status": 200,
+          "bytes": 26214400,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 1497,
+          "status": 200,
+          "bytes": 26214400,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 1354,
+          "status": 200,
+          "bytes": 26214400,
+          "ok": true
+        }
+      ],
+      "clientOk": 3,
+      "clientTotal": 3,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:45Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 160041,
+          "cpuP99us": 160041
+        },
+        {
+          "second": "2026-11-24T01:59:47Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 258962,
+          "cpuP99us": 258962
+        },
+        {
+          "second": "2026-11-24T01:59:48Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 242607,
+          "cpuP99us": 242607
+        },
+        {
+          "second": "2026-11-24T01:59:49Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 9465,
+          "cpuP99us": 9465
+        },
+        {
+          "second": "2026-11-24T01:59:50Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 10698,
+          "cpuP99us": 10698
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 5,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 258962,
+        "cpuP99us_max": 258962
+      }
+    },
+    {
+      "label": "ws-down-4mib",
+      "start": "2026-11-24T01:59:49.743Z",
+      "end": "2026-11-24T01:59:51.543Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 249,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 349,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 401,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        }
+      ],
+      "clientOk": 3,
+      "clientTotal": 3,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:50Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 10698,
+          "cpuP99us": 10698
+        },
+        {
+          "second": "2026-11-24T01:59:51Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 20959,
+          "cpuP99us": 22126
+        },
+        {
+          "second": "2026-11-24T01:59:52Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 20283,
+          "cpuP99us": 20283
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 4,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 20959,
+        "cpuP99us_max": 22126
+      }
+    },
+    {
+      "label": "ws-down-8mib",
+      "start": "2026-11-24T01:59:51.543Z",
+      "end": "2026-11-24T01:59:54.125Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 528,
+          "status": 200,
+          "bytes": 8388608,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 543,
+          "status": 200,
+          "bytes": 8388608,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 709,
+          "status": 200,
+          "bytes": 8388608,
+          "ok": true
+        }
+      ],
+      "clientOk": 3,
+      "clientTotal": 3,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:52Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 20283,
+          "cpuP99us": 20283
+        },
+        {
+          "second": "2026-11-24T01:59:53Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 64357,
+          "cpuP99us": 64357
+        },
+        {
+          "second": "2026-11-24T01:59:54Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 30306,
+          "cpuP99us": 30306
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 3,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 64357,
+        "cpuP99us_max": 64357
+      }
+    },
+    {
+      "label": "ws-down-32mib",
+      "start": "2026-11-24T01:59:54.125Z",
+      "end": "2026-11-24T01:59:57.077Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 1202,
+          "status": 200,
+          "bytes": 33554432,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 1350,
+          "status": 200,
+          "bytes": 33554432,
+          "ok": true
+        }
+      ],
+      "clientOk": 2,
+      "clientTotal": 2,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:54Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 30306,
+          "cpuP99us": 30306
+        },
+        {
+          "second": "2026-11-24T01:59:55Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 88131,
+          "cpuP99us": 88131
+        },
+        {
+          "second": "2026-11-24T01:59:57Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 7601,
+          "cpuP99us": 12904
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 4,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 88131,
+        "cpuP99us_max": 88131
+      }
+    },
+    {
+      "label": "ws-up-4mib",
+      "start": "2026-11-24T01:59:57.077Z",
+      "end": "2026-11-24T01:59:59.119Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 416,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 405,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        },
+        {
+          "i": 2,
+          "wallMs": 421,
+          "status": 200,
+          "bytes": 4194304,
+          "ok": true
+        }
+      ],
+      "clientOk": 3,
+      "clientTotal": 3,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:57Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 7601,
+          "cpuP99us": 12904
+        },
+        {
+          "second": "2026-11-24T01:59:58Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 14188,
+          "cpuP99us": 14188
+        },
+        {
+          "second": "2026-11-24T01:59:59Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 51070,
+          "cpuP99us": 51070
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 4,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 51070,
+        "cpuP99us_max": 51070
+      }
+    },
+    {
+      "label": "ws-up-16mib",
+      "start": "2026-11-24T01:59:59.119Z",
+      "end": "2026-11-24T02:00:00.741Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 624,
+          "status": 200,
+          "bytes": 16777216,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 597,
+          "status": 200,
+          "bytes": 16777216,
+          "ok": true
+        }
+      ],
+      "clientOk": 2,
+      "clientTotal": 2,
+      "analytics": [
+        {
+          "second": "2026-11-24T01:59:59Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 51070,
+          "cpuP99us": 51070
+        },
+        {
+          "second": "2026-11-24T02:00:00Z",
+          "status": "success",
+          "requests": 2,
+          "errors": 0,
+          "cpuP50us": 63711,
+          "cpuP99us": 66921
+        },
+        {
+          "second": "2026-11-24T02:00:01Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 84929,
+          "cpuP99us": 84929
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 4,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 84929,
+        "cpuP99us_max": 84929
+      }
+    },
+    {
+      "label": "ws-up-25mib",
+      "start": "2026-11-24T02:00:00.741Z",
+      "end": "2026-11-24T02:00:02.486Z",
+      "invocations": [
+        {
+          "i": 0,
+          "wallMs": 638,
+          "status": 200,
+          "bytes": 26214400,
+          "ok": true
+        },
+        {
+          "i": 1,
+          "wallMs": 706,
+          "status": 200,
+          "bytes": 26214400,
+          "ok": true
+        }
+      ],
+      "clientOk": 2,
+      "clientTotal": 2,
+      "analytics": [
+        {
+          "second": "2026-11-24T02:00:01Z",
+          "status": "success",
+          "requests": 1,
+          "errors": 0,
+          "cpuP50us": 84929,
+          "cpuP99us": 84929
+        }
+      ],
+      "analyticsSummary": {
+        "requests": 1,
+        "errors": 0,
+        "statuses": [
+          "success"
+        ],
+        "cpuP50us_max": 84929,
+        "cpuP99us_max": 84929
+      }
+    }
+  ]
+}
