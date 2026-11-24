@@ -93,6 +93,9 @@ async function handleUp(request: Request, url: URL, env: Env): Promise<Response>
   const declared = Number(request.headers.get('content-length') || '');
   if (Number.isFinite(declared) && declared > max) {
     ISOLATE_COUNTERS.upRejected++;
+    // G-4b: cancel the incoming body so the runtime can flush the 413
+    // before the client finishes (or never finishes) sending it.
+    try { await request.body?.cancel(); } catch { /* already closed */ }
     return new Response(JSON.stringify({ error: 'upload too large', limit: max }), { status: 413, headers: { 'Cache-Control': 'no-store' } });
   }
   // Streaming count with cap — chunked bodies over the cap are cancelled.

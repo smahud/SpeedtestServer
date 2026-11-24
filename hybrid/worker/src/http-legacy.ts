@@ -363,6 +363,8 @@ export async function handleLegacyHttp(request: Request, url: URL, env: Env): Pr
     const maxBody = num(env.MAX_UPLOAD_BYTES, 0x7fffffff);
     const declared = Number(request.headers.get('content-length') || '');
     if (Number.isFinite(declared) && declared > maxBody) {
+      // G-4b: cancel the incoming body so the runtime can flush the 413 early.
+      try { await request.body?.cancel(); } catch { /* already closed */ }
       return new Response(null, { status: 413, headers: { Connection: 'Close' } });
     }
     const received = await countBody(request.body, maxBody);

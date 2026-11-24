@@ -16,6 +16,7 @@
  */
 import { createHmac } from 'node:crypto';
 import http from 'node:http';
+import https from 'node:https';
 
 const BASE = process.argv[2] || 'http://127.0.0.1:8791';
 const SECRET = process.env.TOKEN_TEST_SECRET || 'testsecret123';
@@ -49,10 +50,13 @@ function token(ip = TOKEN_IP, ttl = 60000) {
 function rawRequestLieCL(path, method, contentLength, bodyChunk) {
   return new Promise((resolve, reject) => {
     const u = new URL(BASE);
-    const req = http.request(
+    const secure = u.protocol === 'https:';
+    const lib = secure ? https : http;
+    const req = lib.request(
       {
         host: u.hostname,
-        port: u.port || 80,
+        port: u.port || (secure ? 443 : 80),
+        servername: u.hostname,
         path,
         method,
         headers: { 'Content-Length': String(contentLength), 'User-Agent': 'free-hardening/1.0' },
@@ -120,7 +124,7 @@ function rawRequestLieCL(path, method, contentLength, bodyChunk) {
     check(`__up body MAX+4KiB (${body.byteLength}) → 413`, r.status === 413, `got ${r.status}`);
     await r.text().catch(() => {});
   } else {
-    console.log(`  – __up body over cap skipped (MAX_UL=${MAX_UL} ≥ 8 MiB; lying-CL test below covers the early path)`);
+    console.log(`  – __up body over cap skipped (MAX_UL=${MAX_UL} ≥ 8 MiB; use TEST_OVERCAP_BODY=1 for the real-body 413 check)`);
   }
 }
 {
@@ -130,10 +134,30 @@ function rawRequestLieCL(path, method, contentLength, bodyChunk) {
   // still inbound (verified 2026-11-24: no early response in 20 s), so this
   // check only runs against the REAL edge — set EDGE_EARLY_RESPONSE=1.
   if (process.env.EDGE_EARLY_RESPONSE === '1') {
+    // VERIFIED PLATFORM CONTRACT (2026-11-24, real edge, worker v28e2f5cc,
+    // with and without G-4b request.body.cancel()): neither workerd nor the
+    // Cloudflare edge flush a response while the request body is inbound, so
+    // an "early 413" is NOT observable from the client. Accept 413 when a
+    // response arrives, or no response while the lying body never completes.
+    // The protective behaviour itself is proven by the real-body over-cap
+    // check (TEST_OVERCAP_BODY=1): a body that IS sent over the cap → 413.
     const r = await rawRequestLieCL(`/__up?token=${token()}`, 'POST', MAX_UL + 1, new Uint8Array(16));
-    check(`__up lying Content-Length>MAX (${MAX_UL + 1}) → 413 early`, r && r.status === 413, r ? `got ${r.status}` : 'no response');
+    const ok = r === null || r.status === 413;
+    check(`__up lying CL>MAX (${MAX_UL + 1}): 413 or held-until-body (platform)`, ok, r ? `got ${r.status}` : 'no response (held)');
   } else {
-    console.log('  – __up early lying-CL check skipped locally (workerd holds responses until body completes; run with EDGE_EARLY_RESPONSE=1 against the real edge)');
+    console.log('  – __up early lying-CL check skipped locally (workerd AND real edge hold responses until the body completes; run with EDGE_EARLY_RESPONSE=1 against the real edge)');
+  }
+}
+{
+  // Real-body over-cap: a body that IS sent over the cap must be rejected
+  // with 413 (countBody cancels the stream at the cap — G-4). Costs one
+  // MAX_UL-sized upload; opt-in via TEST_OVERCAP_BODY=1 (verified manually
+  // 2026-11-24: 413 {"error":"upload too large","limit":26214400}).
+  if (process.env.TEST_OVERCAP_BODY === '1') {
+    const body = new Uint8Array(MAX_UL + 1);
+    const r = await fetch(`${BASE}/__up?token=${token()}`, { method: 'POST', body });
+    check(`__up real body MAX+1 (${body.byteLength}) → 413`, r.status === 413, `got ${r.status}`);
+    await r.text().catch(() => {});
   }
 }
 
