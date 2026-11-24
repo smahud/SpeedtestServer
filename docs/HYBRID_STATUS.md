@@ -103,3 +103,32 @@ Sisa pekerjaan untuk operator:
 1. A3: jalankan host tester resmi (speedtest.net/host-tester) untuk speedtest.lumajangnetworks.my.id:8080; kirim hasil + jam mulai ke agent untuk analisis capture (Fase 7).
 2. Putuskan T-9: pertahankan redirect nPerf port 80 (nPerf mengambil port 80) atau kembalikan (legacy speedtest port 80 pulih). Bukan wewenang agent.
 3. Push ke GitHub bila ingin menerbitkan commit lokal (dilakukan operator/agent lain, sesuai workflow git master prompt).
+
+
+---
+
+## Status akhir sesi 3 (24 November 2026, sesi speedtest front — real speedtest-cli)
+
+Target operator sesi 3: "real speedtest dengan speedtest-cli resmi sebagai tester; payload besar upload/download dilayani Cloudflare Worker; kebutuhan ringan (seleksi server, ping, dll) dilayani VPS; IP VPS muncul saat seleksi/ping, Worker melayani saat payload besar lewat." Basis: 20 commit lokal sesi 1+2 (origin/master = aac909a, tanpa divergensi).
+
+Pekerjaan sesi 3 (semua Jalur B; Jalur A tidak disentuh):
+
+1. `hybrid/gateway/src/front.mjs` (BARU) — permukaan HTTP legacy speedtest di gateway: `latency.txt` langsung (plane ping VPS), `random*.jpg` → 302 → `__down` Worker dengan token HMAC (offload download; urllib stock mengikuti 302 GET), `upload.php` POST → drain penuh + `size=N` (klien stock), GET `upload.php` → `size=0` (probe mini). Rate limit mint per IP (90/menit, terverifikasi burst: 90×302 + 30×429), cap 25 MiB per redirect, event journal `front_*` tanpa token.
+2. `hybrid/gateway/src/gateway.mjs` — integrasi front (env `HYBRID_FRONT_ENABLED`, `HYBRID_FRONT_RATE_LIMIT_MPM`, `HYBRID_FRONT_MAX_DOWN_BYTES`), routing front sebelum buffering body, counter front di `/api/health`.
+3. `hybrid/probe-client/speedtest-cli-hybrid.py` (BARU) — speedtest-cli stock (engine pengukuran 100% tidak diubah) + 2 hook transport: URL server → front VPS; POST upload → `__up` Worker (Bearer). Mode `HYBRID_SERVER_LIST_FILE` mengganti daftar geo-lokal dengan domain list operator.
+4. `hybrid/probe-client/server-list-surabaya.json` (BARU) — 9 entri domain list Surabaya operator (72945 BLiP tanpa host tidak diikutkan).
+
+| # | Kriteria | Status | Bukti |
+|---|---|---|---|
+| A1 | Layanan existing tetap aktif | VERIFIED-AUTO | PID keempat unit tidak berubah sepanjang sesi 3 (283954/283944/292073/281912). Gateway di-restart dua kali untuk deploy front (unit Jalur B, diizinkan). |
+| A2 | Gate 31/31 + 19/19 dua varian | VERIFIED-AUTO (identik baseline) | 26/31 dan 4/19 (default) / 9/19 (8080) — persis baseline sesi 2; semua kegagalan = T-9 nPerf port 80 (pra-ada). |
+| A3 | Host tester resmi | NOT TESTED | Tidak ada run operator selama sesi 3. |
+| B1–B3 | Worker / gateway | DEPLOYED (sesi 2, tidak berubah) | Worker `speedtest-hybrid-worker.lumajangnetworks.workers.dev` versi 28e2f5cc; gateway + front :8790 TLS. |
+| B4 | E2E eksternal + atribusi byte | **VERIFIED-AUTO (speedtest-cli nyata)** | T3/T4: 539,2 MB payload di edge (387,7 down + 151,5 up), delta eth0 VPS ±0,5 MB, front keluar 30–146 B; hasil masuk `results.jsonl` (guid 19b4a965). Laporan lengkap: `docs/SPEEDTEST_FRONT_TEST_REPORT_2026-11-24.md`. |
+| B5 | Uji negatif token + rate limit | VERIFIED-AUTO | `__down`/`__up` tanpa token → 401 di edge (tetap); burst 120 → 90×302 + 30×429. |
+| C1 | Dokumentasi | IMPLEMENTED | Laporan uji baru + runbook front + errata spec §0.1/§7.1c + contoh env diperbarui. |
+| C2 | Commit lokal tanpa push | IMPLEMENTED | Commit topik sesi 3 (lihat git log); tidak ada push. |
+
+Temuan baru sesi 3: T-10 (early-answer memutus kirim upload di RTT nyata → drain penuh), T-11 (random4000x4000 31,6 MB melebihi cap 25 MiB edge → front memangkas `bytes`), T-12 (daftar server Python speedtest-cli kini geo-lokal → `--server` ID Surabaya perlu injeksi `HYBRID_SERVER_LIST_FILE`). Batasan terdokumentasi: upload klien stock urllib tidak bisa dialihkan via redirect (body dikirim ke hop pertama sebelum respons dibaca); mock domain publik menunggu credential `Zone › DNS › Edit` (API token aktif tapi tanpa izin DNS; Global Key ditolak Cloudflare).
+
+Sisa pekerjaan operator: (1) A3 host tester resmi; (2) keputusan T-9 (nPerf port 80); (3) record DNS `A speedtest-mock.lumajangnetworks.my.id → 45.126.249.250` (DNS-only) bila mock domain ingin aktif di DNS publik; (4) push ke GitHub bila ingin menerbitkan (agent tidak push sesuai §6.6).

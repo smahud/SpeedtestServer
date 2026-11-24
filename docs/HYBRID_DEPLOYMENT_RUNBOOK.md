@@ -148,3 +148,87 @@ Catatan:
 - 10 ms CPU/invokasi; 128 MB/isolate; body request 100 MB (Free).
 - Transfer HTTP per chunk 16–25 MiB (final dari pengukuran edge nyata — Fase C.3).
 - CPU per koneksi WebSocket di Free belum terverifikasi — ukur dulu sebelum menjadikan `/ws` transport utama (K-6).
+
+
+---
+
+## §front — Speedtest front di gateway (sesi 3, 24 November 2026)
+
+Front = permukaan HTTP legacy speedtest (`latency.txt`, `random*.jpg`, `upload.php`) di gateway VPS dengan offload payload ke Worker. Latar dan hasil uji: `docs/SPEEDTEST_FRONT_TEST_REPORT_2026-11-24.md`.
+
+### File dan env
+
+| Item | Nilai |
+|---|---|
+| Runtime | `/opt/speedtest-hybrid/gateway/{gateway.mjs,front.mjs}` (unit `speedtest-hybrid-gateway.service`, port 8790 TLS — tidak berubah) |
+| Sumber repo | `hybrid/gateway/src/{gateway.mjs,front.mjs}` |
+| `HYBRID_FRONT_ENABLED` | `true` di `/etc/speedtest-hybrid/gateway.env` (default kode `false`) |
+| `HYBRID_FRONT_RATE_LIMIT_MPM` | `90` (mint token per IP per menit; 0 = mati) |
+| `HYBRID_FRONT_MAX_DOWN_BYTES` | `26214400` (25 MiB, harus ≤ `MAX_DOWNLOAD_BYTES` Worker) |
+
+### Perilaku rute
+
+| Rute | Perilaku |
+|---|---|
+| `GET/HEAD /speedtest/latency.txt` | `test=test` langsung dari VPS (plane ping — jangan di-redirect) |
+| `GET/HEAD /speedtest/random{N}x{N}.jpg` | `302 Location: <WORKER_BASE>/__down?bytes=<effective>&token=<mint>`; `effective = min(size, HYBRID_FRONT_MAX_DOWN_BYTES)` |
+| `POST /speedtest/upload.php` | drain penuh → `200 size=<drained>` (klien stock; watchdog 180 s, cap 256 MiB) |
+| `GET/HEAD /speedtest/upload.php` | `200 size=0` (probe mini server) |
+| `GET / , /hi` | banner paritas daemon |
+
+### Verifikasi pasca-deploy
+
+```bash
+BASE=https://speedtest.lumajangnetworks.my.id:8790
+curl -s $BASE/api/health | python3 -m json.tool      # "front": {"enabled": true, ...}
+curl -s "$BASE/speedtest/latency.txt?x=1"            # test=test
+curl -s "$BASE/speedtest/upload.php"                 # size=0
+curl -s -o /dev/null -D - "$BASE/speedtest/random350x350.jpg"   # 302 -> workers.dev
+curl -s -L -o /dev/null -w '%{http_code} %{size_download} %{remote_ip}\n' \
+  "$BASE/speedtest/random350x350.jpg"                # 200 245388 <anycast-CF> (bukan IP VPS)
+curl -s -o /dev/null -w '%{http_code}\n' "https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/__down?bytes=100"  # 401
+# rate limit: 91+ request cepat -> 429
+```
+
+### Rollback front
+
+```bash
+# 1. matikan front tanpa memundurkan kode:
+sed -i 's/^HYBRID_FRONT_ENABLED=.*/HYBRID_FRONT_ENABLED=false/' /etc/speedtest-hybrid/gateway.env
+systemctl restart speedtest-hybrid-gateway
+# 2. kembalikan kode sesi 2 (snapshot pra-deploy sesi 3 ada di /root/speedtest-hybrid-work/gateway-backup-*):
+cp /root/speedtest-hybrid-work/gateway-backup-<ts>/gateway.mjs /opt/speedtest-hybrid/gateway/gateway.mjs
+rm -f /opt/speedtest-hybrid/gateway/front.mjs
+chown root:speedtest-hybrid /opt/speedtest-hybrid/gateway/gateway.mjs && chmod 644 /opt/speedtest-hybrid/gateway/gateway.mjs
+systemctl restart speedtest-hybrid-gateway && systemctl is-active speedtest-hybrid-gateway
+```
+
+Rollback front TIDAK menyentuh Jalur A (daemon :8080/legacy :80 tidak pernah berubah).
+
+### Mock domain (`speedtest-mock.lumajangnetworks.my.id`)
+
+Sertifikat wildcard sudah mencakup nama ini. Aktivasi saat ini via `/etc/hosts` client uji (credential API tidak punya izin `Zone › DNS`). Untuk mengaktifkan di DNS publik (butuh token dengan `Zone › DNS › Edit`, atau dashboard):
+
+```bash
+curl -X POST "https://api.cloudflare.com/client/v4/zones/c299f26316fb0615d05d00c3d1e436a3/dns_records" \
+  -H "Authorization: Bearer <token-dns-edit>" -H "Content-Type: application/json" \
+  -d '{"type":"A","name":"speedtest-mock","content":"45.126.249.250","proxied":false,"comment":"hybrid speedtest front - sesi 3"}'
+```
+
+`proxied:false` WAJIB (DNS-only) — front memakai TLS asli VPS, bukan proxy Cloudflare. Rollback: hapus record tersebut (tidak boleh menyentuh record lain — invariant §3.1).
+
+### Klien uji
+
+- Stock: `speedtest-cli --json --mini https://speedtest.lumajangnetworks.my.id:8790` (download via edge, upload jalur VPS — batas urllib, lihat laporan §6.2).
+- Hybrid penuh: `python3 hybrid/probe-client/speedtest-cli-hybrid.py` dengan env `HYBRID_GATEWAY_BASE`, `HYBRID_WORKER_BASE`, `HYBRID_FRONT_BASE`, dan (mode domain list) `HYBRID_SERVER_LIST_FILE=hybrid/probe-client/server-list-surabaya.json` + `--server <ID>`.
+- CLI resmi Ookla: jalur Jalur A (`--server-id`, tanpa perubahan apa pun); hasilnya jangan dipublikasikan dari tes paksa (blokir `results.speedtest.net` di /etc/hosts client uji).
+
+### Troubleshooting front
+
+| Gejala | Penyebab umum | Tindakan |
+|---|---|---|
+| speedtest-cli stock: `Upload: 0.00 Mbit/s` | klien mengikuti 307/302 dengan body (tidak didukung urllib) — atau `HYBRID_FRONT_ENABLED=false` | pastikan front aktif; gunakan wrapper untuk offload upload |
+| `429` saat uji cepat | rate limit mint (90/menit/IP) | naikkan `HYBRID_FRONT_RATE_LIMIT_MPM` untuk pengujian (jangan permanen) |
+| `random4000x4000.jpg` turun ke 25 MiB | `HYBRID_FRONT_MAX_DOWN_BYTES` < 31,6 MB (disengaja, T-11) | ukuran tetap terukur jujur; jangan naikkan di atas cap Worker |
+| `NoMatchedServers` saat `--server <ID Surabaya>` | daftar geo-lokal speedtest.net (T-12) | pakai `HYBRID_SERVER_LIST_FILE` |
+| ping gagal (`cum 3600`) | `latency.txt` bukan 200/`test=test` (mis. front mati) | cek `systemctl status speedtest-hybrid-gateway` + journal `front_latency` |

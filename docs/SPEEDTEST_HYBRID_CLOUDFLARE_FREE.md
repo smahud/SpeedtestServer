@@ -724,3 +724,11 @@ Credential: API token Cloudflare dengan akses Workers (diberikan operator di ses
 [cf-tos-blog]: https://blog.cloudflare.com/updated-tos/
 [tls-rfc]: https://datatracker.ietf.org/doc/html/rfc8446
 [fetch-std]: https://fetch.spec.whatwg.org/#http-redirect-fetch
+
+
+### Errata & pembaruan status sesi 3 (24 November 2026, 03:00–03:40 UTC)
+
+- **§0.1 komponen — BARU:** `hybrid/gateway/src/front.mjs` (speedtest front). Ter-deploy pada `speedtest-hybrid-gateway.service` port 8790 (env `HYBRID_FRONT_ENABLED=true`). Tugas: plane ping legacy (`latency.txt` langsung), offload download (`random*.jpg` → 302 → `__down` Worker + token HMAC), kompatibilitas klien stock (`upload.php` drain penuh; probe mini `size=0`). Rate limit mint 90/menit/IP. Status: DEPLOYED + VERIFIED-AUTO.
+- **§4 opsi "URL awal di VPS lalu redirect GET" — STATUS BERUBAH: sudah diimplementasikan** oleh front (untuk download; diuji dengan speedtest-cli stock nyata). Untuk upload, opsi "ambil URL dari manifest sebelum mengirim body" diwujudkan sebagai hook transport klien (`hybrid/probe-client/speedtest-cli-hybrid.py`, engine ukur stock, POST → `__up` + Bearer) — bukan redirect, karena urllib stock mengirim seluruh body POST ke hop pertama sebelum membaca respons (temuan T-10/T-sesi3, lihat laporan uji).
+- **§7.1c bukti uji baru (sesi 3):** real speedtest-cli (Ookla resmi 1.2.0.84 + sivel speedtest-cli 2.1.3) dari client eksternal (Alibaba HK). CLI resmi `--server-id 74964`/`66281` + /etc/hosts domain list → VPS: lulus penuh (exit 0, 447/437 Mbps, `persisted=false` — endpoint hasil diblok per invariant §3.8). speedtest-cli hybrid via mock domain `speedtest-mock.lumajangnetworks.my.id` (hosts) dan via domain list (`--server 74964` + `HYBRID_SERVER_LIST_FILE`): ping 130 ms ke VPS; 387,7 MB download + 151,5 MB upload dilayani edge; delta eth0 VPS ±0,5 MB (offload ±1:1000); hasil masuk `results.jsonl` (guid 19b4a965). Bukti lengkap: `hybrid/lab/evidence/e-k-speedtest-front/` + `docs/SPEEDTEST_FRONT_TEST_REPORT_2026-11-24.md`.
+- **Temuan T-10/T-11/T-12** didokumentasikan di laporan uji §7 (early-answer vs drain penuh; cap 25 MiB vs random4000x4000; daftar server geo-lokal).
