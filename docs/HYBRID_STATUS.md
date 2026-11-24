@@ -168,3 +168,26 @@ Operator memberi instruksi baru: uji **binary CLI resmi Ookla** (`speedtest-cli_
 6. **Commit + push** dilaksanakan atas perintah eksplisit operator di sesi ini (commit: kampanye+evidence, README quickstart, status ini). Kredensial (PAT/token CF/UAEG) tidak pernah masuk repo; file env 0600 di sandbox dihapus di akhir sesi.
 
 Sisa pekerjaan operator tidak berubah: (1) A3 host tester resmi; (2) keputusan T-9; (3) record DNS `A speedtest-mock` bila mock domain ingin aktif publik.
+
+---
+
+## Status akhir sesi 6 (24 November 2026, analisis host tester operator — 4 run)
+
+Operator menjalankan **host tester resmi** `https://www.speedtest.net/host-tester` untuk `speedtest.lumajangnetworks.my.id:8080` **4×** pada 24 Nov 19:40:07–19:41:58 WIB (12:40:07–12:41:58 UTC) dan melaporkannya ke agent. Ini adalah item (1) sisa pekerjaan operator pada sesi 5. Yang dilakukan agent (Fase 7 master prompt, semua read-only terhadap produksi):
+
+1. **Pengamanan capture segera**: 20 file ring `hosttester.pcap00–19` disalin ke `/root/speedtest-hybrid-work/hosttester-20261124/` (2 GB, dengan `SHA256SUMS.txt`) sebelum ring tertimpa. Run operator terekam di `hosttester.pcap18` (file aktif saat run).
+2. **Analisis evidence.jsonl** (jendela 12:35–12:45 UTC): 269 entri; pola check lengkap terulang **4×** (`/hi`, NetGauge TCP `HI`/`SERVERID`/`GETIP`, WS `/ws`, `crossdomain` root + `/speedtest/`, TLS 8080 + `GET /hi`, `latency.txt` + keep-alive 3×, 2× `POST upload.php` per run, 10× `HEAD random*.jpg`); **8 event `http_upload_early_response`** (waitedMs 2500 konsisten). Tanpa `http_reject`, tanpa error di `journalctl -u speedtestserver` pada jendela run.
+3. **Analisis pcap per-flow**: seluruh respons `200 OK`/`101`; body lengkap sesuai Content-Length (untuk HEAD: tanpa body, sesuai semantik HEAD); `upload.php` membalas `size=<Content-Length>` (`515699`/`1980899`) pada **2,50 s** — jauh di bawah timeout PHP curl 10 s; respons lengkap + `Connection: Close` + FIN server; klien berhenti mengirim 120–220 ms setelah respons (respons sudah diterima penuh; RST server berikutnya adalah perilaku TCP normal atas data pasca-close, tidak memotong respons). 40/40 HEAD membalas Content-Length **persis ukuran resmi** `http_legacy_fallback.zip` (245.388 … 31.625.365) dengan `Content-Type: image/jpeg`.
+4. **Gate A2 diulang dari sandbox eksternal** (12:52 UTC, setelah jendela run tertutup): 26/31; 4/19 (default); 9/19 (8080) — **identik baseline sesi 2–5** (semua deviasi = T-9 nPerf port 80 pra-ada + T-7 image_sizes clone-only). Tidak ada regresi.
+5. **A1 tetap**: PID `speedtestserver` 283954, `speedtestserver-legacy` 283944, `nperf-server` 292073, `ookla-capture` 281912, `speedtest-hybrid-gateway` 302847 — tidak berubah, `NRestarts=0`. Jalur B tidak disentuh; Worker `speedtest-hybrid-worker` tidak diubah.
+
+Evidence ringkas di repo: `validation/evidence/hosttester-run-20261124.json`.
+
+| # | Kriteria | Status | Bukti |
+|---|---|---|---|
+| A1 | Layanan existing tetap aktif | **VERIFIED-AUTO** | PID kelima unit tidak berubah sebelum/sesudah 4 run operator; NRestarts=0 |
+| A2 | Gate dua varian | **VERIFIED-AUTO** | 26/31; 4/19; 9/19 (8080) — identik baseline; deviasi hanya T-9/T-7 (pra-ada) |
+| A3 | Host tester resmi | **RUN COMPLETED 4× (bukti sisi server: semua check terlayani 4/4) — verdict layar menunggu konfirmasi operator** | `validation/evidence/hosttester-run-20261124.json` + pcap diawetkan. Sesuai aturan pelabelan, agent tidak menulis "Passed" tanpa hasil layar operator |
+| B1–B5, C1, C2 | Tidak berubah dari sesi 5 | DEPLOYED / VERIFIED-AUTO / IMPLEMENTED | Tidak ada perubahan Jalur B sesi ini |
+
+Sisa pekerjaan operator: (1) **konfirmasi verdict layar host tester** (teks/screenshot) agar A3 dapat dilabeli VERIFIED-OPERATOR penuh; (2) keputusan T-9 (redirect nPerf port 80); (3) opsional record DNS `A speedtest-mock` bila mock domain ingin aktif publik.
