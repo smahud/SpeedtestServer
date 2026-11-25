@@ -1,25 +1,35 @@
 /**
- * front.mjs — legacy speedtest HTTP surface on the gateway: edge offload
- * + the VPS ASSIST lane (v1.3 — "Cloudflare membantu beban, bukan
- * menggantikan").
+ * front.mjs — legacy speedtest HTTP surface on the gateway: VPS full
+ * potential + edge assist (v1.4 — "VPS mengeluarkan SEMUA potensi
+ * bandwidth-nya, Cloudflare hanya MEMBANTU").
  *
  * Serves the *measurement* plane of the hybrid architecture for HTTP
  * speedtest clients (speedtest-cli / mini clients):
  *
  *   - GET  /speedtest/latency.txt            → served DIRECTLY (ping = VPS)
- *   - GET  /speedtest/random{N}x{N}.jpg      → THREE download lanes:
- *       1. VPS assist lane (budget-gated): served DIRECTLY from the gateway
- *          with daemon-parity printable-ASCII pool bytes while a token
- *          bucket still has budget (HYBRID_VPS_DL_BUDGET_MBPS). The VPS
- *          therefore contributes up to its link capacity to every client's
- *          measurement — Cloudflare is a HELPER, not a replacement.
- *       2. Edge lane (overflow): once the budget is drained the request is
- *          302-redirected to a pool-selected Worker /__down — aggregate
- *          throughput ≈ VPS budget + edge capacity, so a 1 Gbps client
- *          behind a 100 Mbps VPS still gets ~1 Gbps.
+ *   - GET  /speedtest/random{N}x{N}.jpg      → TWO assist lanes, split by
+ *       request SHARE (no bandwidth budget, no throttle — v1.4):
+ *       1. VPS lane: HYBRID_VPS_DL_SHARE of the download requests is
+ *          served DIRECTLY from the gateway with daemon-parity
+ *          printable-ASCII pool bytes at FULL socket speed. There is NO
+ *          token bucket and NO byte budget: every local response runs as
+ *          fast as the VPS link allows (socket backpressure is the only
+ *          flow control). The VPS therefore always contributes up to its
+ *          real capacity — Cloudflare is a HELPER on top, never a cap.
+ *       2. Edge assist lane: the complementary (1 - share) of the requests
+ *          is 302-redirected to a pool-selected Worker /__down — the edge
+ *          adds its aggregate capacity IN PARALLEL with the VPS lane, so
+ *          throughput ≈ VPS capacity + edge capacity for fast clients.
+ *          The split is a per-IP Bresenham interleave — the same proven
+ *          deterministic distribution as the hybrid client's upload split
+ *          (correct from the very first request).
  *       3. Forced-local fallback: when the offload token mint is
- *          rate-limited AND the assist lane is enabled, serve locally
- *          instead of failing the client's measurement.
+ *          rate-limited AND the VPS lane is enabled (share > 0), serve
+ *          locally instead of failing the client's measurement.
+ *
+ *       HYBRID_VPS_DL_SHARE=1.0 → 100% VPS (pure VPS potential, edge idle,
+ *       CF quota saved). 0.0 → 100% edge (legacy pure offload). Tune ≈
+ *       VPS capacity / expected client demand for maximum aggregate.
  *   - POST /speedtest/upload.php             → drain + answer (stock clients
  *                                              without hybrid routing) — the
  *                                              VPS ingress contribution
@@ -43,10 +53,11 @@
  *   HYBRID_FRONT_RATE_LIMIT_MPM  default 90 (token mints per IP per minute; 0 = off)
  *   HYBRID_FRONT_MAX_DOWN_BYTES  default 26 MiB (edge redirect cap)
  *   HYBRID_FRONT_TOKEN_CACHE_MS  default = token TTL − 60 s; 0 disables the cache
- *   HYBRID_VPS_DL_BUDGET_MBPS    default 0 = off (pure edge offload — legacy
- *                                behavior). Set to the VPS link capacity
- *                                (e.g. 100 on a 100 Mbps VPS).
- *   HYBRID_VPS_DL_BURST_S        default 2 (bucket capacity = budget × seconds)
+ *   HYBRID_VPS_DL_SHARE          default 0.15 — fraction of download requests
+ *                                served by the uncapped VPS lane (0..1).
+ *                                REMOVED in v1.4 (operator decision):
+ *                                HYBRID_VPS_DL_BUDGET_MBPS — the token-bucket
+ *                                budget that capped the VPS's contribution.
  */
 
 import crypto from 'node:crypto';
@@ -71,7 +82,7 @@ const IMAGE_SIZES = {
 
 const IMAGE_RE = /random([0-9]+)x([0-9]+)\.jpg$/;
 const VERSION_STRING = '2.11 (2.11.5) 2026-06-04.1737.7d0993d';
-const FRONT_ID = 'hybrid-gateway-front/1.3';
+const FRONT_ID = 'hybrid-gateway-front/1.4';
 
 // --- VPS download pool (daemon parity F-9): 2 MiB printable ASCII ------
 // Materialized ONCE per process (one randomFill + one 0x20+b%96 map pass,
@@ -91,7 +102,7 @@ function getVpsPool() {
 
 /** Create the front router. Returns (req, res, url, ip) => boolean (handled?).
  *  ctx: { mintToken, log, counters, workerBase, pool?, rateLimitMpm, tokenBindIp?,
- *         tokenTtlMs?, tokenCacheMs?, maxDownBytes?, vpsDlBudgetMbps?, vpsDlBurstS? }
+ *         tokenTtlMs?, tokenCacheMs?, maxDownBytes?, vpsDlShare? }
  */
 export function createFront(ctx) {
   const { mintToken, log, counters } = ctx;
@@ -105,32 +116,27 @@ export function createFront(ctx) {
   // bytes it actually receives, so the measurement stays honest).
   const maxDownBytes = Number(ctx.maxDownBytes ?? 26214400);
 
-  // --- VPS assist lane: token-bucket budget (bytes) ----------------------
-  const vpsDlBudgetMbps = Math.max(0, Number(ctx.vpsDlBudgetMbps || 0));
-  const vpsDlBurstS = Math.max(0.5, Number(ctx.vpsDlBurstS ?? 2));
-  const vpsDlBps = vpsDlBudgetMbps * 125_000; // Mbps → bytes/s (decimal)
-  const vpsDlBucketCap = vpsDlBps * vpsDlBurstS;
-  let vpsDlTokens = vpsDlBucketCap; // full bucket: the VPS contributes first
-  let vpsDlLastRefill = Date.now();
-
-  function refillDlTokens() {
-    const now = Date.now();
-    if (vpsDlBps > 0) {
-      const add = ((now - vpsDlLastRefill) / 1000) * vpsDlBps;
-      vpsDlTokens = Math.min(vpsDlBucketCap, vpsDlTokens + add);
-    }
-    vpsDlLastRefill = now;
-  }
-
-  /** Budget decision for a local-lane serve of `bytes` (token bucket). */
-  function takeLocalBudget(bytes) {
-    if (vpsDlBps <= 0) return false; // assist lane disabled → pure offload
-    refillDlTokens();
-    if (vpsDlTokens >= bytes) {
-      vpsDlTokens -= bytes;
-      return true;
-    }
-    return false;
+  // --- VPS assist lane: request-share interleave (v1.4) -------------------
+  // NO token bucket. NO byte budget. NO throttle. HYBRID_VPS_DL_SHARE is
+  // the fraction of download REQUESTS answered directly by the VPS — each
+  // at full socket speed (the only flow control is TCP backpressure).
+  // The complementary fraction is 302-assisted by the worker pool, IN
+  // PARALLEL, so the aggregate = VPS capacity + edge capacity.
+  // Distribution: per-IP Bresenham interleave — deterministic, correct
+  // from the first request (same algorithm as the client upload split).
+  const shareRaw = ctx.vpsDlShare;
+  const vpsDlShare = Math.min(1, Math.max(0, Number.isFinite(Number(shareRaw)) ? Number(shareRaw) : 0.15));
+  const dlSeq = new Map(); // ipKey -> Bresenham phase
+  function pickVpsLane(ip) {
+    if (vpsDlShare <= 0) return false;
+    if (vpsDlShare >= 1) return true;
+    const key = ipKey(ip);
+    let phase = (dlSeq.get(key) || 0) + vpsDlShare;
+    const vps = phase >= 1;
+    if (vps) phase -= 1;
+    dlSeq.set(key, phase);
+    if (dlSeq.size > 10_000) dlSeq.delete(dlSeq.keys().next().value);
+    return vps;
   }
 
   /** Serve `size` bytes of daemon-parity pool data as image/jpeg with the
@@ -384,7 +390,7 @@ export function createFront(ctx) {
       return false;
     }
 
-    // ---- random{N}x{N}.jpg: the three download lanes ------------------
+    // ---- random{N}x{N}.jpg: the assist lanes (share-interleaved) --------
     const m = stripped.match(IMAGE_RE);
     if (m && m[1] === m[2] && (method === 'GET' || method === 'HEAD')) {
       const n = parseInt(m[1], 10);
@@ -392,14 +398,15 @@ export function createFront(ctx) {
       if (!size) return false; // unknown size → fall through to 404
       counters.frontDownloads = (counters.frontDownloads || 0) + 1;
 
-      // Lane 1 — VPS assist (budget-gated; full size, no Workers cap: the
-      // 25 MiB cap is an EDGE limit, the VPS lane has no such limit).
-      if (method === 'GET' && takeLocalBudget(size)) {
+      // Lane 1 — VPS assist (UNCAPPED, full-speed local serve on its share
+      // of requests; the 25 MiB cap is an EDGE limit, the VPS lane has no
+      // such limit — a VPS-lane response is never budget-gated).
+      if (method === 'GET' && pickVpsLane(ip)) {
         counters.frontDlLocal = (counters.frontDlLocal || 0) + 1;
         serveLocalJpeg(res, size, { ip, n, size });
         return true;
       }
-      if (method === 'HEAD' && vpsDlBps > 0) {
+      if (method === 'HEAD' && vpsDlShare > 0) {
         // HEAD costs no bytes: serve the daemon-parity headers locally.
         finish(res, 200, '', {
           'Content-Type': 'image/jpeg',
@@ -409,15 +416,17 @@ export function createFront(ctx) {
         return true;
       }
 
-      // Lane 2 — edge overflow: 302 → pool-selected Worker __down.
+      // Lane 2 — edge assist: 302 → pool-selected Worker __down.
       const effective = maxDownBytes && size > maxDownBytes ? maxDownBytes : size;
       if (effective !== size) counters.frontDownCapped = (counters.frontDownCapped || 0) + 1;
       counters.frontDownRedirects = (counters.frontDownRedirects || 0) + 1;
       const token = getOffloadToken(ip);
       if (!token) {
         // Lane 3 — mint rate-limited: degrade to a forced local serve (only
-        // when the assist lane exists) instead of breaking the measurement.
-        if (vpsDlBps > 0 && method === 'GET') {
+        // when the VPS lane is part of the design) instead of breaking the
+        // measurement. With share=0 the operator chose pure edge offload,
+        // so the legacy 429 applies.
+        if (vpsDlShare > 0 && method === 'GET') {
           counters.frontDlLocalForced = (counters.frontDlLocalForced || 0) + 1;
           serveLocalJpeg(res, size, { ip, n, size, forced: true });
           return true;
