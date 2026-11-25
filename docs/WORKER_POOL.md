@@ -6,9 +6,12 @@
 > **Sesi 9 (2026-11-25, branch `hybrid-assist-lane`):** growth pool diperbaiki —
 > worker mati/benched di tengah ring tidak lagi memblokir aktivasi worker
 > setelahnya (himpunan aktif eksplisit + kandidat scan; bukti E2E 4/4 di
-> `docs/HYBRID_ASSIST_MODE.md`). Pool kini juga berpasangan dengan **VPS
-> assist lane** — VPS menyumbang bandwidth sampai budget, worker menangkap
-> overflow: lihat `docs/HYBRID_ASSIST_MODE.md`.
+> `docs/HYBRID_ASSIST_MODE.md`).
+>
+> **v1.4 (2026-11-26, branch `vps-full-potential`):** pool assist kini
+> berpasangan dengan **lane VPS tanpa cap** (share interleave — budget byte
+> DIHAPUS atas keputusan operator), dan seluruh deploy pool berjalan
+> otomatis dari `.env` via `install.sh` (lihat §4).
 
 ## 1. Konsep dan batasan platform (jujur)
 
@@ -68,25 +71,41 @@ Worker-side vars (wrangler): `WORKER_ID`, `WORKER_POOL_MAX`, `WORKER_DEFLECT_CON
 
 URL pool diturunkan otomatis: `speedtest-hybrid-worker.lumajangnetworks.workers.dev` → `speedtest-hybrid-worker-2..-100.lumajangnetworks.workers.dev`.
 
-## 4. Cara mengaktifkan pool (operator, butuh 2 hal)
+## 4. Cara mengaktifkan pool (operator)
 
-1. **HYBRID_SHARED_SECRET** (nilai sama dengan gateway VPS; secret Worker write-only — tidak bisa dibaca ulang).
-2. **Akses shell VPS** (UAEG) untuk update gateway + env.
+### 4.1 Jalur otomatis (v1.4 — DISARANKAN): `.env` + install.sh
 
-Langkah:
+Semua yang dulu manual kini satu file konfigurasi `.env` (template:
+`.env.example`; penjelasan tiap field + permission scope token:
+`docs/CLOUDFLARE_CREDENTIALS.md`):
+
+```bash
+cp .env.example .env
+nano .env       # CLOUDFLARE_API_TOKEN (atau EMAIL+API_KEY), CLOUDFLARE_ACCOUNT_ID,
+                # CF_WORKER_DEPLOY_COUNT=100, CF_WORKERS_SUBDOMAIN=...
+                # HYBRID_SHARED_SECRET → kosongkan = auto-generate
+sudo ./install.sh --start
+```
+
+install.sh lalu: (1) pasang daemon + gateway + systemd, (2) generate
+gateway.env dari .env (termasuk HYBRID_WORKER_POOL_MAX=CF_WORKER_DEPLOY_COUNT),
+(3) deploy worker 1..N via deploy-pool.sh BESERTA secret di tiap worker,
+(4) verifikasi /__meta per worker, (5) health-check gateway.
+Idempotent — re-run aman (gateway.env lama di-backup otomatis).
+
+### 4.2 Jalur manual (tetap didukung — deploy-pool.sh langsung)
+
 ```bash
 # di repo hybrid/worker:
 CLOUDFLARE_API_TOKEN=... CLOUDFLARE_ACCOUNT_ID=... \
 HYBRID_SHARED_SECRET=<rahasia yang sama dengan VPS> \
 POOL_SIZE=100 bash deploy-pool.sh          # deploy 1..100 + verify /__meta
 
-# di VPS:
-#   git pull master; rsync hybrid/gateway → /opt/speedtest-hybrid (prosedur runbook)
-#   tambahkan di /etc/speedtest-hybrid/gateway.env:
-#     HYBRID_WORKER_POOL_MAX=100
-#     HYBRID_WORKER_ACTIVE_MIN=2
-#   systemctl restart speedtest-hybrid-gateway
-#   curl -s https://speedtest.lumajangnetworks.my.id:8790/api/pool   # status live
+# di VPS /etc/speedtest-hybrid/gateway.env:
+#   HYBRID_WORKER_POOL_MAX=100
+#   HYBRID_WORKER_ACTIVE_MIN=2
+systemctl restart speedtest-hybrid-gateway
+curl -s https://speedtest.lumajangnetworks.my.id:8790/api/pool   # status live
 ```
 
 ## 5. Bukti pengujian (2026-11-25)

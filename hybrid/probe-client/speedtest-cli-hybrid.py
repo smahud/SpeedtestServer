@@ -19,10 +19,11 @@ documented client-side transport hooks are installed (equivalent to what
      the aggregate far below client capacity — Ookla's own CLI scales to
      32 connections. 0 (default) keeps the stock values untouched.
 
-Download needs no routing patch: the front serves the VPS assist lane
-(budget-gated local bytes) and 302-redirects the overflow to the Worker
-`__down` — stock urllib follows GET redirects natively, and the threads run
-unmodified.
+Download needs no routing patch: the front's v1.4 assist lanes serve a
+SHARE of downloads directly from the VPS at FULL speed (HYBRID_VPS_DL_SHARE
+— no budget, no throttle) and 302-redirect the complementary share to the
+Worker `__down` — stock urllib follows GET redirects natively, and the
+threads run unmodified.
 
 Env:
   HYBRID_GATEWAY_BASE   e.g. https://speedtest.lumajangnetworks.my.id:8790
