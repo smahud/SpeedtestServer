@@ -139,33 +139,49 @@ async function validateConfig(
 
 function parseArgs(args: string[]): CliOptions {
   const result: CliOptions = { role: 'standalone', validateConfigOnly: false, configOverrides: {} };
+  // BUG FIX: a value-taking flag as the LAST argument silently consumed
+  // `undefined` (--config → args[++i] undefined) and fell back to the search
+  // path — the exact failure mode A-1 was meant to prevent. Fail loudly.
+  const needValue = (name: string, value: string | undefined): string => {
+    if (value === undefined || value === '') {
+      console.error(`Missing value for ${name}`);
+      process.exit(2);
+    }
+    return value;
+  };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     switch (arg) {
       case '--role':
       case '-r':
-        result.role = args[++i] || 'standalone';
+        result.role = needValue(arg, args[i + 1]);
+        i++;
         break;
       case '--config':
       case '-c':
-        result.configPath = args[++i];
+        result.configPath = needValue(arg, args[i + 1]);
+        i++;
         break;
       case '--ports':
       case '-p':
-        result.configOverrides.tcpPorts = (args[++i] || '').split(',').map((x) => parseInt(x, 10)).filter((x) => !isNaN(x));
+        result.configOverrides.tcpPorts = needValue(arg, args[i + 1]).split(',').map((x) => parseInt(x, 10)).filter((x) => !isNaN(x));
         result.configOverrides.httpPorts = result.configOverrides.tcpPorts;
+        i++;
         break;
       case '--udp-ports':
-        result.configOverrides.udpPorts = (args[++i] || '').split(',').map((x) => parseInt(x, 10)).filter((x) => !isNaN(x));
+        result.configOverrides.udpPorts = needValue(arg, args[i + 1]).split(',').map((x) => parseInt(x, 10)).filter((x) => !isNaN(x));
+        i++;
         break;
       case '--evidence-log':
-        result.configOverrides.evidenceLogFile = args[++i] || '';
+        result.configOverrides.evidenceLogFile = needValue(arg, args[i + 1]);
+        i++;
         break;
       case '--validate-config':
         result.validateConfigOnly = true;
         break;
       case '--version-string':
-        result.configOverrides.netgaugeVersionString = args[++i] || '';
+        result.configOverrides.netgaugeVersionString = needValue(arg, args[i + 1]);
+        i++;
         break;
       case '--help':
       case '-h':

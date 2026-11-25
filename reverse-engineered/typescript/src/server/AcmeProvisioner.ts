@@ -19,6 +19,7 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import * as tls from 'tls';
 import { SSLAcmeConfig } from '../types/core';
 
 export interface AcmeResult {
@@ -53,7 +54,10 @@ export class AcmeProvisioner {
     return this.cfg.storageDir;
   }
 
-  /** Load a previously issued, still-valid certificate if present. */
+  /** Load a previously issued, still-valid certificate if present.
+   * BUG FIX: the stored pair was never validated against each other — a
+   * corrupted or half-written privkey.pem passed the load and only failed
+   * later as an opaque TLS secure-context error at bind time. */
   loadStored(): AcmeResult | null {
     try {
       const certPem = fs.readFileSync(path.join(this.cfg.storageDir, 'fullchain.pem'), 'utf-8');
@@ -61,9 +65,11 @@ export class AcmeProvisioner {
       const x509 = new crypto.X509Certificate(certPem);
       const expiresAt = new Date(x509.validTo).getTime();
       if (expiresAt <= Date.now()) return null;
+      // Pair validation (same check the custom-cert path applies):
+      tls.createSecureContext({ cert: certPem, key: keyPem });
       return { certPem, keyPem, expiresAt };
     } catch {
-      return null;
+      return null; // missing, expired, OR mismatched — treat as absent
     }
   }
 
@@ -132,7 +138,14 @@ export class AcmeProvisioner {
     });
     await new Promise<void>((resolve, reject) => {
       challengeServer.once('error', reject);
-      challengeServer.listen(http01Port, () => resolve());
+      challengeServer.listen(http01Port, () => {
+        // BUG FIX (stale once-listener): after resolve() the reject listener
+        // stayed armed — the first post-listen server error was swallowed and
+        // the second crashed the process. Log server errors permanently.
+        challengeServer.removeListener('error', reject);
+        challengeServer.on('error', (e) => console.error(`[acme] challenge server error: ${String(e)}`));
+        resolve();
+      });
     });
     try {
       const order = await client.createOrder({ identifiers: domains.map((d) => ({ type: 'dns', value: d })) });

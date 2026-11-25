@@ -30,6 +30,7 @@
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
+import net from 'node:net';
 import { pipeline } from 'node:stream';
 import { PhpFormCounter } from './PhpFormCounter';
 
@@ -348,5 +349,47 @@ export function createLegacyFallback(assets: string): http.Server {
   server.headersTimeout = 10000;
   server.keepAliveTimeout = 10000;
   server.maxConnections = 64;
+  // BUG FIX (single-IP DoS): maxConnections alone only PAUSES accept() —
+  // one host rotating 64 slow requests kept port 80 dark for EVERYONE
+  // (each slot held ~30 s by requestTimeout). A per-IP cap refuses the
+  // abusive peer specifically, so other clients keep being served.
+  // IPv6 peers are bucketed per /64 (sparse-address rotation defense).
+  const MAX_CONNS_PER_IP = 16;
+  const perIpConns = new Map<string, number>();
+  const ipKey = (remote: string | undefined): string => {
+    let ip = (remote || 'unknown').trim();
+    if (ip.startsWith('::ffff:')) ip = ip.slice(7);
+    if (!ip.includes(':')) return ip;
+    const pct = ip.indexOf('%');
+    if (pct !== -1) ip = ip.slice(0, pct);
+    const dbl = ip.indexOf('::');
+    let head: string[];
+    let tail: string[] = [];
+    if (dbl !== -1) {
+      head = ip.slice(0, dbl).split(':').filter(Boolean);
+      tail = ip.slice(dbl + 2).split(':').filter(Boolean);
+    } else {
+      head = ip.split(':');
+    }
+    const groups = [...head, ...Array(Math.max(0, 8 - head.length - tail.length)).fill('0'), ...tail];
+    return groups.slice(0, 4).join(':') + '::'; // /64 bucket
+  };
+  const decrement = (key: string): void => {
+    const n = perIpConns.get(key) ?? 1;
+    if (n <= 1) perIpConns.delete(key);
+    else perIpConns.set(key, n - 1);
+  };
+  server.on('connection', (sock: net.Socket) => {
+    const key = ipKey(sock.remoteAddress);
+    const n = (perIpConns.get(key) ?? 0) + 1;
+    if (n > MAX_CONNS_PER_IP) {
+      perIpConns.set(key, MAX_CONNS_PER_IP); // do not grow past the cap
+      sock.destroy(); // refuse the abusive peer immediately
+      return;
+    }
+    perIpConns.set(key, n);
+    sock.once('close', () => decrement(key));
+    sock.once('error', () => decrement(key)); // error is always followed by close, but be safe
+  });
   return server;
 }

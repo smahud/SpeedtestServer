@@ -183,22 +183,19 @@ export class ConfigManager extends EventEmitter {
       this.loadConfigFile(explicitPath);
       this.configFilePath = explicitPath;
       this.logger.info(`Loaded configuration from ${explicitPath} (--config)`);
+      this.applyEnvJsonOverlay(); // BUG FIX: the env JSON layer was silently dropped when --config was used
       return;
     }
-    // Check environment variable next
-    const envConfig = process.env.OOKLA_SERVER_POCO_CONFIG;
-    if (envConfig) {
-      try {
-        const parsed = JSON.parse(envConfig);
-        this.config = this.mergeConfig(this.config, parsed);
-        this.logger.info('Loaded configuration from environment variable');
-        return;
-      } catch (error) {
-        this.logger.warning('Failed to parse OOKLA_SERVER_POCO_CONFIG', { error });
-      }
-    }
+    // Environment JSON overlay (documented precedence: CLI > env JSON >
+    // properties file > defaults). BUG FIX: this used to RETURN after a
+    // successful env parse, REPLACING the file layer entirely — file-only
+    // keys (e.g. production TLS cert paths) were silently dropped and the
+    // server could degrade to a dev self-signed certificate. The env JSON
+    // now OVERLAYS whatever the file layer provides.
+    const envLoaded = this.applyEnvJsonOverlay();
 
-    // Check config files
+    // Check config files (skipped only when the env JSON parsed AND no file
+    // exists / all files failed — the overlay target must come from somewhere)
     for (const dir of CONFIG_DIRS) {
       for (const file of CONFIG_FILE_NAMES) {
         const fullPath = path.join(dir, file);
@@ -207,6 +204,12 @@ export class ConfigManager extends EventEmitter {
             this.loadConfigFile(fullPath);
             this.configFilePath = fullPath;
             this.logger.info(`Loaded configuration from ${fullPath}`);
+            if (envLoaded) {
+              // Re-apply the env overlay ON TOP of the file layer (the file
+              // load merged into this.config and overwrote env-only keys).
+              this.applyEnvJsonOverlay();
+              this.logger.info('Environment JSON re-applied over the config file (env > file precedence)');
+            }
             return;
           } catch (error) {
             this.logger.warning(`Failed to load config from ${fullPath}`, { error });
@@ -215,7 +218,24 @@ export class ConfigManager extends EventEmitter {
       }
     }
 
-    this.logger.info('No config file found; using defaults');
+    if (!envLoaded) this.logger.info('No config file found; using defaults');
+  }
+
+  /** Merge OOKLA_SERVER_POCO_CONFIG (JSON) over the current config.
+   * Returns true when the env var parsed successfully. A parse failure is
+   * logged and ignored (the file/defaults layer stays authoritative). */
+  private applyEnvJsonOverlay(): boolean {
+    const envConfig = process.env.OOKLA_SERVER_POCO_CONFIG;
+    if (!envConfig) return false;
+    try {
+      const parsed = JSON.parse(envConfig);
+      this.config = this.mergeConfig(this.config, parsed);
+      this.logger.info('Loaded configuration from environment variable');
+      return true;
+    } catch (error) {
+      this.logger.warning('Failed to parse OOKLA_SERVER_POCO_CONFIG', { error });
+      return false;
+    }
   }
 
   /**

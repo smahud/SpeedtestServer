@@ -23,7 +23,12 @@
 export class PhpFormCounter {
   private fields = new Map<string, number>();
   private arrays = new Set<string>();
-  private key: number[] = [];
+  // BUG FIX (memory amplification): the key used to accumulate as number[]
+  // (~4× the byte count in heap per request — an 8 MiB keyless body meant
+  // ~33 MB of Smi array elements, ×64 concurrent requests ≈ 2 GB). V8
+  // one-byte (latin1) strings store exactly 1 byte per char — same semantics,
+  // a quarter of the footprint.
+  private key = '';
   private valueBytes = 0;
   private inValue = false;
   private escape: number[] = [];
@@ -41,7 +46,7 @@ export class PhpFormCounter {
 
   private emit(byte: number): void {
     if (this.inValue) this.valueBytes++;
-    else this.key.push(byte);
+    else this.key += String.fromCharCode(byte); // latin1 one-byte string
   }
 
   private flushEscape(): void {
@@ -93,14 +98,16 @@ export class PhpFormCounter {
 
   private endField(): void {
     this.flushEscape();
-    this.addField(Buffer.from(this.key).toString('latin1'), this.valueBytes);
-    this.key = [];
+    // this.key is already a latin1 string — PHP strlen() byte counts preserved.
+    this.addField(this.key, this.valueBytes);
+    this.key = '';
     this.valueBytes = 0;
     this.inValue = false;
   }
 
   write(chunk: Buffer): void {
-    for (const byte of chunk) {
+    for (let i = 0; i < chunk.length; i++) {
+      const byte = chunk[i];
       if (byte === 38) this.endField();
       else if (byte === 61 && !this.inValue) {
         this.flushEscape();

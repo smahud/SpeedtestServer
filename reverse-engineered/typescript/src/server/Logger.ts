@@ -297,11 +297,28 @@ const level = parts[3]?.replace(/[\[\]]/g, '') || 'INFO';
   }
 
   /**
-   * Rotate log file if needed
+   * Rotate log file if needed.
+   *
+   * BUG FIX (hot-path syscalls): this ran a statSync on EVERY logged line —
+   * with file channels enabled, every connection/request paid an extra
+   * open/stat syscall pair synchronously. The size check is now amortized:
+   * at most once per 5 s or per 256 appended lines per channel (the append
+   * itself stays synchronous and ordered; only the redundant stat is
+   * throttled — a file can exceed maxSize by at most one interval's writes).
    */
+  private rotateStats = new Map<string, { at: number; lines: number }>();
   private rotateIfNeeded(channel: LogChannel, filePath: string): void {
     const maxSize = channel.channelOptions?.maxSize || 100 * 1024 * 1024; // 100MB
     const maxFiles = channel.channelOptions?.maxFiles || 10;
+
+    const st = this.rotateStats.get(filePath) ?? { at: 0, lines: 0 };
+    st.lines++;
+    const now = Date.now();
+    if (st.lines < 256 && now - st.at < 5000) {
+      this.rotateStats.set(filePath, st);
+      return; // amortized: skip the statSync this line
+    }
+    this.rotateStats.set(filePath, { at: now, lines: 0 });
 
     try {
       const stats = fs.statSync(filePath);
@@ -323,10 +340,12 @@ const level = parts[3]?.replace(/[\[\]]/g, '') || 'INFO';
       fs.unlinkSync(oldest);
     }
 
-    // Rotate existing
-    for (let i = maxFiles - 1; i >= 1; i--) {
-      const current = i === 1 ? filePath : `${filePath}.${i}`;
-      const next = `${filePath}.${i + 1}`;
+    // Rotate existing (base → .1, .1 → .2, … — BUG FIX: the previous loop
+    // mapped the base directly to .2, so the .1 generation never existed and
+    // one retention slot was wasted)
+    for (let i = Math.max(1, maxFiles - 1); i >= 1; i--) {
+      const current = i === 1 ? filePath : `${filePath}.${i - 1}`;
+      const next = `${filePath}.${i}`;
       if (fs.existsSync(current)) {
         fs.renameSync(current, next);
       }

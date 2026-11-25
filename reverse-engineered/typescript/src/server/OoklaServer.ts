@@ -112,8 +112,10 @@ export class OoklaServer extends EventEmitter {
       crossDomainPorts: tcpPorts.join(','),
       evidenceLogPath: this.config.evidenceLogFile || undefined,
       maxConnections: 4096,
-      maxConnectionsPerIp: this.config.ipTracking?.maxConnPerIp || 500,
-      idleTimeoutMs: Math.min((this.config.maxConnectionSeconds || 3600) * 1000, 3600_000),
+      // `??` (BUG FIX): `||` turned an explicit operator override of 0 into
+      // the default (500 / 3600), silently ignoring the configuration.
+      maxConnectionsPerIp: this.config.ipTracking?.maxConnPerIp ?? 500,
+      idleTimeoutMs: Math.min((this.config.maxConnectionSeconds ?? 3600) * 1000, 3600_000),
       // F-35/F-36: bounded shutdown + evidence backlog cap (independent
       // safety parameters — OoklaServer.shutdownGraceSeconds /
       // OoklaServer.evidenceMaxBacklogBytes, see CONFIG_MATRIX.md).

@@ -257,14 +257,20 @@ export class NetGaugeEngine {
     this.opts = opts;
   }
 
-  /** Feed received bytes (TCP chunk or WS frame payload). */
-  feed(data: Buffer): void {
+  /** Feed received bytes (TCP chunk or WS frame payload).
+   * `wireLen` — when the transport SYNTHESIZED a trailing newline for a
+   * complete frame without one (WS one-command-per-frame, F-13), the number
+   * of bytes actually received on the wire for that first command line; the
+   * synthesized byte must NOT count toward the UPLOAD inclusive total. */
+  feed(data: Buffer, wireLen?: number): void {
     if (this.closed || this.muted) return;
     // Pre-session GETIP gate (verified F-12): if HI has not been seen yet and
     // the first line of THIS read is exactly "GETIP" with more bytes behind
     // it in the same read, the reference daemon drops the whole connection
     // state (no reply ever again, socket kept open). Replicated verbatim.
-    if (!this.hiSeen && data.length > 6 && data.subarray(0, 5).toString('latin1') === 'GETIP') {
+    // Scope: command reads only — an in-progress UPLOAD's payload bytes are
+    // data, not commands, and must not trip the gate.
+    if (!this.hiSeen && this.uploadRemaining === 0 && data.length > 6 && data.subarray(0, 5).toString('latin1') === 'GETIP') {
       const nl = data.indexOf(0x0a);
       if (nl === -1 || nl + 1 < data.length) {
         this.muted = true;
@@ -272,9 +278,15 @@ export class NetGaugeEngine {
         return;
       }
     }
+    this.pendingWireLen = wireLen;
     this.buf = Buffer.concat([this.buf, data]);
     this.processBuffer();
   }
+
+  /** Wire length of the first command line parsed from the current feed
+   * (only set by transports that synthesize newlines). */
+  private pendingWireLen: number | undefined;
+
 
   private processBuffer(): void {
     while (!this.closed && !this.muted) {
@@ -296,12 +308,18 @@ export class NetGaugeEngine {
       if (idx === -1) {
         if (this.buf.length > this.opts.maxLineBytes) {
           this.hooks.onEvent?.('line_overflow', { bytes: this.buf.length });
+          // Terminate the session FIRST: hooks.close() only half-closes the
+          // TCP stream (FIN) — data events keep arriving after it, and
+          // without `closed` this buffer would grow at line rate forever.
+          this.closed = true;
+          this.buf = Buffer.alloc(0);
           this.hooks.close();
         }
         return;
       }
       const line = this.buf.subarray(0, idx);
-      const lineLen = idx + 1; // includes the newline (UPLOAD counts it)
+      const lineLen = this.pendingWireLen ?? idx + 1; // includes the newline (UPLOAD counts it) unless it was synthesized
+      this.pendingWireLen = undefined;
       this.buf = this.buf.subarray(idx + 1);
       this.processCommand(line, lineLen);
     }
@@ -425,10 +443,19 @@ export class NetGaugeEngine {
     if (s.startsWith('UPLOAD ')) {
       const parts = s.slice(7).trim().split(/\s+/);
       const n = parseInt(parts[0], 10);
-      if (!Number.isFinite(n) || n < 0 || n > this.opts.maxUploadBytes) {
+      if (!Number.isFinite(n) || n < 0) {
         // Verified daemon behavior: non-numeric / negative size → the command
         // is silently ignored (no reply) and the connection keeps processing.
         this.hooks.onEvent?.('upload_invalid_ignored', { arg: parts[0].slice(0, 24) });
+        return;
+      }
+      if (n > this.opts.maxUploadBytes) {
+        // A WELL-FORMED size above the configured cap: refusing with ERROR
+        // mirrors DOWNLOAD's documented safety deviation (otherwise the
+        // payload bytes would be parsed as commands and only produce garbage
+        // ERROR replies — the client would hang on its OK).
+        this.hooks.onEvent?.('upload_cap_rejected', { declared: n, cap: this.opts.maxUploadBytes });
+        this.errorReply();
         return;
       }
       if (n < lineLen) {

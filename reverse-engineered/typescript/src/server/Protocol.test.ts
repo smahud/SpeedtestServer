@@ -362,6 +362,74 @@ describe('NetGaugeEngine command contract', () => {
     expect(t.text()).toMatch(/^OK 20 \d{13}\n$/);
   });
 
+  /* ---- Regression tests: 2026-11-25 production-hardening pass ---- */
+
+  test('line overflow: engine closes AND stops consuming (no unbounded buffer after FIN)', () => {
+    // Rev-7 bug fix: the overflow path used to call hooks.close() WITHOUT
+    // setting closed=true or clearing the buffer — after a TCP half-close
+    // (FIN) data events keep arriving, so the line buffer grew at line rate
+    // forever (memory DoS).
+    const t = makeEngine();
+    const giant = Buffer.alloc(1024 * 1024 + 1, 0x41); // 'A' — no newline
+    t.engine.feed(giant);
+    expect(t.wasClosed()).toBe(true);
+    // Post-overflow bytes must be ignored entirely (engine is closed).
+    t.engine.feed(Buffer.alloc(1024 * 1024, 0x42));
+    expect(t.text()).toBe(''); // no ERROR reply, no strikes
+  });
+
+  test('UPLOAD with well-formed size ABOVE the configured cap → ERROR (parity with DOWNLOAD cap)', () => {
+    // Rev-7 fix: the silent-ignore branch conflated garbage/negative sizes
+    // (daemon parity) with a valid size above maxUploadBytes, leaving the
+    // client hanging on an OK that never comes while its payload was parsed
+    // as garbage commands.
+    const { hooks, writes, text } = makeHooks([]);
+    const engine = new NetGaugeEngine(hooks, {
+      versionString: '2.11 (2.11.5) 2026-06-04.1737.7d0993d',
+      instanceUuid: 'aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000',
+      maxLineBytes: 1024 * 1024,
+      maxDownloadBytes: 0x7fffffff,
+      maxUploadBytes: 1000,
+      pool: generateAsciiPool(2 * 1024 * 1024),
+      loss: new LossRegistry(),
+      startedAt: Date.now(),
+    });
+    engine.feed(Buffer.from('UPLOAD 5000\n'));
+    expect(text()).toBe('ERROR\n');
+    expect(writes.length).toBe(1);
+  });
+
+  test('UPLOAD inclusive counting uses the WIRE length, not a synthesized newline (WS transports)', () => {
+    // Rev-7 fix: WS frames without a trailing newline get one synthesized
+    // by the TRANSPORT for the line-based engine — the synthesized byte must
+    // not count toward the UPLOAD total (the client never sent it). The
+    // engine receives the line WITH '\n' plus the real wire length.
+    const t = makeEngine();
+    // Client sent "UPLOAD 11" (9 bytes, NO newline); transport feeds
+    // "UPLOAD 11\n" but reports wireLen=9:
+    t.engine.feed(Buffer.from('UPLOAD 11\n'), 9);
+    t.engine.feed(Buffer.from('XY')); // +2 payload bytes → 9 + 2 = 11
+    expect(t.text()).toMatch(/^OK 11 \d{13}\n$/);
+    // Control: newline actually ON the wire ("UPLOAD 11\n" = 10 bytes) →
+    // lineLen counts it; 10 + 1 payload byte = 11.
+    const t2 = makeEngine();
+    t2.engine.feed(Buffer.from('UPLOAD 11\n'));
+    t2.engine.feed(Buffer.from('Z'));
+    expect(t2.text()).toMatch(/^OK 11 \d{13}\n$/);
+  });
+
+  test('GETIP pre-session gate does not fire on UPLOAD payload bytes (mid-upload)', () => {
+    // Rev-7 fix: the gate inspected every fed chunk while HI was unseen —
+    // upload payload beginning with the bytes "GETIP\n..." muted a session
+    // mid-transfer (no OK ever sent). The gate is now scoped to command reads
+    // (uploadRemaining === 0).
+    const t = makeEngine();
+    t.engine.feed(Buffer.from('UPLOAD 21\n')); // command line 10 bytes → remaining 11
+    // 11 payload bytes shaped like the gate trigger — the OLD code muted here:
+    t.engine.feed(Buffer.from('GETIP\nEXTRA'));
+    expect(t.text()).toMatch(/^OK 21 \d{13}\n$/);
+  });
+
   /* ---- QUIT per transport (F-14) ---- */
 
   test('QUIT over TCP → connection closed', () => {

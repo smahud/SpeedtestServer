@@ -306,6 +306,13 @@ export class ServerCore {
               srv.listen(
                 t.host === '::' ? { port, host: '::', ipv6Only: true } : { port, host: t.host },
                 () => {
+                  // BUG FIX (stale once-listener): after resolve() the reject
+                  // listener stayed armed — the FIRST post-startup server
+                  // error (e.g. EMFILE on accept) was silently swallowed and
+                  // the SECOND crashed the process as an unhandled 'error'
+                  // event. Remove it and log server errors permanently.
+                  srv.removeListener('error', reject);
+                  srv.on('error', (e) => this.ev('tcp_server_error', { port, host: t.host, error: String(e) }));
                   this.ev('listen_tcp', { port, host: t.host, family: t.family });
                   resolve();
                 },
@@ -324,7 +331,13 @@ export class ServerCore {
         bindHosts: targets.map((t) => t.host),
         loss: this.loss,
         maxDatagramBytes: 2048,
-        onEvent: (k, d) => this.ev(k, d),
+        onEvent: (k, d) => {
+          // Wire the global evidence counters (BUG FIX: they were declared
+          // and read by the validation harness but never incremented).
+          if (k === 'udp_recv' || k === 'udp_count') this.counters.udpReceived++;
+          if (k === 'udp_recv') this.counters.udpAnswered++; // 5-field form gets the RECV reply
+          this.ev(k, d);
+        },
       });
       await this.udp.start();
     } catch (error) {
@@ -521,9 +534,16 @@ export class ServerCore {
     const info = parseTlsHostInfo(cert);
     this.hostInfo.allowedHosts.splice(0, this.hostInfo.allowedHosts.length, ...info.allowedHosts);
     this.hostInfo.certPrimaryHost = info.certPrimaryHost;
-    this.ev('tls_reloaded', {
-      fingerprint: new crypto.X509Certificate(cert.toString()).fingerprint256,
-    });
+    // BUG FIX: state was already mutated above — a fingerprint parse failure
+    // must not escape reloadTls() as a throw (the caller would treat a live
+    // reload as failed). Degrade the event payload instead.
+    let fingerprint: string | null = null;
+    try {
+      fingerprint = new crypto.X509Certificate(cert.toString()).fingerprint256;
+    } catch {
+      /* certificate already accepted by createSecureContext above */
+    }
+    this.ev('tls_reloaded', fingerprint ? { fingerprint } : { fingerprint: null });
     return { ok: true };
   }
 
@@ -662,12 +682,21 @@ export class ServerCore {
      *  performs its own minimal-500 write + destroy. */
     const decide = (): 'route' | 'wait' | 'reject' => {
       const buf = Buffer.concat(chunks);
-      const end = buf.indexOf('\r\n\r\n');
-      if (end === -1) {
-        return total > CAP ? 'route' : 'wait'; // let Node enforce its own limits
+      // Header terminator: standard CRLF CRLF, or bare LF LF for LF-only
+      // clients (Node's llhttp and Poco both accept LF-only requests).
+      // Previously LF-only requests hung until the idle timeout.
+      let stop = buf.indexOf('\r\n\r\n');
+      let firstEnd = buf.indexOf('\r\n');
+      let firstLen = 2;
+      if (stop === -1) {
+        stop = buf.indexOf('\n\n');
+        firstEnd = buf.indexOf('\n');
+        firstLen = 1;
+        if (stop === -1) {
+          return total > CAP ? 'route' : 'wait'; // let Node enforce its own limits
+        }
       }
-      const firstLineEnd = buf.indexOf('\r\n');
-      const headerRegion = buf.subarray(firstLineEnd + 2, end + 2);
+      const headerRegion = buf.subarray(firstEnd === -1 ? 0 : firstEnd + firstLen, stop);
       if (!/^Host:/im.test(headerRegion.toString('latin1'))) {
         this.ev('http_reject', { reason: 'missing_host', id, peer });
         sock.write('HTTP/1.1 500 Internal Server Error\r\nConnection: Close\r\n\r\n');
@@ -834,9 +863,30 @@ export class ServerCore {
       this.perIp.set(peerIp, (this.perIp.get(peerIp) ?? 0) + 1);
       ownsAccounting = true;
     }
+    let resumePoll: NodeJS.Timeout | null = null;
     const send = (data: Buffer | string): boolean => {
       if (ws.readyState !== WebSocket.OPEN) return false;
       ws.send(data, { binary: typeof data !== 'string' });
+      // BUG FIX (WS backpressure): ws.send() ALWAYS accepts and queues — a
+      // slow WS client let the engine synchronously queue the ENTIRE download
+      // (up to ~2 GiB per command) in userland, OOM-killing the process (the
+      // TCP path parks on write()==false + 'drain'; WS had no equivalent).
+      // Park the engine once the socket's pending write buffer exceeds the
+      // cap; a short poll resumes the session when it drains again.
+      if (ws.bufferedAmount > WS_BACKPRESSURE_CAP) {
+        if (resumePoll == null) {
+          resumePoll = setInterval(() => {
+            if (resumePoll == null) return;
+            if (ws.readyState !== WebSocket.OPEN || ws.bufferedAmount <= WS_BACKPRESSURE_CAP >> 1) {
+              clearInterval(resumePoll);
+              resumePoll = null;
+              if (ws.readyState === WebSocket.OPEN) engine.notifyWritable();
+            }
+          }, 25);
+          resumePoll.unref();
+        }
+        return false; // engine parks via waitDrain until notifyWritable()
+      }
       return true;
     };
     const hooks: NetGaugeSessionHooks = {
@@ -877,10 +927,21 @@ export class ServerCore {
       // Verified F-13: the daemon processes (at most) the FIRST command of
       // each WS frame and discards the rest — e.g. a "HI\nGETIP\n" frame
       // yields exactly one HELLO. Upload payload frames are exempt.
-      const payload = engine.isIdle ? firstCommandLine(buf) : buf;
-      engine.feed(payload);
+      if (engine.isIdle) {
+        const nl = buf.indexOf(0x0a);
+        // When the frame had NO newline one is synthesized for the
+        // line-based engine — tell it the REAL wire length so UPLOAD's
+        // inclusive counting counts bytes actually received.
+        engine.feed(firstCommandLine(buf), nl === -1 ? buf.length : undefined);
+      } else {
+        engine.feed(buf);
+      }
     });
     ws.on('close', () => {
+      if (resumePoll != null) {
+        clearInterval(resumePoll);
+        resumePoll = null;
+      }
       engine.destroy();
       if (ownsAccounting) {
         // fallback path only — normally the raw socket's close handler owns
@@ -895,6 +956,10 @@ export class ServerCore {
       // conn_close with the FINAL shared stats entry (byte counters included).
     });
     ws.on('error', (e) => {
+      if (resumePoll != null) {
+        clearInterval(resumePoll);
+        resumePoll = null;
+      }
       // F-27: a message-level maxPayload violation (fragmented frames) or a
       // protocol error — the daemon path is a silent abort; resetAndDestroy
       // sends an RST and suppresses any close handshake.
@@ -915,6 +980,11 @@ export class ServerCore {
     this.ev('conn_ws', { id, peer, secure });
   }
 }
+
+/** WS write-buffer cap for backpressure (BUG FIX — see handleWsConnection).
+ *  4 MiB in-flight per session: bounded memory across concurrent sessions
+ *  while still deep enough to keep fast clients saturated. */
+const WS_BACKPRESSURE_CAP = 4 * 1024 * 1024;
 
 /** First command line of a WS frame (inclusive newline). Frames with NO
  *  newline are still one complete command (verified F-13: a bare "HI" frame
