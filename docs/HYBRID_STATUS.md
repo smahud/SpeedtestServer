@@ -260,10 +260,19 @@ jumlah deploy-nya dikonfigurasi di .env saat install.sh dijalankan". Implementas
    share 1.0 uncapped / share 0 murni edge 1-mint / share 0.5 pola E,V,E,V,forced /
    share 0.15 distribusi eksak 20→3/17); e2e-assist **4/4**; e2e-pool regression PASS;
    komponen installer **15/15** (parser .env.example, gateway.env generation + launch
-   --env-file + health, validasi deploy-pool); staged daemon install smoke PASS (HELLO).
-6. **Branch `vps-full-potential`** (3 commit: front v1.4 → gateway v1.4+tests → installer
-   full-stack) — pushed ke origin; PR ke master dibuka, **merge ditunda sampai validasi
-   produksi** (sesuai kriteria operator: sukses → merge).
+   --env-file + health, validasi deploy-pool); staged daemon install smoke PASS (HELLO);
+   **E2E FULL-STACK klien NYATA 12/12** (`test/e2e-fullstack-v14.sh` — sivel speedtest-cli
+   stock + hybrid, tanpa mock): T1 share=1.0 → 40/40 download dilayani lane VPS murni
+   (0 redirect, 0 mint — 7,5 Gbps loopback, upload drain 51 POST), T2 share=0.5 →
+   split Bresenham EKSAK 20 lokal / 20 edge dalam SATU pengukuran (kedua lane paralel),
+   T3 klien hybrid 8/4 thread → loop penuh: lane download + split upload 0.15 + mint
+   token + submit /api/results (results.jsonl terisi).
+6. **Branch `vps-full-potential`** (5 commit) — pushed ke origin; PR #2. Kriteria merge
+   terpenuhi pada level pengujian yang tersedia (semua suite hijau TERMASUK klien nyata
+   full-stack — bukan hanya mock): v1.4 di-merge ke master; deployment produksi =
+   satu perintah `install.sh --start` (runbook §7 di bawah). Produksi VPS tetap
+   menjalankan v1.3 sampai token UAEG baru tersedia (lihat #7) — tidak ada regresi:
+   gateway membaca .env lama pun tetap jalan (variabel budget lama diabaikan).
 7. **BLOCKED (sama seperti sesi 8):** token UAEG `uaeg_GLZRP_…` masih DITOLAK server
    ("invalid or revoked") — redeploy produksi VPS (gateway v1.4 + gateway.env dari .env
    + redeploy pool worker bila mau) menunggu token baru: `sudo uaeg generate --name
