@@ -54,7 +54,7 @@
     "payload_vs_probe_vpsbytes": "1:27337",
     "payload_vs_interface_upper_bound": "1:640"
   },
-  "interpretation": "Delta interface eth0 pada jendela 81 s hanyalah 183.393 B (batas atas — mencakup SEMUA trafik VPS: sesi MCP agent, Ookla/nPerf produksi, dst.), sedangkan payload 117.440.512 B mengalir client<->edge Cloudflare. Trafik kontrol Jalur B di gateway eksak 4.404 B. Hasil sesi dipersist di /var/lib/speedtest-hybrid/results.jsonl (guid 0b3dd684-9f1a-495c-994b-f96844759164, replay dedup OK).",
+  "interpretation": "Delta interface eth0 pada jendela 81 s hanyalah 183.393 B (batas atas — mencakup SEMUA trafik VPS: sesi MCP agent, Ookla produksi dan layanan lain, dst.), sedangkan payload 117.440.512 B mengalir client<->edge Cloudflare. Trafik kontrol Jalur B di gateway eksak 4.404 B. Hasil sesi dipersist di /var/lib/speedtest-hybrid/results.jsonl (guid 0b3dd684-9f1a-495c-994b-f96844759164, replay dedup OK).",
   "worker_invocations_today_utc": {
     "speedtest-hybrid-worker": {
       "requests": 110,

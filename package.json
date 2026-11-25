@@ -1,6 +1,6 @@
 {
   "name": "speedtestserver",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "OoklaServer Reverse Engineering Project - TypeScript implementation of OoklaServer speed test server",
   "main": "reverse-engineered/typescript/dist/bin/ooklaserver.js",
   "bin": {

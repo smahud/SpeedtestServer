@@ -1,5 +1,5 @@
 /**
- * workerpool.mjs — smart worker-pool manager for the hybrid gateway.
+ * workerpool.mjs — smart worker-pool manager for the hybrid gateway (v1.5).
  *
  * Implements the pool control plane ("VPS memegang kendali worker"):
  *
@@ -13,13 +13,17 @@
  *     cheap `__down?bytes=0` invocation) before it enters the rotation, and
  *     benched for a cooldown when it fails.
  *   - ROUND-ROBIN selection over healthy active workers.
- *   - OPTIONAL Cloudflare quota guard: with HYBRID_CF_API_TOKEN +
- *     HYBRID_CF_ACCOUNT_ID the manager polls Workers Analytics (GraphQL,
- *     hourly, 1 API call) and exposes the account-wide daily invocation
- *     usage. Above the soft threshold growth stops; above the hard
- *     threshold minting is refused so the account cannot be quota-burned
- *     (Workers Free: 100,000 requests/day ACCOUNT-WIDE — a pool of 100
- *     workers does NOT multiply that number, it distributes it).
+ *   - OPTIONAL Cloudflare quota guard: with credentials present the manager
+ *     polls Workers Analytics (GraphQL, hourly, 1 API call) and exposes the
+ *     account-wide daily invocation usage. Above the soft threshold growth
+ *     stops; above the hard threshold minting is refused so the account
+ *     cannot be quota-burned (Workers Free: 100,000 requests/day
+ *     ACCOUNT-WIDE — a pool of 100 workers does NOT multiply that number,
+ *     it distributes it).
+ *   - v1.5 reconfigure(patch): the routing pool follows the LIVE .env —
+ *     deploy count, active bounds, autoscaler tuning and worker URLs can
+ *     change while the gateway runs (state preserved per-URL).
+ *   - v1.5 createRateLimiter: setMpm() — the rate itself is hot-configurable.
  *
  * Env (all optional; defaults preserve the legacy single-worker behavior):
  *   HYBRID_WORKER_POOL_MAX        default 1      (100 = the Free-plan script cap)
@@ -33,8 +37,8 @@
  *   HYBRID_WORKER_BENCH_COOLDOWN_MS default 120000
  *   HYBRID_WORKER_URLS            explicit comma-separated worker URL list (overrides derivation)
  *   HYBRID_WORKER_CANARY_BYTES    default 0      (__down?bytes=0 TTFB probe)
- *   HYBRID_CF_API_TOKEN           optional — enables the quota guard
- *   HYBRID_CF_ACCOUNT_ID          required with the token
+ *   HYBRID_CF_API_TOKEN / HYBRID_CF_EMAIL + HYBRID_CF_API_KEY / HYBRID_CF_ACCOUNT_ID
+ *                                optional — enables the quota guard (token or global key auth)
  *   HYBRID_CF_QUOTA_SOFT_PCT      default 80     stop growing above this % of the daily quota
  *   HYBRID_CF_QUOTA_HARD_PCT      default 95     refuse mints above this %
  *   HYBRID_CF_DAILY_QUOTA         default 100000 (Workers Free)
@@ -63,14 +67,15 @@ export function ipKey(ip) {
   return groups.slice(0, 4).join(':') + '::';
 }
 
-/** Per-key sliding-window rate limiter (returns allow(key) + state()). */
+/** Per-key sliding-window rate limiter. v1.5: setMpm() makes the rate live. */
 export function createRateLimiter(mpm) {
   const window = new Map(); // key -> [timestamps]
+  let rate = mpm;
   function allow(key) {
-    if (!mpm) return true;
+    if (!rate) return true;
     const now = Date.now();
     const list = (window.get(key) || []).filter((t) => now - t < 60_000);
-    if (list.length >= mpm) {
+    if (list.length >= rate) {
       window.set(key, list);
       if (window.size > 10_000) window.delete(window.keys().next().value);
       return false;
@@ -80,7 +85,7 @@ export function createRateLimiter(mpm) {
     if (window.size > 10_000) window.delete(window.keys().next().value);
     return true;
   }
-  return { allow, size: () => window.size };
+  return { allow, setMpm(v) { rate = Number.isFinite(Number(v)) ? Math.max(0, Number(v)) : 0; }, size: () => window.size };
 }
 
 function envNum(name, dflt) {
@@ -123,33 +128,39 @@ function deriveWorkerUrls(base, max, log) {
 
 export function createWorkerPool(opts = {}) {
   const log = opts.log || (() => {});
-  const base = opts.base || 'http://127.0.0.1:8790';
-  const explicitUrls = (process.env.HYBRID_WORKER_URLS || opts.urls || '')
+  let base = opts.base || 'http://127.0.0.1:8790';
+  let explicitUrls = (process.env.HYBRID_WORKER_URLS || opts.urls || '')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  const poolMax = Math.max(1, Math.floor(envNum('HYBRID_WORKER_POOL_MAX', opts.poolMax ?? 1)));
-  const urls = explicitUrls.length > 1 ? explicitUrls.slice(0, poolMax) : deriveWorkerUrls(base, poolMax, log);
-  const effectiveMax = Math.min(poolMax, urls.length);
+  let poolMax = Math.max(1, Math.floor(envNum('HYBRID_WORKER_POOL_MAX', opts.poolMax ?? 1)));
+  let urls = explicitUrls.length > 1 ? explicitUrls.slice(0, poolMax) : deriveWorkerUrls(base, poolMax, log);
+  let effectiveMax = Math.min(poolMax, urls.length);
 
-  const activeMin = Math.max(1, Math.min(effectiveMax, Math.floor(envNum('HYBRID_WORKER_ACTIVE_MIN', opts.activeMin ?? 1))));
-  const activeMax = Math.max(activeMin, Math.min(effectiveMax, Math.floor(envNum('HYBRID_WORKER_ACTIVE_MAX', opts.activeMax ?? effectiveMax))));
-  const scaleRate = Math.max(1, envNum('HYBRID_WORKER_SCALE_RATE', opts.scaleRate ?? 24));
-  const shrinkRate = Math.max(1, envNum('HYBRID_WORKER_SHRINK_RATE', opts.shrinkRate ?? 6));
-  const idleShrinkMs = envNum('HYBRID_WORKER_IDLE_SHRINK_MS', opts.idleShrinkMs ?? 600_000);
-  const probeIntervalMs = envNum('HYBRID_WORKER_PROBE_INTERVAL_MS', opts.probeIntervalMs ?? 0);
+  let activeMin = Math.max(1, Math.min(effectiveMax, Math.floor(envNum('HYBRID_WORKER_ACTIVE_MIN', opts.activeMin ?? 1))));
+  let activeMaxArg = Math.floor(envNum('HYBRID_WORKER_ACTIVE_MAX', opts.activeMax ?? 0));
+  let activeMax = Math.max(activeMin, Math.min(effectiveMax, activeMaxArg || effectiveMax));
+  let scaleRate = Math.max(1, envNum('HYBRID_WORKER_SCALE_RATE', opts.scaleRate ?? 24));
+  let shrinkRate = Math.max(1, envNum('HYBRID_WORKER_SHRINK_RATE', opts.shrinkRate ?? 6));
+  let idleShrinkMs = envNum('HYBRID_WORKER_IDLE_SHRINK_MS', opts.idleShrinkMs ?? 600_000);
+  let probeIntervalMs = envNum('HYBRID_WORKER_PROBE_INTERVAL_MS', opts.probeIntervalMs ?? 0);
   const probeTimeoutMs = envNum('HYBRID_WORKER_PROBE_TIMEOUT_MS', opts.probeTimeoutMs ?? 4000);
   const benchCooldownMs = envNum('HYBRID_WORKER_BENCH_COOLDOWN_MS', opts.benchCooldownMs ?? 120_000);
   const canaryBytes = envNum('HYBRID_WORKER_CANARY_BYTES', 0);
 
-  // Cloudflare quota guard (optional).
+  // Cloudflare quota guard (optional): token method or global key method.
   const cfToken = process.env.HYBRID_CF_API_TOKEN || opts.cfToken || '';
+  const cfEmail = process.env.HYBRID_CF_EMAIL || opts.cfEmail || '';
+  const cfKey = process.env.HYBRID_CF_API_KEY || opts.cfKey || '';
   const cfAccount = process.env.HYBRID_CF_ACCOUNT_ID || opts.cfAccount || '';
   const cfQuota = Math.max(1000, envNum('HYBRID_CF_DAILY_QUOTA', 100_000));
   const cfSoftPct = envNum('HYBRID_CF_QUOTA_SOFT_PCT', 80);
   const cfHardPct = envNum('HYBRID_CF_QUOTA_HARD_PCT', 95);
 
-  const workers = urls.map((url, i) => ({
+  // Worker slots are POSITIONAL (worker N = url index N-1 — matches the
+  // deployed script naming `<base>-N`). v1.5 reconfigure() preserves each
+  // slot's counters by URL when the pool grows/shrinks.
+  let workers = urls.map((url, i) => ({
     id: i + 1,
     url,
     mints: [], // timestamps of tokens routed to this worker (last 60 s)
@@ -160,12 +171,9 @@ export function createWorkerPool(opts = {}) {
     served: 0,
   }));
 
-  // BUG FIX (2026-11-25, sesi 9): the active set used to be "the first
-  // activeCount workers" — a dead/benched candidate at position activeCount
-  // BLOCKED ALL GROWTH PAST IT (worker 2 dead → worker 3+ could never be
-  // activated, permanently capping the pool below its size). The active set
-  // is now an explicit id list; growth scans for the next healthy,
-  // non-backing-off candidate anywhere beyond the active set.
+  // BUG FIX (2026-11-25, kept): the active set is an explicit id list;
+  // growth scans for the next healthy, non-backing-off candidate anywhere
+  // beyond the active set — a dead sibling no longer blocks scale-up.
   let activeIds = workers.slice(0, activeMin).map((w) => w.id);
   let activeCount = activeIds.length;
   let cursor = 0;
@@ -176,13 +184,13 @@ export function createWorkerPool(opts = {}) {
   let cfUsage = { known: false, used: 0, quota: cfQuota, checkedAt: 0, error: null };
   let probeCursor = 0;
   let stopped = false;
+  let reconfigures = 0;
 
   const healthy = (w) => Date.now() >= w.benchUntil;
   const activeWorkers = () => workers.filter((w) => activeIds.includes(w.id) && healthy(w));
 
   /** Next growth candidate: lowest-id worker NOT active, not benched, and
-   *  not in canary backoff — so a dead sibling in the middle of the ring no
-   *  longer stalls the whole pool's scale-up. */
+   *  not in canary backoff. */
   function nextCandidate() {
     for (const w of workers) {
       if (activeIds.includes(w.id)) continue;
@@ -210,6 +218,7 @@ export function createWorkerPool(opts = {}) {
 
   function recordMint(id) {
     const w = workers.find((x) => x.id === id) || workers[0];
+    if (!w) return;
     const now = Date.now();
     w.mints.push(now);
     w.served++;
@@ -257,8 +266,7 @@ export function createWorkerPool(opts = {}) {
       ok = false;
       recordWorkerError(w.id);
     }
-    // Exponential backoff for failing candidates (5 s → 60 s cap) so a dead
-    // sibling costs at most ~1 canary/minute instead of 1 per 5 s tick.
+    // Exponential backoff for failing candidates (5 s → 60 s cap).
     if (!ok) {
       const prev = canaryBackoff.get(w.id) || { retryAt: 0, failCount: 0 };
       const backoffMs = Math.min(60_000, 5_000 * 2 ** Math.min(prev.failCount, 4));
@@ -281,8 +289,12 @@ export function createWorkerPool(opts = {}) {
   }
 
   /** Quota guard: hourly GraphQL poll of the account-wide daily invocations. */
+  function cfHeaders() {
+    if (cfToken) return { Authorization: `Bearer ${cfToken}`, 'Content-Type': 'application/json' };
+    return { 'X-Auth-Email': cfEmail, 'X-Auth-Key': cfKey, 'Content-Type': 'application/json' };
+  }
   async function refreshCfUsage() {
-    if (!cfToken || !cfAccount) return;
+    if ((!cfToken && !(cfEmail && cfKey)) || !cfAccount) return;
     if (Date.now() - cfUsage.checkedAt < 3600_000) return;
     cfUsage.checkedAt = Date.now();
     const since = new Date();
@@ -291,7 +303,7 @@ export function createWorkerPool(opts = {}) {
     try {
       const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${cfToken}`, 'Content-Type': 'application/json' },
+        headers: cfHeaders(),
         body: JSON.stringify({ query: q }),
       });
       const j = await res.json();
@@ -316,9 +328,7 @@ export function createWorkerPool(opts = {}) {
       const target = Math.max(activeMin, Math.min(activeMax, Math.ceil(rate / scaleRate)));
 
       if (target > activeCount && !quotaBlocksGrowth()) {
-        // Grow one worker per tick (canary-gated); the candidate scan skips
-        // benched / backing-off siblings so one dead worker in the middle of
-        // the ring no longer blocks activation of the healthy ones beyond it.
+        // Grow one worker per tick (canary-gated).
         const candidate = nextCandidate();
         if (candidate) {
           const ok = await canary(candidate);
@@ -337,8 +347,6 @@ export function createWorkerPool(opts = {}) {
         if (!idleSince) idleSince = Date.now();
         else if (Date.now() - idleSince >= idleShrinkMs && activeCount > activeMin) {
           while (activeIds.length > activeMin && activeIds[activeIds.length - 1] === 1) {
-            // defensive: rotate the primary to the front if it ever ends up
-            // at the tail (cannot happen via push/pop, but stays correct).
             activeIds.unshift(activeIds.pop());
             break;
           }
@@ -353,8 +361,7 @@ export function createWorkerPool(opts = {}) {
         idleSince = 0;
       }
 
-      // Optional periodic health probing of the ACTIVE set (staggered: at
-      // most one worker per tick — bounded probe budget even at 100 active).
+      // Optional periodic health probing of the ACTIVE set (staggered).
       if (probeIntervalMs > 0 && Date.now() - (state.lastPeriodicProbeAt || 0) >= probeIntervalMs / Math.max(1, activeCount)) {
         const act = activeWorkers();
         if (act.length > 0) {
@@ -373,6 +380,68 @@ export function createWorkerPool(opts = {}) {
   const timer = setTimeout(tick, TICK_MS);
   timer.unref?.();
 
+  // --- v1.5: live reconfiguration (.env hot-reload) ------------------------
+  function reconfigure(patch = {}) {
+    reconfigures++;
+    if (patch.poolMax !== undefined && Number.isFinite(Number(patch.poolMax)) && Number(patch.poolMax) >= 1) {
+      poolMax = Math.floor(Number(patch.poolMax));
+    }
+    if (patch.activeMin !== undefined && Number.isFinite(Number(patch.activeMin)) && Number(patch.activeMin) >= 1) {
+      activeMin = Math.floor(Number(patch.activeMin));
+    }
+    if (patch.activeMax !== undefined && Number.isFinite(Number(patch.activeMax)) && Number(patch.activeMax) >= 0) {
+      activeMaxArg = Math.floor(Number(patch.activeMax));
+    }
+    if (patch.scaleRate !== undefined && Number.isFinite(Number(patch.scaleRate)) && Number(patch.scaleRate) >= 1) {
+      scaleRate = Math.floor(Number(patch.scaleRate));
+    }
+    if (patch.shrinkRate !== undefined && Number.isFinite(Number(patch.shrinkRate)) && Number(patch.shrinkRate) >= 1) {
+      shrinkRate = Math.floor(Number(patch.shrinkRate));
+    }
+    if (patch.idleShrinkMs !== undefined && Number.isFinite(Number(patch.idleShrinkMs)) && Number(patch.idleShrinkMs) >= 0) {
+      idleShrinkMs = Number(patch.idleShrinkMs);
+    }
+    if (patch.probeIntervalMs !== undefined && Number.isFinite(Number(patch.probeIntervalMs)) && Number(patch.probeIntervalMs) >= 0) {
+      probeIntervalMs = Number(patch.probeIntervalMs);
+    }
+    if (patch.workerUrls && patch.workerUrls.length > 1) {
+      explicitUrls = patch.workerUrls.slice();
+    }
+    if (patch.workerBase && patch.workerBase !== base) {
+      base = patch.workerBase;
+    }
+    if (explicitUrls.length > 1) {
+      urls = explicitUrls.slice(0, poolMax);
+    } else {
+      urls = deriveWorkerUrls(base, poolMax, log);
+    }
+    effectiveMax = Math.min(poolMax, urls.length);
+    activeMin = Math.max(1, Math.min(effectiveMax, activeMin));
+    activeMax = Math.max(activeMin, Math.min(effectiveMax, activeMaxArg || effectiveMax));
+
+    // Reconcile worker slots POSITIONALLY, preserving per-URL counters.
+    const byUrl = new Map(workers.map((w) => [w.url, w]));
+    workers = urls.map((url, i) => {
+      const prev = byUrl.get(url);
+      return prev
+        ? { ...prev, id: i + 1 }
+        : { id: i + 1, url, mints: [], benchUntil: 0, probeFailures: 0, lastProbeOk: 0, lastProbeMs: -1, served: 0 };
+    });
+    // Keep the backoff map bounded to the current pool size.
+    for (const id of [...canaryBackoff.keys()]) if (id > effectiveMax) canaryBackoff.delete(id);
+
+    // Clamp the active set into the new bounds (keep the lowest ids).
+    activeIds = activeIds.filter((id) => id <= effectiveMax).sort((a, b) => a - b).slice(0, activeMax);
+    while (activeIds.length < activeMin) {
+      const next = activeIds.length + 1;
+      if (next > effectiveMax) break;
+      activeIds.push(next);
+    }
+    activeCount = activeIds.length;
+    idleSince = 0;
+    log('pool_reconfigured', { poolMax: effectiveMax, activeMin, activeMax, activeCount, reconfigures });
+  }
+
   function status() {
     pruneMints();
     return {
@@ -380,13 +449,14 @@ export function createWorkerPool(opts = {}) {
       activeMin,
       activeMax,
       activeCount,
+      reconfigures,
       mintRatePerMin: mintRatePerMin(),
       mintsTotal: mintTotal,
       scaleRate,
       shrinkRate,
       idleShrinkMs,
       probing: probeIntervalMs > 0,
-      quotaGuard: cfToken ? { enabled: true, ...cfUsage, usedPct: Math.round(quotaPct() * 10) / 10, softPct: cfSoftPct, hardPct: cfHardPct } : { enabled: false },
+      quotaGuard: cfToken || (cfEmail && cfKey) ? { enabled: true, ...cfUsage, usedPct: Math.round(quotaPct() * 10) / 10, softPct: cfSoftPct, hardPct: cfHardPct } : { enabled: false },
       quotaBlocksGrowth: quotaBlocksGrowth(),
       quotaBlocksMint: quotaBlocksMint(),
       activeIds: [...activeIds],
@@ -411,6 +481,7 @@ export function createWorkerPool(opts = {}) {
     recordWorkerError,
     recordWorkerOk,
     canary,
+    reconfigure,
     status,
     quotaBlocksMint,
     mintRatePerMin,

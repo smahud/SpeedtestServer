@@ -46,7 +46,7 @@ in `evidence/http-repair-20261123/`.
 The VPS source at `/opt/SpeedtestServer-src` and runtime at
 `/opt/speedtestserver` were updated; only `speedtestserver` was restarted.
 Rollback snapshot: `/root/speedtestserver-rollback/http-parity-eBSdzq/dist`.
-The fallback and nPerf processes remained active with their original PIDs.
+The fallback and layanan lain processes remained active with their original PIDs.
 
 Runtime SHA-256 values match the local build:
 

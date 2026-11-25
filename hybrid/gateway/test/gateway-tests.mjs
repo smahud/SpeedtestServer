@@ -310,7 +310,7 @@ test('extra: /api/pool and /api/health expose pool state', async () => {
     const h = await req(g.port, 'GET', '/api/health');
     const hj = JSON.parse(h.body);
     assert.equal(hj.pool.poolMax, 3);
-    assert.ok(hj.server.startsWith('hybrid-gateway/1.4'));
+    assert.ok(hj.server.startsWith('hybrid-gateway/1.5'));
   } finally {
     await g.stop();
   }
@@ -483,4 +483,199 @@ test('T14: assist lane — share=0.15 long-run distribution is exact (20 req →
   } finally {
     await g.stop();
   }
+});
+
+// ---------------------------------------------------------------------------
+// v1.5 tests: live runtime configuration (.env watcher), rate setMpm, pool
+// reconfigure, workersync vps-only status.
+// ---------------------------------------------------------------------------
+test('T15: .env hot-reload — share hot-applies WITHOUT restart; explicit deploy count 0 forces the vps-only fallback', async () => {
+  const fs = await import('node:fs');
+  const envFile = `/tmp/gw-t15-${process.pid}.env`;
+  fs.writeFileSync(envFile, 'HYBRID_VPS_DL_SHARE=0.5\n');
+  const g = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+      HYBRID_WORKER_POOL_MAX: '1',
+      HYBRID_VPS_DL_SHARE: '0.5',
+      HYBRID_FRONT_TOKEN_CACHE_MS: '0',
+      HYBRID_ENV_FILE: envFile,
+      HYBRID_ENV_POLL_MS: '300',
+    },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  try {
+    // Phase 1 (legacy local-pool mode, no deploy count): share=0.5 → the
+    // FIRST request takes the edge lane (Bresenham: edge on odd requests).
+    const r1 = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
+    assert.ok(r1.status === 302 || (r1.status === 200 && r1.headers['x-hybrid-lane'] === 'vps'));
+
+    // Phase 2: hot change share → 1.0 (pure VPS lane), applied live.
+    fs.writeFileSync(envFile, 'HYBRID_VPS_DL_SHARE=1.0\n');
+    let share = 0.5;
+    for (let i = 0; i < 40 && share !== 1; i++) {
+      await new Promise((r) => setTimeout(r, 200));
+      const h = await req(g.port, 'GET', '/api/health');
+      share = JSON.parse(h.body).front.assist.vpsDlShare;
+    }
+    assert.equal(share, 1, 'vpsDlShare must hot-apply to 1.0 without restart');
+    const r2 = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
+    assert.equal(r2.status, 200);
+    assert.equal(r2.headers['x-hybrid-lane'], 'vps');
+
+    // Phase 3: hot change share → 0.0 (pure edge lane).
+    fs.writeFileSync(envFile, 'HYBRID_VPS_DL_SHARE=0.0\n');
+    let share2 = 1;
+    for (let i = 0; i < 40 && share2 !== 0; i++) {
+      await new Promise((r) => setTimeout(r, 200));
+      const h = await req(g.port, 'GET', '/api/health');
+      share2 = JSON.parse(h.body).front.assist.vpsDlShare;
+    }
+    assert.equal(share2, 0, 'vpsDlShare must hot-apply to 0 without restart');
+    const r3 = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
+    assert.equal(r3.status, 302);
+
+    // Phase 4: an explicit CF_WORKER_DEPLOY_COUNT=0 with no credentials makes
+    // the deployment plane authoritative → vps-only fallback: even share=0
+    // serves everything from the VPS (never breaks the measurement).
+    fs.writeFileSync(envFile, 'HYBRID_VPS_DL_SHARE=0.0\nCF_WORKER_DEPLOY_COUNT=0\n');
+    let mode = 'hybrid';
+    for (let i = 0; i < 40 && mode !== 'vps-only'; i++) {
+      await new Promise((r) => setTimeout(r, 200));
+      const h = await req(g.port, 'GET', '/api/health');
+      mode = JSON.parse(h.body).mode;
+    }
+    assert.equal(mode, 'vps-only', 'explicit deploy count 0 → vps-only deployment mode');
+    const r4 = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
+    assert.equal(r4.status, 200);
+    assert.equal(r4.headers['x-hybrid-lane'], 'vps');
+
+    // health exposes the env watcher state
+    const h = await req(g.port, 'GET', '/api/health');
+    const hj = JSON.parse(h.body);
+    assert.ok(hj.env.watching === true);
+    assert.ok(Array.isArray(hj.env.lastChangeKeys) && hj.env.lastChangeKeys.length > 0);
+    assert.equal(hj.workers.mode, 'vps-only');
+    assert.equal(hj.workers.target, 0);
+  } finally {
+    await g.stop();
+    try { fs.unlinkSync(envFile); } catch {}
+  }
+});
+
+test('T16: rate limiter setMpm is live', async () => {
+  const { createRateLimiter } = await import(new URL('../src/workerpool.mjs', import.meta.url).href);
+  const rl = createRateLimiter(2);
+  assert.ok(rl.allow('k'));
+  assert.ok(rl.allow('k'));
+  assert.ok(!rl.allow('k'));
+  rl.setMpm(4);
+  assert.ok(rl.allow('k'));
+  assert.ok(rl.allow('k'));
+  assert.ok(!rl.allow('k'));
+  rl.setMpm(0);
+  assert.ok(rl.allow('k')); // 0 = unlimited
+});
+
+test('T17: pool reconfigure — grow/shrink with state preservation', async () => {
+  const { createWorkerPool } = await import(new URL('../src/workerpool.mjs', import.meta.url).href);
+  const logs = [];
+  const pool = createWorkerPool({
+    base: 'https://speedtest-hybrid-worker.example.workers.dev',
+    poolMax: 3,
+    activeMin: 1,
+    log: (k, d) => logs.push({ k, d }),
+  });
+  pool.recordMint(1);
+  pool.reconfigure({ poolMax: 5, activeMin: 2 });
+  const st1 = pool.status();
+  assert.equal(st1.poolMax, 5);
+  assert.equal(st1.workers.length, 5);
+  assert.equal(st1.workers[4].url, 'https://speedtest-hybrid-worker-5.example.workers.dev');
+  assert.equal(st1.activeCount, 2);
+  assert.equal(st1.workers[0].servedTotal, 1, 'per-URL counters survive reconfigure');
+  pool.reconfigure({ poolMax: 2 });
+  const st2 = pool.status();
+  assert.equal(st2.poolMax, 2);
+  assert.equal(st2.workers.length, 2);
+  assert.ok(st2.activeIds.every((id) => id <= 2), 'active set clamped into bounds');
+  assert.ok(logs.some((l) => l.k === 'pool_reconfigured'));
+  pool.stop();
+});
+
+test('T18: workersync — vps-only without credentials; hybrid target from explicit deploy count', async () => {
+  const { createWorkerSync } = await import(new URL('../src/workersync.mjs', import.meta.url).href);
+  const logs = [];
+  // no credentials → vps-only
+  const ws1 = createWorkerSync({ cfg: { cf: { mode: 'none', accountId: '' }, deployCountExplicit: false, poolMax: 3, workerSyncDelete: true }, log: (k, d) => logs.push({ k, d }) });
+  assert.equal(ws1.status().mode, 'vps-only');
+  assert.equal(ws1.status().target, 0);
+  const r1 = await ws1.sync();
+  assert.equal(r1.mode, 'vps-only');
+  assert.equal(ws1.status().deployStatus, 'ok');
+  // credentials + explicit target → hybrid (REST is attempted; with a mock
+  // fetch returning a valid empty script list the sync fails gracefully and
+  // deployStatus must become 'error', never crash)
+  const ws2 = createWorkerSync({
+    cfg: { cf: { mode: 'key', token: '', email: 'a@b.c', key: 'k', accountId: 'acct' }, deployCountExplicit: true, deployCount: 4, poolMax: 3, workerSyncDelete: true, workerName: 'speedtest-hybrid-worker', workersSubdomain: 'sub', workerBundlePath: '', workerFingerprintFile: '', workerSyncIntervalMs: 0 },
+    log: (k, d) => logs.push({ k, d }),
+  });
+  assert.equal(ws2.status().mode, 'hybrid');
+  assert.equal(ws2.status().target, 4);
+  const r2 = await ws2.sync();
+  assert.ok(r2.error, 'sync without a readable bundle must fail gracefully');
+  assert.equal(ws2.status().deployStatus, 'error');
+});
+
+test('T19: rest-deploy — name mapping, form shape, auth headers, listPool filtering', async () => {
+  const mod = await import(new URL('../../worker/rest-deploy.mjs', import.meta.url).href);
+  assert.equal(mod.poolName('speedtest-hybrid-worker', 1), 'speedtest-hybrid-worker');
+  assert.equal(mod.poolName('speedtest-hybrid-worker', 42), 'speedtest-hybrid-worker-42');
+  // form: metadata JSON with plain_text vars + secret_text binding
+  const fd = mod.buildDeployForm({ bundleSrc: 'export default {};', workerId: 2, poolSize: 10, secret: 's3cr3t' });
+  assert.ok(fd instanceof FormData);
+  const meta = fd.get('metadata');
+  assert.ok(meta instanceof Blob);
+  const metaJson = JSON.parse(await meta.text());
+  assert.equal(metaJson.main_module, 'index.js');
+  assert.equal(metaJson.compatibility_date, '2026-10-01');
+  const names = metaJson.bindings.map((b) => `${b.name}:${b.type}`).sort();
+  assert.ok(names.includes('WORKER_ID:plain_text'));
+  assert.ok(names.includes('WORKER_POOL_MAX:plain_text'));
+  assert.ok(names.includes('HYBRID_SHARED_SECRET:secret_text'));
+  const idBinding = metaJson.bindings.find((b) => b.name === 'WORKER_ID');
+  assert.equal(idBinding.text, '2');
+  const pmBinding = metaJson.bindings.find((b) => b.name === 'WORKER_POOL_MAX');
+  assert.equal(pmBinding.text, '10');
+  // auth headers: token mode vs key mode
+  const ctxToken = mod.createRestCtx({ auth: { token: 'tok' }, accountId: 'a', baseName: 'speedtest-hybrid-worker', subdomain: 'sub' });
+  const hT = ctxToken.headers({});
+  assert.equal(hT.Authorization, 'Bearer tok');
+  const ctxKey = mod.createRestCtx({ auth: { token: '', email: 'e@x.y', key: 'kk' }, accountId: 'a', baseName: 'speedtest-hybrid-worker', subdomain: 'sub' });
+  const hK = ctxKey.headers({});
+  assert.equal(hK['X-Auth-Email'], 'e@x.y');
+  assert.equal(hK['X-Auth-Key'], 'kk');
+  // listPool filters to the exact pool naming scheme
+  const fakeResult = [
+    { id: 'speedtest-hybrid-worker', modified_on: 'x' },
+    { id: 'speedtest-hybrid-worker-2', modified_on: 'x' },
+    { id: 'speedtest-hybrid-worker-10', modified_on: 'x' },
+    { id: 'speedtest-hybrid-worker-evil', modified_on: 'x' }, // NOT a pool member (suffix must be numeric)
+    { id: 'speedtest-hybrid-worker2', modified_on: 'x' }, // not pool naming
+    { id: 'unrelated-script', modified_on: 'x' },
+    { id: 'speedtest-other-worker', modified_on: 'x' },
+  ];
+  const calls = [];
+  const ctxList = mod.createRestCtx({
+    auth: { token: 'tok' }, accountId: 'a', baseName: 'speedtest-hybrid-worker', subdomain: 'sub',
+    fetchImpl: async (url) => {
+      calls.push(url);
+      return { ok: true, status: 200, text: async () => JSON.stringify({ success: true, result: fakeResult }) };
+    },
+  });
+  const pool = await mod.listPool(ctxList);
+  assert.deepEqual(pool.map((w) => w.id), [1, 2, 10]);
 });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * gateway.mjs — the VPS control plane of the hybrid architecture.
+ * gateway.mjs — the VPS control plane of the hybrid architecture (v1.5).
  *
  * Responsibilities (the "origin" role of the VPS):
  *   - discovery:      GET  /api/servers   — the role-split endpoint map
@@ -9,46 +9,29 @@
  *   - result intake:  POST /api/results   — measurement records land here
  *   - latency plane:  GET  /api/ping      — TTFB-style timestamp echo on the
  *                     VPS path (the UDP echo/jitter plane stays on STS :8080)
- *   - worker pool:    GET  /api/pool      — smart worker-pool status (see
- *                     workerpool.mjs — the "VPS memegang kendali worker"
- *                     control plane for the 1..100 Worker pool)
+ *   - worker pool:    GET  /api/pool      — routing pool status (workerpool.mjs)
+ *   - worker sync:    GET  /api/workers   — deployment sync status (v1.5: the
+ *                     deployed Cloudflare pool converges to the .env target
+ *                     ON THE FLY; see workersync.mjs)
+ *
+ * v1.5 ON-THE-FLY CONFIGURATION: the repository .env (path in
+ * HYBRID_ENV_FILE) is watched and applied live — worker deploy count, pool
+ * bounds, lane share, front limits, credentials, shared secret. A restart
+ * is only needed for port/bind/TLS changes (re-run install.sh).
+ *
+ * Mode:
+ *   hybrid   (default)  Cloudflare credentials usable + deploy target > 0
+ *   vps-only (fallback) no credentials / target 0 — everything served by
+ *                       the VPS; the front forces the local lane.
  *
  * The payload data plane (DOWNLOAD/UPLOAD bytes) NEVER transits this
  * service — that is the entire point of the hybrid split.
  *
  * Zero dependencies: node:http + node:crypto (+ node:tls for HTTPS).
  *
- * Env:
- *   HYBRID_GATEWAY_PORT       default 8090
- *   HYBRID_GATEWAY_BIND       default 127.0.0.1 (use 0.0.0.0 to expose; pair with TLS)
- *   HYBRID_GATEWAY_TLS_CERT   optional path to PEM cert — enables HTTPS listener
- *   HYBRID_GATEWAY_TLS_KEY    optional path to PEM key (required when cert set)
- *   HYBRID_SHARED_SECRET      HMAC secret (same value as the Worker secret)
- *   HYBRID_WORKER_BASE        default http://127.0.0.1:8790 (edge stand-in)
- *   HYBRID_VPS_PUBLIC_BASE    default http://127.0.0.1:8090 (this gateway)
- *   HYBRID_STS_BASE           default http://127.0.0.1:8080 (SpeedtestServer)
- *   HYBRID_TOKEN_TTL_MS       default 300000 (5 min; G-1)
- *   HYBRID_TOKEN_BIND_IP      default false. true = bind token to the peer
- *                             socket IP (pre-G-1 behaviour; breaks clients
- *                             behind proxies / dual-stack mismatches)
- *   HYBRID_DISCOVERY_FALLBACK default false. true = advertise the STS /ws
- *                             fallback in discovery (K-7: off in production)
- *   HYBRID_RESULTS_FILE       optional JSONL result log
- *   HYBRID_RESULTS_DEDUP_MS   default 3600000 — duplicate result POSTs for the
- *                             same guid within this window get the same
- *                             response and are logged once (G-9)
- *   HYBRID_SESSIONS_RATE_LIMIT_MPM default 60 — per-IP token-mint rate limit on
- *                             /api/sessions (BUG FIX: this endpoint was an
- *                             unthrottled token fountain that could burn the
- *                             account's daily Worker quota)
- *   HYBRID_VPS_DL_SHARE       default 0.15 — v1.4 assist model: fraction of
- *                             front download REQUESTS served directly by the
- *                             VPS at full speed (no budget, no throttle);
- *                             the rest is 302-assisted by the worker pool.
- *                             1.0 = pure VPS, 0.0 = pure edge. REMOVED v1.4:
- *                             HYBRID_VPS_DL_BUDGET_MBPS (operator decision —
- *                             the VPS must never be bandwidth-capped)
- *   HYBRID_WORKER_* / HYBRID_CF_*   see workerpool.mjs (worker pool control)
+ * Env: see .env.example and hybrid/gateway/gateway.env.example — every
+ * variable, including all Cloudflare credential scopes, is documented in
+ * docs/CLOUDFLARE_CREDENTIALS.md.
  */
 
 import http from 'node:http';
@@ -57,39 +40,27 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { createFront } from './front.mjs';
 import { createWorkerPool, createRateLimiter } from './workerpool.mjs';
+import { createRuntime } from './runtime.mjs';
+import { createWorkerSync } from './workersync.mjs';
 
 const PORT = Number(process.env.HYBRID_GATEWAY_PORT || 8090);
 const BIND = process.env.HYBRID_GATEWAY_BIND || '127.0.0.1';
 const TLS_CERT = process.env.HYBRID_GATEWAY_TLS_CERT || '';
 const TLS_KEY = process.env.HYBRID_GATEWAY_TLS_KEY || '';
-const SECRET = process.env.HYBRID_SHARED_SECRET || '';
-const WORKER_BASE = process.env.HYBRID_WORKER_BASE || 'http://127.0.0.1:8790';
+const WORKER_BASE_FALLBACK = process.env.HYBRID_WORKER_BASE || 'http://127.0.0.1:8790';
 const VPS_BASE = process.env.HYBRID_VPS_PUBLIC_BASE || 'http://127.0.0.1:8090';
 const STS_BASE = process.env.HYBRID_STS_BASE || 'http://127.0.0.1:8080';
-const TTL_MS = Number(process.env.HYBRID_TOKEN_TTL_MS || 300000);
-const TOKEN_BIND_IP = String(process.env.HYBRID_TOKEN_BIND_IP || '') === 'true';
-const DISCOVERY_FALLBACK = String(process.env.HYBRID_DISCOVERY_FALLBACK || '') === 'true';
 const RESULTS_FILE = process.env.HYBRID_RESULTS_FILE || '';
 const RESULTS_DEDUP_MS = Number(process.env.HYBRID_RESULTS_DEDUP_MS || 3600000);
-const SESSIONS_RATE_LIMIT_MPM = Number(process.env.HYBRID_SESSIONS_RATE_LIMIT_MPM ?? 60);
+const DISCOVERY_FALLBACK = String(process.env.HYBRID_DISCOVERY_FALLBACK || '') === 'true';
 
-// --- speedtest front (legacy HTTP surface: edge offload + VPS assist) ---
-const FRONT_ENABLED = String(process.env.HYBRID_FRONT_ENABLED || '') === 'true';
-const FRONT_RATE_LIMIT_MPM = Number(process.env.HYBRID_FRONT_RATE_LIMIT_MPM ?? 90);
-const FRONT_MAX_DOWN_BYTES = Number(process.env.HYBRID_FRONT_MAX_DOWN_BYTES ?? 26214400);
-const FRONT_TOKEN_CACHE_MS = Number(process.env.HYBRID_FRONT_TOKEN_CACHE_MS ?? Math.max(30000, TTL_MS - 60000));
-// --- VPS assist lane (v1.4: "VPS mengeluarkan SEMUA potensi, CF membantu") ---
-// Share of front download REQUESTS served DIRECTLY by the VPS at FULL link
-// speed — there is NO token bucket and NO byte budget (the v1.3
-// HYBRID_VPS_DL_BUDGET_MBPS was removed at operator request: it capped the
-// VPS's contribution). The complementary (1 - share) of requests is
-// 302-assisted by the CF worker pool in parallel, so the client aggregate
-// ≈ VPS capacity + edge capacity. 1.0 = pure VPS potential; 0.0 = legacy
-// pure edge offload. Empty/unset → 0.15; "0" is honored as an explicit 0.
-const VPS_DL_SHARE_RAW = String(process.env.HYBRID_VPS_DL_SHARE ?? '').trim();
-const VPS_DL_SHARE = VPS_DL_SHARE_RAW === ''
-  ? 0.15
-  : Math.min(1, Math.max(0, Number(VPS_DL_SHARE_RAW) || 0));
+function log(kind, detail = {}) {
+  console.log(JSON.stringify({ ts: Date.now(), kind, ...detail }));
+}
+
+// --- v1.5 live runtime configuration (.env watcher) -----------------------
+const RT = createRuntime({ log });
+const cfg = RT.cfg;
 
 // Evidence counters — how many control-plane bytes the VPS actually served.
 const counters = { servers: 0, sessions: 0, results: 0, pings: 0, bytesIn: 0, bytesOut: 0 };
@@ -97,37 +68,78 @@ const counters = { servers: 0, sessions: 0, results: 0, pings: 0, bytesIn: 0, by
 const startedAt = Date.now();
 const instanceId = crypto.randomUUID();
 
-function log(kind, detail = {}) {
-  console.log(JSON.stringify({ ts: Date.now(), kind, ...detail }));
+let appVersion = null;
+function readVersion() {
+  if (appVersion !== null) return appVersion;
+  try {
+    appVersion = fs.readFileSync(cfg.versionFile, 'utf8').trim();
+  } catch {
+    appVersion = '';
+  }
+  return appVersion;
 }
 
-// --- worker pool ("VPS memegang kendali worker": 1..100 smart activation) --
-const pool = createWorkerPool({ base: WORKER_BASE, log });
+// --- worker routing pool ("VPS memegang kendali worker") ------------------
+const pool = createWorkerPool({ base: cfg.workerBase || WORKER_BASE_FALLBACK, log });
 
-// --- token minting (format shared with hybrid/worker/src/token.ts) ---------
+/** Routing-pool patch derived from the live cfg (deploy-target aware). */
+function poolPatch() {
+  const target = RT.deployTarget();
+  const routingMax = Math.max(1, target > 0 ? target : cfg.poolMax);
+  return {
+    poolMax: routingMax,
+    activeMin: cfg.activeMin,
+    activeMax: cfg.activeMax > 0 ? cfg.activeMax : routingMax,
+    scaleRate: cfg.scaleRate,
+    shrinkRate: cfg.shrinkRate,
+    idleShrinkMs: cfg.idleShrinkMs,
+    probeIntervalMs: cfg.probeIntervalMs,
+    workerBase: cfg.workerBase || WORKER_BASE_FALLBACK,
+    workerUrls: cfg.workerUrls,
+  };
+}
+pool.reconfigure(poolPatch());
+
+// --- worker deployment sync (v1.5: .env → deployed pool, on the fly) -----
+const workersync = createWorkerSync({ cfg, log });
+
+/** Is the edge (worker) lane actually available to the front RIGHT NOW? */
+const edgeAvailable = () => {
+  // Legacy local-pool mode (tests/labs, explicit HYBRID_WORKER_URLS,
+  // no Cloudflare deployment plane): assume the configured pool is
+  // alive — the routing pool canaries it anyway.
+  if (cfg.cf.mode === 'none' && !cfg.deployCountExplicit) return cfg.poolMax > 0 || cfg.workerUrls.length > 0;
+  // Production: the deployment plane decides. 'error' (bad/expired
+  // credentials, CF outage) degrades the front to the VPS lane until
+  // the next successful sync — fixing .env re-enables hybrid on the fly.
+  return workersync.status().mode === 'hybrid' && workersync.status().deployStatus !== 'error';
+};
+
+// --- token minting (format shared with hybrid/worker/src/token.ts) --------
 // G-1: by default the token is NOT bound to a socket IP ('*'), so clients
 // behind proxies/NAT or with v4↔v6 path asymmetry (IPv4 to the VPS, IPv6 to
 // Cloudflare) are not rejected with ip-mismatch. Set HYBRID_TOKEN_BIND_IP=true
-// to restore strict binding.
+// to restore strict binding. v1.5: secret/TTL/bind are read LIVE from cfg —
+// a shared-secret rotation applies to new mints immediately.
 function mintToken(ip) {
   const guid = crypto.randomUUID();
-  const expMs = Date.now() + TTL_MS;
-  const tip = TOKEN_BIND_IP ? ip : '*';
-  const sig = crypto.createHmac('sha256', SECRET).update(`v1|${guid}|${expMs}|${tip}`).digest('hex');
+  const expMs = Date.now() + cfg.tokenTtlMs;
+  const tip = cfg.tokenBindIp ? ip : '*';
+  const sig = crypto.createHmac('sha256', cfg.secret).update(`v1|${guid}|${expMs}|${tip}`).digest('hex');
   return { token: `v1~${guid}~${expMs}~${tip}~${sig}`, guid, expMs };
 }
 
 function verifyToken(token, ip) {
-  if (!SECRET) return { ok: true, reason: 'open-mode' };
+  if (!cfg.secret) return { ok: true, reason: 'open-mode' };
   if (!token) return { ok: false, reason: 'missing-token' };
   const parts = token.split('~');
   if (parts.length !== 5 || parts[0] !== 'v1') return { ok: false, reason: 'malformed' };
   const [v, guid, expStr, tip, sig] = parts;
   const expMs = Number(expStr);
   if (!Number.isFinite(expMs)) return { ok: false, reason: 'bad-exp' };
-  const expect = crypto.createHmac('sha256', SECRET).update(`${v}|${guid}|${expStr}|${tip}`).digest('hex');
-  // BUG FIX: plain !== short-circuits at the first differing byte (signature
-  // comparison side channel). Constant-time compare with a length guard.
+  const expect = crypto.createHmac('sha256', cfg.secret).update(`${v}|${guid}|${expStr}|${tip}`).digest('hex');
+  // BUG FIX (kept): constant-time compare — plain !== short-circuits at the
+  // first differing byte (signature comparison side channel).
   const a = Buffer.from(expect, 'utf8');
   const b = Buffer.from(String(sig), 'utf8');
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return { ok: false, reason: 'bad-signature' };
@@ -140,16 +152,14 @@ function verifyToken(token, ip) {
 function mintSessionToken(ip) {
   const worker = pool.pickWorker();
   pool.recordMint(worker.id);
-  const minted = mintToken(TOKEN_BIND_IP ? ip : '*');
+  const minted = mintToken(cfg.tokenBindIp ? ip : '*');
   return { ...minted, worker };
 }
 
 function readBody(req, limitBytes = 1024 * 1024) {
   return new Promise((resolve) => {
-    // BUG FIX: the old path destroyed the socket IMMEDIATELY on overflow —
-    // the 413/400 response written afterwards went into a destroyed socket
-    // and the client saw a connection reset instead of a status. The socket
-    // is now torn down only after the response has flushed.
+    // BUG FIX (kept): tear the socket down only after the response flushed —
+    // destroying immediately sent the 413 into a dead socket (client saw RST).
     const chunks = [];
     let total = 0;
     let destroyed = false;
@@ -159,7 +169,6 @@ function readBody(req, limitBytes = 1024 * 1024) {
         if (!destroyed) {
           destroyed = true;
           resolve({ overLimit: true, body: null });
-          // Stop reading; the caller responds, then destroys on finish.
           req.pause();
         }
         return;
@@ -178,7 +187,7 @@ function json(res, status, obj) {
     'Content-Type': 'application/json',
     'Content-Length': body.length,
     'Cache-Control': 'no-store, no-transform',
-    'X-Hybrid-Gateway': '1.4',
+    'X-Hybrid-Gateway': '1.5',
   });
   res.end(body);
 }
@@ -195,8 +204,8 @@ function serversDocument() {
       max: pool.status().poolMax,
     },
   };
-  // G-3 / K-7: the STS /ws fallback is opt-in and OFF by default — no mass
-  // fallback of throughput traffic to the VPS.
+  // G-3 / K-7 (kept): the STS /ws fallback is opt-in and OFF by default — no
+  // mass fallback of throughput traffic to the VPS.
   if (DISCOVERY_FALLBACK) {
     throughput.fallback = { url: `${STS_BASE}/ws`, transport: 'ws-netgauge', description: 'OPT-IN: VPS fallback when the edge is unavailable (not for production discovery)' };
   }
@@ -217,8 +226,8 @@ function serversDocument() {
   };
 }
 
-// G-9: result deduplication per guid — replays within the window get the
-// identical response and are persisted once.
+// G-9 (kept): result deduplication per guid — replays within the window get
+// the identical response and are persisted once.
 const resultMemory = new Map(); // guid -> { expiresAt, response }
 function rememberResult(guid, response) {
   const now = Date.now();
@@ -233,37 +242,57 @@ function rememberResult(guid, response) {
 /** Append a result record to the JSONL log (async, failure-isolated). */
 function appendResultRecord(record) {
   if (!RESULTS_FILE) return;
-  // BUG FIX: appendFileSync threw synchronously inside the async handler on
-  // any I/O error (disk full / bad path) and killed the process.
+  // BUG FIX (kept): appendFileSync threw synchronously inside the async
+  // handler on any I/O error (disk full / bad path) and killed the process.
   fs.appendFile(RESULTS_FILE, JSON.stringify(record) + '\n', (err) => {
     if (err) log('result_log_error', { error: String(err).slice(0, 200) });
   });
 }
 
-// Per-IP rate limit for /api/sessions (BUG FIX: unthrottled token fountain).
-const sessionsLimiter = createRateLimiter(SESSIONS_RATE_LIMIT_MPM);
+// Per-IP rate limit for /api/sessions (BUG FIX kept: unthrottled token
+// fountain). v1.5: the rate itself is live-configurable (setMpm).
+const sessionsLimiter = createRateLimiter(cfg.sessionsRateLimitMpm);
 
-// The front router (only when enabled). Shares mintToken/counters/logging.
-const front = FRONT_ENABLED
+// --- the front router (v1.5: mutable options + vps-only fallback) ----------
+const front = cfg.frontEnabled
   ? createFront({
       mintToken,
       log,
       counters,
-      workerBase: WORKER_BASE,
+      workerBase: cfg.workerBase || WORKER_BASE_FALLBACK,
       pool,
-      rateLimitMpm: FRONT_RATE_LIMIT_MPM,
-      maxDownBytes: FRONT_MAX_DOWN_BYTES,
-      tokenTtlMs: TTL_MS,
-      tokenCacheMs: FRONT_TOKEN_CACHE_MS,
-      tokenBindIp: TOKEN_BIND_IP,
-      vpsDlShare: VPS_DL_SHARE,
+      rateLimitMpm: cfg.frontRateLimitMpm,
+      maxDownBytes: cfg.frontMaxDownBytes,
+      tokenTtlMs: cfg.tokenTtlMs,
+      tokenCacheMs: cfg.frontTokenCacheMs,
+      tokenBindIp: cfg.tokenBindIp,
+      vpsDlShare: cfg.vpsDlShare,
+      workersAvailable: edgeAvailable,
     })
   : null;
 
+// Boot-time application of the live cfg (covers process-env-only configs
+// where no .env file is watched).
+applyLiveConfig();
+
+/** Push the live cfg into every mutable component (start + every .env change). */
+function applyLiveConfig() {
+  sessionsLimiter.setMpm(cfg.sessionsRateLimitMpm);
+  pool.reconfigure(poolPatch());
+  if (front && front.setOptions) {
+    front.setOptions({
+      rateLimitMpm: cfg.frontRateLimitMpm,
+      maxDownBytes: cfg.frontMaxDownBytes,
+      tokenCacheMs: cfg.frontTokenCacheMs,
+      vpsDlShare: cfg.vpsDlShare,
+    });
+  }
+}
+
 const requestHandler = async (req, res) => {
-  // BUG FIX (crash): a malformed Host header made the WHATWG URL constructor
-  // throw synchronously inside the async handler → unhandled rejection →
-  // process death (Node ≥15 default). Parse defensively.
+  // BUG FIX (kept, crash): a malformed Host header made the WHATWG URL
+  // constructor throw synchronously inside the async handler → unhandled
+  // rejection → process death (Node ≥15 default). Parse defensively.
   let url;
   try {
     url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
@@ -306,10 +335,9 @@ const requestHandler = async (req, res) => {
   }
 
   if (path === '/api/sessions' && req.method === 'POST') {
-    if (!SECRET) return json(res, 500, { error: 'HYBRID_SHARED_SECRET not configured' });
-    // BUG FIX: rate limit — this endpoint minted unlimited 5-minute wildcard
-    // tokens (each spendable at the edge up to the per-request caps), an
-    // easy account-quota burn vector.
+    if (!cfg.secret) return json(res, 500, { error: 'HYBRID_SHARED_SECRET not configured' });
+    // BUG FIX (kept): rate limit — this endpoint minted unlimited 5-minute
+    // wildcard tokens, an easy account-quota burn vector.
     if (!sessionsLimiter.allow(ip)) {
       log('sessions_rate_limited', { ip });
       return json(res, 429, { error: 'rate-limited', retryAfterMs: 60000 });
@@ -320,7 +348,7 @@ const requestHandler = async (req, res) => {
     }
     counters.sessions++;
     const { token, guid, expMs, worker } = mintSessionToken(ip);
-    log('session_minted', { guid, ip, expMs, bound: TOKEN_BIND_IP, workerId: worker.id });
+    log('session_minted', { guid, ip, expMs, bound: cfg.tokenBindIp, workerId: worker.id });
     return json(res, 200, {
       token,
       guid,
@@ -345,8 +373,8 @@ const requestHandler = async (req, res) => {
     } catch {
       return json(res, 400, { error: 'invalid json' });
     }
-    // BUG FIX (verified crash): JSON.parse('null') returns null — the old
-    // code dereferenced payload.token and killed the process.
+    // BUG FIX (kept, verified crash): JSON.parse('null') returns null — the
+    // old code dereferenced payload.token and killed the process.
     if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
       return json(res, 400, { error: 'invalid json' });
     }
@@ -381,22 +409,28 @@ const requestHandler = async (req, res) => {
     return json(res, 200, pool.status());
   }
 
+  if (path === '/api/workers' && req.method === 'GET') {
+    return json(res, 200, workersync.status());
+  }
+
   if (path === '/api/health' && req.method === 'GET') {
     return json(res, 200, {
-      server: 'hybrid-gateway/1.4',
+      server: 'hybrid-gateway/1.5',
+      version: readVersion(),
+      mode: cfg.frontEnabled ? (edgeAvailable() ? 'hybrid' : 'vps-only') : 'control-only',
       instanceId,
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
       counters,
       front: front
         ? {
             enabled: true,
-            rateLimitMpm: FRONT_RATE_LIMIT_MPM,
-            // v1.4 — the assist lane: which download lane served what.
-            // NO bandwidth budget exists anymore: the VPS lane runs
-            // uncapped; share only distributes requests between lanes.
+            rateLimitMpm: cfg.frontRateLimitMpm,
+            // v1.4+ assist lane: which download lane served what. NO bandwidth
+            // budget exists: the VPS lane runs uncapped; share only
+            // distributes requests between lanes.
             assist: {
-              vpsDlShare: VPS_DL_SHARE,
-              enabled: VPS_DL_SHARE > 0,
+              vpsDlShare: cfg.vpsDlShare,
+              enabled: cfg.vpsDlShare > 0,
             },
             counters: {
               latency: counters.frontLatency || 0,
@@ -417,7 +451,15 @@ const requestHandler = async (req, res) => {
           }
         : { enabled: false },
       pool: pool.status(),
-      config: { workerBase: WORKER_BASE, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: TTL_MS, tokenBindIp: TOKEN_BIND_IP, discoveryFallback: DISCOVERY_FALLBACK, tls: Boolean(TLS_CERT), resultsDedupMs: RESULTS_DEDUP_MS, secretConfigured: Boolean(SECRET), sessionsRateLimitMpm: SESSIONS_RATE_LIMIT_MPM },
+      workers: workersync.status(),
+      env: {
+        file: cfg.envFile || null,
+        watching: RT.state.watching,
+        lastChangeAt: RT.state.lastChangeAt ? new Date(RT.state.lastChangeAt).toISOString() : null,
+        lastChangeKeys: RT.state.lastChangeKeys,
+        lastError: RT.state.lastError,
+      },
+      config: { workerBase: cfg.workerBase || WORKER_BASE_FALLBACK, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: cfg.tokenTtlMs, tokenBindIp: cfg.tokenBindIp, discoveryFallback: DISCOVERY_FALLBACK, tls: Boolean(TLS_CERT), resultsDedupMs: RESULTS_DEDUP_MS, secretConfigured: Boolean(cfg.secret), sessionsRateLimitMpm: cfg.sessionsRateLimitMpm },
     });
   }
 
@@ -431,10 +473,9 @@ if (TLS_CERT) {
   }
 }
 const safeHandler = (req, res) => {
-  // BUG FIX (process crash): Node does NOT catch rejections returned by an
-  // async request listener — one bad request (null JSON body, throw in a
-  // helper) killed the whole control plane (verified live). Every
-  // rejection is now answered with a 500 and logged.
+  // BUG FIX (kept, process crash): Node does NOT catch rejections returned by
+  // an async request listener — one bad request killed the whole control
+  // plane (verified live). Every rejection is answered with a 500 and logged.
   requestHandler(req, res).catch((e) => {
     log('handler_error', { method: req.method, url: String(req.url).slice(0, 120), error: String(e).slice(0, 200) });
     try {
@@ -453,9 +494,8 @@ const listener = TLS_CERT
     )
   : http.createServer(safeHandler);
 
-// BUG FIX (production hardening): an EADDRINUSE/EACCES on listen surfaced as
-// an unhandled 'error' event → hard crash → systemd restart loop with no
-// diagnosable log line. Fail loudly ONCE with the real errno instead.
+// BUG FIX (kept): an EADDRINUSE/EACCES on listen surfaced as an unhandled
+// 'error' event → hard crash → systemd restart loop. Fail loudly ONCE.
 listener.on('error', (e) => {
   console.error(JSON.stringify({ kind: 'gateway_error', error: String(e && e.code ? e.code : e).slice(0, 200), syscall: e && e.syscall, port: PORT, bind: BIND }));
   process.exit(1);
@@ -466,23 +506,56 @@ process.on('unhandledRejection', (e) => {
   log('unhandled_rejection', { error: String(e).slice(0, 200) });
 });
 
+// --- v1.5: .env hot-reload wiring -----------------------------------------
+// Any change to the watched .env (worker count, pool bounds, share, front
+// limits, credentials, secret) is applied LIVE; deployment-plane keys also
+// trigger a worker-pool convergence.
+RT.startEnvWatch((changedKeys) => {
+  applyLiveConfig();
+  const deploymentish = changedKeys.some((k) =>
+    k.startsWith('CLOUDFLARE') || k.startsWith('CF_WORKER') || k === 'HYBRID_SHARED_SECRET' || k === 'HYBRID_WORKER_URLS',
+  );
+  if (deploymentish) {
+    workersync
+      .sync()
+      .then(() => pool.reconfigure(poolPatch()))
+      .catch((e) => log('worker_sync_error', { error: String(e).slice(0, 160) }));
+  }
+});
+
+// --- v1.5: initial deployment convergence (non-blocking) ------------------
+if (cfg.envFile || cfg.workerSyncIntervalMs > 0) {
+  workersync
+    .sync()
+    .then((r) => {
+      pool.reconfigure(poolPatch());
+      log('worker_sync_initial', r);
+    })
+    .catch((e) => log('worker_sync_initial_error', { error: String(e).slice(0, 160) }));
+}
+
 listener.listen(PORT, BIND, () => {
   console.log(JSON.stringify({
     kind: 'gateway_started',
+    version: readVersion(),
+    server: 'hybrid-gateway/1.5',
     port: PORT,
     bind: BIND,
     tls: Boolean(TLS_CERT),
-    front: FRONT_ENABLED,
-    frontRateLimitMpm: FRONT_RATE_LIMIT_MPM,
-    frontTokenCacheMs: FRONT_TOKEN_CACHE_MS,
-    vpsDlShare: VPS_DL_SHARE,
-    workerBase: WORKER_BASE,
+    mode: cfg.frontEnabled ? (edgeAvailable() ? 'hybrid' : 'vps-only') : 'control-only',
+    deployTarget: RT.deployTarget(),
+    front: cfg.frontEnabled,
+    frontRateLimitMpm: cfg.frontRateLimitMpm,
+    frontTokenCacheMs: cfg.frontTokenCacheMs,
+    vpsDlShare: cfg.vpsDlShare,
+    workerBase: cfg.workerBase || WORKER_BASE_FALLBACK,
     workerPoolMax: pool.poolMax,
     vpsBase: VPS_BASE,
     stsBase: STS_BASE,
-    tokenTtlMs: TTL_MS,
-    tokenBindIp: TOKEN_BIND_IP,
+    tokenTtlMs: cfg.tokenTtlMs,
+    tokenBindIp: cfg.tokenBindIp,
     discoveryFallback: DISCOVERY_FALLBACK,
-    secretConfigured: Boolean(SECRET),
+    envFile: cfg.envFile || null,
+    secretConfigured: Boolean(cfg.secret),
   }));
 });

@@ -184,3 +184,21 @@ Variabel yang **tidak** masuk `.env` (jalur berbeda):
    Token scoped hanya membuka worker scripts — bukan DNS/zona/billing.
 6. `gateway.env` di VPS = 0640 root:speedtest-hybrid — token CF di dalamnya
    (untuk quota guard) tidak terbaca user lain.
+
+---
+
+## v1.5: REST deploy + on-the-fly sync
+
+`install.sh` and the gateway's live worker sync deploy workers through the
+Cloudflare REST API directly (`hybrid/worker/rest-deploy.mjs`) — the same
+permission scopes as above are required (Workers Scripts Edit covers the
+REST PUT/DELETE; Account Settings Read covers the script list; wrangler
+remains the fallback path). Two operational notes:
+
+- **API token invalid/expired?** The installer and the gateway both fall
+  back to the Global API Key method automatically (CLOUDFLARE_EMAIL +
+  CLOUDFLARE_API_KEY). Fix the token in `.env` whenever convenient — the
+  running gateway picks the change up on the fly and redeploys.
+- **Wrong credentials entirely** → the stack runs in VPS-ONLY mode (the
+  daemon + gateway still work; every measurement is served by the VPS).
+  Fix `.env` and re-run `install.sh` to re-enable the hybrid lane.

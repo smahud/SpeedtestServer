@@ -1,498 +1,246 @@
-# SpeedtestServer
+# SpeedtestServer — Independent OoklaServer Replacement (v1.5)
 
-**An independent, open-source speedtest server implementing the OoklaServer
-compatibility profile** — verified end-to-end against the *unmodified official
-Speedtest CLI*.
+An open-source, production-grade replacement for the official OoklaServer
+binary. The TypeScript daemon speaks the Ookla NetGauge protocol 1:1 (the
+official speedtest CLI cannot tell the difference — verified against the
+official binary with real CLI campaigns), then adds what the official
+server cannot do:
 
-> This project is not an Ookla product and is not affiliated with Ookla. It is
-> a clean-room interoperability implementation built from authorized,
-> observable protocol behavior (see `validation/PROTOCOL_CONTRACT.md`).
+- **Hybrid Cloudflare assist** — heavy download/upload payload is served in
+  parallel by a dynamic pool of Cloudflare Workers, so aggregate throughput
+  is no longer capped by a single VPS link (target: ≥ 2 Gbps DL/UL).
+- **On-the-fly configuration** — the pool size, credentials, lane share and
+  limits live in one `.env` file that the running gateway watches: edit it,
+  and the deployed worker pool converges within seconds. No restart, no
+  reinstall.
+- **Daily self-update** — a systemd timer pulls repository updates,
+  reinstalls and restarts the stack every night (version-gated, safe).
+- **One-command install** — `sudo ./install.sh --start` builds the daemon,
+  installs hardened systemd units, and deploys the Cloudflare worker pool.
 
-## 1. Project overview and scope
+> This project is fully self-contained and standalone. It is not a part of,
+> and does not depend on, any other project. Future integrations are a
+> separate concern.
 
-Fresh 2026-11-23 analysis with the unmodified official CLI and reference binary,
-using `speedtest.lumajangnetworks.my.id` as the remote endpoint:
-[`validation/REINVESTIGATION_2026-11-23.md`](validation/REINVESTIGATION_2026-11-23.md).
-This distinguishes CLI interoperability, host-tester HTTP behavior, and official
-server discovery. The wildcard Host fix was subsequently deployed to the VPS;
-the public-subdomain host tester passed 19/19 (see
-[`validation/DEPLOYMENT_WILDCARD_2026-11-23.md`](validation/DEPLOYMENT_WILDCARD_2026-11-23.md)).
-Subsequent original-binary analysis found additional multi-port policy and upload
-alias/OPTIONS gaps that the 19-check tester missed. See
-[`validation/HTTP_COMPATIBILITY_REPAIR_2026-11-23.md`](validation/HTTP_COMPATIBILITY_REPAIR_2026-11-23.md)
-for those fixes and stricter acceptance evidence.
-The subsequent maximum-upload byte/encoding regression and combined 31-case
-gate are documented in
-[`validation/MAX_UPLOAD_REGRESSION_2026-11-23.md`](validation/MAX_UPLOAD_REGRESSION_2026-11-23.md).
+## Architecture
 
-SpeedtestServer replaces the *observable server-side behavior* of the official
-OoklaServer daemon for legitimate OoklaServer-compatible clients: the native
-NetGauge measurement protocol (TCP, TLS-wrapped, WebSocket), the HTTP legacy
-surface, UDP packet-loss accounting, and TLS with correct trust semantics.
-Out of scope: Ookla host-network admission/certification, proprietary backend
-parity, and any behavior without a publicly observable contract
-(`validation/EXTERNAL_FLOWS.md`).
+```
+                         ┌────────────────────────────┐
+   Ookla CLI (binary ────┤  VPS :8080/:5060           │  Lane A — native
+   NetGauge protocol)    │  SpeedtestServer daemon    │  (1:1 official
+                         │  full VPS link speed       │   protocol, TLS)
+                         └────────────────────────────┘
+                         ┌────────────────────────────┐
+   HTTP speedtest ───────┤  VPS :8790 hybrid gateway  │  Lane B — hybrid
+   clients + probe       │  control plane + front     │  (VPS lane at FULL
+                         │  .env watcher (live config)│   speed ∥ CF edge)
+                         └──────────┬─────────────────┘
+                                    │ 302 offload + HMAC tokens
+                    ┌───────────────┴───────────────┐
+                    │  Cloudflare Worker pool 1..N  │
+                    │  speedtest-hybrid-worker[-N]  │
+                    │  .workers.dev (dynamic N)     │
+                    └───────────────────────────────┘
+```
 
-### Hybrid VPS + Cloudflare Workers (branch `hybrid-vps-workers`)
+| Lane | Who it serves | Endpoint | Throughput |
+|---|---|---|---|
+| A — native | Official Ookla CLI / NetGauge TCP+UDP | VPS `:8080` / `:5060` | VPS link (uncapped) |
+| B — hybrid | HTTP speedtest clients (mini/probe) | Gateway `:8790` + worker pool | VPS **+** Cloudflare edge |
 
-This repository's `hybrid-vps-workers` branch adds and **experimentally
-validates** a hybrid architecture in which the VPS (SpeedtestServer + a
-control-plane gateway) and a Cloudflare Worker cooperate: the Worker serves
-the bandwidth-intensive plane for web/custom clients — the **full NetGauge
-protocol over WSS**, the daemon HTTP surface, and `__down`/`__up` streaming,
-with payload generated/drained **at the edge** — while the VPS keeps the
-native-socket responsibilities (official-CLI lane, UDP loss/jitter,
-discovery, tokens, results, identity). Headline measured results: host-tester
-suite **10/10 PASS against the Worker** (1.25 GB speed phases through the
-edge); hybrid sessions offload payload at ratio **≈1:16 000** (56 MiB at the
-edge vs 3 653 B on the VPS); the unmodified official CLI **provably cannot**
-use the edge (`Protocol error: Did not receive HELLO` → `NoServers`, exit 2)
-and completes 26 GB runs on the VPS lane instead. Full report:
-[`hybrid/reports/HYBRID_RESEARCH_REPORT.md`](hybrid/reports/HYBRID_RESEARCH_REPORT.md),
-claims register: [`hybrid/reports/WORKERS_LIMITS.md`](hybrid/reports/WORKERS_LIMITS.md),
-quickstart: [`hybrid/README.md`](hybrid/README.md).
+The two lanes share one HMAC secret; the gateway mints tokens, the Workers
+verify them locally (zero runtime coupling). Result records flow back to the
+gateway (`/api/results`) for attribution: exactly which lane served which
+bytes.
 
-## Hybrid mode quickstart — run with or without the Cloudflare Worker
+## Ports — what this project touches
 
-The project runs **with or without** a Cloudflare Worker. The default is
-native mode (VPS only, no Cloudflare dependency). Adding the Worker switches
-web/custom-client traffic to hybrid mode: heavy download/upload payload is
-generated and drained at the Cloudflare edge while the VPS keeps only the
-light control plane. Status log: [`docs/HYBRID_STATUS.md`](docs/HYBRID_STATUS.md);
-architecture detail: [`hybrid/README.md`](hybrid/README.md). The subsection
-above is the research summary; this section is the operator quickstart.
-
-### The two operating modes
-
-| Aspect | NATIVE (no Worker) | HYBRID (with Worker) |
+| Port | Component | Notes |
 |---|---|---|
-| VPS runs | `speedtestserver.service` — the OoklaServer-compatible daemon (TCP+UDP 5060/8080; TLS/HTTP/WebSocket/NetGauge multiplexed on one port) | the daemon, plus the light plane: `speedtest-hybrid-gateway.service` on port 8790 (TLS with the existing wildcard cert) — server selection, `latency.txt` ping, token minting, session/results accounting |
-| Heavy DL/UL payload | at the VPS | at the Cloudflare Worker `speedtest-hybrid-worker`: `GET /__down?bytes=N` (download streaming), `POST /__up` (upload drain), NetGauge over WSS (`/ws`), plus HTTP legacy surface mirrors |
-| Official Ookla CLI | the only mode the official CLI binary can use — its measurement protocol is raw TCP NetGauge on the host:port from the Ookla server list, so the payload always transits the VPS. Verified: 9/9 official-CLI runs exit 0 ([`docs/OFFICIAL_CLI_MOCK_CAMPAIGN_2026-11-24.md`](docs/OFFICIAL_CLI_MOCK_CAMPAIGN_2026-11-24.md)) | unchanged — the CLI keeps the VPS lane; web/custom clients get the edge |
-| Measured offload | — | ~1:1000+ VPS control bytes vs edge payload bytes ([`hybrid/lab/evidence/e-k-speedtest-front/`](hybrid/lab/evidence/e-k-speedtest-front/), [`e-l-post-push-verification/`](hybrid/lab/evidence/e-l-post-push-verification/), [`e-m-official-cli-campaign/`](hybrid/lab/evidence/e-m-official-cli-campaign/)) |
+| **8080** | SpeedtestServer daemon | OoklaServer-standard TCP/UDP/HTTP port |
+| **5060** | SpeedtestServer daemon | OoklaServer-standard secondary port |
+| 8790 | Hybrid gateway (control plane + front) | configurable in `.env` |
+| — | Cloudflare Workers | `*.workers.dev` (no VPS port) |
 
-### Install summary
+The project **never** binds 80, 443, 8081 or 8443, and never touches
+unrelated services on the host. `OoklaServer.properties` follows the
+official Ookla format exactly and is preserved across upgrades.
 
-- **Native (no Worker):** `cp .env.example .env` → set `HYBRID_ENABLED=false`
-  (or run `install.sh --no-hybrid`) → `sudo ./install.sh --start`. No
-  Cloudflare account is involved. (Manual path: sections 5 and 6, starting
-  from [`config/OoklaServer.properties.template`](config/OoklaServer.properties.template).)
-- **Full hybrid stack (daemon + gateway + Cloudflare worker pool):**
-  `cp .env.example .env` → fill the Cloudflare credentials and
-  `CF_WORKER_DEPLOY_COUNT` → `sudo ./install.sh --start`. Everything
-  installs automatically — including the worker side (deploy-pool.sh with
-  the shared secret on every worker). Manual/legacy path:
-  [`docs/HYBRID_DEPLOYMENT_RUNBOOK.md`](docs/HYBRID_DEPLOYMENT_RUNBOOK.md).
-  Gateway: `speedtest-hybrid-gateway.service`, env file
-  `/etc/speedtest-hybrid/gateway.env` (generated from `.env`),
-  speedtest front enabled via `HYBRID_FRONT_ENABLED=true`, listening on
-  port 8790 (TLS).
-
-### Worker pool mode (100 workers, smart activation)
-
-Deploy 1..100 copies of the same Worker (`speedtest-hybrid-worker`, `-2` …
-`-100` — the Free-plan script cap) with `bash hybrid/worker/deploy-pool.sh`
-(needs `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and the
-`HYBRID_SHARED_SECRET` value). The VPS gateway then routes traffic smartly:
-its autoscaler activates more workers as the token-mint rate rises
-(canary-gated), benches broken ones, and each worker autonomously deflects
-authenticated requests to a sibling when it senses saturation
-(302/307 + hop guard). Pool size and thresholds are env-tuned on the VPS
-(`HYBRID_WORKER_POOL_MAX` … — see `docs/WORKER_POOL.md`). Full design,
-limits (100k requests/day is ACCOUNT-wide — a pool distributes, it does not
-multiply), and evidence: [`docs/WORKER_POOL.md`](docs/WORKER_POOL.md).
-
-### VPS full-potential assist mode (v1.4 — "VPS releases ALL its bandwidth, CF only helps")
-
-The v1.3 byte-budget (`HYBRID_VPS_DL_BUDGET_MBPS`) was REMOVED at operator
-decision — it capped the VPS's contribution. v1.4 has **no budget and no
-throttle at all**: `HYBRID_VPS_DL_SHARE` (0.0–1.0, default 0.15) is the
-fraction of download requests served DIRECTLY by the VPS at full socket
-speed, while the complementary fraction is 302-assisted by the Worker pool
-**in parallel** (per-IP Bresenham interleave — deterministic from the first
-request). The client's aggregate becomes ≈ VPS capacity + edge capacity:
-`1.0` = pure VPS potential (edge idle, CF quota saved), `0.0` = pure edge.
-The hybrid probe client additionally splits its uploads between the VPS
-front and the Worker edge (`HYBRID_VPS_UL_SHARE`) and can raise engine
-parallelism (`HYBRID_DL_THREADS`/`HYBRID_UL_THREADS`/`HYBRID_DL_COUNTS`).
-Design, configuration, tests (13/13 unit, 4/4 e2e) and evidence:
-[`docs/HYBRID_ASSIST_MODE.md`](docs/HYBRID_ASSIST_MODE.md).
-
-### One-shot full-stack install (v1.4 — `.env` driven)
-
-The repository `.env` (template: [`.env.example`](.env.example)) is the
-single source of install-time configuration: Cloudflare credentials (API
-token or global key — every required permission scope is documented in
-[`docs/CLOUDFLARE_CREDENTIALS.md`](docs/CLOUDFLARE_CREDENTIALS.md)), the
-**worker pool deploy count** (`CF_WORKER_DEPLOY_COUNT`, 1..100), the
-shared HMAC secret (auto-generated when left empty), and all gateway
-runtime vars.
+## Quick start
 
 ```bash
-cp .env.example .env && nano .env   # fill the CF credentials + worker count
-sudo ./install.sh --start           # daemon + hybrid gateway + N CF workers
+git clone https://github.com/smahud/SpeedtestServer.git
+cd SpeedtestServer
+cp .env.example .env
+nano .env          # fill the Cloudflare credentials + worker count
+sudo ./install.sh --start
 ```
 
-`install.sh` deploys everything: the OoklaServer-compatible daemon, the
-hybrid gateway (systemd, hardened), the Cloudflare worker pool with the
-shared secret set on every worker, and post-deploy verification
-(`/__meta` per worker + gateway `/api/health`). It is idempotent —
-re-runs regenerate `gateway.env` from `.env` (with an automatic backup of
-the previous one) and redeploy the workers.
+That single command: builds the TypeScript daemon, installs hardened
+systemd units, creates the service users, deploys 1..N Cloudflare Workers
+(REST, fingerprint-gated), installs the daily auto-update timer, and starts
+everything. Re-running it is safe (config, certificates and `.env` are
+preserved; unchanged workers are not redeployed).
 
-### Creating the Cloudflare Worker
+### Modes
 
-Prerequisites: a Cloudflare account (the Free plan works), Node.js + wrangler
-(`npx wrangler`), an API token with the right permission scopes (Account >
-Workers Scripts: Edit + Account Settings: Read + User Details: Read — the
-"Edit Cloudflare Workers" template), and the account ID. **Every scope,
-where to click, and how to verify the token is documented step-by-step in
-[`docs/CLOUDFLARE_CREDENTIALS.md`](docs/CLOUDFLARE_CREDENTIALS.md)** — or
-skip all of this and let `install.sh` + `.env` deploy the whole pool
-automatically.
+| Mode | When | Behavior |
+|---|---|---|
+| **hybrid** (default) | usable Cloudflare credential + `CF_WORKER_DEPLOY_COUNT ≥ 1` | VPS serves its share at full speed; the worker pool assists in parallel |
+| **vps-only** (fallback) | no/invalid credentials, or count 0 | everything served by the VPS; fix `.env` and re-run `install.sh` (or just save the file — the running gateway retries) |
 
-1. `cd hybrid/worker`
-2. Set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the shell —
-   never commit them to the repository.
-3. Register a workers.dev subdomain if the account has none
-   (`npx wrangler whoami`, or the dashboard).
-4. `npx wrangler secret put HYBRID_SHARED_SECRET` — the value must equal
-   the VPS gateway's `HYBRID_SHARED_SECRET`.
-5. `npx wrangler deploy` — uses
-   [`hybrid/worker/wrangler.toml`](hybrid/worker/wrangler.toml): worker name
-   `speedtest-hybrid-worker`, `workers_dev = true`, `preview_urls = false`,
-   vars `MAX_DOWNLOAD_BYTES`/`MAX_UPLOAD_BYTES` (25 MiB caps for the Free
-   plan), `LEGACY_HTTP_ENABLED=false` by default.
-6. Optional first-time conformance test worker (`[env.test]`: legacy surface
-   on, 32 MiB cap): `npx wrangler deploy --env test`; run
-   `node test/conformance.mjs https://speedtest-hybrid-worker-test.<subdomain>.workers.dev`;
-   then **delete it**: `npx wrangler delete --env test` (mandatory — an open
-   test worker can burn account quota).
-7. Verify: `curl` the `/__down` endpoint without a token → expect `401`;
-   with a gateway-minted token → `200` and streamed bytes.
-8. Point the VPS gateway at the worker: set
-   `HYBRID_WORKER_BASE=https://speedtest-hybrid-worker.<subdomain>.workers.dev`
-   in `/etc/speedtest-hybrid/gateway.env`, then
-   `systemctl restart speedtest-hybrid-gateway`.
-9. Dashboard alternative (no wrangler): create a Worker in the Cloudflare
-   dashboard, paste/upload the built worker bundle from `hybrid/worker`
-   (wrangler build output), set the same vars and secret, and note the URL.
-   Keep this path for exceptions — wrangler is the reproducible one.
+## Configuration — one `.env` file
 
-Quota note: Workers Free = 100,000 requests/day and 10 ms CPU per
-invocation; keep the test worker deleted whenever it is not in use.
+`cp .env.example .env` — every key is documented inline. The essentials:
 
-### Running a speedtest
+| Key | Default | Meaning |
+|---|---|---|
+| `CLOUDFLARE_API_TOKEN` *or* `CLOUDFLARE_EMAIL` + `CLOUDFLARE_API_KEY` | — | credentials (token preferred; global key is the automatic fallback) |
+| `CLOUDFLARE_ACCOUNT_ID` | — | 32-hex account id |
+| `CF_WORKER_DEPLOY_COUNT` | 100 | worker pool target — **synced on the fly** |
+| `CF_WORKERS_SUBDOMAIN` / `CF_WORKER_NAME` | — | workers.dev URL derivation |
+| `HYBRID_SHARED_SECRET` | auto | HMAC secret (auto-generated; deployed to every worker) |
+| `HYBRID_VPS_DL_SHARE` | 0.15 | fraction of download requests served directly by the VPS at FULL speed; the rest is 302-assisted by the pool. 1.0 = pure VPS, 0.0 = pure edge |
+| `HYBRID_GATEWAY_PORT` | 8790 | gateway listener (avoid 80/443/5060/8080/8081/8443) |
+| `HYBRID_GATEWAY_TLS_CERT/KEY` | daemon cert | gateway TLS (served via systemd `LoadCredential`) |
 
-- **Official Ookla CLI — native mode only:** `speedtest --server-id=<ID>`
-  (or `--host`). Mock-DNS example (test lab only): map the server hostname
-  to the VPS IP in `/etc/hosts` and block `results.speedtest.net` when
-  testing forced endpoints. Reference:
-  [`docs/OFFICIAL_CLI_MOCK_CAMPAIGN_2026-11-24.md`](docs/OFFICIAL_CLI_MOCK_CAMPAIGN_2026-11-24.md).
-- **HTTP speedtest clients (sivel `speedtest-cli` family), stock client:**
-  `speedtest-cli --json --mini https://<front-host>:8790` — download is
-  already offloaded via a 302; upload drains at the VPS because urllib
-  cannot follow redirects with a request body.
-- **Hybrid-aware client (full offload, DL + UL):**
+Full field reference, Cloudflare token scopes and troubleshooting:
+[docs/CLOUDFLARE_CREDENTIALS.md](docs/CLOUDFLARE_CREDENTIALS.md).
 
-  ```bash
-  HYBRID_GATEWAY_BASE=https://<front-host>:8790 \
-  HYBRID_WORKER_BASE=https://speedtest-hybrid-worker.<subdomain>.workers.dev \
-  HYBRID_FRONT_BASE=https://<front-host>:8790 \
-  HYBRID_SERVER_LIST_FILE=hybrid/probe-client/server-list-surabaya.json \
-  python3 hybrid/probe-client/speedtest-cli-hybrid.py --json --server <ID>
-  ```
+### Hot-applied (no restart) vs restart-required
 
-  The engine is 100% stock sivel `speedtest-cli`; the wrapper
-  ([`hybrid/probe-client/speedtest-cli-hybrid.py`](hybrid/probe-client/speedtest-cli-hybrid.py))
-  adds only transport routing hooks.
-- **Custom clients:** gateway API `/api/servers`, `/api/sessions` (token
-  mint), `/api/ping`, `/api/results`; worker endpoints
-  `/__down?bytes=N&token=...` and `POST /__up` with
-  `Authorization: Bearer <token>`.
-
-### Architecture in one picture
-
-```
-official Ookla CLI ----------------> VPS daemon :8080/:5060
-                                     (raw TCP NetGauge + UDP loss;
-                                      payload always at the VPS)
-
-web / custom clients --> VPS front :8790 (server list, latency.txt ping,
-                                        token mint -- light plane only)
-                          |
-                          +-- 302 redirect (stock HTTP clients: download)
-                          +-- Bearer token, direct call (hybrid-aware
-                              clients: download + upload)
-                                      |
-                                      v
-                     Cloudflare Worker speedtest-hybrid-worker
-                     /__down?bytes=N - POST /__up - /ws (NetGauge over WSS)
-                     (payload generated/drained at the edge)
-```
-
-## 2. Relationship to the official OoklaServer
-
-The official binary (reference: 2.11.5.2, tarball sha256 `ce180aa3…598159`)
-is used **only** as an authorized behavioral reference for differential
-testing. No proprietary code or assets are included; the compatibility
-banner is configurable (`OoklaServer.netgaugeVersionString`). Parity claims
-are bounded to the verified profile — `validation/PARITY_MATRIX.md`.
-
-## 3. Current TypeScript compatibility status (revision 5 — config-parity + defect fix, 2026-11-05)
-
-| Gate | Result |
+| Hot-applied while running (`HYBRID_ENV_FILE` watched, ~2 s) | Restart required (re-run `install.sh`) |
 |---|---|
-| **Live differential battery vs the running reference daemon** (103 probes: NetGauge/HTTP/TLS/WS/UDP) | **89/103 raw byte-identical**; 6 expected non-differences (timestamps, random payload, own port); 8 documented deviations (D-2/D-3 + safety refusals) — re-verified on the rev-5 code (zero regression) |
-| **Per-config-variant differential (new, rev 5)**: `userAgentFilterEnabled`, `frameSizeLimitBytes`, `useIPv4`/`useIPv6` | **0 mismatches** on every battery — `validation/evidence/rea-lab-rev5/` |
-| Official Speedtest CLI 1.2.0.84 → this server (non-publishing) | rev 4: **PASS 3/3 isolated runs** · rev 5 re-run: **BLOCKED upstream** (config endpoint throttles the CLI UA from the lab IP — see HANDOFF); plaintext-fallback paths covered by the differential |
-| Publishing opt-in battery (multi-server, forced local) | genuine public speedtest.net Result URLs, e.g. `https://www.speedtest.net/result/c/55713fba-3d50-4558-95f2-7afbde18107a` (`validation/PUBLISHED_RESULT_URLS.md`) |
-| Speedtest Host Tester v1.1.0 | **10/10 PASS** (identical verdict to the official reference daemon) |
-| Unit/protocol/conformance suite | **143/143** (125 rev-4 + 18 rev-5 regressions: F-26/F-27/F-28/F-29 wiring + the F-30 security fix) |
-| Negative/security battery | **7/7** (rev 4 shipped 5/7-effective: a >64 KiB header block OOM-killed the server — F-30 fixed; see FINDINGS) |
-| Strict TLS battery (§9/§10) | **10/10 PASS** (re-run on rev-5 code) |
-| Installer (dry-run/staged/idempotent/fail-closed) | PASS (systemd start: container-blocked, documented) |
+| `CF_WORKER_DEPLOY_COUNT` (deploy/undeploy workers) | `HYBRID_GATEWAY_PORT` / `BIND` / TLS paths |
+| `HYBRID_WORKER_*` (pool bounds, autoscaler tuning) | `HYBRID_VPS_PUBLIC_BASE`, `HYBRID_STS_BASE` |
+| `HYBRID_VPS_DL_SHARE`, `HYBRID_FRONT_*` limits | `HYBRID_RESULTS_FILE` |
+| `HYBRID_SESSIONS_RATE_LIMIT_MPM` | |
+| `HYBRID_SHARED_SECRET` (workers redeploy to match) | |
+| `CLOUDFLARE_*` credentials (re-authenticate + re-converge) | |
 
-Revision 4 (2026-11-04) re-verified the protocol **against the live
-reference binary** on this very machine and closed 25 new reference findings
-(F-8…F-25 in `validation/FINDINGS.md`): the Host/SAN validation with 307
-redirects, the verified `allowedDomains` semantics (CSP + crossdomain.xml +
-CORS Origin filter), byte-exact HTTP header order/casing, the DOWNLOAD
-trailing-newline + printable-ASCII pool structure, the TCP "three strikes"
-rule, CRLF tolerance, the pre-session GETIP gate, WS one-command-per-frame
-and QUIT-over-WS semantics, plus fail-closed/hardening fixes (explicit-config
-failures, prototype pollution, UDP binds, evidence flush, per-IP limits).
-
-Evidence: `validation/evidence/` · index: `validation/TEST_RESULTS.md` ·
-reproduce everything: `validation/REPRODUCE.md`.
-
-## 4. Requirements
-
-- Debian 13 (trixie) — primary target (other Linuxes work unverified)
-- Node.js ≥ 18 (v24 tested), npm, rsync (installer only)
-- No root required to run (unprivileged, no `/var/lock` or `/etc/ooklaserver`
-  writes); the system installer needs root once
-
-## 5. Installation using `install.sh` (Debian 13 + systemd)
+Watch it happen:
 
 ```bash
-./install.sh --dry-run        # checks + plan + config/TLS validation, no changes
-sudo ./install.sh             # build, validate, install to /opt, systemd unit
-sudo ./install.sh --start     # … and enable + start the service now
+journalctl -u speedtest-hybrid-gateway -f | grep -E "env_change_applied|worker_sync"
+curl -sk https://127.0.0.1:8790/api/health    # mode, version, sync state
+curl -sk https://127.0.0.1:8790/api/workers   # deployment sync status
+curl -sk https://127.0.0.1:8790/api/pool      # routing pool status
 ```
 
-The installer deploys the open-source TypeScript server (never the
-proprietary binary), creates a dedicated non-root service user, preserves
-existing configuration and certificates on re-runs (idempotent), verifies the
-installed server answers (`HELLO …` probe), and reports TLS readiness.
-Staged/portable installs: `./install.sh --staging-dir /tmp/sts`.
+## Dynamic worker pool
 
-## 6. Manual installation
+`CF_WORKER_DEPLOY_COUNT` is the deployment target. When it changes (in
+`.env`, while everything is running), the gateway converges the real
+Cloudflare state to match:
 
-### HTTP fallback required by host testers
+- **grow** → missing workers deployed via the REST API (6 concurrent),
+  shared secret included;
+- **shrink** → surplus workers deleted (highest ids first, never worker 1,
+  only the exact `speedtest-hybrid-worker[-N]` naming scheme — anything
+  else in the account is untouchable);
+- **rotate** → a changed worker bundle / secret / pool config (deployment
+  fingerprint) triggers a full redeploy.
 
-The native daemon on ports 5060/8080 and the HTTP legacy fallback on port 80
-are separate services. Installing the daemon alone does not install the legacy
-site. The legacy site needs actual JPEG files and the PHP-style form upload
-accounting (`500 + sum(byteLength(key) + byteLength(value) + 3)`); the daemon
-continues to return the raw POST body length on its own ports.
+Set `HYBRID_WORKER_SYNC_DELETE=false` to forbid deletions. Quota guard:
+the account-wide 100k/day Workers Free request budget is polled hourly;
+growth stops at the soft threshold, token minting stops at the hard one.
 
-After the standard installer, run `sudo bash install-legacy.sh`. It downloads
-the reference fallback asset bundle over HTTPS, verifies its pinned SHA-256,
-extracts only the ten known JPEG files, and enables `speedtestserver-legacy`
-on port 80. You can supply a pre-downloaded archive as its first argument.
-The separately distributed bundle is not included or relicensed in this repo.
-Requirements: curl, python3, sha256sum, and the standard `/opt/speedtestserver`
-installation. If port 80 is already occupied, the installer refuses to replace
-the existing web server; configure that server's legacy paths instead.
+## Auto-update
 
-The fallback has bounded wire uploads (8 MiB, to accommodate percent encoding
-of the maximum test payload), request/header timeouts, persistent
-HTTP connections, and streams the real JPEG bytes from disk. It runs under the
-dedicated service user, with only the capability required to bind port 80.
-
-Both the daemon and fallback must be reachable at the hostname entered into
-the tester. Verify public A/AAAA records point to the intended VPS, and verify
-inbound TCP 80/8080 and UDP 5060/8080. A locally pinned DNS test proves the VPS
-implementation, not public DNS routing or the official hosted tester verdict.
-
-When sharing a host with nPerf, check nftables redirect rules as well as
-`ss`: nPerf can redirect external port 80 to 8081 even when no process listens
-on 80. Allocate port 80 to the fallback and keep nPerf on 8081/8443 (and 443),
-or use a web proxy to share the legacy paths. Set nPerf's `REDIRECT_PORT_80=0`
-in its operator configuration before removing the existing port-80 redirect,
-otherwise nPerf can recreate it on restart. Back up the configuration/rules
-first; the generic fallback installer never changes another service's firewall.
-
-Logs: `journalctl -u speedtestserver -u speedtestserver-legacy`.
-To remove the fallback listener: `systemctl disable --now speedtestserver-legacy`.
-
-### Native daemon
+`install.sh` installs `speedtest-autoupdate.timer` (daily 04:30 + up to
+30 min jitter, `Persistent=true`). It pulls `master`, ff-only, reinstalls
+when code changed (docs-only commits are pulled without reinstall), and
+restarts the units. The `VERSION` file gates and reports the release.
+Details: [docs/AUTO_UPDATE.md](docs/AUTO_UPDATE.md).
 
 ```bash
-cd reverse-engineered/typescript
-npm ci                       # committed lock file → reproducible deps
-npm run build                # → dist/bin/ooklaserver.js
-node dist/bin/ooklaserver.js --config /path/to/OoklaServer.properties
+systemctl list-timers speedtest-autoupdate.timer
+systemctl start speedtest-autoupdate.service   # run once now
 ```
 
-## 7. Configuration (`OoklaServer.properties`)
+## Verifying the server
 
-Searched in `./config`, `/etc/ooklaserver`, … or selected explicitly with
-`--config <path>`. Precedence: **CLI flags > `OOKLA_SERVER_POCO_CONFIG` env
-JSON > properties file > defaults** (unit-verified). Key properties:
+### Native lane (official Ookla CLI) — 1:1 with the official binary
 
-- `OoklaServer.tcpPorts` / `OoklaServer.udpPorts` — listeners (default 5060,8080; every TCP port multiplexes TLS/HTTP/WS/NetGauge)
-- `openSSL.server.certificateFile` + `openSSL.server.privateKeyFile` — custom certificate pair (takes precedence, disables auto issuance)
-- `OoklaServer.ssl.useLetsEncrypt = true` — automatic issuance via standard ACME (needs `OoklaServer.ssl.acme.domains` + `.email`)
-- `openSSL.server.minimumTLSProtocol` — 1.0/1.1/1.2/1.3 (default 1.2)
-- `OoklaServer.netgaugeVersionString` — compatibility banner
-- `OoklaServer.evidenceLogFile` — JSONL evidence log (the audit channel)
-- `logging.loggers.*` — Poco-style logging (EventLogChannel→journal, FileChannel→file)
-
-Full property-by-property status: `validation/CONFIG_MATRIX.md`.
-
-## 8. Let's Encrypt behavior
-
-`useLetsEncrypt=true` (with no custom pair) provisions through **standard
-public ACME** (Let's Encrypt via the established `acme-client` library,
-HTTP-01 challenge on port 80 — configurable `ssl.acme.http01Port`). Issued
-material is stored under `ssl.acme.storageDir` (default `./certs/acme`),
-reused while valid, renewed ≤30 days before expiry, and hot-activated without
-restart. **Failures are fatal**: missing ACME settings, unreachable
-directory, or failed issuance abort startup — the server never hides an
-issuance failure behind a self-signed certificate. Operators should validate
-on the Let's Encrypt **staging** directory first, then switch
-`ssl.acme.directoryUrl` to production.
-
-## 9. Custom certificate configuration and precedence
-
-Both `openSSL.server.certificateFile` and `openSSL.server.privateKeyFile`
-configured → the custom pair wins: loaded, validated (parse + key match),
-never overwritten, `effectiveUseLetsEncrypt=false` (even if
-`useLetsEncrypt=true` remains in the file). Only one of the two configured →
-**startup fails** with a clear error. Certificates replaced on disk after
-startup are hot-reloaded (validated first; the last valid certificate is
-preserved if a replacement is broken).
-
-## 10. SSL validation and troubleshooting
-
-- Dev quick start (no TLS config) generates a **self-signed development
-  certificate** — loudly announced, `publiclyTrusted:false`; strict HTTPS
-  clients correctly reject it. Production needs a custom pair or ACME.
-- Validate any configuration without binding ports:
-  `node dist/bin/ooklaserver.js --config <file> --validate-config`
-- Strict probe: `node validation/harness/tls-strict-check.mjs --port 8080 --ca <ca.pem>`
-- Expired / wrong-hostname / mismatched-key / self-signed behaviors are
-  covered by the 10-scenario battery: `validation/harness/run-tls-validation.sh`
-  (evidence `validation/evidence/tls/`).
-
-## 11. Service management (systemd)
+The official CLI speaks binary NetGauge to `:8080`. Point the CLI at this
+VPS with a hosts entry (the CLI resolves server hostnames locally):
 
 ```bash
-sudo systemctl status speedtestserver
-sudo systemctl restart speedtestserver
-journalctl -u speedtestserver -f          # EventLogChannel output
+# on the measurement machine (root):
+echo "45.126.249.250 speedtest.somedigit.net" >> /etc/hosts
+./speedtest-cli_official/speedtest --accept-license --accept-gdpr -s 74964 --json
 ```
 
-Hardened unit (NoNewPrivileges, ProtectSystem=strict, dedicated user,
-StateDirectory for certificates). Manual runs: `Ctrl-C`/SIGTERM for a clean
-shutdown.
+The result JSON (ping / download / upload) must be indistinguishable from a
+run against the official binary — that equivalence is the project's core
+contract, verified with multi-server CLI campaigns.
 
-## 12. Logs and diagnostics
-
-- Console/journal channel: `logging.loggers.app.*` (default information level)
-- Optional file channels: `logging.loggers.<n>.channel.class = FileChannel` + `.path`
-- Evidence log: `OoklaServer.evidenceLogFile` — every connection, command,
-  and byte counter (used by all validation gates)
-- `--validate-config` prints the effective plan as JSON
-
-## 13. SpeedtestHost-Tester validation
-
-The independent host tester (v1.1.0, read-only upstream) passes **10/10**
-against this server with verdict strings identical to the official daemon's.
-Run: `node speedtest-host-tester.mjs 127.0.0.1:8080`
-(comparison: `validation/HOST_TESTER_COMPARISON.md`).
-
-## 14. Official Speedtest CLI validation ★
-
-The primary acceptance proof: the **genuine, unmodified** official CLI
-(1.2.0.84, sha256-verified) completes full latency/download/upload/packet-loss
-measurements against this server, non-publishing (3/3 gates, loss 0) —
-with per-run destination proof (port owner, official daemon absent) and
-server-side byte corroboration. An opt-in publishing battery forces several
-distinct live server IDs at this server and captures genuine public Result
-URLs (spot-verified against the live result pages). Details:
-`validation/OFFICIAL_CLI_RESULTS.md`, `validation/PUBLISHED_RESULT_URLS.md`.
-
-## 15. Known limitations
-
-- The CLI's encrypted-binary engine protocol is not implemented; the
-  documented plaintext fallback (verified 3/3) is used instead (D-2).
-- Automatic issuance requires an operator-controlled domain; real ACME
-  issuance is not exercised in the lab (fail-closed paths are).
-- `userAgentFilterEnabled`, `frameSizeLimitBytes` override,
-  `useIPv4`/`useIPv6` and `addresses` binding are **applied** as of
-  revision 5 (F-26…F-29, verified against the live daemon). The one
-  deliberate deviation: `addresses` implements the documented intent
-  (deviation D-9) because the reference daemon's own handling never binds
-  listed IPv4 addresses — details in `validation/CONFIG_MATRIX.md` and
-  FINDINGS.md §rev 5. (`allowedDomains` has been applied since rev 4.)
-- HTTP Host validation accepts exact certificate SAN entries and single-label
-  wildcard SANs (e.g. `*.example.com` covers `speedtest.example.com`). Others
-  get a 307 redirect to `https://<cert-CN>`. The reference's more permissive
-  wildcard-certificate behavior is deliberately restricted (decision D-12).
-  Deploy a certificate whose SANs cover the hostnames/IPs clients will use.
-- Single-process serving tops out at ~18–22 Gbps loopback (informational).
-- systemd service start verified on Debian 13 only via offline unit checks +
-  direct-launch probes (container limitation, documented).
-
-## 16. Security and licensing notes
-
-Source: MIT (this project's code only — no rights over Ookla binaries,
-protocol documentation, or trademarks; "OoklaServer"/"Speedtest" are Ookla
-marks). The server makes **zero outbound connections**; TLS
-misconfiguration is fatal rather than silently degrading; the earlier
-invented "Host API" endpoints and `rejectUnauthorized:false` code were
-removed (see `validation/FINDINGS.md` C-3, `validation/SECURITY_AUDIT.md`).
-
----
-
-## Quick start (development)
+### Hybrid lane (HTTP clients)
 
 ```bash
-cd reverse-engineered/typescript
-npm ci && npm run build && npm test
-node dist/bin/ooklaserver.js                    # TCP+UDP 5060,8080, all protocols multiplexed
+HYBRID_FRONT_BASE=https://speedtest.lumajangnetworks.my.id:8790 \
+HYBRID_WORKER_BASE=https://speedtest-hybrid-worker.lumajangnetworks.workers.dev \
+HYBRID_GATEWAY_BASE=https://speedtest.lumajangnetworks.my.id:8790 \
+HYBRID_DL_THREADS=16 HYBRID_UL_THREADS=8 \
+python3 hybrid/probe-client/speedtest-cli-hybrid.py --json --server 99999
 ```
 
-Manual check:
+`/api/health` front counters attribute every byte (`dlLocal*` vs
+`downRedirects` + worker-side counts) — the evidence that the Cloudflare
+pool is genuinely carrying payload.
+
+## Performance model
+
+The VPS lane is **never capped** (the old `HYBRID_VPS_DL_BUDGET_MBPS`
+throttle was removed at operator request): every VPS-lane response runs at
+full socket speed, TCP backpressure being the only flow control. The edge
+lane adds worker-pool capacity **in parallel**, so a fast client measures
+≈ VPS capacity + edge capacity. Tune `HYBRID_VPS_DL_SHARE ≈
+VPS capacity / expected client demand` for the maximum aggregate (e.g. a
+500 Mbps VPS serving 2 Gbps clients → 0.25).
+
+## Maintenance
 
 ```bash
-printf 'HI\nGETIP\nPING 1\n' | nc 127.0.0.1 8080
-# HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d   ← compatibility banner (configurable)
-# YOURIP 127.0.0.1
-# PONG 1793776390681
+systemctl status speedtestserver speedtest-hybrid-gateway
+journalctl -u speedtestserver -f               # daemon log (JSONL events)
+journalctl -u speedtest-hybrid-gateway -f      # gateway + pool + env-sync log
+sudo ./install.sh --start                      # reinstall/upgrade (safe, idempotent)
+curl -sk https://127.0.0.1:8790/api/health     # version, mode, sync, counters
 ```
 
-## What it speaks (single port: 8080 and 5060)
-
-- **Native NetGauge protocol** (TCP + TLS-wrapped): `HI/GETIP/CAPABILITIES/
-  SERVERID/UPTIME/PING/DOWNLOAD/UPLOAD/INITPLOSS/PLOSS/QUIT` — the protocol
-  used by the official CLI (via its plaintext fallback) and NetGauge clients.
-- **UDP packet-loss protocol**: `LOSS`/`RECV` + `PLOSS` accounting.
-- **HTTP legacy surface** byte-parity: `/`, `/hi`, `/speedtest/latency.txt`,
-  `/crossdomain.xml`, `/speedtest/random{N}x{N}.jpg` (14 fixed sizes),
-  `POST /speedtest/upload.php`, security headers, keep-alive.
-- **WebSocket** `/ws` (NetGauge over WS/WSS, same port).
+Uninstall: `systemctl disable --now speedtestserver speedtest-hybrid-gateway
+speedtest-autoupdate.timer`, remove `/opt/speedtestserver`,
+`/opt/speedtest-hybrid`, the units and users, and (optionally) the worker
+pool via `CLOUDFLARE_…=… POOL_SIZE=0 node hybrid/worker/rest-deploy.mjs`.
 
 ## Repository layout
 
 ```
-install.sh                       ← automated installer (Debian 13 + systemd)
-reverse-engineered/typescript/   ← CANONICAL implementation (build, run, test)
-javascript/                      ← deprecated frozen port (see DEPRECATED.md)
-reverse-engineered/documentation/ reverse-engineered/strings/   ← RE artifacts
-reverse-engineering-batch/       ← binary analysis artifacts (historical)
-validation/                      ← §15 package: matrices, harness, evidence
+install.sh                     one-command full-stack installer
+auto-update.sh                 daily self-update (systemd timer)
+VERSION                        release version (auto-update gate)
+.env.example                   the single source of configuration
+reverse-engineered/typescript  the OoklaServer-compatible daemon (NetGauge)
+hybrid/gateway/src             VPS control plane + front + live .env watcher
+hybrid/worker/                 Cloudflare Worker (NetGauge-over-WSS + __down/__up)
+hybrid/worker/rest-deploy.mjs  REST deploy/undeploy for the worker pool
+hybrid/probe-client/           hybrid speedtest client (multi-thread, attribution)
+docs/                          credentials, worker pool, assist mode, auto-update
+validation/                    protocol/e2e validation reports + evidence
+speedtest-cli_official/        official CLI binaries used for equivalence testing
+OoklaServer-*                  official reference binaries (protocol RE source)
 ```
+
+## Development
+
+```bash
+cd reverse-engineered/typescript && npm ci && npm run build && npm test
+node hybrid/gateway/test/gateway-tests.mjs       # 18 gateway tests
+bash hybrid/gateway/test/e2e-fullstack-v14.sh    # full-stack e2e with real clients
+```
+
+The daemon's protocol implementation is reverse-engineered from the
+official OoklaServer binaries (`reverse-engineering-batch/`,
+`speedtest-cli_analysis/`); its compatibility profile is pinned by
+`validation/PROTOCOL_CONTRACT.md`.
