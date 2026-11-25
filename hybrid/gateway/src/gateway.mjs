@@ -41,6 +41,13 @@
  *                             /api/sessions (BUG FIX: this endpoint was an
  *                             unthrottled token fountain that could burn the
  *                             account's daily Worker quota)
+ *   HYBRID_VPS_DL_SHARE       default 0.15 — v1.4 assist model: fraction of
+ *                             front download REQUESTS served directly by the
+ *                             VPS at full speed (no budget, no throttle);
+ *                             the rest is 302-assisted by the worker pool.
+ *                             1.0 = pure VPS, 0.0 = pure edge. REMOVED v1.4:
+ *                             HYBRID_VPS_DL_BUDGET_MBPS (operator decision —
+ *                             the VPS must never be bandwidth-capped)
  *   HYBRID_WORKER_* / HYBRID_CF_*   see workerpool.mjs (worker pool control)
  */
 
@@ -71,12 +78,18 @@ const FRONT_ENABLED = String(process.env.HYBRID_FRONT_ENABLED || '') === 'true';
 const FRONT_RATE_LIMIT_MPM = Number(process.env.HYBRID_FRONT_RATE_LIMIT_MPM ?? 90);
 const FRONT_MAX_DOWN_BYTES = Number(process.env.HYBRID_FRONT_MAX_DOWN_BYTES ?? 26214400);
 const FRONT_TOKEN_CACHE_MS = Number(process.env.HYBRID_FRONT_TOKEN_CACHE_MS ?? Math.max(30000, TTL_MS - 60000));
-// --- VPS assist lane (sesi 9: "CF membantu beban, bukan menggantikan") ---
-// Budget the VPS spends serving download payload DIRECTLY (token-bucket,
-// decimal Mbps). 0 = pure edge offload (legacy behavior); 100 on a
-// 100 Mbps VPS makes the aggregate ≈ VPS budget + edge capacity.
-const VPS_DL_BUDGET_MBPS = Math.max(0, Number(process.env.HYBRID_VPS_DL_BUDGET_MBPS || 0));
-const VPS_DL_BURST_S = Math.max(0.5, Number(process.env.HYBRID_VPS_DL_BURST_S || 2));
+// --- VPS assist lane (v1.4: "VPS mengeluarkan SEMUA potensi, CF membantu") ---
+// Share of front download REQUESTS served DIRECTLY by the VPS at FULL link
+// speed — there is NO token bucket and NO byte budget (the v1.3
+// HYBRID_VPS_DL_BUDGET_MBPS was removed at operator request: it capped the
+// VPS's contribution). The complementary (1 - share) of requests is
+// 302-assisted by the CF worker pool in parallel, so the client aggregate
+// ≈ VPS capacity + edge capacity. 1.0 = pure VPS potential; 0.0 = legacy
+// pure edge offload. Empty/unset → 0.15; "0" is honored as an explicit 0.
+const VPS_DL_SHARE_RAW = String(process.env.HYBRID_VPS_DL_SHARE ?? '').trim();
+const VPS_DL_SHARE = VPS_DL_SHARE_RAW === ''
+  ? 0.15
+  : Math.min(1, Math.max(0, Number(VPS_DL_SHARE_RAW) || 0));
 
 // Evidence counters — how many control-plane bytes the VPS actually served.
 const counters = { servers: 0, sessions: 0, results: 0, pings: 0, bytesIn: 0, bytesOut: 0 };
@@ -165,7 +178,7 @@ function json(res, status, obj) {
     'Content-Type': 'application/json',
     'Content-Length': body.length,
     'Cache-Control': 'no-store, no-transform',
-    'X-Hybrid-Gateway': '1.3',
+    'X-Hybrid-Gateway': '1.4',
   });
   res.end(body);
 }
@@ -243,8 +256,7 @@ const front = FRONT_ENABLED
       tokenTtlMs: TTL_MS,
       tokenCacheMs: FRONT_TOKEN_CACHE_MS,
       tokenBindIp: TOKEN_BIND_IP,
-      vpsDlBudgetMbps: VPS_DL_BUDGET_MBPS,
-      vpsDlBurstS: VPS_DL_BURST_S,
+      vpsDlShare: VPS_DL_SHARE,
     })
   : null;
 
@@ -371,7 +383,7 @@ const requestHandler = async (req, res) => {
 
   if (path === '/api/health' && req.method === 'GET') {
     return json(res, 200, {
-      server: 'hybrid-gateway/1.3',
+      server: 'hybrid-gateway/1.4',
       instanceId,
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
       counters,
@@ -379,11 +391,12 @@ const requestHandler = async (req, res) => {
         ? {
             enabled: true,
             rateLimitMpm: FRONT_RATE_LIMIT_MPM,
-            // sesi 9 — the assist lane: which download lane served what
+            // v1.4 — the assist lane: which download lane served what.
+            // NO bandwidth budget exists anymore: the VPS lane runs
+            // uncapped; share only distributes requests between lanes.
             assist: {
-              vpsDlBudgetMbps: VPS_DL_BUDGET_MBPS,
-              vpsDlBurstS: VPS_DL_BURST_S,
-              enabled: VPS_DL_BUDGET_MBPS > 0,
+              vpsDlShare: VPS_DL_SHARE,
+              enabled: VPS_DL_SHARE > 0,
             },
             counters: {
               latency: counters.frontLatency || 0,
@@ -462,8 +475,7 @@ listener.listen(PORT, BIND, () => {
     front: FRONT_ENABLED,
     frontRateLimitMpm: FRONT_RATE_LIMIT_MPM,
     frontTokenCacheMs: FRONT_TOKEN_CACHE_MS,
-    vpsDlBudgetMbps: VPS_DL_BUDGET_MBPS,
-    vpsDlBurstS: VPS_DL_BURST_S,
+    vpsDlShare: VPS_DL_SHARE,
     workerBase: WORKER_BASE,
     workerPoolMax: pool.poolMax,
     vpsBase: VPS_BASE,

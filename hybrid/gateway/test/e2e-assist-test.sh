@@ -1,17 +1,22 @@
 #!/bin/bash
-# e2e-assist-test.sh — end-to-end proof of the VPS ASSIST lane + the pool
-# candidate-scan fix (sesi 9: "Cloudflare membantu beban, bukan menggantikan").
+# e2e-assist-test.sh — end-to-end proof of the VPS FULL-POTENTIAL assist
+# lane v1.4 + the pool candidate-scan fix ("VPS mengeluarkan SEMUA potensi
+# bandwidth-nya, Cloudflare hanya MEMBANTU — tanpa budget, tanpa throttle").
 #
 # Topology: 4 fake Node workers — worker 2 is CANARY-BROKEN from the start —
-# plus the gateway with the assist lane enabled.
+# plus two gateways with the assist lane enabled.
 #
 #   Phase A: pool growth SKIPS the broken worker 2 → active set = {1,3}
 #            (v1.2 bug: growth stopped dead at worker 2 forever)
-#   Phase B: front download: budget → LOCAL 200 lane (X-Hybrid-Lane: vps,
-#            byte-exact Content-Length, image/jpeg)
-#   Phase C: budget exhausted → 302 → pool worker __down (edge overflow)
-#   Phase D: mint rate-limited (cache off, MPM=2) + assist on → forced-local
-#            200 instead of 429 (measurement never breaks)
+#   Phase B: share=1.0 → EVERY front download served on the UNCAPPED LOCAL
+#            lane (X-Hybrid-Lane: vps, byte-exact Content-Length, image/jpeg,
+#            zero edge mints — pure VPS potential)
+#   Phase C: share=0.5 → 302 edge-assist redirect → pool worker __down
+#            (the FIRST request of the Bresenham sequence is the edge lane)
+#   Phase D: share=0.5 + cache off + MPM=2 → E,V,E,V,forced-V sequence —
+#            the 5th edge-lane request finds the mint rate-limited and
+#            degrades to forced-local 200 instead of 429 (never breaks a
+#            measurement; no byte budget exists to drain)
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/.."
@@ -76,13 +81,13 @@ for p in $W1 $W2 $W3 $W4; do
   curl -s -m 3 "http://127.0.0.1:$p/__meta" >/dev/null && echo "  fake worker :$p up" || { echo "  fake worker :$p FAILED"; exit 1; }
 done
 
-echo "=== gateway A (:$GPORT, assist 1.5 Mbps / burst 1.5 s ≈ 281,250 B — exactly ONE 245,388 B local serve) ==="
-start_gateway "$GPORT" HYBRID_VPS_DL_BUDGET_MBPS=1.5 HYBRID_VPS_DL_BURST_S=1.5
+echo "=== gateway A (:$GPORT, HYBRID_VPS_DL_SHARE=1.0 → every download on the UNCAPPED VPS lane) ==="
+start_gateway "$GPORT" HYBRID_VPS_DL_SHARE=1.0
 GW_PID=$!
 wait_gateway "$GPORT" || exit 1
 
-echo "=== gateway B (:$G2PORT, cache OFF + MPM=2 → forced-local after 2 mints) ==="
-start_gateway "$G2PORT" HYBRID_VPS_DL_BUDGET_MBPS=1.5 HYBRID_VPS_DL_BURST_S=1.5 HYBRID_FRONT_TOKEN_CACHE_MS=0 HYBRID_FRONT_RATE_LIMIT_MPM=2
+echo "=== gateway B (:$G2PORT, share=0.5 + cache OFF + MPM=2 → E,V,E,V,forced-V) ==="
+start_gateway "$G2PORT" HYBRID_VPS_DL_SHARE=0.5 HYBRID_FRONT_TOKEN_CACHE_MS=0 HYBRID_FRONT_RATE_LIMIT_MPM=2
 GW2_PID=$!
 wait_gateway "$G2PORT" || exit 1
 
@@ -106,34 +111,38 @@ ACTIVE_A=$(echo "$STATE_A" | jq -r .active)
 IDS_A=$(echo "$STATE_A" | jq -c .ids)
 
 echo ""
-echo "=== phase B: download 1 → LOCAL lane (VPS assist) ==="
+echo "=== phase B: share=1.0 → download 1 → UNCAPPED LOCAL lane (full VPS potential) ==="
 B1=$(curl -s -m 10 -D /tmp/e2e-assist-h1 -o /tmp/e2e-assist-b1 "http://127.0.0.1:$GPORT/speedtest/random350x350.jpg" -w "%{http_code} %{size_download}")
 LANE1=$(grep -i '^x-hybrid-lane:' /tmp/e2e-assist-h1 | tr -d '\r' | awk '{print $2}')
 echo "  request 1: $B1 lane=$LANE1 (expect: 200 245388 lane=vps)"
+B2=$(curl -s -m 10 -D /tmp/e2e-assist-h2 -o /dev/null "http://127.0.0.1:$GPORT/speedtest/random750x750.jpg" -w "%{http_code} %{size_download}")
+LANE2=$(grep -i '^x-hybrid-lane:' /tmp/e2e-assist-h2 | tr -d '\r' | awk '{print $2}')
+echo "  request 2: $B2 lane=$LANE2 (expect: 200 1118012 lane=vps — budget can NEVER drain)"
 
 echo ""
-echo "=== phase C: budget drained → 302 → edge (fake worker __down) ==="
-C1=$(curl -s -m 10 -o /dev/null -w "%{http_code} %{redirect_url}" "http://127.0.0.1:$GPORT/speedtest/random350x350.jpg")
-echo "  request 2: $C1"
+echo "=== phase C: share=0.5 → first request of the Bresenham sequence → 302 edge assist ==="
+C1=$(curl -s -m 10 -o /dev/null -w "%{http_code} %{redirect_url}" "http://127.0.0.1:$G2PORT/speedtest/random350x350.jpg")
+echo "  request 1 (gateway B): $C1"
 echo "  (expect: 302 → http://127.0.0.1:1899[68]/__down?bytes=245388&token=v1~...)"
 
 echo ""
-echo "=== phase D: gateway B — L → 302 → 302 → forced-L → forced-L (no 429) ==="
+echo "=== phase D: gateway B — E → V → E → V → forced-V (no 429, no budget) ==="
+# request 1 of phase C already consumed: E(mint1). Continue the sequence.
 SEQ=""
-for i in 1 2 3 4 5; do
+for i in 2 3 4 5; do
   R=$(curl -s -m 10 -D /tmp/e2e-assist-hd -o /dev/null "http://127.0.0.1:$G2PORT/speedtest/random350x350.jpg" -w "%{http_code}")
   L=$(grep -i '^x-hybrid-lane:' /tmp/e2e-assist-hd | tr -d '\r' | awk '{print $2}')
   SEQ="$SEQ $R:${L:--}"
 done
-echo "  sequence:$SEQ"
-echo "  (expect: 200:vps 302:- 302:- 200:vps 200:vps)"
+echo "  sequence (req 2..5):$SEQ"
+echo "  (expect: 200:vps 302:- 200:vps 200:vps — req5 edge-lane mint #3 rate-limited → forced-local)"
 
 echo ""
 R_A=$([ "$ACTIVE_A" = "2" ] && [ "$IDS_A" = "[1,3]" ] && echo PASS || echo FAIL)
-R_B=$(echo "$B1" | grep -q "^200 245388$" && [ "$LANE1" = "vps" ] && echo PASS || echo FAIL)
+R_B=$(echo "$B1" | grep -q "^200 245388$" && [ "$LANE1" = "vps" ] && echo "$B2" | grep -q "^200 1118012$" && [ "$LANE2" = "vps" ] && echo PASS || echo FAIL)
 R_C=$(echo "$C1" | grep -q "^302 http://127.0.0.1:1899.*/__down?bytes=245388&token=v1~" && echo PASS || echo FAIL)
-R_D=$(echo "$SEQ" | grep -q "200:vps 302:- 302:- 200:vps 200:vps" && echo PASS || echo FAIL)
-echo "== RESULT: pool-skip-broken(growth): $R_A | local-lane: $R_B | edge-overflow-302: $R_C | forced-local-no-429: $R_D =="
+R_D=$(echo "$SEQ" | grep -q "200:vps 302:- 200:vps 200:vps" && echo PASS || echo FAIL)
+echo "== RESULT: pool-skip-broken(growth): $R_A | uncapped-local-lane: $R_B | edge-assist-302: $R_C | interleave+forced-local-no-429: $R_D =="
 echo "--- gateway pool events ---"
 grep -E "pool_" /tmp/e2e-assist-g$GPORT.log | tail -8
 echo "--- gateway front events ---"

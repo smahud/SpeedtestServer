@@ -15,8 +15,15 @@
  *       autoscaler scale-up/scale-down state machine, benching
  *   T7  rate limiter: IPv6 /64 bucketing
  *   T8  front: 302 redirect target follows the pool selection; rate limit 429
+ *       (share=0 — pure edge: the legacy 429 path; with share>0 the front
+ *       degrades to forced-local instead, covered by T13)
  *   T9  upload drain: size=N answer; watchdog cleared on abort
  *  T10  result dedup window
+ *  T11  v1.4 assist: share=1.0 → UNCAPPED local lane (bytes, headers, no mints)
+ *  T12  v1.4 assist: share=0 → pure edge 302; token cache = 1 mint for 5 req
+ *  T13  v1.4 assist: share=0.5 Bresenham interleave E,V,E,V,E + forced-local
+ *       when the mint is rate-limited (never 429 with share>0)
+ *  T14  v1.4 assist: share=0.15 exact long-run distribution (20 → 3/17, 1 mint)
  */
 
 import { test } from 'node:test';
@@ -236,6 +243,10 @@ test('T8: front 302 redirect follows the pool worker and rate-limits', async () 
       // so every redirect actually mints (the legacy per-request behavior
       // this test was written against).
       HYBRID_FRONT_TOKEN_CACHE_MS: '0',
+      // v1.4: share=0 = pure edge offload (legacy behavior) — the 429 path
+      // only applies when the VPS lane is NOT part of the design; with
+      // share>0 a rate-limited mint degrades to forced-local instead.
+      HYBRID_VPS_DL_SHARE: '0',
       HYBRID_WORKER_BASE: 'http://127.0.0.1:59999', // unreachable — irrelevant for redirect logic
       HYBRID_WORKER_POOL_MAX: '1',
     },
@@ -299,22 +310,22 @@ test('extra: /api/pool and /api/health expose pool state', async () => {
     const h = await req(g.port, 'GET', '/api/health');
     const hj = JSON.parse(h.body);
     assert.equal(hj.pool.poolMax, 3);
-    assert.ok(hj.server.startsWith('hybrid-gateway/1.3'));
+    assert.ok(hj.server.startsWith('hybrid-gateway/1.4'));
   } finally {
     await g.stop();
   }
 });
 
-test('T11: assist lane — budget-gated LOCAL serve (daemon-parity bytes, exact length, X-Hybrid-Lane)', async () => {
+test('T11: assist lane — share=1.0 LOCAL serve, UNCAPPED (daemon-parity bytes, exact length, X-Hybrid-Lane)', async () => {
   const g = spawnNode(
     {
       HYBRID_SHARED_SECRET: SECRET,
       HYBRID_FRONT_ENABLED: 'true',
       HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
       HYBRID_WORKER_POOL_MAX: '1',
-      // 100 Mbps budget, 2 s burst → 25 MB bucket: the first (and several)
-      // requests take the VPS lane.
-      HYBRID_VPS_DL_BUDGET_MBPS: '100',
+      // v1.4: share=1.0 → EVERY download request takes the uncapped VPS
+      // lane (full potential; no token bucket exists anymore).
+      HYBRID_VPS_DL_SHARE: '1.0',
     },
     (nextPort = freePort()),
   );
@@ -338,12 +349,16 @@ test('T11: assist lane — budget-gated LOCAL serve (daemon-parity bytes, exact 
     assert.equal(r2.status, 200);
     assert.equal(r2.body.length, 1118012);
     assert.equal(r2.headers['x-hybrid-lane'], 'vps');
-    // health shows the assist counters
+    // health shows the assist counters (v1.4: share, no budget)
     const h = await req(g.port, 'GET', '/api/health');
     const hj = JSON.parse(h.body);
     assert.ok(hj.front.assist.enabled);
+    assert.equal(hj.front.assist.vpsDlShare, 1);
     assert.ok(hj.front.counters.dlLocal >= 2);
     assert.ok(hj.front.counters.dlLocalBytes >= 245388 + 1118012);
+    // pure VPS share: not a single token mint / edge redirect happened
+    assert.equal(hj.front.counters.tokensMinted, 0);
+    assert.equal(hj.front.counters.downRedirects, 0);
     // latency still VPS-served
     const lat = await req(g.port, 'GET', '/speedtest/latency.txt');
     assert.equal(lat.body, 'test=test\n');
@@ -352,7 +367,7 @@ test('T11: assist lane — budget-gated LOCAL serve (daemon-parity bytes, exact 
   }
 });
 
-test('T12: assist lane — budget exhausted → 302 edge overflow; token cache reuses one mint', async () => {
+test('T12: assist lane — share=0 pure edge offload; token cache reuses one mint', async () => {
   const g = spawnNode(
     {
       HYBRID_SHARED_SECRET: SECRET,
@@ -360,9 +375,9 @@ test('T12: assist lane — budget exhausted → 302 edge overflow; token cache r
       HYBRID_FRONT_RATE_LIMIT_MPM: '3',
       HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
       HYBRID_WORKER_POOL_MAX: '1',
-      // 0.001 Mbps × 0.5 s (min burst) → ~62 B bucket: every image (≥245 KB)
-      // immediately exceeds the budget → edge lane from the first request.
-      HYBRID_VPS_DL_BUDGET_MBPS: '0.001',
+      // v1.4: share=0 = pure edge offload (legacy v1.2 behavior) — every
+      // request is 302-assisted by the Worker.
+      HYBRID_VPS_DL_SHARE: '0',
     },
     (nextPort = freePort()),
   );
@@ -391,7 +406,7 @@ test('T12: assist lane — budget exhausted → 302 edge overflow; token cache r
   }
 });
 
-test('T13: assist lane — mint rate-limited degrades to FORCED local (not 429)', async () => {
+test('T13: assist lane — share=0.5 Bresenham interleave + forced-local on rate-limit (no 429)', async () => {
   const g = spawnNode(
     {
       HYBRID_SHARED_SECRET: SECRET,
@@ -400,10 +415,9 @@ test('T13: assist lane — mint rate-limited degrades to FORCED local (not 429)'
       HYBRID_FRONT_TOKEN_CACHE_MS: '0', // every edge redirect mints (test the limit)
       HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
       HYBRID_WORKER_POOL_MAX: '1',
-      // 1.5 Mbps × 1.5 s = 281,250 B bucket: exactly ONE 245,388 B local
-      // serve; afterwards the budget is drained → edge lane.
-      HYBRID_VPS_DL_BUDGET_MBPS: '1.5',
-      HYBRID_VPS_DL_BURST_S: '1.5',
+      // v1.4: share=0.5 per-IP Bresenham interleave — request lanes follow
+      // E,V,E,V,E (deterministic from the first request).
+      HYBRID_VPS_DL_SHARE: '0.5',
     },
     (nextPort = freePort()),
   );
@@ -414,15 +428,58 @@ test('T13: assist lane — mint rate-limited degrades to FORCED local (not 429)'
       const r = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
       seq.push({ status: r.status, lane: r.headers['x-hybrid-lane'] || null });
     }
-    // deterministic pattern: local → 302 → 302 (mints 1+2) → forced-local → forced-local
+    // deterministic pattern: edge(302,mint1) → VPS(200) → edge(302,mint2) →
+    // VPS(200) → edge lane picked BUT mint #3 is rate-limited → forced-local
+    // 200 (share > 0: the measurement NEVER breaks with 429)
     assert.deepEqual(
       seq.map((s) => `${s.status}:${s.lane}`),
-      ['200:vps', '302:null', '302:null', '200:vps', '200:vps'],
+      ['302:null', '200:vps', '302:null', '200:vps', '200:vps'],
     );
     const h = await req(g.port, 'GET', '/api/health');
     const hj = JSON.parse(h.body);
-    assert.equal(hj.front.counters.dlLocalForced, 2);
-    assert.equal(hj.front.counters.rateLimited, 2);
+    assert.equal(hj.front.assist.vpsDlShare, 0.5);
+    assert.equal(hj.front.counters.dlLocal, 2);
+    assert.equal(hj.front.counters.dlLocalForced, 1);
+    assert.equal(hj.front.counters.rateLimited, 1);
+    assert.equal(hj.front.counters.tokensMinted, 2);
+  } finally {
+    await g.stop();
+  }
+});
+
+test('T14: assist lane — share=0.15 long-run distribution is exact (20 req → 3 VPS / 17 edge, 1 mint)', async () => {
+  const g = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      // limiter off (0) — distribution is the subject, not the rate limit
+      HYBRID_FRONT_RATE_LIMIT_MPM: '0',
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+      HYBRID_WORKER_POOL_MAX: '1',
+      HYBRID_VPS_DL_SHARE: '0.15',
+    },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  try {
+    let vps = 0;
+    let edge = 0;
+    for (let i = 0; i < 20; i++) {
+      const r = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
+      if (r.status === 200 && r.headers['x-hybrid-lane'] === 'vps') vps++;
+      else if (r.status === 302) edge++;
+      else throw new Error(`unexpected status ${r.status} at request ${i + 1}`);
+    }
+    // Bresenham over 20 requests at share 0.15: local lanes at requests
+    // 7, 14, 20 — EXACTLY 15% (a modulo split would starve the VPS lane).
+    assert.equal(vps, 3);
+    assert.equal(edge, 17);
+    const h = await req(g.port, 'GET', '/api/health');
+    const hj = JSON.parse(h.body);
+    assert.equal(hj.front.counters.dlLocal, 3);
+    assert.equal(hj.front.counters.downRedirects, 17);
+    // token cache: 17 edge requests consumed ONE mint
+    assert.equal(hj.front.counters.tokensMinted, 1);
   } finally {
     await g.stop();
   }
