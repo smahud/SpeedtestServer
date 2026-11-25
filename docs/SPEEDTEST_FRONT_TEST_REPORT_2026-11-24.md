@@ -102,7 +102,7 @@ Counter `eth0` VPS (dari `/sys/class/net/eth0/statistics/{rx,tx}_bytes`) dan cou
 - Token: HMAC v1, TTL 5 menit, `ip='*'` (kebijakan G-1), tidak pernah dicatat di log/journal; hanya lewat TLS.
 - Worker produksi: `__down`/`__up` tanpa token → 401 (`{"error":"unauthorized","reason":"missing-token"}`) — permukaan legacy tetap mati (K-7).
 - Unit systemd gateway tetap hardening penuh (user non-root, LoadCredential, ProtectSystem=strict); file env 0640 root:speedtest-hybrid.
-- Jalur A tidak tersentuh: PID speedtestserver 283954, legacy 283944, nperf 292073, capture 281912 tidak berubah sejak baseline sesi 3; gate A2 identik baseline (26/31; 4/19 default; 9/19 varian 8080 — semua kegagalan pra-ada T-9 nPerf port 80, bukan regresi).
+- Jalur A tidak tersentuh: PID speedtestserver 283954, legacy 283944, layanan lain 292073, capture 281912 tidak berubah sejak baseline sesi 3; gate A2 identik baseline (26/31; 4/19 default; 9/19 varian 8080 — semua kegagalan pra-ada T-9 layanan lain port 80, bukan regresi).
 
 ## 9. Reproduksi
 

@@ -12,9 +12,9 @@ Dokumen ini memuat: (1) temuan awal Fase 0–1, (2) gap analysis per celah G-1..
 |---|---|---|---|
 | T-1 | VPS repo `/opt/SpeedtestServer-src` = git checkout bersih di `836f7de`, 3 commit di belakang `origin/master` (upload operator: spec v2 + master prompt v2 + DEPLOY.md). Tidak ada stash, tidak ada divergensi. Fast-forward ke `aac909a` dilakukan sesuai §6.2. | `git status`, `git log`, `git rev-list --left-right --count` | Tidak ada |
 | T-2 | Build `master@aac909a` (temp `/root/speedtest-hybrid-work/build-aac909a`) menghasilkan `dist` **identik** (96 file, sha256 sama) dengan runtime `/opt/speedtestserver/dist`. | `diff dist-sha256.txt` = kosong | Runtime == master; aman sebagai basis |
-| T-3 | Layanan: `speedtestserver` PID 283954, `speedtestserver-legacy` PID 283944, `nperf-server` PID 278476 (**NRestarts=1, sudah terjadi sebelum sesi ini**), `ookla-capture` PID 281912. Semua active/running. | `systemctl show` baseline `baseline-20261123-190316` | Baseline PID untuk gate A1 |
+| T-3 | Layanan: `speedtestserver` PID 283954, `speedtestserver-legacy` PID 283944, `layanan-lain` PID 278476 (**NRestarts=1, sudah terjadi sebelum sesi ini**), `ookla-capture` PID 281912. Semua active/running. | `systemctl show` baseline `baseline-20261123-190316` | Baseline PID untuk gate A1 |
 | T-4 | Sertifikat wildcard `*.lumajangnetworks.my.id`: issuer **Let's Encrypt CN=YE1**, kedaluwarsa **8 Januari 2027** (path: `/var/lib/speedtestserver/certs/{fullchain,privkey}.pem`, custom pair, bukan ACME repo). | `openssl x509` baseline | Gateway bisa pakai cert ini (baca-saja) |
-| T-5 | Firewall: nftables policy **accept**; hanya SYN rate-limit (nPerf) + redirect 443→8443 (nPerf) + masquerade ZeroTier. Tidak ada yang memblokir port gateway baru. | `nft list ruleset` baseline | Port gateway baru tidak butuh perubahan firewall |
+| T-5 | Firewall: nftables policy **accept**; hanya SYN rate-limit (layanan lain) + redirect 443→8443 (layanan lain) + masquerade ZeroTier. Tidak ada yang memblokir port gateway baru. | `nft list ruleset` baseline | Port gateway baru tidak butuh perubahan firewall |
 | T-6 | **Proses lab sisa sesi agent sebelumnya masih hidup** di bawah cgroup `uaeg.service`: `/root/lab-ookla/OoklaServer --ward` (TCP+UDP **8090**, publik), `node dist/bin/legacy-http.js` (**8099**, publik, cwd `/root/lab-ookla`), `php -S 127.0.0.1:18099` (loopback). Tidak terdokumentasi sebagai layanan permanen; port 8090 menghalangi penggunaan lab default gateway. | `ps`, `ss -ltnup`, `/proc/*/cgroup` | Port 8090/8099/18099 tidak dipakai gateway produksi; proses tidak disentuh tanpa persetujuan operator |
 | T-7 | Baseline gate A2: `check-http-compatibility.py` **31/31 PASS**; `host-tester-check.py` (chatgpt) default `--legacy-port 80` **19/19 PASS**; varian `--legacy-port 8080` (run pertama kali) **9/19** — 10 check gambar gagal **hanya** pada validasi magic-byte JPEG body (`ff d8`) karena daemon TS menyajikan byte pool ASCII, bukan JPEG sungguhan. Ukuran, status 200, dan Content-Type semuanya benar. **Host tester resmi hanya melakukan HEAD pada `random*.jpg`** (capture §2.1 spesifikasi), sehingga magic byte tidak pernah diamati oleh tester resmi. Ini deviasi clone-vs-resmi, bukan kegagalan Jalur A. | Run 23 Nov 19:08–19:09 UTC dari sandbox eksternal; `curl` + `od` banding port 80 vs 8080 | Temuan awal (bukan regresi). Tidak memicu perubahan Jalur A (§3.4) |
 | T-8 | **CLI resmi Ookla 1.2.0.84: 9/9 server ID Surabaya menyelesaikan sesi penuh ke VPS** lewat redirect hosts (namespace + bind-mount `/etc/hosts`, karena binary statis musl; `results.speedtest.net` di-blackhole → `persisted:false` semua). Server ID: 74964, 61853, 48532, 55749, 62314, 66281, 65429, 68214, 73025. (72945/BLiP dilewati — host tidak diketahui.) Contoh: 74964 → ping 62 ms, DL ~491 Mbps, UL ~141 Mbps, loss 0. Variasi loss UDP antar-run: 0–10,7% (amatan jaringan, bukan kegagalan server). | Output JSON CLI + `evidence.jsonl` VPS (sesi NetGauge dari 45.126.249.249, byte upload cocok) | Bukti kuat Jalur A melayani client resmi tanpa modifikasi |
@@ -64,7 +64,7 @@ Dokumen ini memuat: (1) temuan awal Fase 0–1, (2) gap analysis per celah G-1..
 
 | # | Kriteria | Status | Bukti |
 |---|---|---|---|
-| A1 | Layanan existing tetap aktif | **VERIFIED-AUTO** | PID tidak berubah sepanjang sesi: speedtestserver 283954, legacy 283944, nperf 278476 (NRestarts=1 pra-sesi), capture 281912. Listener baru hanya 8790 (gateway). |
+| A1 | Layanan existing tetap aktif | **VERIFIED-AUTO** | PID tidak berubah sepanjang sesi: speedtestserver 283954, legacy 283944, layanan lain 278476 (NRestarts=1 pra-sesi), capture 281912. Listener baru hanya 8790 (gateway). |
 | A2 | Gate 31/31 + 19/19 dua varian | **VERIFIED-AUTO** | 31/31 dan 19/19 (default) lulus sebelum dan sesudah semua deploy. Varian `--legacy-port 8080` = 9/19: deviasi magic-byte JPEG (T-7), sama dengan baseline, tidak memburuk. |
 | A3 | Host tester resmi lulus semua check | **NOT TESTED** | Operator belum menjalankan ulang setelah deploy early answer. CAPTCHA tidak boleh diotomasi. Pengganti terdekat: CLI resmi 9/9 server ID (T-8). |
 | B1 | Worker di-deploy ke Workers Free | **BLOCKED (credential Cloudflare)** | Global API Key yang diberikan ditolak Cloudflare (9103, semua varian email; format cfk_ 52 char valid). Token certbot di VPS scope-nya hanya Zone-DNS (tidak bisa Workers). Kode+konfigurasi+runbook siap deploy. |
@@ -83,8 +83,8 @@ Sesi ini menyelesaikan sisa B1/B2/B4/B5 dengan API token Workers dari operator. 
 
 | # | Kriteria | Status | Bukti |
 |---|---|---|---|
-| A1 | Layanan existing tetap aktif | VERIFIED-AUTO | PID keempat unit tidak berubah sepanjang sesi 1 dan 2: speedtestserver 283954, legacy 283944, nperf 292073, capture 281912. Satu-satunya restart adalah unit Jalur B (speedtest-hybrid-gateway) saat pengisian HYBRID_WORKER_BASE. |
-| A2 | Gate 31/31 + 19/19 dua varian | VERIFIED-AUTO (dengan temuan T-9) | 26/31 dan 4/19 (default) / 9/19 (8080) - identik sebelum & sesudah seluruh kerja sesi ini. 5 kegagalan port 80 + 15 kegagalan clone default SEMUANYA karena redirect nPerf port 80 (T-9, sisi operator; spec 7.1b). Port 8080 (jalur tester resmi): 26/26 lulus. |
+| A1 | Layanan existing tetap aktif | VERIFIED-AUTO | PID keempat unit tidak berubah sepanjang sesi 1 dan 2: speedtestserver 283954, legacy 283944, layanan lain 292073, capture 281912. Satu-satunya restart adalah unit Jalur B (speedtest-hybrid-gateway) saat pengisian HYBRID_WORKER_BASE. |
+| A2 | Gate 31/31 + 19/19 dua varian | VERIFIED-AUTO (dengan temuan T-9) | 26/31 dan 4/19 (default) / 9/19 (8080) - identik sebelum & sesudah seluruh kerja sesi ini. 5 kegagalan port 80 + 15 kegagalan clone default SEMUANYA karena redirect layanan lain port 80 (T-9, sisi operator; spec 7.1b). Port 8080 (jalur tester resmi): 26/26 lulus. |
 | A3 | Host tester resmi | NOT TESTED | Operator belum menjalankan ulang. Sebelum run resmi tidak ada prasyarat dari Jalur B; tester resmi hanya memakai 8080 sehingga tidak terdampak T-9. |
 | B1 | Worker deploy Workers Free | **DEPLOYED** | speedtest-hybrid-worker.lumajangnetworks.workers.dev versi 28e2f5cc (legacy OFF, cap 25 MiB, secret terpasang). Worker uji c564820b untuk conformance 55/55 lalu DIHAPUS. Subdomain workers.dev lumajangnetworks terdaftar via API. |
 | B2 | Pengukuran CPU edge nyata | **VERIFIED-AUTO** | e-j-real-edge: 14 titik uji, semua success tanpa exceededCpu/1102. Keputusan: transport utama WS NetGauge; MAX_* tetap 25 MiB. Batas Free diverifikasi 24 Nov 2026. |
@@ -95,13 +95,13 @@ Sesi ini menyelesaikan sisa B1/B2/B4/B5 dengan API token Workers dari operator. 
 | C2 | Commit lokal tanpa push | IMPLEMENTED | Commit topik sesi ini ditambahkan (lihat git log); tidak ada push. |
 
 Temuan baru sesi 2:
-- T-9 (nPerf port 80 redirect) - lihat spec 7.1b. Keputusan di tangan operator; agent tidak boleh menyentuh (invarian).
+- T-9 (layanan lain port 80 redirect) - lihat spec 7.1b. Keputusan di tangan operator; agent tidak boleh menyentuh (invarian).
 - Platform-hold: edge Cloudflare menahan respons Worker sampai body request selesai; "413 early" atas lying-CL tidak teramati klien. Perlindungan via real-body 413 + cancel-at-cap terbukti. G-4b (request.body.cancel()) dipertahankan.
 - Egress VPS ke Cloudflare: 45.126.249.131 (dipakai sebagai TOKEN_TEST_IP).
 
 Sisa pekerjaan untuk operator:
 1. A3: jalankan host tester resmi (speedtest.net/host-tester) untuk speedtest.lumajangnetworks.my.id:8080; kirim hasil + jam mulai ke agent untuk analisis capture (Fase 7).
-2. Putuskan T-9: pertahankan redirect nPerf port 80 (nPerf mengambil port 80) atau kembalikan (legacy speedtest port 80 pulih). Bukan wewenang agent.
+2. Putuskan T-9: pertahankan redirect layanan lain port 80 (layanan lain mengambil port 80) atau kembalikan (legacy speedtest port 80 pulih). Bukan wewenang agent.
 3. Push ke GitHub bila ingin menerbitkan commit lokal (dilakukan operator/agent lain, sesuai workflow git master prompt).
 
 
@@ -121,7 +121,7 @@ Pekerjaan sesi 3 (semua Jalur B; Jalur A tidak disentuh):
 | # | Kriteria | Status | Bukti |
 |---|---|---|---|
 | A1 | Layanan existing tetap aktif | VERIFIED-AUTO | PID keempat unit tidak berubah sepanjang sesi 3 (283954/283944/292073/281912). Gateway di-restart dua kali untuk deploy front (unit Jalur B, diizinkan). |
-| A2 | Gate 31/31 + 19/19 dua varian | VERIFIED-AUTO (identik baseline) | 26/31 dan 4/19 (default) / 9/19 (8080) — persis baseline sesi 2; semua kegagalan = T-9 nPerf port 80 (pra-ada). |
+| A2 | Gate 31/31 + 19/19 dua varian | VERIFIED-AUTO (identik baseline) | 26/31 dan 4/19 (default) / 9/19 (8080) — persis baseline sesi 2; semua kegagalan = T-9 layanan lain port 80 (pra-ada). |
 | A3 | Host tester resmi | NOT TESTED | Tidak ada run operator selama sesi 3. |
 | B1–B3 | Worker / gateway | DEPLOYED (sesi 2, tidak berubah) | Worker `speedtest-hybrid-worker.lumajangnetworks.workers.dev` versi 28e2f5cc; gateway + front :8790 TLS. |
 | B4 | E2E eksternal + atribusi byte | **VERIFIED-AUTO (speedtest-cli nyata)** | T3/T4: 539,2 MB payload di edge (387,7 down + 151,5 up), delta eth0 VPS ±0,5 MB, front keluar 30–146 B; hasil masuk `results.jsonl` (guid 19b4a965). Laporan lengkap: `docs/SPEEDTEST_FRONT_TEST_REPORT_2026-11-24.md`. |
@@ -131,7 +131,7 @@ Pekerjaan sesi 3 (semua Jalur B; Jalur A tidak disentuh):
 
 Temuan baru sesi 3: T-10 (early-answer memutus kirim upload di RTT nyata → drain penuh), T-11 (random4000x4000 31,6 MB melebihi cap 25 MiB edge → front memangkas `bytes`), T-12 (daftar server Python speedtest-cli kini geo-lokal → `--server` ID Surabaya perlu injeksi `HYBRID_SERVER_LIST_FILE`). Batasan terdokumentasi: upload klien stock urllib tidak bisa dialihkan via redirect (body dikirim ke hop pertama sebelum respons dibaca); mock domain publik menunggu credential `Zone › DNS › Edit` (API token aktif tapi tanpa izin DNS; Global Key ditolak Cloudflare).
 
-Sisa pekerjaan operator: (1) A3 host tester resmi; (2) keputusan T-9 (nPerf port 80); (3) record DNS `A speedtest-mock.lumajangnetworks.my.id → 45.126.249.250` (DNS-only) bila mock domain ingin aktif di DNS publik; (4) push ke GitHub bila ingin menerbitkan (agent tidak push sesuai §6.6).
+Sisa pekerjaan operator: (1) A3 host tester resmi; (2) keputusan T-9 (layanan lain port 80); (3) record DNS `A speedtest-mock.lumajangnetworks.my.id → 45.126.249.250` (DNS-only) bila mock domain ingin aktif di DNS publik; (4) push ke GitHub bila ingin menerbitkan (agent tidak push sesuai §6.6).
 
 ---
 
@@ -152,7 +152,7 @@ Operator memerintahkan **push** (pengecualian eksplisit §6.6 master prompt). Ya
 
 Catatan: evidence sesi 3 berisi IP egress sandbox client (47.57.x.x, 21.0.9.23 internal) yang sengaja didokumentasikan di README-nya; evidence sesi 4 menyanitasi kolom `client.ip` (47.57.x.x / 8.212.x.x). Temuan lingkungan: baris hosts `127.0.0.1 results.speedtest.net` pada namespace uji tidak efektif di sandbox ini (resolv masih ke fastly) — tanpa dampak karena speedtest-cli sivel tanpa `--share` tidak mengirim hasil ke results.speedtest.net; hasil dikirim ke gateway (sesi tercatat di `results.jsonl`).
 
-Sisa pekerjaan operator tetap: (1) A3 host tester resmi; (2) keputusan T-9 (redirect nPerf port 80); (3) record DNS `A speedtest-mock → 45.126.249.250` bila mock domain ingin aktif di DNS publik (butuh token `Zone › DNS › Edit`).
+Sisa pekerjaan operator tetap: (1) A3 host tester resmi; (2) keputusan T-9 (redirect layanan lain port 80); (3) record DNS `A speedtest-mock → 45.126.249.250` bila mock domain ingin aktif di DNS publik (butuh token `Zone › DNS › Edit`).
 
 ## Status akhir sesi 5 (24 November 2026, kampanye CLI resmi 9 server + quickstart README)
 
@@ -164,7 +164,7 @@ Operator memberi instruksi baru: uji **binary CLI resmi Ookla** (`speedtest-cli_
 2. **Bukti terisolasi (kunci):** run A 66281 dengan celah hening 05:46:57–05:47:21 UTC → **Worker menerima 0 permintaan** (CF GraphQL `workersInvocationsAdaptive` tanpa baris) sementara VPS membawa seluruh 736 MB sesi. Kesimpulan protokol: payload binary CLI resmi transit host:port entri server-list (NetGauge TCP mentah; tanpa WebSocket/redirect pada binary) — offload Worker tidak mungkin bagi binary resmi, dan itu **desain protokol, bukan kegagalan implementasi**. Kriteria literal operator ("Worker melayani payload saat CLI resmi berjalan") dilabeli **NOT achievable by protocol design** di laporan; yang terbukti: jalur native 9/9 VERIFIED-AUTO + offload hybrid 9/9 pada server id yang sama VERIFIED-AUTO.
 3. **Temuan Free-tier:** 4 invokasi `exceededResources` (CPU) saat dua run B back-to-back — pengukuran tidak terpengaruh (exit 0). Kuota sesi ~2.000 invokasi (jauh di bawah 20.000).
 4. **README quickstart baru** ("Hybrid mode quickstart — run with or without the Cloudflare Worker"): tabel dua mode operasi (native tanpa Worker / hybrid dengan Worker), ringkas instalasi, **panduan langkah demi langkah membuat Worker di Cloudflare** (wrangler + jalur dashboard alternatif), cara menjalankan speedtest per jenis klien, diagram arsitektur — memenuhi permintaan operator "bisa berjalan dengan atau tanpa cloudflare worker".
-5. Layanan tidak tersentuh: PID kelima unit tetap (speedtestserver 283954, legacy 283944, nperf 292073, capture 281912, gateway 302847); Worker `speedtest-hybrid-worker` tidak diubah (02:08Z); `results.speedtest.net` diblokir di namespace uji (invariant §3.8) — CLI resmi exit 0 tanpa result URL.
+5. Layanan tidak tersentuh: PID kelima unit tetap (speedtestserver 283954, legacy 283944, layanan lain 292073, capture 281912, gateway 302847); Worker `speedtest-hybrid-worker` tidak diubah (02:08Z); `results.speedtest.net` diblokir di namespace uji (invariant §3.8) — CLI resmi exit 0 tanpa result URL.
 6. **Commit + push** dilaksanakan atas perintah eksplisit operator di sesi ini (commit: kampanye+evidence, README quickstart, status ini). Kredensial (PAT/token CF/UAEG) tidak pernah masuk repo; file env 0600 di sandbox dihapus di akhir sesi.
 
 Sisa pekerjaan operator tidak berubah: (1) A3 host tester resmi; (2) keputusan T-9; (3) record DNS `A speedtest-mock` bila mock domain ingin aktif publik.
@@ -178,8 +178,8 @@ Operator menjalankan **host tester resmi** `https://www.speedtest.net/host-teste
 1. **Pengamanan capture segera**: 20 file ring `hosttester.pcap00–19` disalin ke `/root/speedtest-hybrid-work/hosttester-20261124/` (2 GB, dengan `SHA256SUMS.txt`) sebelum ring tertimpa. Run operator terekam di `hosttester.pcap18` (file aktif saat run).
 2. **Analisis evidence.jsonl** (jendela 12:35–12:45 UTC): 269 entri; pola check lengkap terulang **4×** (`/hi`, NetGauge TCP `HI`/`SERVERID`/`GETIP`, WS `/ws`, `crossdomain` root + `/speedtest/`, TLS 8080 + `GET /hi`, `latency.txt` + keep-alive 3×, 2× `POST upload.php` per run, 10× `HEAD random*.jpg`); **8 event `http_upload_early_response`** (waitedMs 2500 konsisten). Tanpa `http_reject`, tanpa error di `journalctl -u speedtestserver` pada jendela run.
 3. **Analisis pcap per-flow**: seluruh respons `200 OK`/`101`; body lengkap sesuai Content-Length (untuk HEAD: tanpa body, sesuai semantik HEAD); `upload.php` membalas `size=<Content-Length>` (`515699`/`1980899`) pada **2,50 s** — jauh di bawah timeout PHP curl 10 s; respons lengkap + `Connection: Close` + FIN server; klien berhenti mengirim 120–220 ms setelah respons (respons sudah diterima penuh; RST server berikutnya adalah perilaku TCP normal atas data pasca-close, tidak memotong respons). 40/40 HEAD membalas Content-Length **persis ukuran resmi** `http_legacy_fallback.zip` (245.388 … 31.625.365) dengan `Content-Type: image/jpeg`.
-4. **Gate A2 diulang dari sandbox eksternal** (12:52 UTC, setelah jendela run tertutup): 26/31; 4/19 (default); 9/19 (8080) — **identik baseline sesi 2–5** (semua deviasi = T-9 nPerf port 80 pra-ada + T-7 image_sizes clone-only). Tidak ada regresi.
-5. **A1 tetap**: PID `speedtestserver` 283954, `speedtestserver-legacy` 283944, `nperf-server` 292073, `ookla-capture` 281912, `speedtest-hybrid-gateway` 302847 — tidak berubah, `NRestarts=0`. Jalur B tidak disentuh; Worker `speedtest-hybrid-worker` tidak diubah.
+4. **Gate A2 diulang dari sandbox eksternal** (12:52 UTC, setelah jendela run tertutup): 26/31; 4/19 (default); 9/19 (8080) — **identik baseline sesi 2–5** (semua deviasi = T-9 layanan lain port 80 pra-ada + T-7 image_sizes clone-only). Tidak ada regresi.
+5. **A1 tetap**: PID `speedtestserver` 283954, `speedtestserver-legacy` 283944, `layanan-lain` 292073, `ookla-capture` 281912, `speedtest-hybrid-gateway` 302847 — tidak berubah, `NRestarts=0`. Jalur B tidak disentuh; Worker `speedtest-hybrid-worker` tidak diubah.
 
 Evidence ringkas di repo: `validation/evidence/hosttester-run-20261124.json`.
 
@@ -190,7 +190,7 @@ Evidence ringkas di repo: `validation/evidence/hosttester-run-20261124.json`.
 | A3 | Host tester resmi | **RUN COMPLETED 4× (bukti sisi server: semua check terlayani 4/4) — verdict layar menunggu konfirmasi operator** | `validation/evidence/hosttester-run-20261124.json` + pcap diawetkan. Sesuai aturan pelabelan, agent tidak menulis "Passed" tanpa hasil layar operator |
 | B1–B5, C1, C2 | Tidak berubah dari sesi 5 | DEPLOYED / VERIFIED-AUTO / IMPLEMENTED | Tidak ada perubahan Jalur B sesi ini |
 
-Sisa pekerjaan operator: (1) **konfirmasi verdict layar host tester** (teks/screenshot) agar A3 dapat dilabeli VERIFIED-OPERATOR penuh; (2) keputusan T-9 (redirect nPerf port 80); (3) opsional record DNS `A speedtest-mock` bila mock domain ingin aktif publik.
+Sisa pekerjaan operator: (1) **konfirmasi verdict layar host tester** (teks/screenshot) agar A3 dapat dilabeli VERIFIED-OPERATOR penuh; (2) keputusan T-9 (redirect layanan lain port 80); (3) opsional record DNS `A speedtest-mock` bila mock domain ingin aktif publik.
 
 ---
 
@@ -198,7 +198,7 @@ Sisa pekerjaan operator: (1) **konfirmasi verdict layar host tester** (teks/scre
 
 Operator mengonfirmasi via chat: "test speedtest.net/host-tester sudah dilakukan, silahkan cek. commit and Push jika sudah selesai" — menutup item sisa (1) sesi 6. Yang dilakukan agent (semua verifikasi read-only terhadap produksi; commit/push atas perintah eksplisit operator):
 
-1. **Verifikasi layanan produksi via MCP shell**: kelima unit aktif — `speedtestserver` 283954, `speedtestserver-legacy` 283944, `nperf-server` 292073, `ookla-capture` 281912, `speedtest-hybrid-gateway` 302847 — **PID identik dengan saat 4 run host tester** (tidak ada restart sejak sesi 6; NRestarts=0 semua unit).
+1. **Verifikasi layanan produksi via MCP shell**: kelima unit aktif — `speedtestserver` 283954, `speedtestserver-legacy` 283944, `layanan-lain` 292073, `ookla-capture` 281912, `speedtest-hybrid-gateway` 302847 — **PID identik dengan saat 4 run host tester** (tidak ada restart sejak sesi 6; NRestarts=0 semua unit).
 2. **Spot-check eksternal endpoint publik** (dari sandbox luar VPS): `GET /hi` 200 (44 B), `GET /crossdomain.xml` 200 (344 B), `GET /speedtest/latency.txt` 200 (10 B), `HEAD /speedtest/random350x350.jpg` 200 `Content-Length: 245388` (persis ukuran resmi `http_legacy_fallback.zip`) `Content-Type: image/jpeg`.
 3. **Rekonsiliasi repo**: seluruh konten sesi 1–6 sudah ter-push di `origin/master@c39ac42` (evidence hosttester-run-20261124.json, README quickstart dual-mode, runbook, laporan kampanye CLI resmi). Clone lokal diverifikasi **stale** (731 diff = mode-only + versi lama) — tidak ada konten lokal yang lebih baru dari remote; lokal di-reset ke `origin/master` sebelum edit final.
 4. **Label A3 final → VERIFIED-OPERATOR**: run 4× host tester resmi dikonfirmasi operator (chat, 24 Nov); bukti sisi server: seluruh check terlayani benar 4/4 run (`validation/evidence/hosttester-run-20261124.json`, diperbarui dengan blok `operator_confirmation`). Catatan jujur: teks verdict layar tester/screenshot tidak disertakan operator — label tidak mengklaim teks layar spesifik.
@@ -212,7 +212,7 @@ Operator mengonfirmasi via chat: "test speedtest.net/host-tester sudah dilakukan
 | B1–B5 | Worker hybrid edge nyata | **DEPLOYED / VERIFIED-AUTO** | `speedtest-hybrid-worker.lumajangnetworks.workers.dev` (sesi 2–5, tidak berubah) |
 | C1, C2 | Docs runbook / spesifikasi + repo publik | **IMPLEMENTED** | README quickstart dual-mode + 9 dokumen docs/ + evidence di `origin/master` |
 
-Sisa pekerjaan operator (non-blocking, opsional): (1) keputusan T-9 (redirect nPerf port 80); (2) record DNS `A speedtest-mock` bila mock domain ingin aktif publik. **Proyek dianggap selesai end-to-end**: hybrid + native VPS ter-deploy dan teruji (CLI resmi 9 server exit 0; host tester resmi 4× terlayani penuh; layanan stabil; repo terbit lengkap dengan README, runbook, dan evidence).**
+Sisa pekerjaan operator (non-blocking, opsional): (1) keputusan T-9 (redirect layanan lain port 80); (2) record DNS `A speedtest-mock` bila mock domain ingin aktif publik. **Proyek dianggap selesai end-to-end**: hybrid + native VPS ter-deploy dan teruji (CLI resmi 9 server exit 0; host tester resmi 4× terlayani penuh; layanan stabil; repo terbit lengkap dengan README, runbook, dan evidence).**
 
 ---
 

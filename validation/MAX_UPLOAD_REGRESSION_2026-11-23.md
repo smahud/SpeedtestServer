@@ -58,7 +58,7 @@ All paths below are under `evidence/max-upload-regression-20261123/`:
 ## Deployment isolation
 
 Only the legacy fallback runtime modules were replaced and its service restarted.
-`speedtestserver` remained PID **271356** and nPerf remained PID **1268**.
+`speedtestserver` remained PID **271356** and layanan lain remained PID **1268**.
 The deployment asserts that both the main PID and the hashes of HttpApi.js and
 OoklaServer.js remain unchanged. Its rollback hook restores the old fallback if
 the combined gate fails.

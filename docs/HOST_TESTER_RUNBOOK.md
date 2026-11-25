@@ -31,7 +31,7 @@ Tester resmi HANYA memakai **port 8080**. Urutan check yang terekam:
 
 ## 3. Yang dilakukan agent SEBELUM run
 
-- Rekam `systemctl show speedtestserver speedtestserver-legacy nperf-server ookla-capture -p MainPID,NRestarts` dan `ss -ltnup`.
+- Rekam `systemctl show speedtestserver speedtestserver-legacy layanan-lain ookla-capture -p MainPID,NRestarts` dan `ss -ltnup`.
 - Pastikan gate A2: `check-http-compatibility.py` 31/31; `host-tester-check.py` default 19/19.
 - Catat file ring capture terakhir: `ls -la /var/lib/ookla-capture/ | tail -5`.
 
@@ -56,10 +56,10 @@ Tester resmi HANYA memakai **port 8080**. Urutan check yang terekam:
 | 23 Nov 19:09 UTC | Clone (chatgpt, `--legacy-port 8080`) | 9/19 | Run pertama varian ini. 10 check gambar gagal HANYA pada validasi magic-byte JPEG (`ff d8`) karena daemon TS menyajikan byte pool ASCII. Ukuran/status/Content-Type benar. Tester resmi hanya melakukan HEAD pada gambar → magic byte tidak pernah diamati resmi. Deviasi clone-vs-resmi, bukan kegagalan Jalur A |
 | 23 Nov 19:12–19:18 UTC | CLI resmi Ookla 1.2.0.84 (redirect hosts) | 9/9 server ID Surabaya selesai penuh ke VPS | 74964/61853/48532/55749/62314/66281/65429/68214/73025; contoh 74964: ping 62 ms, DL ~491 Mbps, UL ~141 Mbps, loss 0; semua `persisted:false` (results.speedtest.net diblokir) |
 | 24 Nov (setelah deploy gateway) | Clone (gate publik + chatgpt) | 31/31 dan 19/19 | Setelah deploy gateway :8790 — tidak ada regresi |
-| 24 Nov 01:45-01:52 UTC (sesi 2, baseline) | Clone (gate publik + chatgpt 2 varian) | 26/31; 4/19 (default); 9/19 (8080) | 5 kegagalan upload legacy port 80: respons `Server: nPerf/2.2.11` body kosong - trafik port 80 dialihkan nPerf oleh rule nftables baru `tcp dport 80 redirect to :8081` setelah restart nperf-server (T-9, sisi operator). Port 8080: 26/26 lulus |
+| 24 Nov 01:45-01:52 UTC (sesi 2, baseline) | Clone (gate publik + chatgpt 2 varian) | 26/31; 4/19 (default); 9/19 (8080) | 5 kegagalan upload legacy port 80: respons `Server: layanan lain/2.2.11` body kosong - trafik port 80 dialihkan layanan lain oleh rule nftables baru `tcp dport 80 redirect to :8081` setelah restart layanan-lain (T-9, sisi operator). Port 8080: 26/26 lulus |
 | 24 Nov 02:20-02:25 UTC (sesi 2, final) | Clone (gate publik + chatgpt 2 varian) | 26/31; 4/19 (default); 9/19 (8080) | Identik dengan baseline sesi 2 - seluruh kerja Jalur B (deploy Worker edge nyata, restart gateway) tidak menimbulkan regresi Jalur A |
 | 24 Nov 19:40:07–19:41:58 WIB | Operator (host tester resmi, **4 run**) | Bukti sisi server: **seluruh check terlayani 4/4 run** — verdict layar tester menunggu konfirmasi operator | Analisis lengkap: `validation/evidence/hosttester-run-20261124.json`. Ringkas: `/hi` 200 OK 4/4; NetGauge TCP mentah 4/4 (HELLO 2.11/SERVERID/GETIP, FIN bersih); WS `/ws` 101 4/4; `/crossdomain.xml` + `/speedtest/crossdomain.xml` 200 OK 8/8; TLS 8080 handshake + `GET /hi` 4/4; `latency.txt` 200 OK 4/4 + keep-alive 3×/socket 4/4; `POST upload.php` 515.699 B & 1.980.899 B → 200 OK `size=<CL>` early-answer @2,50 s **8/8** (perbaikan max_upload 23 Nov 23:51 bekerja; respons HTTP lengkap jauh di bawah timeout PHP curl 10 s; RST server terjadi hanya setelah respons lengkap diterima); `HEAD` 10 `random*.jpg` → 200 OK + Content-Length resmi + `image/jpeg` **40/40**. PID keempat unit Jalur A + gateway tidak berubah (NRestarts=0). Pcap ring 20 file diawetkan ke `/root/speedtest-hybrid-work/hosttester-20261124/` + SHA256SUMS |
-| 24 Nov 12:52 UTC | Clone (gate publik + chatgpt 2 varian, dari sandbox eksternal) | 26/31; 4/19 (default); 9/19 (8080) | Identik baseline sesi 2–5: 5+15 kegagalan = T-9 (redirect nPerf port 80, pra-ada); 1 kegagalan 8080 = T-7 (magic-byte body, clone-only). Jalur A sehat pasca 4 run operator |
+| 24 Nov 12:52 UTC | Clone (gate publik + chatgpt 2 varian, dari sandbox eksternal) | 26/31; 4/19 (default); 9/19 (8080) | Identik baseline sesi 2–5: 5+15 kegagalan = T-9 (redirect layanan lain port 80, pra-ada); 1 kegagalan 8080 = T-7 (magic-byte body, clone-only). Jalur A sehat pasca 4 run operator |
 
 ## 6. Registrasi/visibilitas di Ookla
 

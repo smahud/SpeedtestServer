@@ -17,7 +17,7 @@
    4. `docs/SPEEDTEST_HYBRID_CLOUDFLARE_FREE.md` (versi 2).
    5. Dokumen lama: `hybrid/reports/*`, `hybrid/worker/DEPLOY.md`, `validation/HANDOFF.md`, dan README bagian hybrid.
 2. Semua fakta di §2 adalah **kondisi terdokumentasi per 24 November 2026**. Fakta itu dipakai untuk mengarahkan pemeriksaan. Jangan memperlakukannya sebagai kebenaran sebelum Anda memverifikasinya di VPS.
-3. Tugas ini mencakup produksi yang sedang melayani tes Ookla dan nPerf. Bila ragu apakah sebuah langkah berisiko, anggap berisiko. Berhenti di titik STOP (§11).
+3. Tugas ini mencakup produksi yang sedang melayani tes Ookla dan layanan lain. Bila ragu apakah sebuah langkah berisiko, anggap berisiko. Berhenti di titik STOP (§11).
 
 ---
 
@@ -42,7 +42,7 @@ Jalur B **tidak boleh** mengubah perilaku Jalur A. Host tester resmi menguji Jal
 | Runtime | `/opt/speedtestserver/dist`. Konfigurasi di `/etc/speedtestserver/OoklaServer.properties`. | idem, `install.sh` |
 | `speedtestserver.service` | Daemon TypeScript. Melayani TCP+UDP **5060** dan **8080**, dengan TLS, HTTP, WebSocket, dan NetGauge di port yang sama. | `README.md`, validation 11-23 |
 | `speedtestserver-legacy.service` | Fallback HTTP/PHP legacy di port **80**. | `config/speedtestserver-legacy.service` |
-| `nperf-server.service` | Layanan lain milik operator, bukan bagian proyek ini. Port **8081/8443**, plus redirect **443** (`REDIRECT_PORT_443=1`). PID 1268 tercatat tidak berubah sampai deploy ketiga tanggal 23 Nov. Untuk deploy keempat dan kelima, PID tidak dicatat. | `validation/evidence/deploy-wildcard-20261123/runtime-state.json` |
+| `layanan-lain.service` | Layanan lain milik operator, bukan bagian proyek ini. Port **8081/8443**, plus redirect **443** (`REDIRECT_PORT_443=1`). PID 1268 tercatat tidak berubah sampai deploy ketiga tanggal 23 Nov. Untuk deploy keempat dan kelima, PID tidak dicatat. | `validation/evidence/deploy-wildcard-20261123/runtime-state.json` |
 | `ookla-capture.service` | tcpdump port 80/5060/8080 ke `/var/lib/ookla-capture/hosttester.pcapNN` (ring 20 × 100 MB). | `validation/OBSERVABILITY_AND_LEGACY_FIX_2026-11-23.md` |
 | Evidence log daemon | `/var/lib/speedtestserver/evidence.jsonl` | idem |
 | Sertifikat | Wildcard publik `*.lumajangnetworks.my.id`. Hampir pasti dipasang sebagai pasangan cert/key custom, bukan lewat ACME repo. Issuer, expiry, dan pemilik renewal **tidak terdokumentasi**. | `validation/REINVESTIGATION_2026-11-23.md` |
@@ -100,7 +100,7 @@ CLI Ookla resmi juga tidak bisa memakai endpoint Cloudflare (eksperimen E-D/E-E:
 
 - Cara akses UAEG dan batas kemampuannya. Baca dokumentasi `smahudd/uaeg`. Evidence lama menunjukkan agent sebelumnya menjalankan perintah lewat tool remote bergaya JSON-RPC/MCP.
 - Apakah `/opt/SpeedtestServer-src` adalah git checkout, di commit mana, dan apakah ada perubahan yang belum di-commit atau `git stash`.
-- Aturan firewall aktual (nftables/iptables/ufw atau firewall provider) dan target redirect 443 milik nPerf.
+- Aturan firewall aktual (nftables/iptables/ufw atau firewall provider) dan target redirect 443 milik layanan lain.
 - Apakah zona `lumajangnetworks.my.id` aktif di Cloudflare (nameserver Cloudflare) atau di DNS lain. Ini menentukan apakah Custom Domain Worker bisa dipakai.
 - Issuer dan tanggal kedaluwarsa sertifikat wildcard, serta path file cert/key di `OoklaServer.properties`.
 - Apakah akun Cloudflare sudah punya subdomain `workers.dev`.
@@ -113,7 +113,7 @@ Melanggar salah satu poin ini dianggap kegagalan tugas, meskipun tujuan lain ter
 
 1. **DNS `speedtest.lumajangnetworks.my.id` tetap DNS-only (abu-abu) dan menunjuk ke `45.126.249.250`.** Jangan ubah record ini, record apex, atau record wildcard yang sudah ada. Jangan pasang Worker Route, Custom Domain, Page Rule, atau proxy pada hostname tersebut.
 2. **Jangan ubah nameserver zona, mode SSL/TLS zona, atau pengaturan level zona/akun Cloudflare** (Always Use HTTPS, HSTS, WAF global, dan sejenisnya). Satu-satunya perubahan Cloudflare yang boleh dilakukan tercantum di §7.
-3. **Port 80, 443, 5060, 8080, 8081, dan 8443 (TCP/UDP) bukan untuk Jalur B.** Jangan bind, redirect, atau proxy port tersebut. Jangan sentuh nPerf, konfigurasinya, `REDIRECT_PORT_*`, maupun rule redirect-nya.
+3. **Port 80, 443, 5060, 8080, 8081, dan 8443 (TCP/UDP) bukan untuk Jalur B.** Jangan bind, redirect, atau proxy port tersebut. Jangan sentuh layanan lain, konfigurasinya, `REDIRECT_PORT_*`, maupun rule redirect-nya.
 4. **Jalur B tidak menyentuh `/opt/speedtestserver/dist`, `speedtestserver.service`, `speedtestserver-legacy.service`, maupun `OoklaServer.properties`.** Perubahan pada Jalur A hanya boleh dilakukan untuk memperbaiki kegagalan host tester yang terbukti. Perubahan itu wajib mengikuti prosedur isolasi di §8.
 5. **Jangan jalankan ulang `install.sh` atau `install-legacy.sh` penuh di VPS.** `install.sh` melakukan `rsync --delete` pada `dist`, menimpa unit systemd, dan membuka listener sementara 18080. `install-legacy.sh` me-restart layanan legacy.
 6. **Jangan aktifkan ACME/Let's Encrypt** (`OoklaServer.ssl.useLetsEncrypt`). Fitur ini memakai HTTP-01 di port 80 yang dipakai layanan legacy, dan tidak bisa menerbitkan sertifikat wildcard.
@@ -139,7 +139,7 @@ Gunakan label status ini secara konsisten di laporan dan dokumentasi:
 
 | # | Kriteria | Status minimum untuk menyatakan selesai |
 |---|---|---|
-| A1 | Layanan existing (speedtestserver, legacy, nPerf, capture) tetap aktif. PID nPerf tidak berubah. Tidak ada restart yang tidak direncanakan. | VERIFIED-AUTO |
+| A1 | Layanan existing (speedtestserver, legacy, layanan lain, capture) tetap aktif. PID layanan lain tidak berubah. Tidak ada restart yang tidak direncanakan. | VERIFIED-AUTO |
 | A2 | `check-http-compatibility.py` 31/31 dan `host-tester-check.py` (chatgpt) lulus untuk `speedtest.lumajangnetworks.my.id:8080`, dengan **dua varian**: default (`--legacy-port 80`, pembanding historis) dan `--legacy-port 8080` (mendekati tester resmi). Hasil ini dibandingkan dengan baseline Fase 1. | VERIFIED-AUTO |
 | A3 | Host tester resmi lulus semua check, termasuk `max_upload`. | VERIFIED-OPERATOR. Jika operator belum menjalankannya, tulis NOT TESTED. **Jangan** tulis Passed. |
 | B1 | Worker di-deploy ke Workers Free (pilot di `workers.dev`). Versi, compatibility date, dan URL tercatat. | DEPLOYED |
@@ -163,7 +163,7 @@ Setiap fase punya output tertulis. Jangan lanjut ke fase berikutnya sebelum gate
 1. Baca dokumentasi UAEG dan gunakan metode akses paling sederhana yang disediakan. Jangan memasang SSH key permanen, agent, atau backdoor, dan jangan mengubah `sshd`.
 2. Laporkan secara eksplisit: status koneksi UAEG, `hostname`, `whoami`, `uptime`, `date` (UTC dan WIB), serta OS (`/etc/os-release`).
 3. Rekam baseline tanpa mengubah apa pun. Simpan di luar repo, misalnya `/root/speedtest-hybrid-work/baseline-<UTC>/`:
-   - `systemctl status speedtestserver speedtestserver-legacy nperf-server ookla-capture`
+   - `systemctl status speedtestserver speedtestserver-legacy layanan-lain ookla-capture`
    - `systemctl show -p MainPID,NRestarts,ActiveState` untuk keempat unit
    - `ss -ltnup`
    - `nft list ruleset` (atau iptables/ufw yang dipakai)
@@ -282,7 +282,7 @@ Minta credential **hanya saat Fase 3 selesai**. Ikuti §7.
    - Pakai user non-root yang bisa membaca cert, atau `LoadCredential=`.
 4. Verifikasi:
    - `/api/health` dan `/api/ping` dari luar dengan TLS ketat.
-   - PID speedtestserver, legacy, nPerf, dan capture tidak berubah.
+   - PID speedtestserver, legacy, layanan lain, dan capture tidak berubah.
    - Gate A2 diulang dan tetap lulus.
 
 **Gate 5:** B3 terpenuhi dan A1/A2 tetap lulus.
@@ -436,7 +436,7 @@ Berhenti, jelaskan situasinya dalam beberapa kalimat, tawarkan opsi, lalu tunggu
 - Akses UAEG gagal atau ternyata memerlukan perubahan pada VPS.
 - Working tree VPS menyimpang dari `origin/master` dengan cara yang tidak bisa diamankan sesuai §6.
 - `dist` runtime berbeda dari hasil build `master` dan perbedaannya tidak bisa dijelaskan.
-- Pekerjaan membutuhkan port terlarang, perubahan firewall, perubahan nPerf, atau perubahan sertifikat.
+- Pekerjaan membutuhkan port terlarang, perubahan firewall, perubahan layanan lain, atau perubahan sertifikat.
 - Pekerjaan membutuhkan perubahan DNS, Custom Domain, pendaftaran subdomain `workers.dev`, atau perubahan apa pun di level zona/akun Cloudflare.
 - Pengukuran menunjukkan Workers Free tidak sanggup melayani transfer yang berguna. Sajikan angkanya dan opsinya, misalnya chunk kecil dengan lebih banyak invocation, Workers Paid, atau menunda Jalur B.
 - Gate A2 gagal setelah perubahan Anda dan rollback tidak memulihkannya.
@@ -450,7 +450,7 @@ Di luar titik-titik ini, jangan bertanya hal yang bisa dijawab dengan memeriksa 
 
 - **Lanjutkan, jangan mulai ulang.** `hybrid/` adalah basis kode yang dipakai.
 - **Periksa dulu, baru ubah.** Mulai dari Fase 0 yang read-only.
-- **Jaga layanan yang berjalan.** Jalur A dan nPerf lebih penting daripada fitur baru.
+- **Jaga layanan yang berjalan.** Jalur A dan layanan lain lebih penting daripada fitur baru.
 - **Perubahan minimal tetapi lengkap.** Tidak ada UI browser, Ed25519, atau halaman hasil publik kecuali diminta.
 - **Klaim hanya yang terbukti.** Bedakan IMPLEMENTED, DEPLOYED, VERIFIED-AUTO, dan VERIFIED-OPERATOR. Hasil lab bukan hasil edge nyata, dan hasil clone bukan verdict Ookla.
 - **Dokumentasikan untuk direproduksi.** Agent berikutnya harus bisa deploy ulang hanya dari `docs/`.

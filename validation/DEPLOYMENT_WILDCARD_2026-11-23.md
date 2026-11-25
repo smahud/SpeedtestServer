@@ -28,10 +28,10 @@ This is the repository tester's result, not a separately executed verdict from
 Ookla's CAPTCHA-protected hosted tester.
 
 Public HTTPS `/hi` returned 200 instead of redirecting to the wildcard CN.
-Speedtest, the legacy fallback and nPerf remained active, with zero automatic
-restarts. nPerf's existing process remained unchanged; its HTTP 8081 returned
+Speedtest, the legacy fallback and layanan lain remained active, with zero automatic
+restarts. layanan lain's existing process remained unchanged; its HTTP 8081 returned
 200. Speedtest continues to listen on TCP/UDP 5060/8080, legacy HTTP on 80,
-and nPerf on 8081/8443 with its existing 443 redirect.
+and layanan lain on 8081/8443 with its existing 443 redirect.
 
 Runtime-state evidence: [runtime-state.json](evidence/deploy-wildcard-20261123/runtime-state.json).
 

@@ -124,7 +124,7 @@ Yang **terbukti** pada kampanye ini:
 
 ## 6. Keamanan dan invariant yang dijaga
 
-- **Layanan VPS tidak tersentuh** — PID tidak berubah sepanjang kampanye: `speedtestserver` (283954), `speedtestserver-legacy` (283944), `nperf-server` (292073), `ookla-capture` (281912), `speedtest-hybrid-gateway` (302847).
+- **Layanan VPS tidak tersentuh** — PID tidak berubah sepanjang kampanye: `speedtestserver` (283954), `speedtestserver-legacy` (283944), `layanan-lain` (292073), `ookla-capture` (281912), `speedtest-hybrid-gateway` (302847).
 - **Worker tidak diubah:** `speedtest-hybrid-worker` tetap versi sesi sebelumnya (last modified 2026-11-24T02:08Z).
 - **`results.speedtest.net` diblokir** (127.0.0.1) di namespace uji sesuai invariant §3.8 `MASTER_PROMPT_SPEEDTEST_HYBRID_v2.md` (tes paksa/forced-endpoint tidak boleh mengirim hasil ke layanan Ookla); CLI tetap exit 0 tanpa URL hasil (`persisted=false`).
 - **Token tidak dicatat:** Bearer token hybrid hanya transit lewat TLS, tidak muncul di log/journal/evidence; IP client disamarkan (masked) pada semua file evidence.

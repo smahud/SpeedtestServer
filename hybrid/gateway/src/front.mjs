@@ -1,6 +1,6 @@
 /**
  * front.mjs — legacy speedtest HTTP surface on the gateway: VPS full
- * potential + edge assist (v1.4 — "VPS mengeluarkan SEMUA potensi
+ * potential + edge assist (v1.5 — "VPS mengeluarkan SEMUA potensi
  * bandwidth-nya, Cloudflare hanya MEMBANTU").
  *
  * Serves the *measurement* plane of the hybrid architecture for HTTP
@@ -8,7 +8,7 @@
  *
  *   - GET  /speedtest/latency.txt            → served DIRECTLY (ping = VPS)
  *   - GET  /speedtest/random{N}x{N}.jpg      → TWO assist lanes, split by
- *       request SHARE (no bandwidth budget, no throttle — v1.4):
+ *       request SHARE (no bandwidth budget, no throttle):
  *       1. VPS lane: HYBRID_VPS_DL_SHARE of the download requests is
  *          served DIRECTLY from the gateway with daemon-parity
  *          printable-ASCII pool bytes at FULL socket speed. There is NO
@@ -20,44 +20,32 @@
  *          is 302-redirected to a pool-selected Worker /__down — the edge
  *          adds its aggregate capacity IN PARALLEL with the VPS lane, so
  *          throughput ≈ VPS capacity + edge capacity for fast clients.
- *          The split is a per-IP Bresenham interleave — the same proven
- *          deterministic distribution as the hybrid client's upload split
- *          (correct from the very first request).
+ *          The split is a per-IP Bresenham interleave — deterministic and
+ *          correct from the very first request.
  *       3. Forced-local fallback: when the offload token mint is
  *          rate-limited AND the VPS lane is enabled (share > 0), serve
  *          locally instead of failing the client's measurement.
+ *       4. vps-only mode: when NO Cloudflare worker deployment is available
+ *          (no credentials / target 0 — workersAvailable() === false), ALL
+ *          downloads are served by the VPS lane (graceful fallback).
  *
  *       HYBRID_VPS_DL_SHARE=1.0 → 100% VPS (pure VPS potential, edge idle,
- *       CF quota saved). 0.0 → 100% edge (legacy pure offload). Tune ≈
+ *       CF quota saved). 0.0 → 100% edge (pure offload). Tune ≈
  *       VPS capacity / expected client demand for maximum aggregate.
  *   - POST /speedtest/upload.php             → drain + answer (stock clients
  *                                              without hybrid routing) — the
- *                                              VPS ingress contribution
+ *              VPS ingress contribution
  *   - GET  /speedtest/upload.php             → `size=0` (mini-server probe)
  *   - GET  / , /hi                           → daemon-parity banners
  *
- * Offload tokens are CACHED per client IP for (TTL - margin): a 16-32
- * thread download ramp no longer mints one token per request (the mint
- * flood tripped the per-IP rate limit MID-MEASUREMENT, and the limiter now
- * counts actual mints only). recordMint() is still called per redirect so
- * the pool autoscaler keeps its per-worker traffic signal.
+ * v1.5: ALL limits (share, rate limit, byte cap, token cache) are LIVE —
+ * setOptions() applies .env changes without a restart.
  *
  * Security:
  *   - disabled by default (HYBRID_FRONT_ENABLED)
  *   - per-IP rate limit on token MINTING (HYBRID_FRONT_RATE_LIMIT_MPM;
  *     IPv6 peers are bucketed per /64)
  *   - tokens never logged; responses carry no-store
- *
- * Env (via the gateway ctx):
- *   HYBRID_FRONT_ENABLED         default false
- *   HYBRID_FRONT_RATE_LIMIT_MPM  default 90 (token mints per IP per minute; 0 = off)
- *   HYBRID_FRONT_MAX_DOWN_BYTES  default 26 MiB (edge redirect cap)
- *   HYBRID_FRONT_TOKEN_CACHE_MS  default = token TTL − 60 s; 0 disables the cache
- *   HYBRID_VPS_DL_SHARE          default 0.15 — fraction of download requests
- *                                served by the uncapped VPS lane (0..1).
- *                                REMOVED in v1.4 (operator decision):
- *                                HYBRID_VPS_DL_BUDGET_MBPS — the token-bucket
- *                                budget that capped the VPS's contribution.
  */
 
 import crypto from 'node:crypto';
@@ -82,12 +70,12 @@ const IMAGE_SIZES = {
 
 const IMAGE_RE = /random([0-9]+)x([0-9]+)\.jpg$/;
 const VERSION_STRING = '2.11 (2.11.5) 2026-06-04.1737.7d0993d';
-const FRONT_ID = 'hybrid-gateway-front/1.4';
+const FRONT_ID = 'hybrid-gateway-front/1.5';
 
 // --- VPS download pool (daemon parity F-9): 2 MiB printable ASCII ------
-// Materialized ONCE per process (one randomFill + one 0x20+b%96 map pass,
-// ~15 ms for 2 MiB); every local-lane response is streamed from this pool
-// cyclically, exactly like the reference daemon and the Worker's pool.ts.
+// Materialized ONCE per process; every local-lane response is streamed from
+// this pool cyclically, exactly like the reference daemon and the Worker's
+// pool.ts.
 const POOL_SIZE = 2 * 1024 * 1024;
 let vpsPool = null;
 function getVpsPool() {
@@ -100,38 +88,39 @@ function getVpsPool() {
   return vpsPool;
 }
 
-/** Create the front router. Returns (req, res, url, ip) => boolean (handled?).
+/** Create the front router. Returns (req, res, url, ip) => boolean (handled?)
+ *  with a .setOptions(patch) method for v1.5 live configuration.
  *  ctx: { mintToken, log, counters, workerBase, pool?, rateLimitMpm, tokenBindIp?,
- *         tokenTtlMs?, tokenCacheMs?, maxDownBytes?, vpsDlShare? }
+ *         tokenTtlMs?, tokenCacheMs?, maxDownBytes?, vpsDlShare?, workersAvailable? }
  */
 export function createFront(ctx) {
   const { mintToken, log, counters } = ctx;
-  const rateLimitMpm = Number(ctx.rateLimitMpm ?? 90);
-  const tokenBindIp = ctx.tokenBindIp === true;
   const pickWorker = ctx.pool ? () => ctx.pool.pickWorker() : () => ({ id: 1, url: ctx.workerBase });
   const recordMint = ctx.pool ? (id) => ctx.pool.recordMint(id) : () => {};
+  const workersAvailable = ctx.workersAvailable || (() => true);
   // Cap redirected download size at the Worker's MAX_DOWNLOAD_BYTES (deployed
-  // production cap: 25 MiB). Sizes above the cap would 400 at the edge and
-  // count as zero; capping keeps the bytes measurable (the client counts
-  // bytes it actually receives, so the measurement stays honest).
-  const maxDownBytes = Number(ctx.maxDownBytes ?? 26214400);
+  // production cap: 25 MiB). LIVE (v1.5): mutable via setOptions.
+  const opts = {
+    rateLimitMpm: Number(ctx.rateLimitMpm ?? 90),
+    maxDownBytes: Number(ctx.maxDownBytes ?? 26214400),
+    tokenCacheMs: Number(
+      ctx.tokenCacheMs ?? Math.max(30_000, (Number(ctx.tokenTtlMs ?? 300_000) || 300_000) - 60_000),
+    ),
+    vpsDlShare: Math.min(1, Math.max(0, Number.isFinite(Number(ctx.vpsDlShare)) ? Number(ctx.vpsDlShare) : 0.15)),
+  };
+  const tokenBindIp = ctx.tokenBindIp === true;
 
-  // --- VPS assist lane: request-share interleave (v1.4) -------------------
-  // NO token bucket. NO byte budget. NO throttle. HYBRID_VPS_DL_SHARE is
-  // the fraction of download REQUESTS answered directly by the VPS — each
-  // at full socket speed (the only flow control is TCP backpressure).
-  // The complementary fraction is 302-assisted by the worker pool, IN
-  // PARALLEL, so the aggregate = VPS capacity + edge capacity.
-  // Distribution: per-IP Bresenham interleave — deterministic, correct
-  // from the first request (same algorithm as the client upload split).
-  const shareRaw = ctx.vpsDlShare;
-  const vpsDlShare = Math.min(1, Math.max(0, Number.isFinite(Number(shareRaw)) ? Number(shareRaw) : 0.15));
+  // --- VPS assist lane: request-share interleave --------------------------
+  // NO token bucket. NO byte budget. NO throttle. opts.vpsDlShare is the
+  // fraction of download REQUESTS answered directly by the VPS — each at
+  // full socket speed. Distribution: per-IP Bresenham interleave.
   const dlSeq = new Map(); // ipKey -> Bresenham phase
   function pickVpsLane(ip) {
-    if (vpsDlShare <= 0) return false;
-    if (vpsDlShare >= 1) return true;
+    const share = opts.vpsDlShare;
+    if (share <= 0) return false;
+    if (share >= 1) return true;
     const key = ipKey(ip);
-    let phase = (dlSeq.get(key) || 0) + vpsDlShare;
+    let phase = (dlSeq.get(key) || 0) + share;
     const vps = phase >= 1;
     if (vps) phase -= 1;
     dlSeq.set(key, phase);
@@ -144,7 +133,7 @@ export function createFront(ctx) {
    *  A client disconnect stops generation immediately (no wasted bytes). */
   function serveLocalJpeg(res, size, meta) {
     counters.frontDlLocalServed = (counters.frontDlLocalServed || 0) + 1;
-    log('front_download_local', { ...meta, lane: 'vps' });
+    log('front_download_local', { ...meta, lane: meta && meta.lane ? meta.lane : 'vps' });
     res.writeHead(200, {
       'Content-Type': 'image/jpeg',
       'Content-Length': size,
@@ -202,11 +191,11 @@ export function createFront(ctx) {
   // --- per-IP token mint rate limiting (sliding 60s window, /64 IPv6) ----
   const mintWindow = new Map(); // ipKey -> [timestamps]
   function allowMint(ip) {
-    if (!rateLimitMpm) return true;
+    if (!opts.rateLimitMpm) return true;
     const key = ipKey(ip);
     const now = Date.now();
     const list = (mintWindow.get(key) || []).filter((t) => now - t < 60_000);
-    if (list.length >= rateLimitMpm) {
+    if (list.length >= opts.rateLimitMpm) {
       mintWindow.set(key, list);
       if (mintWindow.size > 10_000) mintWindow.delete(mintWindow.keys().next().value);
       return false;
@@ -218,21 +207,15 @@ export function createFront(ctx) {
   }
 
   // --- per-IP cached offload token ---------------------------------------
-  // v1.2 and earlier minted one token PER download request: a 16-32 thread
-  // ramp (the throughput-boosting mode) minted dozens of tokens per second
-  // and tripped the per-IP rate limit MID-MEASUREMENT. Tokens are stateless
-  // HMAC bearer capabilities — REUSE within the TTL is safe and collapses
-  // mint churn to ~1 per (TTL - margin) per client.
+  // Tokens are stateless HMAC bearer capabilities — REUSE within the TTL is
+  // safe and collapses mint churn to ~1 per (TTL - margin) per client.
   const TOKEN_MARGIN_MS = 60_000;
-  const tokenCacheMs = Number(
-    ctx.tokenCacheMs ?? Math.max(30_000, (Number(ctx.tokenTtlMs ?? 300_000) || 300_000) - TOKEN_MARGIN_MS),
-  );
   const tokenCache = new Map(); // ipKey -> { token, expMs }
   function getOffloadToken(ip) {
     const key = ipKey(ip);
     const now = Date.now();
     const hit = tokenCache.get(key);
-    if (tokenCacheMs > 0 && hit && hit.expMs - TOKEN_MARGIN_MS > now) return hit.token;
+    if (opts.tokenCacheMs > 0 && hit && hit.expMs - TOKEN_MARGIN_MS > now) return hit.token;
     if (!allowMint(ip)) {
       counters.frontRateLimited = (counters.frontRateLimited || 0) + 1;
       log('front_rate_limited', { ip });
@@ -241,7 +224,7 @@ export function createFront(ctx) {
     counters.frontTokensMinted = (counters.frontTokensMinted || 0) + 1;
     const minted = mintToken(tokenBindIp ? ip : '*');
     const rec = { token: minted.token, expMs: minted.expMs };
-    if (tokenCacheMs > 0) {
+    if (opts.tokenCacheMs > 0) {
       tokenCache.set(key, rec);
       if (tokenCache.size > 10_000) tokenCache.delete(tokenCache.keys().next().value);
     }
@@ -273,8 +256,7 @@ export function createFront(ctx) {
 
   /** Drain the upload body FULLY, then answer `size=N` (daemon legacy
    *  parity). No early answer: an early response + close would abort the
-   *  client's send loop mid-body on real-RTT links (observed T-10) and
-   *  corrupt the stock-client upload measurement. */
+   *  client's send loop mid-body on real-RTT links (observed T-10). */
   function handleUpload(req, res, ip, url) {
     const declared = Number(req.headers['content-length'] || 0);
     counters.frontUploads = (counters.frontUploads || 0) + 1;
@@ -298,10 +280,8 @@ export function createFront(ctx) {
       counters.frontBytesIn = (counters.frontBytesIn || 0) + c.length;
       if (drained > 256 * 1024 * 1024) { // 256 MiB safety cap
         clearWatchdog();
-        // BUG FIX (verified live, v1.2 regression): req.destroy() ran
-        // IMMEDIATELY after res.on('finish', ...) — defeating its own hook
-        // (the socket died before the 413 flushed; the client saw
-        // ECONNRESET). Pause the request now; destroy only after finish.
+        // BUG FIX (kept): pause the request now; destroy only after finish —
+        // destroying immediately defeated the 413 flush (client saw ECONNRESET).
         answered = true;
         req.pause();
         finish(res, 413, 'size=0\n', { 'Content-Type': 'text/plain; charset=UTF-8', Connection: 'close' });
@@ -322,13 +302,12 @@ export function createFront(ctx) {
       clearWatchdog();
       log('front_upload_abort', { ip, declared, drained });
     });
-    // A client RST mid-body surfaces as res 'close' WITHOUT an 'error' on
-    // req — clear the watchdog here too (v1.1 fix, kept).
+    // A client RST mid-body surfaces as res 'close' WITHOUT an 'error' on req.
     res.on('close', clearWatchdog);
     req.resume();
   }
 
-  return function front(req, res, url, ip) {
+  function front(req, res, url, ip) {
     const method = (req.method || 'GET').toUpperCase();
     let path = url.pathname;
     // accept both /speedtest/x and /x (daemon-parity alias)
@@ -398,15 +377,17 @@ export function createFront(ctx) {
       if (!size) return false; // unknown size → fall through to 404
       counters.frontDownloads = (counters.frontDownloads || 0) + 1;
 
+      // v1.5 vps-only fallback: no deployed edge → everything served locally.
+      const fallbackLocal = !workersAvailable();
+
       // Lane 1 — VPS assist (UNCAPPED, full-speed local serve on its share
-      // of requests; the 25 MiB cap is an EDGE limit, the VPS lane has no
-      // such limit — a VPS-lane response is never budget-gated).
-      if (method === 'GET' && pickVpsLane(ip)) {
+      // of requests; the byte cap is an EDGE limit, the VPS lane has none).
+      if (method === 'GET' && (fallbackLocal || pickVpsLane(ip))) {
         counters.frontDlLocal = (counters.frontDlLocal || 0) + 1;
-        serveLocalJpeg(res, size, { ip, n, size });
+        serveLocalJpeg(res, size, fallbackLocal ? { ip, n, size, lane: 'vps-fallback' } : { ip, n, size });
         return true;
       }
-      if (method === 'HEAD' && vpsDlShare > 0) {
+      if (method === 'HEAD' && (opts.vpsDlShare > 0 || fallbackLocal)) {
         // HEAD costs no bytes: serve the daemon-parity headers locally.
         finish(res, 200, '', {
           'Content-Type': 'image/jpeg',
@@ -417,7 +398,7 @@ export function createFront(ctx) {
       }
 
       // Lane 2 — edge assist: 302 → pool-selected Worker __down.
-      const effective = maxDownBytes && size > maxDownBytes ? maxDownBytes : size;
+      const effective = opts.maxDownBytes && size > opts.maxDownBytes ? opts.maxDownBytes : size;
       if (effective !== size) counters.frontDownCapped = (counters.frontDownCapped || 0) + 1;
       counters.frontDownRedirects = (counters.frontDownRedirects || 0) + 1;
       const token = getOffloadToken(ip);
@@ -426,9 +407,9 @@ export function createFront(ctx) {
         // when the VPS lane is part of the design) instead of breaking the
         // measurement. With share=0 the operator chose pure edge offload,
         // so the legacy 429 applies.
-        if (vpsDlShare > 0 && method === 'GET') {
+        if ((opts.vpsDlShare > 0 || fallbackLocal) && method === 'GET') {
           counters.frontDlLocalForced = (counters.frontDlLocalForced || 0) + 1;
-          serveLocalJpeg(res, size, { ip, n, size, forced: true });
+          serveLocalJpeg(res, size, { ip, n, size, forced: true, lane: 'vps-forced' });
           return true;
         }
         finish(res, 429, JSON.stringify({ error: 'rate-limited', retryAfterMs: 60000 }), {
@@ -446,5 +427,29 @@ export function createFront(ctx) {
     }
 
     return false; // not a front path — let the gateway answer (404)
+  }
+
+  /** v1.5: apply live .env changes (clamped, logged). */
+  front.setOptions = function setOptions(patch = {}) {
+    const applied = {};
+    if (patch.rateLimitMpm !== undefined && Number.isFinite(Number(patch.rateLimitMpm)) && Number(patch.rateLimitMpm) >= 0) {
+      opts.rateLimitMpm = Math.floor(Number(patch.rateLimitMpm));
+      applied.rateLimitMpm = opts.rateLimitMpm;
+    }
+    if (patch.maxDownBytes !== undefined && Number.isFinite(Number(patch.maxDownBytes)) && Number(patch.maxDownBytes) >= 0) {
+      opts.maxDownBytes = Math.floor(Number(patch.maxDownBytes));
+      applied.maxDownBytes = opts.maxDownBytes;
+    }
+    if (patch.tokenCacheMs !== undefined && Number.isFinite(Number(patch.tokenCacheMs)) && Number(patch.tokenCacheMs) >= 0) {
+      opts.tokenCacheMs = Number(patch.tokenCacheMs);
+      applied.tokenCacheMs = opts.tokenCacheMs;
+    }
+    if (patch.vpsDlShare !== undefined && Number.isFinite(Number(patch.vpsDlShare))) {
+      opts.vpsDlShare = Math.min(1, Math.max(0, Number(patch.vpsDlShare)));
+      applied.vpsDlShare = opts.vpsDlShare;
+    }
+    if (Object.keys(applied).length > 0) log('front_options_updated', applied);
   };
+
+  return front;
 }

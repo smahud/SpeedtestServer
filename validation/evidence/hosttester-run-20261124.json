@@ -43,7 +43,7 @@
     "upload_post_515699": {"count": 4, "result": "200 OK + body 'size=515699' (Content-Length 12), early answer @2,5 s, Connection: Close + FIN server"},
     "upload_post_1980899": {"count": 4, "result": "200 OK + body 'size=1980899' (Content-Length 13), early answer @2,5 s"},
     "head_random_jpg": {"count": 40, "result": "10 file x 4 run: 200 OK, Content-Type image/jpeg, Content-Length resmi (lihat head_content_lengths)"},
-    "service_health": {"result": "speedtestserver 283954 / legacy 283944 / nperf 292073 / ookla-capture 281912 / gateway 302847 - PID tidak berubah, NRestarts=0"}
+    "service_health": {"result": "speedtestserver 283954 / legacy 283944 / layanan lain 292073 / ookla-capture 281912 / gateway 302847 - PID tidak berubah, NRestarts=0"}
   },
   "upload_flow_detail": [
     {"run": 1, "client_port": 60273, "cl": 515699, "received_before_answer": 419976, "response_at_s": 2.501, "body": "size=515699", "client_close": "FIN client @2,73 s"},
@@ -70,7 +70,7 @@
   },
   "gates_after_run": {
     "when_utc": "2026-11-24T12:52Z (eksternal, sandbox luar VPS)",
-    "check_http_compatibility": "26/31 - 5 kegagalan seluruhnya 'legacy port 80 upload' (T-9 nPerf redirect port 80, pra-ada, sisi operator)",
+    "check_http_compatibility": "26/31 - 5 kegagalan seluruhnya 'legacy port 80 upload' (T-9 layanan lain redirect port 80, pra-ada, sisi operator)",
     "host_tester_check_default": "4/19 - 15 kegagalan seluruhnya legacy port 80 (T-9)",
     "host_tester_check_8080": "9/19 - 1 kegagalan image_sizes (T-7 deviasi magic-byte body; tester resmi HEAD-only tidak pernah melihat body)",
     "conclusion": "identik dengan baseline terdokumentasi sesi 2-5; tidak ada regresi"

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# install.sh — SpeedtestServer automated installer (MASTER PROMPT v6.0 §13
-# + hybrid full-stack v1.4).
+# install.sh — SpeedtestServer automated installer (v1.5).
 #
 # Deploys the OPEN-SOURCE TYPESCRIPT SpeedtestServer (reverse-engineered/
-# typescript) — never the proprietary OoklaServer binary.
+# typescript) — never the proprietary OoklaServer binary. This project is a
+# STANDALONE OoklaServer replacement: the daemon binds 8080/5060 ONLY (the
+# two ports the official OoklaServer.properties offers). It never touches
+# 80/443/8081/8443 or any unrelated production service.
 #
 # Primary target: Debian 13 (trixie) with systemd.
 #
@@ -14,29 +16,38 @@
 #   4. Installs to /opt/speedtestserver (dist + runtime node_modules + docs).
 #   5. Creates a dedicated non-root service user (speedtestserver).
 #   6. Installs /etc/speedtestserver/OoklaServer.properties (preserved on
-#      upgrade) and a hardened systemd unit.
+#      upgrade — the official Ookla configuration format is NEVER modified)
+#      and a hardened systemd unit.
 #   7. Verifies: unit syntax (systemd-analyze), listener + protocol probe.
-#   8. HYBRID (default when .env enables it — see .env.example and
+#   8. HYBRID (the default when .env enables it — see .env.example and
 #      docs/CLOUDFLARE_CREDENTIALS.md):
 #      a. installs the hybrid gateway to /opt/speedtest-hybrid (zero-dep
 #         Node sources) + speedtest-hybrid user + hardened systemd unit
-#         (speedtest-hybrid-gateway.service) + /etc/speedtest-hybrid/
-#         gateway.env generated FROM the repository .env;
-#      b. deploys the Cloudflare worker POOL (1..N workers, N =
-#         CF_WORKER_DEPLOY_COUNT in .env) with wrangler using the .env
-#         credentials (CLOUDFLARE_API_TOKEN or CLOUDFLARE_EMAIL +
-#         CLOUDFLARE_API_KEY) — INCLUDING the shared secret on every
-#         worker — then verifies each /__meta;
-#      c. starts + health-checks the gateway (its /api/health reports the
-#         live pool state).
-#   9. Optionally starts the services (--start).
+#         (speedtest-hybrid-gateway.service, TLS via systemd LoadCredential)
+#         + /etc/speedtest-hybrid/gateway.env generated FROM the repo .env;
+#         the gateway then WATCHES the repo .env and applies changes
+#         ON THE FLY (worker deploy count, pool bounds, lane share,
+#         credentials, shared secret — no restart needed);
+#      b. builds the worker bundle (esbuild) and deploys/updates the
+#         Cloudflare worker pool (1..N = CF_WORKER_DEPLOY_COUNT in .env)
+#         through the REST API (rest-deploy.mjs; wrangler deploy-pool.sh is
+#         the fallback), setting the shared secret on every worker, then
+#         verifies a sample via /__meta;
+#      c. VPS-ONLY FALLBACK: when no usable Cloudflare credential is present
+#         the install still completes (daemon + gateway, everything served
+#         by the VPS); fix .env and re-run install.sh to enable hybrid.
+#   9. AUTO-UPDATE (v1.5): installs speedtest-autoupdate.service + .timer
+#      (daily 04:30 + jitter, Persistent) — the stack pulls repo updates,
+#      reinstalls and restarts itself. See docs/AUTO_UPDATE.md.
+#  10. LEGACY PURGE (v1.5): disables and removes the old port-80
+#      speedtestserver-legacy unit if present (the project no longer runs
+#      any port-80 HTTP surface).
+#  11. Optionally starts the services (--start).
 #
-# Options:
-#   --help              this text
-#   --dry-run           validate prerequisites + print the plan; NO changes
-#   --staging-dir DIR   full install into DIR (for tests/portable installs):
-#                       no system user, no systemctl; unit file written under
-#                       DIR/etc/systemd/system, config under DIR/etc/...
+# Usage:
+#   sudo ./install.sh [--start] [--dry-run] [--config FILE] [--prefix DIR]
+#        [--service-user N] [--env-file FILE] [--no-hybrid] [--no-workers]
+#
 #   --start             enable + start the services after install
 #   --config FILE       use FILE as the OoklaServer.properties source
 #                       (default: shipped template; existing installed
@@ -53,6 +64,8 @@
 #   --no-hybrid         skip the hybrid gateway install (daemon only)
 #   --no-workers        skip the Cloudflare worker deployment (gateway only;
 #                       its forced-local assist lane keeps measurements alive)
+#
+# Environment overrides: REST_DEPLOY=0 forces the wrangler deploy path.
 #
 # Re-running is safe: builds are rebuilt, files re-synced, existing
 # configuration/certificates are preserved. The installer never changes
@@ -74,6 +87,7 @@ CONFIGDIR="/etc/speedtestserver"
 ENV_FILE="$REPO_ROOT/.env"
 NO_HYBRID=0
 NO_WORKERS=0
+GW_UNIT_NAME="speedtest-hybrid-gateway.service"
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -110,6 +124,9 @@ fi
 say()  { printf '\033[1;34m[install]\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m[warn]\033[0m %s\n' "$*" >&2; }
 fail() { printf '\033[1;31m[FATAL]\033[0m %s\n' "$*" >&2; exit 1; }
+
+APP_VERSION="$(cat "$REPO_ROOT/VERSION" 2>/dev/null || echo unknown)"
+say "SpeedtestServer installer — VERSION $APP_VERSION"
 
 # ------------------------------------------------------------- .env load ---
 # The repository .env is the SINGLE source of truth for install-time
@@ -216,21 +233,18 @@ if [ "$AS_ROOT" = 1 ]; then
   fi
 fi
 
-# Hybrid worker toolchain: curl + jq (deploy-pool.sh verify) — auto-install
-# on Debian-family when running as root, warn-and-continue otherwise.
-if [ "$NO_HYBRID" = 0 ] && [ "$NO_WORKERS" = 0 ] && [ "$CF_WORKER_DEPLOY_COUNT" != "0" ]; then
-  MISSING=""
-  command -v curl >/dev/null 2>&1 || MISSING="curl"
-  command -v jq   >/dev/null 2>&1 || MISSING="$MISSING jq"
-  if [ -n "${MISSING// /}" ]; then
-    if [ "$AS_ROOT" = 1 ] && command -v apt-get >/dev/null 2>&1; then
-      say "Installing missing worker-deploy toolchain:${MISSING} (apt-get)…"
-      DEBIAN_FRONTEND=noninteractive apt-get install -y -qq $MISSING >/dev/null 2>&1 \
-        || warn "apt-get install failed — install ${MISSING} manually if worker verification errors"
+# Worker deploy toolchain: curl (credential verification + REST fallback
+# checks). Auto-installed on Debian-family when running as root.
+if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
+  command -v curl >/dev/null 2>&1 || {
+    if command -v apt-get >/dev/null 2>&1; then
+      say "Installing curl (apt-get)…"
+      DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl >/dev/null 2>&1 \
+        || warn "apt-get install curl failed — install it manually"
     else
-      warn "worker verification needs:${MISSING} — not auto-installed (non-root or no apt-get)"
+      warn "curl not found — Cloudflare credential verification will be skipped"
     fi
-  fi
+  }
 fi
 
 # ------------------------------------------------------------------ plan ---
@@ -240,7 +254,7 @@ PLAN=(
   "validate     node dist/bin/ooklaserver.js --validate-config"
   "install      rsync dist + runtime deps →  $PLAN_PREFIX"
   "user         dedicated non-root user       $SERVICE_USER"
-  "config       OoklaServer.properties →     $CONFIGDIR/OoklaServer.properties"
+  "config       OoklaServer.properties →     $CONFIGDIR/OoklaServer.properties (preserved)"
   "state dir    certificates / ACME storage  $STATEDIR (preserved)"
   "systemd      unit file →                   $SYSTEMD_DIR/speedtestserver.service"
   "verify       unit syntax + listener + protocol probe"
@@ -249,15 +263,17 @@ PLAN=(
 
 if [ "$NO_HYBRID" = 0 ]; then
   PLAN+=(
-    "hybrid gw    zero-dep Node gateway →     $HYBRID_PREFIX/src"
+    "hybrid gw    zero-dep Node gateway →     $HYBRID_PREFIX/src (+ .env watcher)"
     "hybrid user  dedicated non-root user       $HYBRID_USER"
     "hybrid env   gateway.env generated from    $ENV_FILE → $HYBRID_ETC/gateway.env"
-    "hybrid unit  speedtest-hybrid-gateway.service"
+    "hybrid unit  speedtest-hybrid-gateway.service (TLS via LoadCredential)"
   )
   if [ "$NO_WORKERS" = 0 ] && [ "$CF_WORKER_DEPLOY_COUNT" != "0" ]; then
-    PLAN+=("cf workers   deploy-pool.sh →           $CF_WORKER_DEPLOY_COUNT workers (+ secrets + /__meta verify)")
+    PLAN+=("cf workers   REST deploy 1..${CF_WORKER_DEPLOY_COUNT}     (fingerprint-gated; wrangler fallback)")
   fi
+  PLAN+=("autoupdate  speedtest-autoupdate.timer    daily 04:30 + jitter")
 fi
+[ "$AS_ROOT" = 1 ] && PLAN+=("legacy purge remove port-80 speedtestserver-legacy (if present)")
 
 say "Install plan:"
 printf '  %s\n' "${PLAN[@]}"
@@ -289,6 +305,7 @@ say "Installing files to $PREFIX…"
 mkdir -p "$PREFIX" "$CONFIGDIR" "$STATEDIR/certs"
 rsync -a --delete "$TS_DIR/dist/" "$PREFIX/dist/"
 rsync -a "$REPO_ROOT/README.md" "$PREFIX/README.md"
+[ -f "$REPO_ROOT/VERSION" ] && rsync -a "$REPO_ROOT/VERSION" "$PREFIX/VERSION"
 [ -f "$REPO_ROOT/LICENSE" ] && rsync -a "$REPO_ROOT/LICENSE" "$PREFIX/LICENSE"
 # Runtime dependencies: production node_modules for the installed dist.
 # Built in an ISOLATED copy of the manifest (never `npm ci` in the source tree,
@@ -341,7 +358,7 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=$SERVICE_USER
-Group=$( [ "$AS_ROOT" = 1 ] && echo "$SERVICE_USER" || echo "$SERVICE_USER" )
+Group=$SERVICE_USER
 WorkingDirectory=$STATEDIR
 ExecStart=$(command -v node) $PREFIX/dist/bin/ooklaserver.js --config $CONFIG_INSTALLED
 Restart=on-failure
@@ -408,11 +425,13 @@ cleanup_verify
 trap - EXIT
 
 # ------------------------------------------------------- hybrid gateway ---
-# v1.4 full-stack install: the VPS control plane + assist-lane front, driven
-# entirely by the repository .env. The daemon above stays 100% standard
-# (OoklaServer.properties is NEVER touched by this phase).
+# v1.5 full-stack install: the VPS control plane + assist-lane front, driven
+# entirely by the repository .env — and kept IN SYNC with it at runtime (the
+# gateway watches the file; worker count / credentials / secret changes apply
+# on the fly). The daemon above stays 100% standard (OoklaServer.properties
+# is NEVER touched by this phase).
 if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
-  say "Installing hybrid gateway (v1.4 — full-potential assist lane)…"
+  say "Installing hybrid gateway (v1.5 — full-potential assist lane + on-the-fly .env sync)…"
 
   # --- shared secret: reuse from .env, or generate + persist back ---------
   if [ -z "${HYBRID_SHARED_SECRET:-}" ]; then
@@ -438,12 +457,23 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
   fi
   mkdir -p "$HYBRID_PREFIX/src" "$HYBRID_ETC" "$HYBRID_STATE"
   rsync -a "$REPO_ROOT/hybrid/gateway/src/" "$HYBRID_PREFIX/src/"
-  rsync -a "$REPO_ROOT/hybrid/README.md" "$HYBRID_PREFIX/README.md"
-  # Worker deploy toolchain (for operator re-runs / pool changes later):
+  rsync -a "$REPO_ROOT/hybrid/README.md" "$HYBRID_PREFIX/README.md" 2>/dev/null || true
+  # Worker deploy toolchain + REST module (synced fully — incl. dist/ — in the
+  # worker phase below, after the bundle is built).
   rsync -a --delete \
     --exclude node_modules --exclude .wrangler \
     "$REPO_ROOT/hybrid/worker/" "$HYBRID_PREFIX/worker/"
   chown -R "$HYBRID_USER:$HYBRID_USER" "$HYBRID_STATE"
+
+  # --- .env readability for the gateway watcher ---------------------------
+  # The gateway (user $HYBRID_USER) polls the repo .env so on-the-fly edits
+  # apply without a restart. It already holds HYBRID_CF_* credentials in
+  # gateway.env, so group-read on .env grants nothing new.
+  if [ -f "$ENV_FILE" ]; then
+    chown "root:$HYBRID_USER" "$ENV_FILE"
+    chmod 0640 "$ENV_FILE"
+    say "  .env secured: 0640 root:$HYBRID_USER (gateway watcher can read it)"
+  fi
 
   # --- worker base URL derivation (when not set explicitly) --------------
   if [ -z "${HYBRID_WORKER_BASE:-}" ] && [ -n "${CF_WORKERS_SUBDOMAIN:-}" ]; then
@@ -470,8 +500,13 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
   gw_emit HYBRID_SHARED_SECRET
   gw_emit HYBRID_GATEWAY_PORT 8790
   gw_emit HYBRID_GATEWAY_BIND 0.0.0.0
-  gw_emit HYBRID_GATEWAY_TLS_CERT
-  gw_emit HYBRID_GATEWAY_TLS_KEY
+  # TLS: the unit reads the daemon wildcard cert via systemd LoadCredential
+  # (root-only readable) and exposes private copies under /run/credentials —
+  # the gateway never needs direct access to the 0600 privkey.
+  if [ -n "${HYBRID_GATEWAY_TLS_CERT:-}" ] && [ -n "${HYBRID_GATEWAY_TLS_KEY:-}" ]; then
+    printf 'HYBRID_GATEWAY_TLS_CERT=/run/credentials/%s/cert\n' "$GW_UNIT_NAME" >> "$GW_TMP"
+    printf 'HYBRID_GATEWAY_TLS_KEY=/run/credentials/%s/key\n' "$GW_UNIT_NAME" >> "$GW_TMP"
+  fi
   gw_emit HYBRID_VPS_PUBLIC_BASE
   gw_emit HYBRID_WORKER_BASE
   gw_emit HYBRID_STS_BASE
@@ -486,6 +521,18 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
   gw_emit HYBRID_FRONT_MAX_DOWN_BYTES
   gw_emit HYBRID_FRONT_TOKEN_CACHE_MS
   gw_emit HYBRID_VPS_DL_SHARE 0.15
+  # --- v1.5: on-the-fly .env sync (the watched file + deployment plane) ---
+  printf 'HYBRID_ENV_FILE=%s\n' "$ENV_FILE" >> "$GW_TMP"
+  gw_emit HYBRID_ENV_POLL_MS 2000
+  printf 'HYBRID_WORKER_BUNDLE=%s/worker/dist/worker-bundle.js\n' "$HYBRID_PREFIX" >> "$GW_TMP"
+  printf 'HYBRID_WORKER_FP_FILE=%s/deployed.pool.sha\n' "$HYBRID_STATE" >> "$GW_TMP"
+  printf 'HYBRID_VERSION_FILE=%s\n' "$REPO_ROOT/VERSION" >> "$GW_TMP"
+  gw_emit HYBRID_WORKER_SYNC_DELETE true
+  gw_emit HYBRID_WORKER_SYNC_INTERVAL_MS 0
+  gw_emit CF_WORKER_DEPLOY_COUNT "${CF_WORKER_DEPLOY_COUNT:-1}"
+  gw_emit CF_WORKER_NAME speedtest-hybrid-worker
+  gw_emit CF_WORKERS_SUBDOMAIN lumajangnetworks
+  # --- routing pool bounds (same semantics as v1.4) ---
   gw_emit HYBRID_WORKER_POOL_MAX "${CF_WORKER_DEPLOY_COUNT:-1}"
   if [ "${HYBRID_WORKER_POOL_MAX:-1}" -ge 2 ] 2>/dev/null; then
     gw_emit HYBRID_WORKER_ACTIVE_MIN 2
@@ -499,15 +546,19 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
   gw_emit HYBRID_WORKER_PROBE_INTERVAL_MS
   gw_emit HYBRID_WORKER_BENCH_COOLDOWN_MS
   gw_emit HYBRID_WORKER_URLS
-  # Cloudflare quota guard (runtime): reuses the .env credentials — hourly
-  # GraphQL usage poll; soft = stop pool growth, hard = refuse token mints.
+  # Cloudflare credentials (runtime): token method, or global key method.
+  # Used by the quota guard AND by the on-the-fly worker deploy sync.
   if [ -n "${CLOUDFLARE_API_TOKEN:-}" ] && [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
     printf 'HYBRID_CF_API_TOKEN=%s\n' "$CLOUDFLARE_API_TOKEN" >> "$GW_TMP"
     printf 'HYBRID_CF_ACCOUNT_ID=%s\n' "$CLOUDFLARE_ACCOUNT_ID" >> "$GW_TMP"
-    gw_emit HYBRID_CF_QUOTA_SOFT_PCT
-    gw_emit HYBRID_CF_QUOTA_HARD_PCT
-    gw_emit HYBRID_CF_DAILY_QUOTA
+  elif [ -n "${CLOUDFLARE_EMAIL:-}" ] && [ -n "${CLOUDFLARE_API_KEY:-}" ] && [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+    printf 'HYBRID_CF_EMAIL=%s\n' "$CLOUDFLARE_EMAIL" >> "$GW_TMP"
+    printf 'HYBRID_CF_API_KEY=%s\n' "$CLOUDFLARE_API_KEY" >> "$GW_TMP"
+    printf 'HYBRID_CF_ACCOUNT_ID=%s\n' "$CLOUDFLARE_ACCOUNT_ID" >> "$GW_TMP"
   fi
+  gw_emit HYBRID_CF_QUOTA_SOFT_PCT
+  gw_emit HYBRID_CF_QUOTA_HARD_PCT
+  gw_emit HYBRID_CF_DAILY_QUOTA
   install -m 0640 -o root -g "$HYBRID_USER" "$GW_TMP" "$GW_ENV"
   rm -f "$GW_TMP"
   say "  gateway.env written: $GW_ENV (0640 root:$HYBRID_USER, $(grep -c '=' "$GW_ENV") vars)"
@@ -518,15 +569,15 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
       || fail "HYBRID_GATEWAY_TLS_CERT set without HYBRID_GATEWAY_TLS_KEY (or vice versa)"
     [ -r "${HYBRID_GATEWAY_TLS_CERT}" ] || fail "HYBRID_GATEWAY_TLS_CERT not readable: ${HYBRID_GATEWAY_TLS_CERT}"
     [ -r "${HYBRID_GATEWAY_TLS_KEY}" ] || fail "HYBRID_GATEWAY_TLS_KEY not readable: ${HYBRID_GATEWAY_TLS_KEY}"
-    say "  TLS material OK (read-only use of the daemon certificate)"
+    say "  TLS material OK (served to the unit via systemd LoadCredential)"
   else
     warn "no HYBRID_GATEWAY_TLS_CERT/KEY set — gateway will listen PLAINTEXT HTTP"
   fi
 
-  # --- systemd unit --------------------------------------------------------
-  cat > "$SYSTEMD_DIR/speedtest-hybrid-gateway.service" <<EOF
+  # --- systemd unit (TLS material via LoadCredential) ---------------------
+  cat > "$SYSTEMD_DIR/$GW_UNIT_NAME" <<EOF
 [Unit]
-Description=Speedtest Hybrid Gateway (VPS control plane + full-potential assist lane v1.4)
+Description=Speedtest Hybrid Gateway (VPS control plane + full-potential assist lane v1.5)
 Documentation=file://$HYBRID_PREFIX/README.md
 After=network-online.target speedtestserver.service
 Wants=network-online.target
@@ -546,12 +597,22 @@ ProtectSystem=strict
 ProtectHome=true
 ReadWritePaths=$HYBRID_STATE
 LimitNOFILE=65536
+EOF
+  if [ -n "${HYBRID_GATEWAY_TLS_CERT:-}" ] && [ -n "${HYBRID_GATEWAY_TLS_KEY:-}" ]; then
+    # systemd (root) reads the READ-ONLY wildcard certs and exposes private
+    # copies at /run/credentials/<unit>/{cert,key} — no permission changes.
+    cat >> "$SYSTEMD_DIR/$GW_UNIT_NAME" <<EOF
+LoadCredential=cert:${HYBRID_GATEWAY_TLS_CERT}
+LoadCredential=key:${HYBRID_GATEWAY_TLS_KEY}
+EOF
+  fi
+  cat >> "$SYSTEMD_DIR/$GW_UNIT_NAME" <<EOF
 
 [Install]
 WantedBy=multi-user.target
 EOF
   if command -v systemd-analyze >/dev/null 2>&1; then
-    if UNIT_ERR="$(systemd-analyze verify "$SYSTEMD_DIR/speedtest-hybrid-gateway.service" 2>&1 | grep -v '^$' | head -5)"; [ -z "$UNIT_ERR" ]; then
+    if UNIT_ERR="$(systemd-analyze verify "$SYSTEMD_DIR/$GW_UNIT_NAME" 2>&1 | grep -v '^$' | head -5)"; [ -z "$UNIT_ERR" ]; then
       say "  systemd-analyze verify (hybrid): OK"
     else
       warn "systemd-analyze verify (hybrid) reported: $UNIT_ERR"
@@ -567,15 +628,13 @@ EOF
   sed -e "s/^HYBRID_GATEWAY_BIND=.*/HYBRID_GATEWAY_BIND=127.0.0.1/" \
       -e "s/^HYBRID_GATEWAY_PORT=.*/HYBRID_GATEWAY_PORT=$GW_PROBE_PORT/" \
       -e "/^HYBRID_GATEWAY_TLS_CERT=/d" -e "/^HYBRID_GATEWAY_TLS_KEY=/d" \
-      -e "/^HYBRID_RESULTS_FILE=/d" \
+      -e "/^HYBRID_RESULTS_FILE=/d" -e "/^HYBRID_ENV_FILE=/d" \
+      -e "/^HYBRID_WORKER_BUNDLE=/d" -e "/^HYBRID_WORKER_FP_FILE=/d" \
+      -e "/^HYBRID_VERSION_FILE=/d" \
       "$GW_ENV" > "$GW_PROBE_CFG"
-  # Node >= 20.6: --env-file. IMPORTANT: process-environment values take
-  # precedence over the file — and install.sh itself EXPORTED the .env into
-  # its own environment (env_load), so a plain subprocess would inherit e.g.
-  # HYBRID_GATEWAY_TLS_CERT and defeat the sed-strip below. The probe
-  # therefore launches with a CLEAN environment (env -i): the file + the two
-  # explicit overrides are the only sources. Values are parsed WITHOUT any
-  # shell evaluation.
+  # Node >= 20.6: --env-file. The probe launches with a CLEAN environment
+  # (env -i) so install.sh's own exported .env values cannot leak in and
+  # defeat the sed-strip above. Values are parsed WITHOUT shell evaluation.
   env -i PATH="$PATH" HOME="${HOME:-/root}" \
     HYBRID_GATEWAY_PORT="$GW_PROBE_PORT" HYBRID_GATEWAY_BIND=127.0.0.1 \
     "$(command -v node)" --env-file="$GW_PROBE_CFG" "$HYBRID_PREFIX/src/gateway.mjs" > "$GW_PROBE_LOG" 2>&1 &
@@ -597,7 +656,7 @@ const req = http.get({ host: '127.0.0.1', port: +process.argv[1], path: '/api/he
   let d = '';
   res.on('data', (c) => { d += c; });
   res.on('end', () => {
-    try { const j = JSON.parse(d); console.log(j.server + ' vpsDlShare=' + (j.front && j.front.assist ? j.front.assist.vpsDlShare : 'front-off')); process.exit(0); }
+    try { const j = JSON.parse(d); console.log(j.server + ' mode=' + j.mode + ' vpsDlShare=' + (j.front && j.front.assist ? j.front.assist.vpsDlShare : 'front-off')); process.exit(0); }
     catch { console.error('bad health body'); process.exit(1); }
   });
 });
@@ -610,23 +669,15 @@ setTimeout(() => { req.destroy(); process.exit(1); }, 5000);
 fi
 
 # ------------------------------------------------- cloudflare workers -----
-# Deploys the 1..N worker pool (N = CF_WORKER_DEPLOY_COUNT from .env) with
-# wrangler, sets HYBRID_SHARED_SECRET on EVERY worker, verifies /__meta.
-# Skipped by --no-workers or CF_WORKER_DEPLOY_COUNT=0.
+# v1.5: builds the esbuild bundle once, then converges the deployed 1..N
+# pool (N = CF_WORKER_DEPLOY_COUNT from .env) through the Cloudflare REST
+# API — fast (parallel), fingerprint-gated (unchanged deployments are
+# skipped), and the SAME code path the gateway uses for on-the-fly sync.
+# Fallback: wrangler deploy-pool.sh (REST_DEPLOY=0 forces it).
+# Credentials that do not verify → VPS-ONLY fallback (the install completes;
+# fix .env and re-run to enable the hybrid lane).
 if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ] && [ "$NO_WORKERS" = 0 ] && [ "$CF_WORKER_DEPLOY_COUNT" != "0" ]; then
-  CF_MISSING=0
-  [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && { warn "  CLOUDFLARE_ACCOUNT_ID is empty in $ENV_FILE"; CF_MISSING=1; }
-  if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
-    if [ -z "${CLOUDFLARE_EMAIL:-}" ] || [ -z "${CLOUDFLARE_API_KEY:-}" ]; then
-      warn "  CLOUDFLARE_API_TOKEN empty AND CLOUDFLARE_EMAIL+CLOUDFLARE_API_KEY incomplete in $ENV_FILE"
-      CF_MISSING=1
-    fi
-  fi
-  if [ "$CF_MISSING" = 1 ]; then
-    fail "worker deployment requested (CF_WORKER_DEPLOY_COUNT=$CF_WORKER_DEPLOY_COUNT) but the Cloudflare credentials are incomplete — fill .env per docs/CLOUDFLARE_CREDENTIALS.md and re-run install.sh"
-  fi
-
-  # Pre-flight: verify the credentials actually authenticate (fast fail).
+  CF_AUTH_MODE="none"
   if command -v curl >/dev/null 2>&1; then
     say "Verifying Cloudflare credentials…"
     if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
@@ -634,19 +685,22 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ] && [ "$NO_WORKERS" = 0 ] && [ "$CF
         https://api.cloudflare.com/client/v4/user/tokens/verify || true)"
       if echo "$CF_CHECK" | grep -q '"status":"active"'; then
         say "  API token: ACTIVE"
+        CF_AUTH_MODE="token"
       else
-        warn "  API token did not verify as active — wrangler will surface any auth error"
+        warn "  API token did not verify as active — trying the Global API Key method"
       fi
-    else
+    fi
+    if [ "$CF_AUTH_MODE" = "none" ] && [ -n "${CLOUDFLARE_EMAIL:-}" ] && [ -n "${CLOUDFLARE_API_KEY:-}" ]; then
       CF_CHECK="$(curl -s -m 20 -H "X-Auth-Email: ${CLOUDFLARE_EMAIL}" -H "X-Auth-Key: ${CLOUDFLARE_API_KEY}" \
         https://api.cloudflare.com/client/v4/user || true)"
       if echo "$CF_CHECK" | grep -q '"success":true'; then
         say "  Global API Key: OK (user ${CLOUDFLARE_EMAIL})"
+        CF_AUTH_MODE="key"
       else
-        warn "  Global API Key check failed — wrangler will surface any auth error"
+        warn "  Global API Key check failed"
       fi
     fi
-    if [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+    if [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ "$CF_AUTH_MODE" != "none" ]; then
       CF_ACC="$(curl -s -m 20 ${CLOUDFLARE_API_TOKEN:+-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"} \
         ${CLOUDFLARE_EMAIL:+-H "X-Auth-Email: ${CLOUDFLARE_EMAIL}"} ${CLOUDFLARE_API_KEY:+-H "X-Auth-Key: ${CLOUDFLARE_API_KEY}"} \
         https://api.cloudflare.com/client/v4/accounts || true)"
@@ -656,55 +710,191 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ] && [ "$NO_WORKERS" = 0 ] && [ "$CF
         warn "  account id ${CLOUDFLARE_ACCOUNT_ID} not visible with these credentials (token account-resource scoping?)"
       fi
     fi
+  else
+    warn "curl not available — skipping credential verification"
+    [ -n "${CLOUDFLARE_API_TOKEN:-}" ] && CF_AUTH_MODE="token"
+    { [ -z "$CF_AUTH_MODE" ] || [ "$CF_AUTH_MODE" = "none" ]; } && [ -n "${CLOUDFLARE_EMAIL:-}" ] && [ -n "${CLOUDFLARE_API_KEY:-}" ] && CF_AUTH_MODE="key"
   fi
 
-  say "Installing worker deploy toolchain (npm ci in hybrid/worker)…"
-  ( cd "$REPO_ROOT/hybrid/worker" && npm ci --no-audit --no-fund >/dev/null 2>&1 ) \
-    || fail "npm ci failed in hybrid/worker (wrangler toolchain)"
+  if [ "$CF_AUTH_MODE" = "none" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+    warn "==================================================================="
+    warn " VPS-ONLY FALLBACK: no usable Cloudflare credential in $ENV_FILE."
+    warn " The daemon + gateway are installed and fully functional — every"
+    warn " measurement is served by the VPS at full speed. To enable the"
+    warn " hybrid Cloudflare lane: fix the credentials in .env (see"
+    warn " docs/CLOUDFLARE_CREDENTIALS.md) and re-run install.sh."
+    warn "==================================================================="
+    NO_WORKERS=1
+  fi
+fi
 
-  say "Deploying Cloudflare worker pool: 1..${CF_WORKER_DEPLOY_COUNT}…"
-  ( cd "$REPO_ROOT/hybrid/worker" && \
-    POOL_SIZE="$CF_WORKER_DEPLOY_COUNT" \
-    CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-}" \
-    CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN:-}" \
-    CLOUDFLARE_EMAIL="${CLOUDFLARE_EMAIL:-}" \
-    CLOUDFLARE_API_KEY="${CLOUDFLARE_API_KEY:-}" \
-    HYBRID_SHARED_SECRET="${HYBRID_SHARED_SECRET:-}" \
-    VERIFY="${CF_WORKER_VERIFY:-1}" \
-    bash deploy-pool.sh ) \
-    || fail "worker pool deployment failed — the VPS side (daemon + gateway) is already installed; fix the error above (usually credentials/scopes — see docs/CLOUDFLARE_CREDENTIALS.md) and re-run install.sh"
-  say "Worker pool deployed: 1..${CF_WORKER_DEPLOY_COUNT} (secret set on every worker)."
+if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ] && [ "$NO_WORKERS" = 0 ] && [ "$CF_WORKER_DEPLOY_COUNT" != "0" ]; then
+  say "Installing worker toolchain (npm ci in hybrid/worker)…"
+  ( cd "$REPO_ROOT/hybrid/worker" && npm ci --no-audit --no-fund >/dev/null 2>&1 ) \
+    || fail "npm ci failed in hybrid/worker"
+
+  say "Building the worker bundle (esbuild)…"
+  ( cd "$REPO_ROOT/hybrid/worker" \
+    && [ -x node_modules/.bin/esbuild ] \
+    && node_modules/.bin/esbuild src/index.ts --bundle --format=esm --outfile=dist/worker-bundle.js --log-level=warning ) \
+    || fail "esbuild bundle failed (is esbuild present in hybrid/worker/node_modules?)"
+  [ -s "$REPO_ROOT/hybrid/worker/dist/worker-bundle.js" ] || fail "worker bundle is empty"
+  mkdir -p "$HYBRID_PREFIX/worker/dist"
+  rsync -a --delete \
+    --exclude node_modules --exclude .wrangler \
+    "$REPO_ROOT/hybrid/worker/" "$HYBRID_PREFIX/worker/"
+  say "  bundle: $(wc -c < "$REPO_ROOT/hybrid/worker/dist/worker-bundle.js") bytes → $HYBRID_PREFIX/worker/dist/worker-bundle.js"
+
+  if [ "${REST_DEPLOY:-1}" = "1" ]; then
+    say "Deploying Cloudflare worker pool 1..${CF_WORKER_DEPLOY_COUNT} (REST, fingerprint-gated)…"
+    if ( cd "$REPO_ROOT/hybrid/worker" && \
+      POOL_SIZE="$CF_WORKER_DEPLOY_COUNT" \
+      CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-}" \
+      CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN:-}" \
+      CLOUDFLARE_EMAIL="${CLOUDFLARE_EMAIL:-}" \
+      CLOUDFLARE_API_KEY="${CLOUDFLARE_API_KEY:-}" \
+      CF_WORKER_NAME="${CF_WORKER_NAME:-speedtest-hybrid-worker}" \
+      CF_WORKERS_SUBDOMAIN="${CF_WORKERS_SUBDOMAIN:-}" \
+      HYBRID_SHARED_SECRET="${HYBRID_SHARED_SECRET:-}" \
+      FP_FILE="$HYBRID_STATE/deployed.pool.sha" \
+      VERIFY="${CF_WORKER_VERIFY:-1}" \
+      node rest-deploy.mjs ); then
+      say "Worker pool converged: 1..${CF_WORKER_DEPLOY_COUNT} (secret set on every worker)."
+    else
+      warn "REST deploy failed — falling back to wrangler deploy-pool.sh"
+      ( cd "$REPO_ROOT/hybrid/worker" && \
+        POOL_SIZE="$CF_WORKER_DEPLOY_COUNT" \
+        CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-}" \
+        CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN:-}" \
+        CLOUDFLARE_EMAIL="${CLOUDFLARE_EMAIL:-}" \
+        CLOUDFLARE_API_KEY="${CLOUDFLARE_API_KEY:-}" \
+        CF_WORKERS_SUBDOMAIN="${CF_WORKERS_SUBDOMAIN:-}" \
+        HYBRID_SHARED_SECRET="${HYBRID_SHARED_SECRET:-}" \
+        VERIFY="${CF_WORKER_VERIFY:-1}" \
+        bash deploy-pool.sh ) \
+        || fail "worker pool deployment failed — the VPS side (daemon + gateway) is already installed; fix the error above (usually credentials/scopes — see docs/CLOUDFLARE_CREDENTIALS.md) and re-run install.sh"
+      say "Worker pool deployed via wrangler: 1..${CF_WORKER_DEPLOY_COUNT}."
+    fi
+  else
+    say "Deploying Cloudflare worker pool 1..${CF_WORKER_DEPLOY_COUNT} (wrangler, REST_DEPLOY=0)…"
+    ( cd "$REPO_ROOT/hybrid/worker" && \
+      POOL_SIZE="$CF_WORKER_DEPLOY_COUNT" \
+      CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-}" \
+      CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN:-}" \
+      CLOUDFLARE_EMAIL="${CLOUDFLARE_EMAIL:-}" \
+      CLOUDFLARE_API_KEY="${CLOUDFLARE_API_KEY:-}" \
+      CF_WORKERS_SUBDOMAIN="${CF_WORKERS_SUBDOMAIN:-}" \
+      HYBRID_SHARED_SECRET="${HYBRID_SHARED_SECRET:-}" \
+      VERIFY="${CF_WORKER_VERIFY:-1}" \
+      bash deploy-pool.sh ) \
+      || fail "worker pool deployment failed — the VPS side (daemon + gateway) is already installed; fix the error above and re-run install.sh"
+    say "Worker pool deployed via wrangler: 1..${CF_WORKER_DEPLOY_COUNT}."
+  fi
+fi
+
+# ----------------------------------------------------- auto-update units --
+# Daily self-update: git pull → reinstall → restart (docs/AUTO_UPDATE.md).
+if [ "$AS_ROOT" = 1 ] && [ -f "$REPO_ROOT/auto-update.sh" ]; then
+  say "Installing auto-update units (daily 04:30 + jitter, Persistent)…"
+  cat > "$SYSTEMD_DIR/speedtest-autoupdate.service" <<EOF
+[Unit]
+Description=SpeedtestServer daily auto-update (git pull + reinstall + restart)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash $REPO_ROOT/auto-update.sh
+Environment=AUTO_UPDATE_BRANCH=${AUTO_UPDATE_BRANCH:-master}
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=3600
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  cat > "$SYSTEMD_DIR/speedtest-autoupdate.timer" <<EOF
+[Unit]
+Description=Run the SpeedtestServer auto-update daily
+
+[Timer]
+OnCalendar=*-*-* 04:30:00
+RandomizedDelaySec=30min
+Persistent=true
+AccuracySec=1min
+Unit=speedtest-autoupdate.service
+
+[Install]
+WantedBy=timers.target
+EOF
+  if command -v systemd-analyze >/dev/null 2>&1; then
+    UNIT_ERR="$(systemd-analyze verify "$SYSTEMD_DIR/speedtest-autoupdate.service" "$SYSTEMD_DIR/speedtest-autoupdate.timer" 2>&1 | grep -v '^$' | head -5 || true)"
+    [ -z "$UNIT_ERR" ] && say "  systemd-analyze verify (autoupdate): OK" || warn "systemd-analyze verify (autoupdate) reported: $UNIT_ERR"
+  fi
+  say "  timer enabled: speedtest-autoupdate.timer (systemctl list-timers to verify)"
+fi
+
+# ------------------------------------------------------------ legacy purge -
+# v1.5: the project binds 8080/5060 ONLY. Remove the old port-80 legacy unit
+# (this project's own speedtestserver-legacy) and any stray legacy-http.js
+# instance of ours. Unrelated services are never touched.
+if [ "$AS_ROOT" = 1 ]; then
+  if systemctl list-unit-files 2>/dev/null | grep -q '^speedtestserver-legacy'; then
+    say "Purging the legacy port-80 unit (speedtestserver-legacy)…"
+    systemctl disable --now speedtestserver-legacy.service 2>/dev/null || true
+    rm -f "$SYSTEMD_DIR/speedtestserver-legacy.service"
+    systemctl daemon-reload
+    say "  speedtestserver-legacy removed (the daemon serves 8080/5060 only)"
+  fi
+  STRAY="$(pgrep -f 'legacy-http\.js' 2>/dev/null || true)"
+  if [ -n "$STRAY" ]; then
+    say "Stopping stray legacy-http.js instance(s): $(echo "$STRAY" | tr '\n' ' ')"
+    pkill -f 'legacy-http\.js' 2>/dev/null || true
+  fi
 fi
 
 # ------------------------------------------------------------ systemctl ----
 if [ "$AS_ROOT" = 1 ]; then
   systemctl daemon-reload
   if [ "$SYSTEMD_AVAILABLE" = 1 ]; then
-    if [ "$START" = 1 ]; then
-      say "Enabling + starting speedtestserver.service…"
-      systemctl enable --now speedtestserver
-      sleep 2
-      systemctl --no-pager --lines=5 status speedtestserver || true
-      say "Service started. Logs: journalctl -u speedtestserver -f"
-      if [ "$NO_HYBRID" = 0 ]; then
-        say "Enabling + starting speedtest-hybrid-gateway.service…"
-        systemctl enable --now speedtest-hybrid-gateway
-        sleep 2
-        systemctl --no-pager --lines=5 status speedtest-hybrid-gateway || true
-        say "Hybrid gateway started. Logs: journalctl -u speedtest-hybrid-gateway -f"
-        if command -v curl >/dev/null 2>&1; then
-          GW_PORT_LIVE="${HYBRID_GATEWAY_PORT:-8790}"
-          GW_TLS_LIVE="${HYBRID_GATEWAY_TLS_CERT:-}"
-          GW_PROTO="http"
-          [ -n "$GW_TLS_LIVE" ] && GW_PROTO="https"
-          say "Live health check: $GW_PROTO://127.0.0.1:$GW_PORT_LIVE/api/health"
-          curl -sk -m 10 "$GW_PROTO://127.0.0.1:$GW_PORT_LIVE/api/health" \
-            | head -c 400; echo
-        fi
+    # enable + (re)start: a re-install on an already-running unit RESTARTS it
+    # so the running code matches the freshly installed files.
+    for U in speedtestserver; do
+      if [ "$START" = 1 ] || systemctl is-active --quiet "$U"; then
+        say "Enabling + (re)starting $U…"
+        systemctl enable "$U" >/dev/null 2>&1 || true
+        systemctl restart "$U" || fail "failed to start $U"
       fi
-    else
-      say "Unit installed (not started — rerun with --start or: systemctl enable --now speedtestserver)"
-      [ "$NO_HYBRID" = 0 ] && say "Hybrid unit installed (start: systemctl enable --now speedtest-hybrid-gateway)"
+    done
+    sleep 2
+    if [ "$START" = 1 ] || systemctl is-active --quiet speedtest-hybrid-gateway; then
+      if [ "$NO_HYBRID" = 0 ] || systemctl list-unit-files | grep -q '^speedtest-hybrid-gateway'; then
+        say "Enabling + (re)starting speedtest-hybrid-gateway…"
+        systemctl enable speedtest-hybrid-gateway >/dev/null 2>&1 || true
+        systemctl restart speedtest-hybrid-gateway || fail "failed to start speedtest-hybrid-gateway"
+        sleep 2
+      fi
+    elif [ "$START" = 1 ] && [ "$NO_HYBRID" = 0 ]; then
+      say "Enabling + starting speedtest-hybrid-gateway…"
+      systemctl enable --now speedtest-hybrid-gateway || fail "failed to start speedtest-hybrid-gateway"
+      sleep 2
+    fi
+    if [ -f "$SYSTEMD_DIR/speedtest-autoupdate.timer" ]; then
+      systemctl enable speedtest-autoupdate.timer >/dev/null 2>&1 || true
+      systemctl start speedtest-autoupdate.timer 2>/dev/null || true
+    fi
+    systemctl --no-pager --lines=3 status speedtestserver 2>/dev/null | head -6 || true
+    say "Service logs: journalctl -u speedtestserver -f"
+    if systemctl is-active --quiet speedtest-hybrid-gateway; then
+      say "Hybrid gateway logs: journalctl -u speedtest-hybrid-gateway -f"
+      if command -v curl >/dev/null 2>&1; then
+        GW_PORT_LIVE="${HYBRID_GATEWAY_PORT:-8790}"
+        say "Live health check: https://127.0.0.1:$GW_PORT_LIVE/api/health"
+        curl -sk -m 10 "https://127.0.0.1:$GW_PORT_LIVE/api/health" | head -c 500; echo
+      fi
+    fi
+    if [ "$START" != 1 ]; then
+      say "Units installed. To start now: systemctl enable --now speedtestserver speedtest-hybrid-gateway"
     fi
   else
     warn "systemd not running in this environment — service NOT started (BLOCKED)."
@@ -718,10 +908,13 @@ else
   say "(staging mode never installs the hybrid gateway — use a system install for that)"
 fi
 
-say "Done. Upgrade: re-run this script (configuration and certificates are preserved)."
+say "Done (VERSION $APP_VERSION). Upgrade: re-run this script (configuration and certificates are preserved)."
 say "Recovery: systemctl restart speedtestserver  (or re-run with --start)"
 if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
   say "Hybrid recovery: systemctl restart speedtest-hybrid-gateway"
-  say "Pool status:   curl -sk ${HYBRID_GATEWAY_TLS_CERT:+-k }https://127.0.0.1:${HYBRID_GATEWAY_PORT:-8790}/api/pool"
-  say "Documentation: docs/HYBRID_ASSIST_MODE.md · docs/WORKER_POOL.md · docs/CLOUDFLARE_CREDENTIALS.md"
+  say "Pool status:   curl -sk https://127.0.0.1:${HYBRID_GATEWAY_PORT:-8790}/api/pool"
+  say "Worker sync:   curl -sk https://127.0.0.1:${HYBRID_GATEWAY_PORT:-8790}/api/workers"
+  say "On-the-fly:    edit .env — the running gateway applies it within seconds"
+  say "Auto-update:   systemctl list-timers speedtest-autoupdate.timer"
+  say "Documentation: docs/HYBRID_ASSIST_MODE.md · docs/WORKER_POOL.md · docs/CLOUDFLARE_CREDENTIALS.md · docs/AUTO_UPDATE.md"
 fi

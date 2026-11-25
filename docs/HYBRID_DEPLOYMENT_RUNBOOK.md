@@ -66,7 +66,7 @@ HYBRID_RESULTS_DEDUP_MS=3600000   # G-9
 
 1. Salin `gateway.mjs` baru ke `/opt/speedtest-hybrid/gateway/`
 2. `systemctl restart speedtest-hybrid-gateway` (unit lain TIDAK ikut restart)
-3. Verifikasi PID keempat unit produksi tidak berubah: `systemctl show speedtestserver speedtestserver-legacy nperf-server ookla-capture -p MainPID,NRestarts`
+3. Verifikasi PID keempat unit produksi tidak berubah: `systemctl show speedtestserver speedtestserver-legacy layanan-lain ookla-capture -p MainPID,NRestarts`
 
 ## 4. Worker di Cloudflare (TERDEPLOY 24 November 2026 - status produksi)
 

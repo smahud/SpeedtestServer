@@ -29,3 +29,8 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
+# v1.5: when TLS is configured, install.sh emits a unit with:
+#   LoadCredential=cert:/var/lib/speedtestserver/certs/fullchain.pem
+#   LoadCredential=key:/var/lib/speedtestserver/certs/privkey.pem
+# and gateway.env points at /run/credentials/speedtest-hybrid-gateway.service/{cert,key}
+# (the unprivileged service user never touches the 0600 privkey directly).

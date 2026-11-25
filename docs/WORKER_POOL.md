@@ -123,3 +123,23 @@ curl -s https://speedtest.lumajangnetworks.my.id:8790/api/pool   # status live
 - Hapus sibling: `npx wrangler delete --name speedtest-hybrid-worker-N` (jangan hapus primary).
 - Deflection mati total: set `WORKER_DEFLECT_CONCURRENCY=999999` (var per worker) atau `HYBRID_WORKER_POOL_MAX=1` di gateway.
 - Observasi: `journalctl -u speedtest-hybrid-gateway | grep pool_` (event `pool_scaled_up/down`, `pool_canary_backoff`, `pool_deflect`).
+
+## v1.5: On-the-fly pool sync
+
+The deployed pool size follows `.env` LIVE — `CF_WORKER_DEPLOY_COUNT` is
+watched by the gateway and applied within seconds (default poll 2 s):
+
+- **grow**: missing workers are deployed via the Cloudflare REST API
+  (6 concurrent PUTs, shared secret set on every worker)
+- **shrink**: surplus workers (highest ids, never worker 1) are deleted —
+  set `HYBRID_WORKER_SYNC_DELETE=false` in `.env` to disable deletions
+- **rotate**: a changed worker bundle / shared secret / pool config
+  (deployment fingerprint) triggers a full redeploy
+- **credentials**: fixing a token/key in `.env` re-authenticates on the
+  fly and re-converges the pool
+
+Watch it happen:
+```bash
+journalctl -u speedtest-hybrid-gateway -f | grep -E "env_change_applied|worker_sync"
+curl -sk https://127.0.0.1:8790/api/workers
+```

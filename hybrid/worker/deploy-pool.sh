@@ -149,9 +149,8 @@ if [[ "$VERIFY" == "1" ]]; then
 fi
 
 echo ""
-echo "NEXT (VPS side — needs shell access):"
-echo "  1. Update /opt/speedtest-hybrid (pull master), keep gateway.env,"
-echo "     add: HYBRID_WORKER_POOL_MAX=${POOL_SIZE} HYBRID_WORKER_ACTIVE_MIN=2"
-echo "  2. systemctl restart speedtest-hybrid-gateway"
-echo "  3. Watch: journalctl -u speedtest-hybrid-gateway -f | grep pool_"
-echo "     and: curl -s https://speedtest.lumajangnetworks.my.id:8790/api/pool"
+echo ""
+echo "NOTE (v1.5): the fast REST deploy path is hybrid/worker/rest-deploy.mjs —"
+echo "  install.sh uses it by default (this wrangler script is the fallback;"
+echo "  REST_DEPLOY=0 forces it). The gateway's on-the-fly worker sync also"
+echo "  uses the REST module."
