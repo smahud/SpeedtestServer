@@ -84,6 +84,20 @@ above is the research summary; this section is the operator quickstart.
   speedtest front enabled via `HYBRID_FRONT_ENABLED=true`, listening on
   port 8790 (TLS).
 
+### Worker pool mode (100 workers, smart activation)
+
+Deploy 1..100 copies of the same Worker (`speedtest-hybrid-worker`, `-2` …
+`-100` — the Free-plan script cap) with `bash hybrid/worker/deploy-pool.sh`
+(needs `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and the
+`HYBRID_SHARED_SECRET` value). The VPS gateway then routes traffic smartly:
+its autoscaler activates more workers as the token-mint rate rises
+(canary-gated), benches broken ones, and each worker autonomously deflects
+authenticated requests to a sibling when it senses saturation
+(302/307 + hop guard). Pool size and thresholds are env-tuned on the VPS
+(`HYBRID_WORKER_POOL_MAX` … — see `docs/WORKER_POOL.md`). Full design,
+limits (100k requests/day is ACCOUNT-wide — a pool distributes, it does not
+multiply), and evidence: [`docs/WORKER_POOL.md`](docs/WORKER_POOL.md).
+
 ### Creating the Cloudflare Worker
 
 Prerequisites: a Cloudflare account (the Free plan works), Node.js + wrangler

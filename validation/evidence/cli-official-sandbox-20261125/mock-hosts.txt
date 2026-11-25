@@ -1,0 +1,15 @@
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+fe00::0	ip6-mcastprefix
+fe00::1	ip6-allnodes
+45.126.249.250 speedtest.somedigit.net
+45.126.249.250 speedtest-sby.xl.co.id
+45.126.249.250 speedtest.patas.id
+45.126.249.250 speedtest.tuxsnet.id
+45.126.249.250 ookla.sub.atharva.co.id
+45.126.249.250 speedtest.era.net.id
+45.126.249.250 speedtest2.lintasmediasolusindo.com
+45.126.249.250 v137170.faznet.co.id
+45.126.249.250 sby.speedtest.ring.net.id
+127.0.0.1 results.speedtest.net
