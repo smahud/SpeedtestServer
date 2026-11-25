@@ -40,6 +40,15 @@ export interface Env {
    *  G-6/Free CPU: per-command console.log on hot paths costs CPU. Session
    *  open/close, transfers and errors are always logged. */
   WORKER_VERBOSE_LOGS?: string;
+  /** Worker-pool identity: this deployment's 1-based index in the pool
+   *  (worker 1 = the canonical primary script). Default "1". */
+  WORKER_ID?: string;
+  /** Worker-pool size this deployment knows about (siblings 2..N exist).
+   *  Drives autonomous deflection routing. Default "1" (no siblings). */
+  WORKER_POOL_MAX?: string;
+  /** Per-isolate in-flight requests above which an AUTHENTICATED request is
+   *  deflected to the next sibling worker (smart-pool mutual help). Default 6. */
+  WORKER_DEFLECT_CONCURRENCY?: string;
 }
 
 export const DEFAULTS = {

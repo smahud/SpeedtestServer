@@ -64,4 +64,15 @@ TOKEN_TEST_SECRET="$TEST_SECRET" node test/token-tests.mjs "http://127.0.0.1:$PO
 TOKEN_TEST_SECRET="$TEST_SECRET" TEST_MAX_DL="$PHASE2_DL" TEST_MAX_UL="$PHASE2_UL" \
   node test/free-hardening-tests.mjs "http://127.0.0.1:$PORT_SECRET" || FAIL=1
 
+echo ""
+echo "=== phase 3: worker-pool features (deflection + identity) :$PORT_SECRET ==="
+cleanup
+sleep 2
+WRANGLER_SEND_METRICS=false CI=true nohup $WRANGLER dev --port "$PORT_SECRET" --ip 127.0.0.1 \
+  --var HYBRID_SHARED_SECRET:"$TEST_SECRET" \
+  --var WORKER_ID:1 --var WORKER_POOL_MAX:2 --var WORKER_DEFLECT_CONCURRENCY:0 \
+  > /tmp/hybrid-worker-pool.log 2>&1 &
+wait_ready "$PORT_SECRET" || { echo "pool-mode worker failed to start"; tail -20 /tmp/hybrid-worker-pool.log; exit 1; }
+TOKEN_TEST_SECRET="$TEST_SECRET" node test/pool-tests.mjs "http://127.0.0.1:$PORT_SECRET" || FAIL=1
+
 exit $FAIL

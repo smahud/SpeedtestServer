@@ -74,12 +74,33 @@ function wsSession(url) {
     ws.binaryType = 'arraybuffer';
     const queue = [];
     const waiters = [];
+    // BUG FIX (2026-11-25): a timed-out waiter used to stay in the list and
+    // swallow the NEXT message into the dead promise — desyncing the whole
+    // session. Timeouts now remove their waiter before rejecting.
     ws.addEventListener('message', (ev) => {
       const item = typeof ev.data === 'string' ? { text: ev.data } : { bin: new Uint8Array(ev.data) };
       if (waiters.length) waiters.shift()(item);
       else queue.push(item);
     });
-    ws.addEventListener('open', () =>
+    // BUG FIX: the open-timeout timer kept firing into a settled promise —
+    // cleared on open/error now.
+    let settled = false;
+    let openTimer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        reject(new Error('probe: ws open timeout'));
+      }
+    }, 8000);
+    const clearOpenTimer = () => {
+      if (openTimer) {
+        clearTimeout(openTimer);
+        openTimer = null;
+      }
+    };
+    ws.addEventListener('open', () => {
+      clearOpenTimer();
+      if (settled) return;
+      settled = true;
       resolve({
         ws,
         sendText: (s) => ws.send(s),
@@ -87,17 +108,28 @@ function wsSession(url) {
         next: (timeoutMs = 15000) =>
           new Promise((res, rej) => {
             if (queue.length) return res(queue.shift());
-            const t = setTimeout(() => rej(new Error('probe: ws message timeout')), timeoutMs);
-            waiters.push((item) => {
+            let waiter = null;
+            const t = setTimeout(() => {
+              const idx = waiter ? waiters.indexOf(waiter) : -1;
+              if (idx !== -1) waiters.splice(idx, 1); // remove the stale waiter
+              rej(new Error('probe: ws message timeout'));
+            }, timeoutMs);
+            waiter = (item) => {
               clearTimeout(t);
               res(item);
-            });
+            };
+            waiters.push(waiter);
           }),
         close: () => ws.close(),
-      }),
-    );
-    ws.addEventListener('error', () => reject(new Error('probe: ws error')));
-    setTimeout(() => reject(new Error('probe: ws open timeout')), 8000);
+      });
+    });
+    ws.addEventListener('error', () => {
+      clearOpenTimer();
+      if (!settled) {
+        settled = true;
+        reject(new Error('probe: ws error'));
+      }
+    });
   });
 }
 

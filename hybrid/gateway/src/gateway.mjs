@@ -9,6 +9,9 @@
  *   - result intake:  POST /api/results   — measurement records land here
  *   - latency plane:  GET  /api/ping      — TTFB-style timestamp echo on the
  *                     VPS path (the UDP echo/jitter plane stays on STS :8080)
+ *   - worker pool:    GET  /api/pool      — smart worker-pool status (see
+ *                     workerpool.mjs — the "VPS memegang kendali worker"
+ *                     control plane for the 1..100 Worker pool)
  *
  * The payload data plane (DOWNLOAD/UPLOAD bytes) NEVER transits this
  * service — that is the entire point of the hybrid split.
@@ -34,6 +37,11 @@
  *   HYBRID_RESULTS_DEDUP_MS   default 3600000 — duplicate result POSTs for the
  *                             same guid within this window get the same
  *                             response and are logged once (G-9)
+ *   HYBRID_SESSIONS_RATE_LIMIT_MPM default 60 — per-IP token-mint rate limit on
+ *                             /api/sessions (BUG FIX: this endpoint was an
+ *                             unthrottled token fountain that could burn the
+ *                             account's daily Worker quota)
+ *   HYBRID_WORKER_* / HYBRID_CF_*   see workerpool.mjs (worker pool control)
  */
 
 import http from 'node:http';
@@ -41,6 +49,7 @@ import https from 'node:https';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { createFront } from './front.mjs';
+import { createWorkerPool, createRateLimiter } from './workerpool.mjs';
 
 const PORT = Number(process.env.HYBRID_GATEWAY_PORT || 8090);
 const BIND = process.env.HYBRID_GATEWAY_BIND || '127.0.0.1';
@@ -55,6 +64,7 @@ const TOKEN_BIND_IP = String(process.env.HYBRID_TOKEN_BIND_IP || '') === 'true';
 const DISCOVERY_FALLBACK = String(process.env.HYBRID_DISCOVERY_FALLBACK || '') === 'true';
 const RESULTS_FILE = process.env.HYBRID_RESULTS_FILE || '';
 const RESULTS_DEDUP_MS = Number(process.env.HYBRID_RESULTS_DEDUP_MS || 3600000);
+const SESSIONS_RATE_LIMIT_MPM = Number(process.env.HYBRID_SESSIONS_RATE_LIMIT_MPM ?? 60);
 
 // --- speedtest front (legacy HTTP surface with edge offload) ---
 const FRONT_ENABLED = String(process.env.HYBRID_FRONT_ENABLED || '') === 'true';
@@ -70,6 +80,9 @@ const instanceId = crypto.randomUUID();
 function log(kind, detail = {}) {
   console.log(JSON.stringify({ ts: Date.now(), kind, ...detail }));
 }
+
+// --- worker pool ("VPS memegang kendali worker": 1..100 smart activation) --
+const pool = createWorkerPool({ base: WORKER_BASE, log });
 
 // --- token minting (format shared with hybrid/worker/src/token.ts) ---------
 // G-1: by default the token is NOT bound to a socket IP ('*'), so clients
@@ -93,27 +106,48 @@ function verifyToken(token, ip) {
   const expMs = Number(expStr);
   if (!Number.isFinite(expMs)) return { ok: false, reason: 'bad-exp' };
   const expect = crypto.createHmac('sha256', SECRET).update(`${v}|${guid}|${expStr}|${tip}`).digest('hex');
-  if (expect !== sig) return { ok: false, reason: 'bad-signature' };
+  // BUG FIX: plain !== short-circuits at the first differing byte (signature
+  // comparison side channel). Constant-time compare with a length guard.
+  const a = Buffer.from(expect, 'utf8');
+  const b = Buffer.from(String(sig), 'utf8');
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return { ok: false, reason: 'bad-signature' };
   if (Date.now() > expMs) return { ok: false, reason: 'expired' };
   if (tip !== '*' && ip && tip !== ip) return { ok: false, reason: 'ip-mismatch' };
   return { ok: true, guid };
 }
 
-function readBody(req) {
+/** Mint a session token routed to a pool-selected worker. */
+function mintSessionToken(ip) {
+  const worker = pool.pickWorker();
+  pool.recordMint(worker.id);
+  const minted = mintToken(TOKEN_BIND_IP ? ip : '*');
+  return { ...minted, worker };
+}
+
+function readBody(req, limitBytes = 1024 * 1024) {
   return new Promise((resolve) => {
+    // BUG FIX: the old path destroyed the socket IMMEDIATELY on overflow —
+    // the 413/400 response written afterwards went into a destroyed socket
+    // and the client saw a connection reset instead of a status. The socket
+    // is now torn down only after the response has flushed.
     const chunks = [];
     let total = 0;
+    let destroyed = false;
     req.on('data', (c) => {
       total += c.length;
-      if (total > 1024 * 1024) {
-        req.destroy();
-        resolve(null);
+      if (total > limitBytes) {
+        if (!destroyed) {
+          destroyed = true;
+          resolve({ overLimit: true, body: null });
+          // Stop reading; the caller responds, then destroys on finish.
+          req.pause();
+        }
         return;
       }
       chunks.push(c);
     });
-    req.on('end', () => resolve(Buffer.concat(chunks)));
-    req.on('error', () => resolve(null));
+    req.on('end', () => resolve({ overLimit: false, body: Buffer.concat(chunks) }));
+    req.on('error', () => resolve({ overLimit: false, body: Buffer.concat(chunks) }));
   });
 }
 
@@ -124,16 +158,22 @@ function json(res, status, obj) {
     'Content-Type': 'application/json',
     'Content-Length': body.length,
     'Cache-Control': 'no-store, no-transform',
-    'X-Hybrid-Gateway': '1.1',
+    'X-Hybrid-Gateway': '1.2',
   });
   res.end(body);
 }
 
 // --- the discovery document: the role split of the hybrid architecture -----
 function serversDocument() {
+  const primary = pool.primaryUrl;
   const throughput = {
-    primary: { url: `${WORKER_BASE}/ws`, transport: 'wss-netgauge', description: 'NetGauge over WebSocket at the edge' },
-    http: { url: `${WORKER_BASE}/__down`, upload: `${WORKER_BASE}/__up`, transport: 'http-streaming' },
+    primary: { url: `${primary}/ws`, transport: 'wss-netgauge', description: 'NetGauge over WebSocket at the edge' },
+    http: { url: `${primary}/__down`, upload: `${primary}/__up`, transport: 'http-streaming' },
+    pool: {
+      description: 'Smart worker pool — POST /api/sessions returns the assigned worker; GET /api/pool returns the live pool state',
+      activeCount: pool.status().activeCount,
+      max: pool.status().poolMax,
+    },
   };
   // G-3 / K-7: the STS /ws fallback is opt-in and OFF by default — no mass
   // fallback of throughput traffic to the VPS.
@@ -148,7 +188,7 @@ function serversDocument() {
       latency: {
         vpsTtfb: `${VPS_BASE}/api/ping`,
         vpsUdpLoss: `${STS_BASE.replace(/^https?:\/\//, '')} (NetGauge UDP LOSS/RECV via SpeedtestServer)`,
-        edgeTtfb: `${WORKER_BASE}/__down?bytes=0`,
+        edgeTtfb: `${primary}/__down?bytes=0`,
         description: 'UDP jitter/loss and stable-identity latency stay on the VPS; edge TTFB is a comparative metric',
       },
       throughput,
@@ -170,13 +210,43 @@ function rememberResult(guid, response) {
   }
 }
 
+/** Append a result record to the JSONL log (async, failure-isolated). */
+function appendResultRecord(record) {
+  if (!RESULTS_FILE) return;
+  // BUG FIX: appendFileSync threw synchronously inside the async handler on
+  // any I/O error (disk full / bad path) and killed the process.
+  fs.appendFile(RESULTS_FILE, JSON.stringify(record) + '\n', (err) => {
+    if (err) log('result_log_error', { error: String(err).slice(0, 200) });
+  });
+}
+
+// Per-IP rate limit for /api/sessions (BUG FIX: unthrottled token fountain).
+const sessionsLimiter = createRateLimiter(SESSIONS_RATE_LIMIT_MPM);
+
 // The front router (only when enabled). Shares mintToken/counters/logging.
 const front = FRONT_ENABLED
-  ? createFront({ mintToken, log, counters, workerBase: WORKER_BASE, rateLimitMpm: FRONT_RATE_LIMIT_MPM, maxDownBytes: FRONT_MAX_DOWN_BYTES })
+  ? createFront({
+      mintToken,
+      log,
+      counters,
+      workerBase: WORKER_BASE,
+      pool,
+      rateLimitMpm: FRONT_RATE_LIMIT_MPM,
+      maxDownBytes: FRONT_MAX_DOWN_BYTES,
+      tokenBindIp: TOKEN_BIND_IP,
+    })
   : null;
 
 const requestHandler = async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  // BUG FIX (crash): a malformed Host header made the WHATWG URL constructor
+  // throw synchronously inside the async handler → unhandled rejection →
+  // process death (Node ≥15 default). Parse defensively.
+  let url;
+  try {
+    url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  } catch {
+    return json(res, 400, { error: 'bad-request' });
+  }
   let ip = req.socket.remoteAddress || '127.0.0.1';
   if (ip.startsWith('::ffff:')) ip = ip.slice(7); // normalize IPv4-mapped IPv6
 
@@ -192,8 +262,19 @@ const requestHandler = async (req, res) => {
     if (handled) return;
   }
 
-  const body = ['POST', 'PUT'].includes(req.method) ? await readBody(req) : null;
-  if (body) counters.bytesIn += body.length;
+  const isBodyMethod = req.method === 'POST' || req.method === 'PUT';
+  let body = null;
+  if (isBodyMethod) {
+    const r = await readBody(req);
+    if (r.overLimit) {
+      // Respond FIRST, then tear the socket down after the response flushed.
+      json(res, 413, { error: 'payload too large' });
+      res.on('finish', () => req.destroy());
+      return;
+    }
+    body = r.body;
+    if (body) counters.bytesIn += body.length;
+  }
   const path = url.pathname.replace(/\/+$/, '') || '/';
 
   if (path === '/api/servers' && req.method === 'GET') {
@@ -203,10 +284,27 @@ const requestHandler = async (req, res) => {
 
   if (path === '/api/sessions' && req.method === 'POST') {
     if (!SECRET) return json(res, 500, { error: 'HYBRID_SHARED_SECRET not configured' });
+    // BUG FIX: rate limit — this endpoint minted unlimited 5-minute wildcard
+    // tokens (each spendable at the edge up to the per-request caps), an
+    // easy account-quota burn vector.
+    if (!sessionsLimiter.allow(ip)) {
+      log('sessions_rate_limited', { ip });
+      return json(res, 429, { error: 'rate-limited', retryAfterMs: 60000 });
+    }
+    if (pool.quotaBlocksMint()) {
+      log('sessions_quota_blocked', { ip });
+      return json(res, 503, { error: 'worker-quota-exhausted', retryAfterMs: 60000 });
+    }
     counters.sessions++;
-    const { token, guid, expMs } = mintToken(ip);
-    log('session_minted', { guid, ip, expMs, bound: TOKEN_BIND_IP });
-    return json(res, 200, { token, guid, expiresAt: new Date(expMs).toISOString(), endpoints: serversDocument().roles });
+    const { token, guid, expMs, worker } = mintSessionToken(ip);
+    log('session_minted', { guid, ip, expMs, bound: TOKEN_BIND_IP, workerId: worker.id });
+    return json(res, 200, {
+      token,
+      guid,
+      expiresAt: new Date(expMs).toISOString(),
+      worker: { id: worker.id, url: worker.url },
+      endpoints: serversDocument().roles,
+    });
   }
 
   if (path === '/api/ping' && req.method === 'GET') {
@@ -224,8 +322,16 @@ const requestHandler = async (req, res) => {
     } catch {
       return json(res, 400, { error: 'invalid json' });
     }
+    // BUG FIX (verified crash): JSON.parse('null') returns null — the old
+    // code dereferenced payload.token and killed the process.
+    if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
+      return json(res, 400, { error: 'invalid json' });
+    }
     const v = verifyToken(payload.token, ip);
     if (!v.ok) return json(res, 401, { error: 'unauthorized', reason: v.reason });
+    // Optional worker feedback: a client reporting which worker served it.
+    if (typeof payload.workerId === 'number' && payload.workerOk === false) pool.recordWorkerError(payload.workerId);
+    if (typeof payload.workerId === 'number' && payload.workerOk === true) pool.recordWorkerOk(payload.workerId, -1);
     const guid = v.guid || payload.guid || null;
     const mem = guid ? resultMemory.get(guid) : null;
     if (mem && mem.expiresAt > Date.now()) {
@@ -244,15 +350,17 @@ const requestHandler = async (req, res) => {
     const response = { ok: true, guid };
     rememberResult(guid, response);
     log('result_accepted', { guid, ip });
-    if (RESULTS_FILE) {
-      fs.appendFileSync(RESULTS_FILE, JSON.stringify(record) + '\n');
-    }
+    appendResultRecord(record);
     return json(res, 200, response);
+  }
+
+  if (path === '/api/pool' && req.method === 'GET') {
+    return json(res, 200, pool.status());
   }
 
   if (path === '/api/health' && req.method === 'GET') {
     return json(res, 200, {
-      server: 'hybrid-gateway/1.1',
+      server: 'hybrid-gateway/1.2',
       instanceId,
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
       counters,
@@ -273,7 +381,8 @@ const requestHandler = async (req, res) => {
             },
           }
         : { enabled: false },
-      config: { workerBase: WORKER_BASE, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: TTL_MS, tokenBindIp: TOKEN_BIND_IP, discoveryFallback: DISCOVERY_FALLBACK, tls: Boolean(TLS_CERT), resultsDedupMs: RESULTS_DEDUP_MS, secretConfigured: Boolean(SECRET) },
+      pool: pool.status(),
+      config: { workerBase: WORKER_BASE, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: TTL_MS, tokenBindIp: TOKEN_BIND_IP, discoveryFallback: DISCOVERY_FALLBACK, tls: Boolean(TLS_CERT), resultsDedupMs: RESULTS_DEDUP_MS, secretConfigured: Boolean(SECRET), sessionsRateLimitMpm: SESSIONS_RATE_LIMIT_MPM },
     });
   }
 
@@ -286,12 +395,33 @@ if (TLS_CERT) {
     process.exit(2);
   }
 }
+const safeHandler = (req, res) => {
+  // BUG FIX (process crash): Node does NOT catch rejections returned by an
+  // async request listener — one bad request (null JSON body, throw in a
+  // helper) killed the whole control plane (verified live). Every
+  // rejection is now answered with a 500 and logged.
+  requestHandler(req, res).catch((e) => {
+    log('handler_error', { method: req.method, url: String(req.url).slice(0, 120), error: String(e).slice(0, 200) });
+    try {
+      if (!res.headersSent) json(res, 500, { error: 'internal' });
+      else res.destroy();
+    } catch {
+      /* socket already gone */
+    }
+  });
+};
+
 const listener = TLS_CERT
   ? https.createServer(
       { cert: fs.readFileSync(TLS_CERT), key: fs.readFileSync(TLS_KEY), minVersion: 'TLSv1.2' },
-      requestHandler,
+      safeHandler,
     )
-  : http.createServer(requestHandler);
+  : http.createServer(safeHandler);
+
+// Safety net: log any stray rejection instead of dying.
+process.on('unhandledRejection', (e) => {
+  log('unhandled_rejection', { error: String(e).slice(0, 200) });
+});
 
 listener.listen(PORT, BIND, () => {
   console.log(JSON.stringify({
@@ -302,6 +432,7 @@ listener.listen(PORT, BIND, () => {
     front: FRONT_ENABLED,
     frontRateLimitMpm: FRONT_RATE_LIMIT_MPM,
     workerBase: WORKER_BASE,
+    workerPoolMax: pool.poolMax,
     vpsBase: VPS_BASE,
     stsBase: STS_BASE,
     tokenTtlMs: TTL_MS,
@@ -310,4 +441,3 @@ listener.listen(PORT, BIND, () => {
     secretConfigured: Boolean(SECRET),
   }));
 });
-

@@ -117,12 +117,31 @@ function rawRequestLieCL(path, method, contentLength, bodyChunk) {
   check('__up 4 KiB within cap → {bytes:4096}', r.status === 200 && j.bytes === 4096, JSON.stringify(j));
 }
 {
-  // over-cap body (real bytes): only valid when MAX_UL < 8 MiB, else skipped
+  // over-cap body (real bytes): only valid when MAX_UL < 8 MiB, else skipped.
+  // Platform contract (verified 2026-11-24/25, workerd + real edge): when the
+  // Worker cancels the inbound stream at the cap, the runtime may deliver the
+  // 413 OR tear the connection down while the client is still sending —
+  // undici then rejects the fetch with a socket error. BOTH outcomes prove
+  // the over-cap body was refused; a 200/500 would be the failure.
   if (MAX_UL < 8 * 1024 * 1024) {
     const body = new Uint8Array(MAX_UL + 4096);
-    const r = await fetch(`${BASE}/__up?token=${token()}`, { method: 'POST', body });
-    check(`__up body MAX+4KiB (${body.byteLength}) → 413`, r.status === 413, `got ${r.status}`);
-    await r.text().catch(() => {});
+    let status = null;
+    let socketError = false;
+    try {
+      const r = await fetch(`${BASE}/__up?token=${token()}`, { method: 'POST', body });
+      status = r.status;
+      await r.text().catch(() => {});
+    } catch (e) {
+      // undici wraps the socket error — inspect the cause chain too.
+      const deep = `${String(e)} ${String(e?.cause ?? '')} ${String(e?.cause?.cause ?? '')}`;
+      socketError = /closed|terminated|reset|ECONNRESET|UND_ERR|SocketError/i.test(deep);
+      if (!socketError) console.log('    (unexpected fetch error form:', deep.slice(0, 160), ')');
+    }
+    check(
+      `__up body MAX+4KiB (${body.byteLength}) → 413 or stream refused`,
+      status === 413 || socketError,
+      `got ${status ?? 'socket-error(' + socketError + ')'}`,
+    );
   } else {
     console.log(`  – __up body over cap skipped (MAX_UL=${MAX_UL} ≥ 8 MiB; use TEST_OVERCAP_BODY=1 for the real-body 413 check)`);
   }

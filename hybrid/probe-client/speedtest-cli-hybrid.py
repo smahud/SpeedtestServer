@@ -8,8 +8,9 @@ to what /etc/hosts cannot do for ports):
   1. Speedtest.get_servers — server URLs are rewritten to the VPS FRONT
      (mock domain). This is the "server selection + ping" plane: the client
      resolves the front hostname to the VPS IP and measures latency there.
-  2. build_request — upload POSTs (requests WITH body) are routed directly
-     to the Cloudflare Worker `__up` endpoint with a Bearer session token.
+  2. build_request — upload POSTs (requests WITH body targeted at the
+     speedtest upload endpoint) are routed directly to the Cloudflare
+     Worker `__up` endpoint with a Bearer session token.
      This is the ONLY way a urllib client can send its payload to the edge:
      stock urllib always streams the full body to the first hop before
      reading any redirect, so a 307 cannot offload uploads (see docs).
@@ -30,6 +31,7 @@ Env:
 import json
 import os
 import sys
+import time
 import urllib.request
 
 import speedtest as st
@@ -45,8 +47,25 @@ SUBMIT_RESULTS = os.environ.get('HYBRID_SUBMIT_RESULTS', '1') == '1'
 # entry is rewritten to the VPS front.
 SERVER_LIST_FILE = os.environ.get('HYBRID_SERVER_LIST_FILE', '')
 
+# --- session token: LAZY mint + TTL refresh -------------------------------
+# BUG FIX (2026-11-25): the token used to be minted once at IMPORT time —
+# a run slower than the 5-minute TTL (slow links; the stock engine runs many
+# upload rounds) got 401s from /__up and the result submission was skipped.
+# The token is now minted lazily on first use and re-minted when it is
+# older than TTL_MARGIN seconds (importing --help no longer performs a
+# network call either).
+TOKEN_TTL_MS = 300000
+TTL_MARGIN = 45  # re-mint this many seconds before expiry
 
-def _session_token():
+_token_cache = {'token': None, 'minted_at': 0.0}
+
+
+def _session_token(force=False):
+    now = time.time()
+    age_ms = (now - _token_cache['minted_at']) * 1000.0
+    if (not force and _token_cache['token'] is not None
+            and age_ms < TOKEN_TTL_MS - TTL_MARGIN * 1000):
+        return _token_cache['token']
     req = urllib.request.Request(
         GATEWAY_BASE + '/api/sessions',
         data=b'{}',
@@ -54,10 +73,17 @@ def _session_token():
         method='POST',
     )
     with urllib.request.urlopen(req, timeout=20) as r:
-        return json.load(r)['token']
+        _token_cache['token'] = json.load(r)['token']
+        _token_cache['minted_at'] = now
+        return _token_cache['token']
 
 
-TOKEN = _session_token() if (GATEWAY_BASE and WORKER_BASE) else None
+def _token_guid():
+    tok = _token_cache['token']
+    if tok and tok.count('~') >= 4:
+        return tok.split('~')[1]
+    return None
+
 
 # --- hook 1: rewrite server-list URLs to the VPS front ----------------------
 _orig_get_servers = st.Speedtest.get_servers
@@ -131,10 +157,15 @@ _orig_build_request = st.build_request
 
 
 def hybrid_build_request(url, data=None, headers=None, bump='0', secure=False):
-    if data is not None and TOKEN and WORKER_BASE:
+    # BUG FIX (2026-11-25): the reroute previously hijacked EVERY
+    # data-carrying request — sivel's `Speedtest.share()` (--share) also
+    # POSTs a body (to www.speedtest.net/share/api/0) and was silently
+    # shipped to the Worker. Only the speedtest upload endpoint is rerouted.
+    is_upload_target = 'upload.php' in (url or '')
+    if data is not None and is_upload_target and GATEWAY_BASE and WORKER_BASE:
         url = WORKER_BASE + '/__up'
         headers = dict(headers or {})
-        headers['Authorization'] = 'Bearer ' + TOKEN
+        headers['Authorization'] = 'Bearer ' + _session_token()
     return _orig_build_request(url, data=data, headers=headers,
                                bump=bump, secure=secure)
 
@@ -144,18 +175,18 @@ st.build_request = hybrid_build_request
 
 def submit_results(document):
     """POST the final speedtest result document to the gateway (best effort)."""
-    if not (GATEWAY_BASE and TOKEN):
+    if not (GATEWAY_BASE and _token_cache['token']):
         return None
     try:
         payload = {
-            'token': TOKEN,
-            'guid': TOKEN.split('~')[1] if TOKEN.count('~') >= 4 else None,
+            'token': _session_token(),  # fresh/valid token for the intake
+            'guid': _token_guid(),
             'metrics': document,
             'accounting': {
                 'downloadBytes': document.get('bytes_received'),
                 'uploadBytes': document.get('bytes_sent'),
                 'pingMs': document.get('ping'),
-                'client': 'speedtest-cli-hybrid/1.0 (engine: speedtest-cli %s)'
+                'client': 'speedtest-cli-hybrid/1.1 (engine: speedtest-cli %s)'
                           % st.__version__,
             },
         }
@@ -185,6 +216,10 @@ if __name__ == '__main__':
                              **kwargs)
 
     if SUBMIT_RESULTS and '--json' in sys.argv:
+        # Mint the session token now (after flags are known — --help and
+        # friends never touch the network; see the lazy-mint fix above).
+        if GATEWAY_BASE and WORKER_BASE:
+            _session_token()
         st.printer = capturing_printer
 
     try:

@@ -87,8 +87,11 @@ export class NetGaugeEngine {
   }
 
   /** Feed one received WS frame payload (already reduced to its first
-   * command line when idle — see the WS adapter in index.ts). */
-  feedFrame(data: Uint8Array): void {
+   * command line when idle — see the WS adapter in index.ts).
+   * `wireLen` — bytes actually on the wire for the first command line when
+   * the adapter SYNTHESIZED a trailing newline (frame had none); the
+   * synthesized byte must not count toward the UPLOAD inclusive total. */
+  feedFrame(data: Uint8Array, wireLen?: number): void {
     if (this.closed || this.muted) return;
     if (this.uploadRemaining > 0) {
       // Upload payload frames are exempt from the first-command rule [V]
@@ -108,8 +111,17 @@ export class NetGaugeEngine {
       }
       return;
     }
-    // Command frame: process the (single) command line.
-    this.processCommandLine(decodeLatin1(data), data);
+    // Command frame: enforce the command-line cap BEFORE decoding — a
+    // limit-sized frame with no newline used to be latin1-decoded into one
+    // multi-megabyte string (CPU spike against the 10 ms soft limit).
+    if (data.length > this.opts.maxLineBytes) {
+      this.hooks.onEvent?.('line_overflow', { bytes: data.length, limit: this.opts.maxLineBytes });
+      this.closed = true;
+      this.hooks.close();
+      return;
+    }
+    // Process the (single) command line with the real wire length.
+    this.processCommandLine(decodeLatin1(data), data, wireLen);
   }
 
   /** Pre-session GETIP gate check on the RAW frame (before first-command
@@ -128,7 +140,7 @@ export class NetGaugeEngine {
     return false;
   }
 
-  private processCommandLine(rawLine: string, _rawBytes?: Uint8Array): void {
+  private processCommandLine(rawLine: string, _rawBytes?: Uint8Array, wireLen?: number): void {
     // The adapter feeds exactly one command line. Normalize exactly like the
     // TCP engine: strip the trailing \n first (processBuffer semantics),
     // then strip ONE trailing \r before dispatch (F-25) — EXCEPT GETIP,
@@ -224,12 +236,24 @@ export class NetGaugeEngine {
     if (line.startsWith('UPLOAD ')) {
       const parts = line.slice(7).trim().split(/\s+/);
       const n = parseInt(parts[0], 10);
-      if (!Number.isFinite(n) || n < 0 || n > this.opts.maxUploadBytes) {
-        // Silently ignored (daemon parity) [V].
+      if (!Number.isFinite(n) || n < 0) {
+        // Verified daemon behavior: non-numeric / negative size → silently
+        // ignored (no reply) and the connection keeps processing.
         this.hooks.onEvent?.('upload_invalid_ignored', { arg: parts[0].slice(0, 24) });
         return;
       }
-      const lineLen = lineNoNl.length + 1; // inclusive counting: command line + \n [V]
+      if (n > this.opts.maxUploadBytes) {
+        // A WELL-FORMED size above the configured cap (Free-plan budget):
+        // refuse with ERROR instead of silently ignoring (which left the
+        // client hanging on an OK while its payload produced garbage
+        // ERROR replies) — mirrors the DOWNLOAD cap refusal.
+        this.hooks.onEvent?.('upload_cap_rejected', { declared: n, cap: this.opts.maxUploadBytes });
+        this.hooks.writeLine('ERROR');
+        return;
+      }
+      // INCLUSIVE counting: the command line counts toward n — at its WIRE
+      // length (a synthesized trailing newline is not a byte the client sent).
+      const lineLen = wireLen ?? lineNoNl.length + 1;
       if (n < lineLen) {
         this.hooks.writeLine('ERROR');
         return;

@@ -63,12 +63,7 @@ export function originAllowed(origin: string, env: Env): boolean {
   if (domains.includes('*')) return true;
   const m = origin.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/([^/?#]+)/);
   if (!m) return false;
-  let host = m[1].toLowerCase();
-  if (host.startsWith('[') && host.endsWith(']')) host = host.slice(1, -1);
-  else {
-    const colon = host.lastIndexOf(':');
-    if (colon !== -1 && host.indexOf(':') === colon) host = host.slice(0, colon);
-  }
+  const host = hostOf(m[1]);
   for (const d of domains) {
     const pat = d.toLowerCase();
     if (pat === '*') return true;
@@ -111,7 +106,7 @@ export function normalizePath(pathname: string): string {
   return '/' + segments.join('/') + (keepTrailing && segments.length > 0 ? '/' : '');
 }
 
-/** Split scheme://authority from absolute-form targets, strip query/fragment. */
+/** Strip scheme://authority from absolute-form targets, strip query/fragment. */
 export function requestTargetPath(url: string): { target: string; path: string } {
   let target = url || '/';
   const m = target.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^/?#]+(.*)$/);
@@ -124,11 +119,25 @@ export function requestTargetPath(url: string): { target: string; path: string }
   return { target, path: normalizePath(path) };
 }
 
-function hostMatches(host: string, allowed: string[]): boolean {
-  let h = host.trim().toLowerCase();
-  if (h.startsWith('[') && h.endsWith(']')) h = h.slice(1, -1);
+/** Hostname of an Origin/Host header value: strips the port for both IPv4
+ *  (`h:p`) and bracketed IPv6 (`[h]:p`), and unwraps the brackets.
+ *  BUG FIX: `[::1]:8443` previously kept its port (the single-colon
+ *  heuristic never matched multi-colon IPv6) and never equaled an allowlist
+ *  entry. */
+export function hostOf(value: string): string {
+  let h = value.trim().toLowerCase();
+  if (h.startsWith('[')) {
+    const close = h.indexOf(']');
+    if (close !== -1) return h.slice(1, close);
+    return h.slice(1);
+  }
   const colon = h.lastIndexOf(':');
   if (colon !== -1 && h.indexOf(':') === colon) h = h.slice(0, colon);
+  return h;
+}
+
+function hostMatches(host: string, allowed: string[]): boolean {
+  const h = hostOf(host);
   return allowed.some((a) => a.toLowerCase() === h);
 }
 
@@ -170,7 +179,15 @@ function minimal500(reason = 'Internal Server Error'): Response {
  * when the runtime provides it), so a slow client cannot balloon the
  * isolate buffer. A client disconnect errors the stream and stops
  * generation (nothing more is enqueued after cancel/abort). */
-export function poolResponse(size: number, headers: [string, string][], signal?: AbortSignal): Response {
+export function poolResponse(size: number, headers: [string, string][], signal?: AbortSignal, onDone?: () => void): Response {
+  // onDone (worker-pool in-flight gauge): fires EXACTLY once when the
+  // stream completes, errors, or is aborted.
+  let pending = onDone ?? null;
+  const done = (): void => {
+    const cb = pending;
+    pending = null;
+    if (cb) cb();
+  };
   const h = new Headers();
   for (const [k, v] of headers) h.set(k, v);
   h.set('Content-Length', String(size));
@@ -186,6 +203,7 @@ export function poolResponse(size: number, headers: [string, string][], signal?:
         'abort',
         () => {
           // G-5: client cancelled — stop generating and tear down the pipe.
+          done();
           try {
             writer.abort();
           } catch {
@@ -215,6 +233,8 @@ export function poolResponse(size: number, headers: [string, string][], signal?:
         } catch {
           /* already closed */
         }
+      } finally {
+        done();
       }
     })();
     return new Response(fls.readable, { status: 200, headers: h });
@@ -225,8 +245,21 @@ export function poolResponse(size: number, headers: [string, string][], signal?:
   let off = 0;
   const stream = new ReadableStream({
     pull(controller) {
-      if (off >= size || aborted()) {
+      if (off >= size) {
         controller.close();
+        done();
+        return;
+      }
+      if (aborted()) {
+        // BUG FIX: aborting mid-stream closed SHORT of the advertised
+        // Content-Length (a clean truncation); error() is the correct abort
+        // semantic for a fixed-length body.
+        done();
+        try {
+          controller.error(new Error('aborted'));
+        } catch {
+          /* controller already errored */
+        }
         return;
       }
       const len = Math.min(CHUNK, size - off);
@@ -236,7 +269,9 @@ export function poolResponse(size: number, headers: [string, string][], signal?:
       controller.enqueue(out);
     },
     cancel() {
-      /* client aborted — generation simply stops (off no longer advances) */
+      // Consumer gone (client abort) — the stream terminates here; release
+      // the in-flight gauge.
+      done();
     },
   });
   return new Response(stream, { status: 200, headers: h });

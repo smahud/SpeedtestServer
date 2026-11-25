@@ -27,6 +27,12 @@ MAX_DOWNLOAD_BYTES = "26214400"
 MAX_UPLOAD_BYTES = "26214400"
 # G-7/K-7: daemon-parity legacy HTTP surface OFF in production.
 LEGACY_HTTP_ENABLED = "false"
+# Worker-pool identity (worker 1 = this canonical primary script). The pool
+# siblings (speedtest-hybrid-worker-2..-N) override these at deploy time —
+# see hybrid/worker/deploy-pool.sh.
+WORKER_ID = "1"
+WORKER_POOL_MAX = "1"    # overridden per pool deployment (e.g. "100")
+WORKER_DEFLECT_CONCURRENCY = "6"
 
 [observability]
 enabled = true
