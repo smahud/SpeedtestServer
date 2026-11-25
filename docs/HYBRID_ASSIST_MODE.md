@@ -1,9 +1,11 @@
 # HYBRID ASSIST MODE — "Cloudflare membantu beban, bukan menggantikan"
 
 **Dibuat:** 25 November 2026 (sesi 9).
-**Branch:** `hybrid-assist-lane` → target merge ke `master` setelah verifikasi.
-**Status:** IMPLEMENTED + unit 12/12 + E2E 4/4 (pool-skip-broken, local-lane,
-edge-overflow, forced-local) + regression E2E pool 3/3.
+**Branch:** `hybrid-assist-lane`.
+**Status:** PRODUCTION-VERIFIED — pool 100 worker ter-deploy, gateway v1.3 live di VPS,
+unit 12/12 + E2E 4/4 + regression 3/3 + pengukuran produksi: hybrid 600.1 Mbps down /
+339.7 Mbps up (dari stock 218.5/127.1); CLI resmi Ookla 470.9 Mbps down jalur VPS murni;
+root-cause "load < 1 Gbps" (limit SYN nftables nPerf) ditemukan & diperbaiki (43×).
 
 ## 1. Konsep
 
@@ -91,14 +93,72 @@ Klien hybrid (`speedtest-cli-hybrid.py` v1.2):
 4. **Crash tanpa log saat EADDRINUSE** — listener tanpa handler `error`
    → systemd restart loop tanpa baris log yang bisa didiagnosis. Sekarang:
    exit(1) dengan log `gateway_error` berisi errno.
+5. **deploy-pool.sh: wrangler 4.x me-resolve `main` relatif lokasi file
+   TOML** — config di /tmp membuat semua deploy gagal "entry-point not
+   found" (bug laten: pool belum pernah dideploy penuh). Config kini
+   ditulis di sebelah src/; script juga menerima Global API Key
+   (CLOUDFLARE_EMAIL + CLOUDFLARE_API_KEY).
+6. **Split upload modulo keliru** — `n % 1000 < share×1000` mengirim 150
+   request PERTAMA semuanya ke VPS (sekuens speedtest hanya ~50-100
+   POST → edge tidak pernah kebagian). Diganti interleave Bresenham
+   (distribusi benar dari request pertama; 60 req → 9/51 untuk share 0.15).
 
-## 5. Bukti (2026-11-25, sandbox)
+## 5. Bukti
+
+### 5.1 Sandbox test suite (2026-11-25)
 
 | Suite | Hasil |
 |---|---|
 | Unit gateway (T1–T13 + extra) | **12/12** — termasuk T11 (lane lokal: 245,388 B eksak, printable-ASCII 0x20–0x7F, X-Hybrid-Lane), T12 (budget habis → 302; 5 request = 1 mint), T13 (pattern L→302→302→forced-L→forced-L) |
 | E2E assist (`test/e2e-assist-test.sh`) | **4/4** — pool-skip-broken (active={1,3}, worker 2 canary-broken), local-lane, edge-overflow-302, forced-local-no-429 |
 | E2E pool lama (`test/e2e-pool-test.sh`) | **3/3** (regression: scale-up-2, shrink-1, session-download) |
+
+### 5.2 Produksi (2026-11-25, sesi 9 — klien dari sandbox z.ai, RTT ~62 ms ke VPS)
+
+Lingkungan: pool **100 worker ter-deploy penuh** (spot-check 5 acak: id/poolMax benar, colo
+HKG), gateway v1.3 live, assist budget 100 Mbps, HYBRID_WORKER_ACTIVE_MIN=2,
+probe berkala 60 s.
+
+| Pengukuran | Nilai | Catatan |
+|---|---|---|
+| Stock `speedtest-cli --mini` (threads stock) | **218.5 Mbps down / 127.1 Mbps up** | lane VPS 24 req/76.8 MB + edge 13 redirect; 1 token untuk 13 redirect edge (cache); upload drain VPS |
+| Hybrid wrapper 16/8 thread, split 15/85 | **543.4 Mbps down / 332.3 Mbps up** | 731.6 MB diterima; aditif: ~520 edge + ~31 VPS (bucket baru isi ulang) |
+| Hybrid wrapper 32/8 thread (MAX) | **600.1 Mbps down / 339.7 Mbps up** | 752.5 MB; limiter = engine urllib (~20-25 Mbps/thread), bukan arsitektur |
+| CLI RESMI Ookla 1.2.0.84 (NetGauge VPS:8080, hosts-redirect 74964/61853) | **470.9 / 448.8 Mbps down, 170.3 / 140.9 Mbps up, loss 0.5%** | 625 MB & 481 MB via jalur VPS murni — VPS terbukti mampu ~470 Mbps (NIC 1 Gbps), bukan 100 Mbps |
+| Edge single-stream 25 MB (worker) | 330 Mbps | curl |
+| Edge 8 stream paralel (8 worker beda) | **2.27 Gbps** | curl — plafon arsitektur jauh di atas engine klien |
+
+**Kesimpulan aditivitas terbukti di produksi**: throughput agregat = kontribusi lane VPS
+(token-bucket budget) + lane edge (worker pool) secara bersamaan dalam satu
+pengukuran klien — persis konsep "CF membantu beban, bukan menggantikan".
+
+### 5.3 ROOT CAUSE "load < 1 Gbps" yang ditemukan & diperbaiki di produksi
+
+**Firewall nftables nPerfServer membatasi SYN: `limit rate over 260/second
+burst 5 packets drop`** — setiap burst >5 koneksi baru didrop → klien
+retransmit SYN 1–3 detik (bukti historis: 13.958 TcpExtTCPSynRetrans,
+192 ListenOverflows). Klien speedtest multi-thread (16–32 koneksi) kena
+penalti ini di SEMUA port VPS. Terukur: 16 koneksi paralel = **3.137 ms →
+72 ms** (43×) setelah rule diganti menjadi `rate over 2000/second burst 64
+packets drop comment "SYN-guard-relaxed-for-speedtest"`.
+
+Perintah (VPS, root):
+```bash
+# sebelum: tcp flags syn limit rate over 260/second burst 5 packets drop
+nft replace rule inet filter input handle <H> \
+  tcp flags syn limit rate over 2000/second burst 64 packets drop \
+  comment "SYN-guard-relaxed-for-speedtest"
+# rollback: ganti kembali ke 260/second burst 5
+```
+Catatan: rule nftables ini TIDAK persisten di /etc/nftables.conf (dibuat
+runtime oleh nPerf) — jika nPerf restart bisa dibuat ulang; periksa dengan
+`nft list chain inet filter input`. Rule tetap melindungi dari SYN-flood
+(2000/s masih limit).
+
+Bug lain yang diperbaiki di sesi 9 (lihat §4): 413-destroy, banjir mint,
+pool growth macet, crash EADDRINUSE, deploy-pool.sh path wrangler 4.x,
+split upload Bresenham (modulo %1000 mengirim 150 request pertama semuanya
+ke VPS).
 
 ## 6. Cara mengaktifkan (operator)
 

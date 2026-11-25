@@ -220,7 +220,19 @@ st.Speedtest.get_config = hybrid_get_config
 # stock urllib streams the full body before reading any redirect, so a 307
 # cannot offload uploads — see docs).
 _orig_build_request = st.build_request
-_UL_SEQ = {'n': 0}
+_UL_SEQ = {'n': 0, 'phase': 0.0}
+
+
+def _pick_upload_lane():
+    """Bresenham-style weighted interleave: deterministic VPS/edge split that
+    distributes from the FIRST requests (the naive `n % 1000 < share*1000`
+    sent the first 150 consecutive requests ALL to the VPS — a speedtest run
+    only has ~50-100 upload POSTs, so the edge never saw a single one)."""
+    _UL_SEQ['phase'] += VPS_UL_SHARE
+    if _UL_SEQ['phase'] >= 1.0:
+        _UL_SEQ['phase'] -= 1.0
+        return True  # VPS lane
+    return False  # edge lane
 
 
 def hybrid_build_request(url, data=None, headers=None, bump='0', secure=False):
@@ -231,8 +243,7 @@ def hybrid_build_request(url, data=None, headers=None, bump='0', secure=False):
     is_upload_target = 'upload.php' in (url or '')
     if data is not None and is_upload_target and GATEWAY_BASE and WORKER_BASE:
         _UL_SEQ['n'] += 1
-        to_vps = (VPS_UL_SHARE > 0.0
-                  and (_UL_SEQ['n'] % 1000) < int(round(VPS_UL_SHARE * 1000)))
+        to_vps = VPS_UL_SHARE > 0.0 and _pick_upload_lane()
         if not to_vps:
             url = WORKER_BASE + '/__up'
             headers = dict(headers or {})
