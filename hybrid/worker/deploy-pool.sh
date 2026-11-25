@@ -29,8 +29,19 @@ POOL_SIZE="${POOL_SIZE:-100}"
 VERIFY="${VERIFY:-1}"
 WORKERS_DEV_SUFFIX="workers.dev"
 
-if [[ -z "${CLOUDFLARE_API_TOKEN:-}" || -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
-  echo "ERROR: set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (env)." >&2
+# Auth: EITHER an API token (CLOUDFLARE_API_TOKEN — preferred, scoped) OR
+# the account email + Global API Key (CLOUDFLARE_EMAIL + CLOUDFLARE_API_KEY,
+# which wrangler also accepts). CLOUDFLARE_ACCOUNT_ID is required either way.
+if [[ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+  echo "ERROR: set CLOUDFLARE_ACCOUNT_ID (env)." >&2
+  exit 2
+fi
+if [[ -z "${CLOUDFLARE_API_TOKEN:-}" && -z "${CLOUDFLARE_API_KEY:-}" ]]; then
+  echo "ERROR: set CLOUDFLARE_API_TOKEN, or CLOUDFLARE_EMAIL + CLOUDFLARE_API_KEY (global key)." >&2
+  exit 2
+fi
+if [[ -z "${CLOUDFLARE_API_TOKEN:-}" && -z "${CLOUDFLARE_EMAIL:-}" ]]; then
+  echo "ERROR: CLOUDFLARE_API_KEY (global) also needs CLOUDFLARE_EMAIL." >&2
   exit 2
 fi
 if [[ -z "${HYBRID_SHARED_SECRET:-}" ]]; then
@@ -77,7 +88,12 @@ deploy_one() { # deploy_one <id>
   local id="$1"
   local name
   if (( id == 1 )); then name="speedtest-hybrid-worker"; else name="speedtest-hybrid-worker-${id}"; fi
-  local cfg="/tmp/wrangler-pool-${id}.toml"
+  # BUG FIX (2026-11-25, sesi 9): wrangler 4.x resolves `main` (and other
+  # relative paths) against the CONFIG FILE's directory, not the cwd — the
+  # /tmp configs made every deploy fail with "entry-point src/index.ts was
+  # not found". The generated configs now live NEXT TO src/ (this script
+  # already cd's into hybrid/worker).
+  local cfg="wrangler-pool-${id}.toml"
   make_config "$id" > "$cfg"
   WRANGLER_SEND_METRICS=false CI=true npx wrangler deploy -c "$cfg" --dry-run >/dev/null 2>&1 || true
   WRANGLER_SEND_METRICS=false CI=true npx wrangler deploy -c "$cfg" >/dev/null

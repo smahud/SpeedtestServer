@@ -66,10 +66,17 @@ const RESULTS_FILE = process.env.HYBRID_RESULTS_FILE || '';
 const RESULTS_DEDUP_MS = Number(process.env.HYBRID_RESULTS_DEDUP_MS || 3600000);
 const SESSIONS_RATE_LIMIT_MPM = Number(process.env.HYBRID_SESSIONS_RATE_LIMIT_MPM ?? 60);
 
-// --- speedtest front (legacy HTTP surface with edge offload) ---
+// --- speedtest front (legacy HTTP surface: edge offload + VPS assist) ---
 const FRONT_ENABLED = String(process.env.HYBRID_FRONT_ENABLED || '') === 'true';
 const FRONT_RATE_LIMIT_MPM = Number(process.env.HYBRID_FRONT_RATE_LIMIT_MPM ?? 90);
 const FRONT_MAX_DOWN_BYTES = Number(process.env.HYBRID_FRONT_MAX_DOWN_BYTES ?? 26214400);
+const FRONT_TOKEN_CACHE_MS = Number(process.env.HYBRID_FRONT_TOKEN_CACHE_MS ?? Math.max(30000, TTL_MS - 60000));
+// --- VPS assist lane (sesi 9: "CF membantu beban, bukan menggantikan") ---
+// Budget the VPS spends serving download payload DIRECTLY (token-bucket,
+// decimal Mbps). 0 = pure edge offload (legacy behavior); 100 on a
+// 100 Mbps VPS makes the aggregate ≈ VPS budget + edge capacity.
+const VPS_DL_BUDGET_MBPS = Math.max(0, Number(process.env.HYBRID_VPS_DL_BUDGET_MBPS || 0));
+const VPS_DL_BURST_S = Math.max(0.5, Number(process.env.HYBRID_VPS_DL_BURST_S || 2));
 
 // Evidence counters — how many control-plane bytes the VPS actually served.
 const counters = { servers: 0, sessions: 0, results: 0, pings: 0, bytesIn: 0, bytesOut: 0 };
@@ -158,7 +165,7 @@ function json(res, status, obj) {
     'Content-Type': 'application/json',
     'Content-Length': body.length,
     'Cache-Control': 'no-store, no-transform',
-    'X-Hybrid-Gateway': '1.2',
+    'X-Hybrid-Gateway': '1.3',
   });
   res.end(body);
 }
@@ -233,7 +240,11 @@ const front = FRONT_ENABLED
       pool,
       rateLimitMpm: FRONT_RATE_LIMIT_MPM,
       maxDownBytes: FRONT_MAX_DOWN_BYTES,
+      tokenTtlMs: TTL_MS,
+      tokenCacheMs: FRONT_TOKEN_CACHE_MS,
       tokenBindIp: TOKEN_BIND_IP,
+      vpsDlBudgetMbps: VPS_DL_BUDGET_MBPS,
+      vpsDlBurstS: VPS_DL_BURST_S,
     })
   : null;
 
@@ -360,7 +371,7 @@ const requestHandler = async (req, res) => {
 
   if (path === '/api/health' && req.method === 'GET') {
     return json(res, 200, {
-      server: 'hybrid-gateway/1.2',
+      server: 'hybrid-gateway/1.3',
       instanceId,
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
       counters,
@@ -368,8 +379,19 @@ const requestHandler = async (req, res) => {
         ? {
             enabled: true,
             rateLimitMpm: FRONT_RATE_LIMIT_MPM,
+            // sesi 9 — the assist lane: which download lane served what
+            assist: {
+              vpsDlBudgetMbps: VPS_DL_BUDGET_MBPS,
+              vpsDlBurstS: VPS_DL_BURST_S,
+              enabled: VPS_DL_BUDGET_MBPS > 0,
+            },
             counters: {
               latency: counters.frontLatency || 0,
+              downloads: counters.frontDownloads || 0,
+              dlLocal: counters.frontDlLocal || 0,
+              dlLocalServed: counters.frontDlLocalServed || 0,
+              dlLocalBytes: counters.frontDlLocalBytes || 0,
+              dlLocalForced: counters.frontDlLocalForced || 0,
               downRedirects: counters.frontDownRedirects || 0,
               downCapped: counters.frontDownCapped || 0,
               uploadsDrained: counters.frontUploads || 0,
@@ -418,6 +440,14 @@ const listener = TLS_CERT
     )
   : http.createServer(safeHandler);
 
+// BUG FIX (production hardening): an EADDRINUSE/EACCES on listen surfaced as
+// an unhandled 'error' event → hard crash → systemd restart loop with no
+// diagnosable log line. Fail loudly ONCE with the real errno instead.
+listener.on('error', (e) => {
+  console.error(JSON.stringify({ kind: 'gateway_error', error: String(e && e.code ? e.code : e).slice(0, 200), syscall: e && e.syscall, port: PORT, bind: BIND }));
+  process.exit(1);
+});
+
 // Safety net: log any stray rejection instead of dying.
 process.on('unhandledRejection', (e) => {
   log('unhandled_rejection', { error: String(e).slice(0, 200) });
@@ -431,6 +461,9 @@ listener.listen(PORT, BIND, () => {
     tls: Boolean(TLS_CERT),
     front: FRONT_ENABLED,
     frontRateLimitMpm: FRONT_RATE_LIMIT_MPM,
+    frontTokenCacheMs: FRONT_TOKEN_CACHE_MS,
+    vpsDlBudgetMbps: VPS_DL_BUDGET_MBPS,
+    vpsDlBurstS: VPS_DL_BURST_S,
     workerBase: WORKER_BASE,
     workerPoolMax: pool.poolMax,
     vpsBase: VPS_BASE,

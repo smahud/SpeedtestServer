@@ -232,6 +232,10 @@ test('T8: front 302 redirect follows the pool worker and rate-limits', async () 
       HYBRID_SHARED_SECRET: SECRET,
       HYBRID_FRONT_ENABLED: 'true',
       HYBRID_FRONT_RATE_LIMIT_MPM: '2',
+      // v1.3: tokens are cached per IP by default — disable the cache here
+      // so every redirect actually mints (the legacy per-request behavior
+      // this test was written against).
+      HYBRID_FRONT_TOKEN_CACHE_MS: '0',
       HYBRID_WORKER_BASE: 'http://127.0.0.1:59999', // unreachable — irrelevant for redirect logic
       HYBRID_WORKER_POOL_MAX: '1',
     },
@@ -295,7 +299,130 @@ test('extra: /api/pool and /api/health expose pool state', async () => {
     const h = await req(g.port, 'GET', '/api/health');
     const hj = JSON.parse(h.body);
     assert.equal(hj.pool.poolMax, 3);
-    assert.ok(hj.server.startsWith('hybrid-gateway/1.2'));
+    assert.ok(hj.server.startsWith('hybrid-gateway/1.3'));
+  } finally {
+    await g.stop();
+  }
+});
+
+test('T11: assist lane — budget-gated LOCAL serve (daemon-parity bytes, exact length, X-Hybrid-Lane)', async () => {
+  const g = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+      HYBRID_WORKER_POOL_MAX: '1',
+      // 100 Mbps budget, 2 s burst → 25 MB bucket: the first (and several)
+      // requests take the VPS lane.
+      HYBRID_VPS_DL_BUDGET_MBPS: '100',
+    },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  try {
+    const r = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
+    assert.equal(r.status, 200);
+    assert.equal(r.headers['content-length'], String(245388));
+    assert.equal(r.headers['content-type'], 'image/jpeg');
+    assert.equal(r.headers['x-hybrid-lane'], 'vps');
+    assert.equal(r.body.length, 245388);
+    // daemon parity F-9: printable ASCII [0x20..0x7F]
+    let bad = 0;
+    for (let i = 0; i < r.body.length; i++) {
+      const c = r.body.charCodeAt(i);
+      if (c < 0x20 || c > 0x7f) bad++;
+    }
+    assert.equal(bad, 0, 'local-lane bytes must be printable ASCII');
+    // a 1.1 MB image also serves locally (multi-chunk + wrap + backpressure path)
+    const r2 = await req(g.port, 'GET', '/speedtest/random750x750.jpg');
+    assert.equal(r2.status, 200);
+    assert.equal(r2.body.length, 1118012);
+    assert.equal(r2.headers['x-hybrid-lane'], 'vps');
+    // health shows the assist counters
+    const h = await req(g.port, 'GET', '/api/health');
+    const hj = JSON.parse(h.body);
+    assert.ok(hj.front.assist.enabled);
+    assert.ok(hj.front.counters.dlLocal >= 2);
+    assert.ok(hj.front.counters.dlLocalBytes >= 245388 + 1118012);
+    // latency still VPS-served
+    const lat = await req(g.port, 'GET', '/speedtest/latency.txt');
+    assert.equal(lat.body, 'test=test\n');
+  } finally {
+    await g.stop();
+  }
+});
+
+test('T12: assist lane — budget exhausted → 302 edge overflow; token cache reuses one mint', async () => {
+  const g = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      HYBRID_FRONT_RATE_LIMIT_MPM: '3',
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+      HYBRID_WORKER_POOL_MAX: '1',
+      // 0.001 Mbps × 0.5 s (min burst) → ~62 B bucket: every image (≥245 KB)
+      // immediately exceeds the budget → edge lane from the first request.
+      HYBRID_VPS_DL_BUDGET_MBPS: '0.001',
+    },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  try {
+    const codes = [];
+    const locations = [];
+    for (let i = 0; i < 5; i++) {
+      const r = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
+      codes.push(r.status);
+      if (r.headers.location) locations.push(r.headers.location);
+    }
+    // all edge redirects, NO 429: the per-IP token cache mints once and
+    // reuses the token — 5 requests consume ONE mint of the 3/min budget.
+    assert.deepEqual(codes, [302, 302, 302, 302, 302]);
+    assert.ok(locations.length === 5);
+    assert.ok(locations[0].startsWith('http://127.0.0.1:59999/__down?bytes=245388&token=v1~'));
+    assert.equal(locations[0], locations[4], 'cached token: the same token is reused');
+    const h = await req(g.port, 'GET', '/api/health');
+    const hj = JSON.parse(h.body);
+    assert.equal(hj.front.counters.tokensMinted, 1);
+    assert.equal(hj.front.counters.downRedirects, 5);
+    assert.equal(hj.front.counters.dlLocal, 0);
+  } finally {
+    await g.stop();
+  }
+});
+
+test('T13: assist lane — mint rate-limited degrades to FORCED local (not 429)', async () => {
+  const g = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      HYBRID_FRONT_RATE_LIMIT_MPM: '2',
+      HYBRID_FRONT_TOKEN_CACHE_MS: '0', // every edge redirect mints (test the limit)
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+      HYBRID_WORKER_POOL_MAX: '1',
+      // 1.5 Mbps × 1.5 s = 281,250 B bucket: exactly ONE 245,388 B local
+      // serve; afterwards the budget is drained → edge lane.
+      HYBRID_VPS_DL_BUDGET_MBPS: '1.5',
+      HYBRID_VPS_DL_BURST_S: '1.5',
+    },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  try {
+    const seq = [];
+    for (let i = 0; i < 5; i++) {
+      const r = await req(g.port, 'GET', '/speedtest/random350x350.jpg');
+      seq.push({ status: r.status, lane: r.headers['x-hybrid-lane'] || null });
+    }
+    // deterministic pattern: local → 302 → 302 (mints 1+2) → forced-local → forced-local
+    assert.deepEqual(
+      seq.map((s) => `${s.status}:${s.lane}`),
+      ['200:vps', '302:null', '302:null', '200:vps', '200:vps'],
+    );
+    const h = await req(g.port, 'GET', '/api/health');
+    const hj = JSON.parse(h.body);
+    assert.equal(hj.front.counters.dlLocalForced, 2);
+    assert.equal(hj.front.counters.rateLimited, 2);
   } finally {
     await g.stop();
   }

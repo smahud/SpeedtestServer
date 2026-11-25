@@ -3,6 +3,13 @@
 **Dibuat:** 25 November 2026 (sesi 8 — production hardening + worker pool).
 **Status:** IMPLEMENTED (gateway + worker + deploy script) · Worker v1.2 DEPLOYED (primary, verifikasi E2E) · Pool 2..100 menunggu `HYBRID_SHARED_SECRET` (lihat "Cara mengaktifkan pool").
 
+> **Sesi 9 (2026-11-25, branch `hybrid-assist-lane`):** growth pool diperbaiki —
+> worker mati/benched di tengah ring tidak lagi memblokir aktivasi worker
+> setelahnya (himpunan aktif eksplisit + kandidat scan; bukti E2E 4/4 di
+> `docs/HYBRID_ASSIST_MODE.md`). Pool kini juga berpasangan dengan **VPS
+> assist lane** — VPS menyumbang bandwidth sampai budget, worker menangkap
+> overflow: lihat `docs/HYBRID_ASSIST_MODE.md`.
+
 ## 1. Konsep dan batasan platform (jujur)
 
 | Fakta | Bukti |

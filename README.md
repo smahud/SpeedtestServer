@@ -98,6 +98,19 @@ authenticated requests to a sibling when it senses saturation
 limits (100k requests/day is ACCOUNT-wide — a pool distributes, it does not
 multiply), and evidence: [`docs/WORKER_POOL.md`](docs/WORKER_POOL.md).
 
+### VPS assist mode (sesi 9 — "CF helps the load, it does not replace it")
+
+With `HYBRID_VPS_DL_BUDGET_MBPS` set (e.g. 100 on a 100 Mbps VPS) the
+speedtest front serves download payload DIRECTLY from the VPS while a
+token bucket still has budget, and 302-redirects the overflow to the
+Worker pool — the client's aggregate becomes ≈ VPS budget + edge
+capacity, so a 1 Gbps client behind a 100 Mbps VPS can actually measure
+~1 Gbps. The hybrid probe client additionally splits its uploads between
+the VPS front and the Worker edge (`HYBRID_VPS_UL_SHARE`) and can raise
+engine parallelism (`HYBRID_DL_THREADS`/`HYBRID_UL_THREADS`/`HYBRID_DL_COUNTS`).
+Design, configuration, bugs fixed in the same pass, and evidence:
+[`docs/HYBRID_ASSIST_MODE.md`](docs/HYBRID_ASSIST_MODE.md).
+
 ### Creating the Cloudflare Worker
 
 Prerequisites: a Cloudflare account (the Free plan works), Node.js + wrangler
