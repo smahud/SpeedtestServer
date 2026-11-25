@@ -2,9 +2,17 @@
 # deploy-pool.sh — deploy the smart worker pool (1 primary + N-1 siblings).
 #
 # USAGE
-#   CLOUDFLARE_API_TOKEN=... CLOUDFLARE_ACCOUNT_ID=... \
-#   HYBRID_SHARED_SECRET=<same secret as the VPS gateway> \
-#   POOL_SIZE=100 bash deploy-pool.sh
+#   Direct:
+#     CLOUDFLARE_API_TOKEN=... CLOUDFLARE_ACCOUNT_ID=... \
+#     HYBRID_SHARED_SECRET=<same secret as the VPS gateway> \
+#     POOL_SIZE=100 bash deploy-pool.sh
+#
+#   Via install.sh (RECOMMENDED): every variable above — including the
+#   deploy count — comes from the repository .env (CF_WORKER_DEPLOY_COUNT,
+#   CLOUDFLARE_API_TOKEN / CLOUDFLARE_EMAIL + CLOUDFLARE_API_KEY,
+#   CLOUDFLARE_ACCOUNT_ID, HYBRID_SHARED_SECRET). See .env.example and
+#   docs/CLOUDFLARE_CREDENTIALS.md for every field + the exact token
+#   permission scopes required.
 #
 # WHAT IT DOES
 #   - Worker 1: the canonical `speedtest-hybrid-worker` (same name as the
@@ -28,6 +36,9 @@ cd "$(dirname "$0")"
 POOL_SIZE="${POOL_SIZE:-100}"
 VERIFY="${VERIFY:-1}"
 WORKERS_DEV_SUFFIX="workers.dev"
+# workers.dev subdomain of the account (override for non-operator installs;
+# exported automatically by install.sh from .env CF_WORKERS_SUBDOMAIN).
+CF_WORKERS_SUBDOMAIN="${CF_WORKERS_SUBDOMAIN:-lumajangnetworks}"
 
 # Auth: EITHER an API token (CLOUDFLARE_API_TOKEN — preferred, scoped) OR
 # the account email + Global API Key (CLOUDFLARE_EMAIL + CLOUDFLARE_API_KEY,
@@ -113,12 +124,18 @@ END_TS=$(date +%s)
 echo "Pool deployed in $((END_TS - START_TS))s."
 
 if [[ "$VERIFY" == "1" ]]; then
+  if ! command -v jq >/dev/null 2>&1; then
+    echo "  (jq not found — skipping per-worker /__meta verification)" >&2
+    VERIFY=0
+  fi
+fi
+if [[ "$VERIFY" == "1" ]]; then
   echo ""
   echo "Verifying /__meta per worker (1 invocation each)…"
   FAIL=0
   for (( id=1; id<=POOL_SIZE; id++ )); do
     if (( id == 1 )); then name="speedtest-hybrid-worker"; else name="speedtest-hybrid-worker-${id}"; fi
-    URL="https://${name}.lumajangnetworks.${WORKERS_DEV_SUFFIX}/__meta"
+    URL="https://${name}.${CF_WORKERS_SUBDOMAIN}.${WORKERS_DEV_SUFFIX}/__meta"
     BODY=$(curl -s -m 15 "$URL" || true)
     WID=$(echo "$BODY" | jq -r '.worker.id // "err"' 2>/dev/null || echo err)
     if [[ "$WID" == "$id" ]]; then

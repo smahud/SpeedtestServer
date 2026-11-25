@@ -11,3 +11,8 @@ validation/harness/out/
 *.pem
 *.key
 validation/harness/tls-cases/
+
+# install-time configuration with secrets (template: .env.example).
+# NEVER commit a filled .env — it holds the Cloudflare token/global key
+# and the hybrid shared secret.
+/.env

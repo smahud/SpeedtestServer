@@ -73,14 +73,18 @@ above is the research summary; this section is the operator quickstart.
 
 ### Install summary
 
-- **Native (no Worker):** follow sections 5 and 6 — `install.sh` (Debian 13 +
-  systemd) or manual install — starting from
-  [`config/OoklaServer.properties.template`](config/OoklaServer.properties.template).
-  No Cloudflare account is involved.
-- **Hybrid control plane on the VPS:** follow
-  [`docs/HYBRID_DEPLOYMENT_RUNBOOK.md`](docs/HYBRID_DEPLOYMENT_RUNBOOK.md) —
-  gateway unit `speedtest-hybrid-gateway.service`, env file
-  `/etc/speedtest-hybrid/gateway.env` holding `HYBRID_SHARED_SECRET`,
+- **Native (no Worker):** `cp .env.example .env` → set `HYBRID_ENABLED=false`
+  (or run `install.sh --no-hybrid`) → `sudo ./install.sh --start`. No
+  Cloudflare account is involved. (Manual path: sections 5 and 6, starting
+  from [`config/OoklaServer.properties.template`](config/OoklaServer.properties.template).)
+- **Full hybrid stack (daemon + gateway + Cloudflare worker pool):**
+  `cp .env.example .env` → fill the Cloudflare credentials and
+  `CF_WORKER_DEPLOY_COUNT` → `sudo ./install.sh --start`. Everything
+  installs automatically — including the worker side (deploy-pool.sh with
+  the shared secret on every worker). Manual/legacy path:
+  [`docs/HYBRID_DEPLOYMENT_RUNBOOK.md`](docs/HYBRID_DEPLOYMENT_RUNBOOK.md).
+  Gateway: `speedtest-hybrid-gateway.service`, env file
+  `/etc/speedtest-hybrid/gateway.env` (generated from `.env`),
   speedtest front enabled via `HYBRID_FRONT_ENABLED=true`, listening on
   port 8790 (TLS).
 
@@ -98,25 +102,54 @@ authenticated requests to a sibling when it senses saturation
 limits (100k requests/day is ACCOUNT-wide — a pool distributes, it does not
 multiply), and evidence: [`docs/WORKER_POOL.md`](docs/WORKER_POOL.md).
 
-### VPS assist mode (sesi 9 — "CF helps the load, it does not replace it")
+### VPS full-potential assist mode (v1.4 — "VPS releases ALL its bandwidth, CF only helps")
 
-With `HYBRID_VPS_DL_BUDGET_MBPS` set (e.g. 100 on a 100 Mbps VPS) the
-speedtest front serves download payload DIRECTLY from the VPS while a
-token bucket still has budget, and 302-redirects the overflow to the
-Worker pool — the client's aggregate becomes ≈ VPS budget + edge
-capacity, so a 1 Gbps client behind a 100 Mbps VPS can actually measure
-~1 Gbps. The hybrid probe client additionally splits its uploads between
-the VPS front and the Worker edge (`HYBRID_VPS_UL_SHARE`) and can raise
-engine parallelism (`HYBRID_DL_THREADS`/`HYBRID_UL_THREADS`/`HYBRID_DL_COUNTS`).
-Design, configuration, bugs fixed in the same pass, and evidence:
+The v1.3 byte-budget (`HYBRID_VPS_DL_BUDGET_MBPS`) was REMOVED at operator
+decision — it capped the VPS's contribution. v1.4 has **no budget and no
+throttle at all**: `HYBRID_VPS_DL_SHARE` (0.0–1.0, default 0.15) is the
+fraction of download requests served DIRECTLY by the VPS at full socket
+speed, while the complementary fraction is 302-assisted by the Worker pool
+**in parallel** (per-IP Bresenham interleave — deterministic from the first
+request). The client's aggregate becomes ≈ VPS capacity + edge capacity:
+`1.0` = pure VPS potential (edge idle, CF quota saved), `0.0` = pure edge.
+The hybrid probe client additionally splits its uploads between the VPS
+front and the Worker edge (`HYBRID_VPS_UL_SHARE`) and can raise engine
+parallelism (`HYBRID_DL_THREADS`/`HYBRID_UL_THREADS`/`HYBRID_DL_COUNTS`).
+Design, configuration, tests (13/13 unit, 4/4 e2e) and evidence:
 [`docs/HYBRID_ASSIST_MODE.md`](docs/HYBRID_ASSIST_MODE.md).
+
+### One-shot full-stack install (v1.4 — `.env` driven)
+
+The repository `.env` (template: [`.env.example`](.env.example)) is the
+single source of install-time configuration: Cloudflare credentials (API
+token or global key — every required permission scope is documented in
+[`docs/CLOUDFLARE_CREDENTIALS.md`](docs/CLOUDFLARE_CREDENTIALS.md)), the
+**worker pool deploy count** (`CF_WORKER_DEPLOY_COUNT`, 1..100), the
+shared HMAC secret (auto-generated when left empty), and all gateway
+runtime vars.
+
+```bash
+cp .env.example .env && nano .env   # fill the CF credentials + worker count
+sudo ./install.sh --start           # daemon + hybrid gateway + N CF workers
+```
+
+`install.sh` deploys everything: the OoklaServer-compatible daemon, the
+hybrid gateway (systemd, hardened), the Cloudflare worker pool with the
+shared secret set on every worker, and post-deploy verification
+(`/__meta` per worker + gateway `/api/health`). It is idempotent —
+re-runs regenerate `gateway.env` from `.env` (with an automatic backup of
+the previous one) and redeploy the workers.
 
 ### Creating the Cloudflare Worker
 
 Prerequisites: a Cloudflare account (the Free plan works), Node.js + wrangler
-(`npx wrangler`), an API token with Workers edit permission (Account >
-Workers Scripts: Edit; the "Edit Cloudflare Workers" template), and the
-account ID.
+(`npx wrangler`), an API token with the right permission scopes (Account >
+Workers Scripts: Edit + Account Settings: Read + User Details: Read — the
+"Edit Cloudflare Workers" template), and the account ID. **Every scope,
+where to click, and how to verify the token is documented step-by-step in
+[`docs/CLOUDFLARE_CREDENTIALS.md`](docs/CLOUDFLARE_CREDENTIALS.md)** — or
+skip all of this and let `install.sh` + `.env` deploy the whole pool
+automatically.
 
 1. `cd hybrid/worker`
 2. Set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the shell —
