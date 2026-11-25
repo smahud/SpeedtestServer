@@ -160,7 +160,14 @@ export function createWorkerPool(opts = {}) {
     served: 0,
   }));
 
-  let activeCount = activeMin;
+  // BUG FIX (2026-11-25, sesi 9): the active set used to be "the first
+  // activeCount workers" — a dead/benched candidate at position activeCount
+  // BLOCKED ALL GROWTH PAST IT (worker 2 dead → worker 3+ could never be
+  // activated, permanently capping the pool below its size). The active set
+  // is now an explicit id list; growth scans for the next healthy,
+  // non-backing-off candidate anywhere beyond the active set.
+  let activeIds = workers.slice(0, activeMin).map((w) => w.id);
+  let activeCount = activeIds.length;
   let cursor = 0;
   let idleSince = 0;
   let mintTotal = 0;
@@ -171,7 +178,21 @@ export function createWorkerPool(opts = {}) {
   let stopped = false;
 
   const healthy = (w) => Date.now() >= w.benchUntil;
-  const activeWorkers = () => workers.slice(0, activeCount).filter(healthy);
+  const activeWorkers = () => workers.filter((w) => activeIds.includes(w.id) && healthy(w));
+
+  /** Next growth candidate: lowest-id worker NOT active, not benched, and
+   *  not in canary backoff — so a dead sibling in the middle of the ring no
+   *  longer stalls the whole pool's scale-up. */
+  function nextCandidate() {
+    for (const w of workers) {
+      if (activeIds.includes(w.id)) continue;
+      if (Date.now() < w.benchUntil) continue;
+      const bo = canaryBackoff.get(w.id);
+      if (bo && Date.now() < bo.retryAt) continue;
+      return w;
+    }
+    return null;
+  }
 
   function pickWorker() {
     const act = activeWorkers();
@@ -295,25 +316,38 @@ export function createWorkerPool(opts = {}) {
       const target = Math.max(activeMin, Math.min(activeMax, Math.ceil(rate / scaleRate)));
 
       if (target > activeCount && !quotaBlocksGrowth()) {
-        // Grow one worker per tick (canary-gated); sustained pressure repeats.
-        const candidate = workers[activeCount]; // next inactive worker
+        // Grow one worker per tick (canary-gated); the candidate scan skips
+        // benched / backing-off siblings so one dead worker in the middle of
+        // the ring no longer blocks activation of the healthy ones beyond it.
+        const candidate = nextCandidate();
         if (candidate) {
           const ok = await canary(candidate);
           if (ok) {
-            activeCount++;
-            log('pool_scaled_up', { activeCount, target, mintRatePerMin: rate });
+            activeIds.push(candidate.id);
+            activeCount = activeIds.length;
+            log('pool_scaled_up', { activeCount, target, mintRatePerMin: rate, workerId: candidate.id });
           } else {
             log('pool_canary_failed', { id: candidate.id });
           }
         }
         idleSince = 0;
       } else if (rate < shrinkRate * activeCount) {
-        // Below the idle line: shrink by one after a sustained idle window.
+        // Below the idle line: shrink by one after a sustained idle window
+        // (from the tail — the primary worker 1 is never the one removed).
         if (!idleSince) idleSince = Date.now();
         else if (Date.now() - idleSince >= idleShrinkMs && activeCount > activeMin) {
-          activeCount--;
+          while (activeIds.length > activeMin && activeIds[activeIds.length - 1] === 1) {
+            // defensive: rotate the primary to the front if it ever ends up
+            // at the tail (cannot happen via push/pop, but stays correct).
+            activeIds.unshift(activeIds.pop());
+            break;
+          }
+          if (activeIds.length > activeMin) {
+            const removed = activeIds.pop();
+            activeCount = activeIds.length;
+            log('pool_scaled_down', { activeCount, removed, mintRatePerMin: rate });
+          }
           idleSince = Date.now();
-          log('pool_scaled_down', { activeCount, mintRatePerMin: rate });
         }
       } else {
         idleSince = 0;
@@ -322,10 +356,13 @@ export function createWorkerPool(opts = {}) {
       // Optional periodic health probing of the ACTIVE set (staggered: at
       // most one worker per tick — bounded probe budget even at 100 active).
       if (probeIntervalMs > 0 && Date.now() - (state.lastPeriodicProbeAt || 0) >= probeIntervalMs / Math.max(1, activeCount)) {
-        const w = workers[probeCursor % activeCount];
-        probeCursor++;
-        state.lastPeriodicProbeAt = Date.now();
-        await canary(w);
+        const act = activeWorkers();
+        if (act.length > 0) {
+          const w = act[probeCursor % act.length];
+          probeCursor++;
+          state.lastPeriodicProbeAt = Date.now();
+          await canary(w);
+        }
       }
     } catch (e) {
       log('pool_tick_error', { error: String(e).slice(0, 160) });
@@ -352,10 +389,11 @@ export function createWorkerPool(opts = {}) {
       quotaGuard: cfToken ? { enabled: true, ...cfUsage, usedPct: Math.round(quotaPct() * 10) / 10, softPct: cfSoftPct, hardPct: cfHardPct } : { enabled: false },
       quotaBlocksGrowth: quotaBlocksGrowth(),
       quotaBlocksMint: quotaBlocksMint(),
-      workers: workers.slice(0, Math.max(activeCount, Math.min(effectiveMax, activeCount + 4))).map((w) => ({
+      activeIds: [...activeIds],
+      workers: workers.slice(0, Math.min(effectiveMax, Math.max(...activeIds, activeMin) + 4)).map((w) => ({
         id: w.id,
         url: w.url,
-        active: w.id <= activeCount,
+        active: activeIds.includes(w.id),
         healthy: healthy(w),
         benchedUntil: w.benchUntil > Date.now() ? new Date(w.benchUntil).toISOString() : null,
         inWindowMints: w.mints.length,

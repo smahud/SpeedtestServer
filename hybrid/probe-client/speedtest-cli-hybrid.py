@@ -1,22 +1,28 @@
 #!/usr/bin/env python3
 """speedtest-cli-hybrid.py — stock speedtest-cli with hybrid transport routing.
 
-THE MEASUREMENT ENGINE IS 100% STOCK sivel/speedtest-cli. Only two
-client-side transport hooks are installed (both documented, both equivalent
-to what /etc/hosts cannot do for ports):
+THE MEASUREMENT ENGINE IS 100% STOCK sivel/speedtest-cli. Only these
+documented client-side transport hooks are installed (equivalent to what
+/etc/hosts cannot do for ports/parallelism):
 
   1. Speedtest.get_servers — server URLs are rewritten to the VPS FRONT
      (mock domain). This is the "server selection + ping" plane: the client
      resolves the front hostname to the VPS IP and measures latency there.
   2. build_request — upload POSTs (requests WITH body targeted at the
-     speedtest upload endpoint) are routed directly to the Cloudflare
-     Worker `__up` endpoint with a Bearer session token.
-     This is the ONLY way a urllib client can send its payload to the edge:
-     stock urllib always streams the full body to the first hop before
-     reading any redirect, so a 307 cannot offload uploads (see docs).
+     speedtest upload endpoint) are split between the Cloudflare Worker
+     `__up` endpoint (Bearer token) and the VPS front upload.php drain —
+     the VPS contributes its ingress capacity, the edge covers the rest
+     ("CF membantu beban, bukan menggantikan").
+  3. Speedtest.get_config — optional thread/URL-count overrides. The stock
+     engine uses speedtest.net's thread counts (download = threadcount×2,
+     historically small; upload = 4). On a fast link the stock counts cap
+     the aggregate far below client capacity — Ookla's own CLI scales to
+     32 connections. 0 (default) keeps the stock values untouched.
 
-Download needs no patch: the front 302-redirects `random*.jpg` GETs to the
-Worker `__down` endpoint and stock urllib follows GET redirects natively.
+Download needs no routing patch: the front serves the VPS assist lane
+(budget-gated local bytes) and 302-redirects the overflow to the Worker
+`__down` — stock urllib follows GET redirects natively, and the threads run
+unmodified.
 
 Env:
   HYBRID_GATEWAY_BASE   e.g. https://speedtest.lumajangnetworks.my.id:8790
@@ -27,6 +33,14 @@ Env:
                           always | never
   HYBRID_SUBMIT_RESULTS   1 (default) — POST the final JSON result document
                           to <gateway>/api/results (hybrid result intake)
+  HYBRID_DL_THREADS       0 = stock (speedtest.net threadcount×2); e.g. 16
+                          to let a 1 Gbps client actually saturate
+  HYBRID_UL_THREADS       0 = stock; e.g. 8
+  HYBRID_DL_COUNTS        0 = stock urls-per-size; e.g. 8 (more URLs amortize
+                          per-request TLS handshakes at gigabit rates)
+  HYBRID_VPS_UL_SHARE     0.0-1.0 fraction of upload POSTs kept on the VPS
+                          front (its ingress contribution); default 0.15,
+                          0.0 = all edge (v1.1 behavior), 1.0 = all VPS
 """
 import json
 import os
@@ -41,6 +55,27 @@ WORKER_BASE = os.environ.get('HYBRID_WORKER_BASE', '').rstrip('/')
 FRONT_BASE = os.environ.get('HYBRID_FRONT_BASE', '').rstrip('/')
 REWRITE_MODE = os.environ.get('HYBRID_REWRITE_SERVERS', 'auto').lower()
 SUBMIT_RESULTS = os.environ.get('HYBRID_SUBMIT_RESULTS', '1') == '1'
+
+# --- sesi 9 (assist mode): parallelism + VPS/edge upload split ------------
+def _int_env(name, dflt=0):
+    try:
+        return int(os.environ.get(name, str(dflt)))
+    except ValueError:
+        return dflt
+
+
+def _float_env(name, dflt):
+    try:
+        v = float(os.environ.get(name, str(dflt)))
+        return v if 0.0 <= v <= 1.0 else dflt
+    except ValueError:
+        return dflt
+
+
+DL_THREADS = _int_env('HYBRID_DL_THREADS', 0)
+UL_THREADS = _int_env('HYBRID_UL_THREADS', 0)
+DL_COUNTS = _int_env('HYBRID_DL_COUNTS', 0)
+VPS_UL_SHARE = _float_env('HYBRID_VPS_UL_SHARE', 0.15)
 # Optional: the operator's own server list (JSON array of speedtest-server
 # entries). When set, it REPLACES the geo-localized speedtest.net list — this
 # is the "speedtest pointed at the domain list" mode. The URL of every
@@ -152,8 +187,40 @@ def hybrid_get_servers(self, servers=None, exclude=None):
 
 st.Speedtest.get_servers = hybrid_get_servers
 
-# --- hook 2: route upload POSTs directly to the Worker edge -----------------
+# --- hook 3 (sesi 9): parallelism overrides (engine CONFIG, not the
+# measurement algorithm — the stock thread counts come from speedtest.net
+# and cap aggregates far below client capacity on fast links; Ookla's own
+# CLI scales 4→32 connections). 0 = keep stock. ---------------------------
+_orig_get_config = st.Speedtest.get_config
+
+
+def hybrid_get_config(self):
+    result = _orig_get_config(self)
+    try:
+        threads = self.config.get('threads') or {}
+        counts = self.config.get('counts') or {}
+        if DL_THREADS > 0 and 'download' in threads:
+            threads['download'] = DL_THREADS
+        if UL_THREADS > 0 and 'upload' in threads:
+            threads['upload'] = UL_THREADS
+        if DL_COUNTS > 0 and 'download' in counts:
+            counts['download'] = max(int(counts['download']), DL_COUNTS)
+    except (TypeError, ValueError, KeyError):
+        pass
+    return result
+
+
+st.Speedtest.get_config = hybrid_get_config
+
+# --- hook 2: split upload POSTs between the Worker edge and the VPS front ---
+# "CF membantu beban, bukan menggantikan": a weighted fraction of the upload
+# POSTs keeps its original URL (the VPS front upload.php drain — the VPS's
+# ingress contribution), the rest go directly to the Worker __up with a
+# Bearer session token (the only way a urllib client can reach the edge:
+# stock urllib streams the full body before reading any redirect, so a 307
+# cannot offload uploads — see docs).
 _orig_build_request = st.build_request
+_UL_SEQ = {'n': 0}
 
 
 def hybrid_build_request(url, data=None, headers=None, bump='0', secure=False):
@@ -163,9 +230,15 @@ def hybrid_build_request(url, data=None, headers=None, bump='0', secure=False):
     # shipped to the Worker. Only the speedtest upload endpoint is rerouted.
     is_upload_target = 'upload.php' in (url or '')
     if data is not None and is_upload_target and GATEWAY_BASE and WORKER_BASE:
-        url = WORKER_BASE + '/__up'
-        headers = dict(headers or {})
-        headers['Authorization'] = 'Bearer ' + _session_token()
+        _UL_SEQ['n'] += 1
+        to_vps = (VPS_UL_SHARE > 0.0
+                  and (_UL_SEQ['n'] % 1000) < int(round(VPS_UL_SHARE * 1000)))
+        if not to_vps:
+            url = WORKER_BASE + '/__up'
+            headers = dict(headers or {})
+            headers['Authorization'] = 'Bearer ' + _session_token()
+        # else: keep the original URL — the POST drains at the VPS front
+        # (its share of the aggregate upload measurement).
     return _orig_build_request(url, data=data, headers=headers,
                                bump=bump, secure=secure)
 
@@ -186,7 +259,7 @@ def submit_results(document):
                 'downloadBytes': document.get('bytes_received'),
                 'uploadBytes': document.get('bytes_sent'),
                 'pingMs': document.get('ping'),
-                'client': 'speedtest-cli-hybrid/1.1 (engine: speedtest-cli %s)'
+                'client': 'speedtest-cli-hybrid/1.2 (engine: speedtest-cli %s)'
                           % st.__version__,
             },
         }
