@@ -226,3 +226,49 @@ Sesuai perintah operator baru: audit mendalam, perbaikan bug production-ready, d
 4. **Worker v1.2 DEPLOYED** ke akun (primary `speedtest-hybrid-worker`, versi d50eb297) — secret lama dipertahankan (redeploy). E2E produksi hijau (token → 5 MiB @30,6 MB/s HKG; 302 front; 401 negatif). Gateway produksi MASIH v1.1 (berjalan) — update ke v1.2 + env pool butuh akses shell VPS.
 5. **CLI resmi 9/9-style bukti baru (non-publishing):** 2 run exit-0 via mock-DNS sandbox (unshare+bind-mount /etc/hosts): server 74964 → 451,7 Mbps / 133,4 Mbps / loss 0%; server 61853 → 436,0 / 155,0 / 0% (evidence `validation/evidence/cli-official-sandbox-20261125/`).
 6. **BLOCKED:** token UAEG `uaeg_GLZRP_…` DITOLAK server ("invalid or revoked") — semua varian transkripsi juga ditolak; sinkronisasi working tree VPS & deploy gateway v1.2 + pool 100 menunggu token baru (operator: `sudo uaeg keys rotate <ID>` / `sudo uaeg generate`). `HYBRID_SHARED_SECRET` juga dibutuhkan untuk deploy sibling 2..100 (secret Worker write-only).
+
+---
+
+## Status akhir sesi 10 (26 November 2026 — v1.4 "full potential": budget DIHAPUS + .env full-stack)
+
+Keputusan operator (26 Nov): **HYBRID_VPS_DL_BUDGET_MBPS ditolak** — "saya mau VPS bisa
+mengeluarkan semua potensi bandwidth DL/UL nya tapi di bantu dengan CF worker yang
+jumlah deploy-nya dikonfigurasi di .env saat install.sh dijalankan". Implementasi:
+
+1. **v1.4 share-interleave (front.mjs + gateway.mjs):** token-bucket budget DIHAPUS total
+   (tidak ada throttle, tidak ada cap byte). `HYBRID_VPS_DL_SHARE` (0.0–1.0, default 0.15)
+   membagi PERMINTAAN download: share → lane VPS kecepatan PENUH; (1-share) → 302 edge
+   assist PARALEL. Interleave Bresenham per-IP (algoritma yang sama dengan split upload
+   klien — benar sejak request pertama). 1.0 = potensi VPS murni; 0.0 = offload murni.
+   Forced-local fallback tetap (mint rate-limit tidak pernah merusak pengukuran).
+2. **`.env` full-stack (BARU):** `.env.example` root — semua kredensial CF (token ATAU
+   email+global key), account id, `CF_WORKER_DEPLOY_COUNT` (1..100), subdomain, nama
+   worker, shared secret (auto-generate bila kosong), semua var gateway — tiap field
+   berkomentar. `.env` masuk .gitignore.
+3. **install.sh full-stack:** `--env-file/--no-hybrid/--no-workers`; parser .env literal
+   (tanpa eval); fase gateway (user+unit systemd+gateway.env di-generate dari .env+backup
+   otomatis+probe hidup dengan env bersih); fase DEPLOY WORKER POOL (pre-flight verifikasi
+   kredensial CF → npm ci → deploy-pool.sh POOL_SIZE=CF_WORKER_DEPLOY_COUNT → secret di
+   tiap worker → verifikasi /__meta); curl/jq auto-install; kedua service di-enable.
+   `OoklaServer.properties` TETAP 100% standar binary official (tidak disentuh).
+4. **docs/CLOUDFLARE_CREDENTIALS.md (BARU):** token vs global key, tabel scope persis
+   (Account→Workers Scripts:Edit + Account Settings:Read + User→User Details:Read;
+   zone scopes hanya untuk custom domain), langkah pembuatan klik-demi-klik, scope yang
+   tidak perlu, pencarian Account ID, perintah verifikasi, peta variabel .env, batas
+   Free per-akun, keamanan operasional.
+5. **Tes (sandbox, kode `vps-full-potential`):** unit gateway **13/13** (T11–T14 baru:
+   share 1.0 uncapped / share 0 murni edge 1-mint / share 0.5 pola E,V,E,V,forced /
+   share 0.15 distribusi eksak 20→3/17); e2e-assist **4/4**; e2e-pool regression PASS;
+   komponen installer **15/15** (parser .env.example, gateway.env generation + launch
+   --env-file + health, validasi deploy-pool); staged daemon install smoke PASS (HELLO).
+6. **Branch `vps-full-potential`** (3 commit: front v1.4 → gateway v1.4+tests → installer
+   full-stack) — pushed ke origin; PR ke master dibuka, **merge ditunda sampai validasi
+   produksi** (sesuai kriteria operator: sukses → merge).
+7. **BLOCKED (sama seperti sesi 8):** token UAEG `uaeg_GLZRP_…` masih DITOLAK server
+   ("invalid or revoked") — redeploy produksi VPS (gateway v1.4 + gateway.env dari .env
+   + redeploy pool worker bila mau) menunggu token baru: `sudo uaeg generate --name
+   <nama>` atau `sudo uaeg keys rotate <KEY_ID>` di VPS, atau dashboard :3903. Setelah
+   token aktif: `git fetch && git checkout vps-full-potential && cp .env.example .env
+   (isi kredensial CF + CF_WORKER_DEPLOY_COUNT) && sudo ./install.sh --start`, lalu
+   verifikasi `curl -s https://speedtest.lumajangnetworks.my.id:8790/api/health`
+   (`front.assist.vpsDlShare` + `pool.poolMax`) dan E2E speedtest.
