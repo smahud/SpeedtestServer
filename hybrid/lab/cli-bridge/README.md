@@ -5,15 +5,19 @@
 > DIMODIFIKASI, protokol native NetGauge TCP+UDP — bisa atau tidak payload
 > pengukurannya dilayani **VPS + Cloudflare Worker** sekaligus?
 
-## Jawaban singkat (eksperimen berjalan — hasil final menyusul)
+## Jawaban singkat (per eksperimen 27 Nov 2026 — REALIZED_WITH_RELAY)
 
-**Hipotesis yang diuji:** CLI resmi 1.2.0.84 TIDAK DIMODIFIKASI, hosts-mock
-→ VPS, bridge aktif di :8080 — apakah run lengkap (exit 0) terjadi dengan
-payload pengukuran ber-origin di Worker edge (relay VPS)? **Catatan jujur
-sejak desain:** ini BUKAN jalur edge langsung — setiap byte tetap transit
-link VPS (tidak ada tambahan kapasitas per sesi); jalur non-relay untuk
-CLI resmi tetap ter-BLOCK (lihat laporan audit). Angka final + verdict:
-`docs/CLI_BRIDGE_REPORT_2026-11-27.md`.
+**Ya — CLI resmi 1.2.0.84 (tidak dimodifikasi, hosts-mock server ter-publish
+→ VPS :8080) menyelesaikan pengukuran penuh (exit 0, `persisted=false`) dengan
+payload pengukuran ber-origin di Worker edge, pada kedua lane: worker-http
+(DL ≈100% edge 656,7 MB; UL 97,8% 218,7 MB; 54 receipt) dan worker-ws
+(DL ≈100% edge 748,4 MB; UL ≈100% 158,4 MB; ack OK per UPLOAD).** CF GraphQL
+window: 885 invocation semuanya `success`, 0 error. **Label jujur:** ini
+edge-origin dengan **relay VPS** — semua byte tetap transit link VPS (tidak
+ada tambahan kapasitas per sesi; DL bridge 416–449 Mbps vs daemon 451–462
+Mbps); jalur edge langsung (non-relay) untuk CLI resmi tetap BLOCKED per
+audit. Angka lengkap + kronologi: `docs/CLI_BRIDGE_REPORT_2026-11-27.md` +
+`hybrid/lab/evidence/cli-bridge-2026-11-27/`.
 
 ## Arsitektur
 

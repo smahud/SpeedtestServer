@@ -1,0 +1,31 @@
+{
+  "experiment": "cli-bridge — official-CLI native lane bridge (VPS front + Worker payload)",
+  "runId": "cli-bridge-2026-11-27",
+  "question": "Apakah CLI resmi Ookla (tidak dimodifikasi, hosts-mock server ter-publish -> VPS) bisa dilayani secara otomatis oleh VPS + Cloudflare Worker sekaligus dalam satu pengukuran?",
+  "performedBy": "agent session (Z.ai sandbox, egress NAT 45.126.249.249)",
+  "windowUtc": "2026-11-26T20:11:00Z/2026-11-26T20:36:00Z",
+  "repoBaseline": {
+    "master": "1393887 (cli-bridge v1 + fixes)",
+    "vpsDeployed": "daemon /opt/speedtestserver (b629642 dist, unchanged) + bridge transient unit dari /opt/SpeedtestServer-src @1393887",
+    "worker": "speedtest-hybrid-worker (pool 1) — bundle = byte-identical build of committed source (sha256 1cfa1869…, diverifikasi via npx esbuild rebuild)",
+    "workerTestSuite": "conformance 55/55 + token 11/11 + free-hardening 16/16 + pool 8/8 (workerd lokal VPS, PORT_OPEN=18790)",
+    "cliBridgeTestSuite": "158/158 (sandbox + VPS, Node 24.22.3)"
+  },
+  "client": "Speedtest by Ookla 1.2.0.84 (ea6b6773cf) linux-x86_64, unmodified, sha256 31f1124c… — binary tarball repo speedtest-cli_official/ookla-speedtest-1.2.0-linux-x86_64.tgz",
+  "method": {
+    "lab": "unshare --user --map-root-user --mount + bind-mount mockhosts /etc/hosts pada sandbox (entri daftar server operator -> 45.126.249.250; results.speedtest.net -> 127.0.0.1 non-publishing); discovery resmi dibiarkan asli; server dipin --server-id=66281 (speedtest.tuxsnet.id)",
+    "deployment": "push GitHub -> VPS: git pull via uaeg MCP -> daemon direkonfigurasi tcpPorts/udpPorts=5060 selama window (backup .exp-backup-20261127) -> bridge systemd-run transient :8080 (TCP+UDP) -> restore",
+    "backends": "worker-http (/__down chunk 4 MiB streaming + /__up POST per-chunk receipt), worker-ws (NetGauge WSS per-chunk command, framing di-strip, retry re-open), local (pool VPS)",
+    "attribution3sides": "client: JSON CLI exit/bytes/persisted; VPS: bridge JSONL per-lane (bytesFromWorkerDl/bytesToWorkerUl/receipts) + delta eth0; Worker: CF GraphQL workersInvocationsAdaptive (window) + receipts/OK-ack"
+  },
+  "verdict": "REALIZED_WITH_RELAY: CLI resmi 1.2.0.84 menyelesaikan pengukuran penuh (exit 0, persisted=false) dengan 100% byte DL ber-origin di Worker edge dan 96,8–102,5% byte UL diteruskan ke Worker (receipt per-chunk / OK-ack), pada kedua backend (worker-http dan worker-ws). HONEST LABEL: edge-origin dengan VPS relay — semua byte tetap transit link VPS; jalur edge langsung (non-relay) untuk CLI resmi tetap BLOCKED (audit 26–27 Nov).",
+  "notes": [
+    "b2-wh-2 exit 2: bug cache token mint (92 mint -> gateway 429) — fixed commit f9de54e; dokumenter, bukan kegagalan arsitektur.",
+    "b3-ww-1 receipts 0: perintah UPLOAD mentah tidak diteruskan ke sesi WSS (payload jadi frame sampah) — fixed commit 1393887; byte tetap terhitung transit.",
+    "b2-wh-1: bug akumulasi buffer upload (55.478 B dari 181,9 MB) + storm ECONNRESET tanpa retry — fixed commits 0aea68b + 5699d7f.",
+    "DL workerShare >100% = overhead refetch chunk yang di-reset di tengah jalan (CLI menerima byte yang valid penuh).",
+    "GraphQL window 20:00–20:40Z: 885 invocations, semuanya status success, 0 error — tidak ada kill exceededResources selama eksperimen (chunking + retry bekerja)."
+  ],
+  "restore": "daemon dikembalikan ke tcpPorts/udpPorts=5060,8080 + restart; verifikasi post-restore b4-restore-verify exit 0 (462,1/160,3 Mbps, persisted=false); listener :8080/:5060 TCP+UDP kini daemon (PID baru), bridge berhenti.",
+  "sanitization": "tidak ada token/secret pada evidence (bridge JSONL hanya berisi token via header yang tidak dilog; file .env VPS tidak pernah keluar dari VPS)"
+}

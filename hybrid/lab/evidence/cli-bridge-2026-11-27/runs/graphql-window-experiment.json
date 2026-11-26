@@ -1,0 +1,1297 @@
+{
+ "data": {
+  "viewer": {
+   "accounts": [
+    {
+     "workersInvocationsAdaptive": [
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:32Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:33Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 8,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:34Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 22,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:35Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 24,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:36Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 19,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:37Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 14,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:38Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 11,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:39Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:40Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 15,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:41Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 7,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:42Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 12,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:43Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 16,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:44Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 1,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:11:51Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:21Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:22Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 8,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:23Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 12,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:24Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 22,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:25Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 20,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:26Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:27Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 10,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:28Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 12,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:29Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 22,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:30Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 10,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:31Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 15,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:32Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 6,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:33Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 12,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:34Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 16,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:35Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 15,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:37Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 6,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:38Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 6,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:39Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:40Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:41Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:20:42Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 2,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:50Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 10,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:51Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 16,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:52Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 24,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:53Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 13,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:54Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 17,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:55Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 15,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:56Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 12,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:57Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 15,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:58Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 8,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:23:59Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 6,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:00Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 16,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:01Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 8,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:02Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 7,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:03Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 6,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:04Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:05Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:06Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:07Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:09Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 8,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:10Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:11Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:12Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:13Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:14Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:15Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:16Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:17Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:24:18Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 1,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:03Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 6,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:04Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 26,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:05Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 16,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:06Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 21,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:07Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 14,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:08Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 12,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:09Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 9,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:10Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 12,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:11Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 8,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:12Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 12,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:13Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 1,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:14Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 18,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:15Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 7,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:17Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:18Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:19Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 2,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:20Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:21Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:22Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:23Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:24Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:25Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:26Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:27Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:28Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 4,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:27:29Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:28:46Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:28:47Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 6,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:28:48Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 9,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:28:49Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 10,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:28:50Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 2,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:28:51Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 1,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:28:57Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:28:59Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 1,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:32:57Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:32:58Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 1,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:32:59Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:33:00Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 5,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:33:01Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 8,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:33:02Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 6,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:33:03Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 2,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:33:05Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 2,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:33:12Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 3,
+        "subrequests": 0
+       }
+      },
+      {
+       "dimensions": {
+        "datetime": "2026-11-26T20:33:13Z",
+        "scriptName": "speedtest-hybrid-worker",
+        "status": "success"
+       },
+       "sum": {
+        "errors": 0,
+        "requests": 1,
+        "subrequests": 0
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "errors": null
+}
