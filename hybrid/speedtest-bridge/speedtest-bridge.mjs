@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 /**
- * cli-bridge.mjs — the official-CLI native lane bridge: VPS front + Worker
- * payload (cli-bridge v1, 2026-11-27).
+ * speedtest-bridge.mjs — the speedtest-bridge: VPS front for NATIVE Ookla
+ * clients + Worker payload (speedtest-bridge v1.1, 2026-11-27; promoted from
+ * the validated lab experiment `hybrid/lab/cli-bridge/` — see
+ * docs/CLI_BRIDGE_REPORT_2026-11-27.md).
  *
- * WHAT THIS IS
- *   The unmodified official Ookla Speedtest CLI speaks the native NetGauge
- *   protocol (TCP :8080 + UDP loss) and has no edge transport — the 26–27
- *   Nov 2026 audit verdict for it is NATIVE_VPS_ONLY (BLOCKED_BY_PROTOCOL +
- *   BLOCKED_BY_FREE_PLAN for a DIRECT edge path). This bridge is the
- *   explicitly-labeled follow-up experiment: the VPS TERMINATES the native
+ * WHAT THIS IS (and where it runs)
+ *   A PERMANENT VPS-SIDE service component. It runs ON THE VPS — it is NOT a
+ *   client component and nothing is ever installed on any client. Clients are
+ *   always NATIVE, unmodified Ookla applications (official CLI today; the
+ *   same NetGauge engine family powers the Android/iOS apps and the web
+ *   lane rides the hybrid front). The bridge terminates the native NetGauge
  *   protocol exactly like the daemon (control + identity + loss plane stay
  *   on the VPS), while the measurement payload is ORIGINATED BY THE
  *   CLOUDFLARE WORKER and relayed through the VPS:
  *
- *     official CLI --NetGauge TCP/UDP--> cli-bridge :8080 (VPS)
+ *     native Ookla client --NetGauge TCP/UDP--> speedtest-bridge :8080 (VPS)
  *       control:  HI/HELLO, GETIP, PING, CAPABILITIES, INITPLOSS/PLOSS,
  *                 UDP LOSS → served LOCALLY (daemon-parity semantics,
  *                 validation/PROTOCOL_CONTRACT.md §2–3)
@@ -25,8 +27,29 @@
  *
  *   HONEST LABEL: this is edge-ORIGIN payload with VPS RELAY. Every bridged
  *   byte still transits the VPS link (no single-session capacity gain); a
- *   DIRECT (non-relay) edge path for the official CLI remains blocked per
- *   the audit. Per-lane byte attribution is logged to JSONL.
+ *   DIRECT (non-relay) edge path for native clients remains blocked per
+ *   the 26–27 Nov 2026 audit. Per-lane byte attribution is logged to JSONL.
+ *
+ * PORT UNIFICATION (daemon parity — PROTOCOL_CONTRACT §1 [V])
+ *   The official OoklaServer multiplexes plain HTTP, HTTPS/TLS, WebSocket,
+ *   WSS and native NetGauge on ONE TCP port via per-connection first-byte
+ *   detection (native ports 5060 + 8080). speedtest-bridge reproduces that
+ *   on :8080 so the VPS opens ONLY the two native OoklaServer ports:
+ *
+ *     TCP :8080  → first bytes TLS ClientHello (0x16 0x03 …) → raw-proxied
+ *                  to the hybrid gateway on loopback
+ *                  (SPEEDTEST_BRIDGE_TLS_UPSTREAM, default 127.0.0.1:8790)
+ *                  — anything else → the native NetGauge front below.
+ *     UDP :8080  → NetGauge packet-loss / loaded-latency (LOSS/RECV)
+ *     TCP :5060  → the OoklaServer daemon itself (its other native port,
+ *                  configured in OoklaServer.properties — untouched here)
+ *     UDP :5060  → daemon loss plane
+ *
+ *   The daemon keeps full parity on :5060 (including the HTTP/TLS surface
+ *   and TLS-wrapped NetGauge); the bridge front serves native plaintext
+ *   NetGauge + the TLS mux on :8080 (documented deviation: plain-HTTP
+ *   requests on :8080 fall to the NetGauge front → ERROR/3-strikes; use
+ *   https:// — the gateway is TLS in production).
  *
  * PROTOCOL PARITY (front) — faithful port of the verified daemon semantics
  *   (engine reference: reverse-engineered/typescript/src/server/NetGaugeEngine.ts):
@@ -35,17 +58,24 @@
  *   UPLOAD_STATS, DOWNLOAD n byte-exact ("DOWNLOAD " prefix + pool +
  *   trailing "\n", all counted in n, F-9), UPLOAD n inclusive counting +
  *   "OK n <epoch-ms>", QUIT closes, unknown/encrypted-binary hello → ERROR
- *   (drives the CLI's documented plaintext fallback), UDP LOSS init form
+ *   (drives the client's documented plaintext fallback), UDP LOSS init form
  *   (counted, no reply) / loaded-latency form (counted + "RECV ..." reply),
  *   PLOSS stats line, bounded loss registry (F-33 port).
  *
- * BACKENDS (BRIDGE_BACKEND)
+ * ABUSE GUARDS (recommendation #1 of docs/CLI_BRIDGE_REPORT_2026-11-27.md)
+ *   - per-IP concurrent connection cap (daemon parity maxConnPerIp = 500)
+ *   - per-IP new-connection rate limit (SPEEDTEST_BRIDGE_CONN_RATE_PER_MIN,
+ *     default 240/min — a full CLI run opens 30–45 connections; 0 = off)
+ *   - token minting stays behind the gateway's own rate limiter (mint is
+ *     cached once per process + 5s failure backoff)
+ *
+ * BACKENDS (SPEEDTEST_BRIDGE_BACKEND)
  *   worker-http (default, recommended) — chunked /__down streaming (real
  *     HTTP backpressure: the Worker only generates what the bridge drains)
  *     + chunked /__up POSTs with receipts. Validated under the CLI's own
  *     connection pattern on the live worker (32×32 MiB: 32/32 DL +
  *     32/32 UL, 0 errors, 2026-11-27).
- *   worker-ws — one NetGauge WSS session per CLI connection; DOWNLOAD
+ *   worker-ws — one NetGauge WSS session per client connection; DOWNLOAD
  *     relayed as chunked DOWNLOAD commands with the framing stripped
  *     (byte stream stays daemon-parity) so per-command in-flight bytes
  *     stay bounded: unpaced single-command 32 MiB relays get
@@ -56,14 +86,18 @@
  *   local — daemon-parity pool served by the VPS itself (front control
  *     lane: A/B baseline against the worker lanes).
  *
- * USAGE (VPS, during an experiment window; the daemon must not hold :8080)
- *   BRIDGE_BACKEND=worker-http node hybrid/lab/cli-bridge/cli-bridge.mjs \
- *     --port 8080 --log /var/lib/cli-bridge/cli-bridge.jsonl
- *   Token: minted from the hybrid gateway (BRIDGE_GATEWAY_BASE, default
- *   https://127.0.0.1:8790) or fixed via BRIDGE_TOKEN + BRIDGE_WORKER_BASE.
+ * USAGE (production: installed by install.sh as speedtest-bridge.service —
+ *   env-gated by SPEEDTEST_BRIDGE_ENABLED in .env; see the unit file and
+ *   CONTRACT.md. Manual foreground run for debugging:)
+ *   SPEEDTEST_BRIDGE_BACKEND=worker-http \
+ *     node hybrid/speedtest-bridge/speedtest-bridge.mjs \
+ *     --port 8080 --log /var/lib/speedtest-bridge/speedtest-bridge.jsonl
+ *   Token: minted from the hybrid gateway (SPEEDTEST_BRIDGE_GATEWAY_BASE,
+ *   default https://127.0.0.1:8790) or fixed via SPEEDTEST_BRIDGE_TOKEN +
+ *   SPEEDTEST_BRIDGE_WORKER_BASE.
  *
- * Env (BRIDGE_*): see README.md. Zero dependencies (node:net/dgram/tls/
- * http(s)/crypto/fs/path + the global WebSocket client).
+ * Env (SPEEDTEST_BRIDGE_*): see README.md. Zero dependencies (node:net/
+ * dgram/tls/http(s)/crypto/fs/path + the global WebSocket client).
  */
 
 import net from 'node:net';
@@ -74,26 +108,39 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
+const envBool = (v, dflt) => {
+  if (v === undefined || v === '') return dflt;
+  return !/^(0|false|off|no)$/i.test(v);
+};
+
 // ---------------------------------------------------------------- config
 const cfg = {
   port: 8080,
-  backend: (process.env.BRIDGE_BACKEND || 'worker-http').toLowerCase(),
-  gatewayBase: process.env.BRIDGE_GATEWAY_BASE || 'https://127.0.0.1:8790',
-  workerBase: process.env.BRIDGE_WORKER_BASE || '',
-  token: process.env.BRIDGE_TOKEN || '',
-  log: path.join(process.cwd(), 'cli-bridge.jsonl'),
-  idleMs: Number(process.env.BRIDGE_IDLE_MS || 3600000), // daemon maxConnectionSeconds parity
-  maxConnPerIp: Number(process.env.BRIDGE_MAX_CONN_PER_IP || 500),
+  backend: (process.env.SPEEDTEST_BRIDGE_BACKEND || 'worker-http').toLowerCase(),
+  gatewayBase: process.env.SPEEDTEST_BRIDGE_GATEWAY_BASE || 'https://127.0.0.1:8790',
+  workerBase: process.env.SPEEDTEST_BRIDGE_WORKER_BASE || '',
+  token: process.env.SPEEDTEST_BRIDGE_TOKEN || '',
+  log: process.env.SPEEDTEST_BRIDGE_LOG || 'speedtest-bridge.jsonl',
+  idleMs: Number(process.env.SPEEDTEST_BRIDGE_IDLE_MS || 3600000), // daemon maxConnectionSeconds parity
+  maxConnPerIp: Number(process.env.SPEEDTEST_BRIDGE_MAX_CONN_PER_IP || 500),
+  // Abuse guard (recommendation #1): per-IP NEW connections per minute. A
+  // full official-CLI run opens 30–45 TCP connections; default 240/min =
+  // ~5 concurrent runs from one IP. 0 = disabled.
+  connRatePerMin: Number(process.env.SPEEDTEST_BRIDGE_CONN_RATE_PER_MIN ?? 240),
   maxLineBytes: 1024 * 1024,
-  maxDownloadBytes: Number(process.env.BRIDGE_MAX_DL_BYTES || 128 * 1024 * 1024),
-  maxUploadBytes: Number(process.env.BRIDGE_MAX_UL_BYTES || 128 * 1024 * 1024),
-  httpChunk: Number(process.env.BRIDGE_HTTP_CHUNK || 4 * 1024 * 1024),
-  ulChunk: Number(process.env.BRIDGE_UL_CHUNK || 4 * 1024 * 1024),
-  ulInFlight: Number(process.env.BRIDGE_UL_INFLIGHT || 2),
-  wsChunk: Number(process.env.BRIDGE_WS_CHUNK || 1024 * 1024),
-  wsPaceMs: Number(process.env.BRIDGE_WS_PACE_MS ?? 0),
+  maxDownloadBytes: Number(process.env.SPEEDTEST_BRIDGE_MAX_DL_BYTES || 128 * 1024 * 1024),
+  maxUploadBytes: Number(process.env.SPEEDTEST_BRIDGE_MAX_UL_BYTES || 128 * 1024 * 1024),
+  httpChunk: Number(process.env.SPEEDTEST_BRIDGE_HTTP_CHUNK || 4 * 1024 * 1024),
+  ulChunk: Number(process.env.SPEEDTEST_BRIDGE_UL_CHUNK || 4 * 1024 * 1024),
+  ulInFlight: Number(process.env.SPEEDTEST_BRIDGE_UL_INFLIGHT || 2),
+  wsChunk: Number(process.env.SPEEDTEST_BRIDGE_WS_CHUNK || 1024 * 1024),
+  wsPaceMs: Number(process.env.SPEEDTEST_BRIDGE_WS_PACE_MS ?? 0),
   localChunk: 512 * 1024,
-  versionString: process.env.BRIDGE_VERSION_STRING || '2.11 (2.11.5) 2026-06-04.1737.7d0993d',
+  // --- port-unification mux (daemon parity, PROTOCOL_CONTRACT §1 [V]) ---
+  tlsMux: envBool(process.env.SPEEDTEST_BRIDGE_TLS_MUX, true),
+  tlsUpstream: process.env.SPEEDTEST_BRIDGE_TLS_UPSTREAM || '127.0.0.1:8790',
+  tlsSniffMs: Number(process.env.SPEEDTEST_BRIDGE_TLS_SNIFF_MS || 2000),
+  versionString: process.env.SPEEDTEST_BRIDGE_VERSION_STRING || '2.11 (2.11.5) 2026-06-04.1737.7d0993d',
   instanceUuid: crypto.randomUUID(), // lower-case, daemon parity
   startedAt: Date.now(),
 };
@@ -104,9 +151,17 @@ for (let i = 2; i < process.argv.length; i++) {
   else if (t === '--log') cfg.log = process.argv[++i];
   else if (t === '--gateway') cfg.gatewayBase = process.argv[++i];
   else if (t === '--worker') cfg.workerBase = process.argv[++i];
+  else if (t === '--tls-upstream') cfg.tlsUpstream = process.argv[++i];
+  else if (t === '--no-tls-mux') cfg.tlsMux = false;
 }
 fs.mkdirSync(path.dirname(cfg.log), { recursive: true });
-const LOG = fs.createWriteStream(cfg.log, { flags: 'w' });
+// Permanent-service log: append, but roll over a previous run that left a
+// >64 MiB file (one .old generation — keeps it bounded without logrotate).
+try {
+  const st = fs.statSync(cfg.log);
+  if (st.size > 64 * 1024 * 1024) fs.renameSync(cfg.log, cfg.log + '.old');
+} catch { /* not present — fresh start */ }
+const LOG = fs.createWriteStream(cfg.log, { flags: 'a' });
 const t0hr = process.hrtime.bigint();
 const relMs = () => Number((process.hrtime.bigint() - t0hr) / 1000000n);
 function log(o) { o.ts = Date.now(); o.rt = relMs(); LOG.write(JSON.stringify(o) + '\n'); }
@@ -114,13 +169,50 @@ function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 const DOWNLOAD_PREFIX = 'DOWNLOAD ';
+const UA = 'speedtest-bridge/1.1';
 const counters = {
-  conns: 0, closed: 0, rejected: 0,
+  conns: 0, closed: 0, rejected: 0, rateRejected: 0,
   downloads: 0, uploads: 0,
   bytesDownCli: 0, bytesUpCli: 0,
   bytesFromWorkerDl: 0, bytesToWorkerUl: 0, bytesLocalDl: 0,
   workerRequests: 0, workerErrors: 0, workerReceipts: 0,
+  tlsProxied: 0, tlsClosed: 0,
 };
+
+// ---------------------------------------------------------------- per-IP guards
+const perIpConns = new Map();
+
+// Per-IP new-connection rate limit (minute buckets, bounded map).
+const connRate = {
+  map: new Map(), // ip -> {minute, count}
+  allow(ip) {
+    if (cfg.connRatePerMin <= 0) return true;
+    const m = Math.floor(Date.now() / 60000);
+    let e = this.map.get(ip);
+    if (!e || e.minute !== m) {
+      this.prune(m);
+      e = { minute: m, count: 0 };
+      this.map.set(ip, e);
+    }
+    e.count++;
+    return e.count <= cfg.connRatePerMin;
+  },
+  prune(curMinute) {
+    if (this.map.size < 16384) return;
+    for (const [k, v] of this.map) if (v.minute !== curMinute) this.map.delete(k);
+  },
+};
+
+function connRegister(peerIp) {
+  const ipCount = (perIpConns.get(peerIp) || 0) + 1;
+  if (ipCount > cfg.maxConnPerIp) return false;
+  perIpConns.set(peerIp, ipCount);
+  return true;
+}
+function connUnregister(peerIp) {
+  const n = perIpConns.get(peerIp) || 1;
+  if (n <= 1) perIpConns.delete(peerIp); else perIpConns.set(peerIp, n - 1);
+}
 
 // ---------------------------------------------------------------- loss registry
 // Bounded port of the daemon LossRegistry (F-33): per-IP fairness, LRU
@@ -182,7 +274,7 @@ const tokenMgr = {
     // Mint backoff: a failed mint (429 rate-limited / network) must not
     // hammer the gateway — every connection's first measurement would
     // otherwise re-mint (92 mints observed run b2-wh-2 → gateway 429 →
-    // CLI connection aborts). One shared token serves ALL connections.
+    // client connection aborts). One shared token serves ALL connections.
     if (now < this.cooldownUntil) throw new Error(`mint cooling down (${Math.ceil((this.cooldownUntil - now) / 1000)}s)`);
     if (!this.inflight) {
       this.inflight = this.mint()
@@ -198,7 +290,7 @@ const tokenMgr = {
       if (u.protocol !== 'https:') return reject(new Error('gateway must be https'));
       const req = https.request(
         { hostname: u.hostname, port: u.port || 443, path: u.pathname, method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Content-Length': '2', 'User-Agent': 'cli-bridge/1.0' },
+          headers: { 'Content-Type': 'application/json', 'Content-Length': '2', 'User-Agent': UA },
           rejectUnauthorized: false, timeout: 10000 },
         (res) => {
           let b = '';
@@ -240,7 +332,7 @@ async function httpJson(method, urlStr, headers, body, timeoutMs = 120000, agent
 }
 
 // ---------------------------------------------------------------- backends
-// Per-CLI-connection interface:
+// Per-client-connection interface:
 //   download(poolBytes, emit) — emit exactly poolBytes pool bytes via emit(buf)
 //   uploadStart(n)            — begin an upload (n = declared total)
 //   uploadFeed(buf)          — forward payload bytes (may buffer)
@@ -291,7 +383,7 @@ function makeWorkerHttpBackend(connId) {
   let workerBase = null;
   let dlChunks = 0, ulPosts = 0, ulInFlight = 0, ulErrors = 0, wake = null;
   let receipts = [];
-  // Persistent between uploadFeed calls: the CLI socket delivers the payload
+  // Persistent between uploadFeed calls: the client socket delivers the payload
   // in ~64 KiB TCP chunks — accumulation MUST span feeds (a per-call buffer
   // dropped everything but the last chunk; fixed 2026-11-27 after run
   // b2-wh-1 relayed only 55 478 of 181 873 801 upload bytes).
@@ -306,7 +398,7 @@ function makeWorkerHttpBackend(connId) {
   async function base() {
     const t = await tokenMgr.get();
     workerBase = (t.workerBase || cfg.workerBase || workerBase || '').replace(/\/+$/, '');
-    if (!workerBase) throw new Error('no worker base (gateway mint or BRIDGE_WORKER_BASE)');
+    if (!workerBase) throw new Error('no worker base (gateway mint or SPEEDTEST_BRIDGE_WORKER_BASE)');
     return t.token;
   }
   function kick() { if (wake) { const r = wake; wake = null; r(); } }
@@ -316,7 +408,7 @@ function makeWorkerHttpBackend(connId) {
     for (let attempt = 1; ; attempt++) {
       try {
         const r = await httpJson('POST', workerBase + '/__up',
-          { Authorization: `Bearer ${token}`, 'Content-Length': String(body.length), 'User-Agent': 'cli-bridge/1.0' },
+          { Authorization: `Bearer ${token}`, 'Content-Length': String(body.length), 'User-Agent': UA },
           body, 120000, workerBase.startsWith('http://') ? agentHttp : agentHttps);
         counters.workerRequests++;
         if (r.status !== 200) throw new Error(`__up ${r.status}`);
@@ -349,7 +441,7 @@ function makeWorkerHttpBackend(connId) {
           const req = mod.request(
             { hostname: u.hostname, port: u.port || (u.protocol === 'https:' ? 443 : 80),
               path: u.pathname + u.search, method: 'GET',
-              headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'cli-bridge/1.0' },
+              headers: { Authorization: `Bearer ${token}`, 'User-Agent': UA },
               rejectUnauthorized: false, timeout: 60000,
               agent: u.protocol === 'https:' ? agentHttps : agentHttp },
             resolve);
@@ -383,7 +475,7 @@ function makeWorkerHttpBackend(connId) {
       let off = 0;
       while (off < n) {
         const want = Math.min(cfg.httpChunk, n - off);
-        let got = 0; // bytes of THIS chunk already emitted to the CLI
+        let got = 0; // bytes of THIS chunk already emitted to the client
         let attempt = 0;
         for (;;) {
           try {
@@ -394,7 +486,7 @@ function makeWorkerHttpBackend(connId) {
             }
             counters.workerRequests++;
             // async iteration = real backpressure: the worker only generates
-            // what this loop drains (emit awaits the CLI socket drain).
+            // what this loop drains (emit awaits the client socket drain).
             for await (const c of res) {
               counters.bytesFromWorkerDl += c.length;
               await emit(c);
@@ -426,7 +518,7 @@ function makeWorkerHttpBackend(connId) {
     async uploadStart() { receipts = []; ulPosts = 0; ulErrors = 0; pending = null; },
     async uploadFeed(buf) {
       // ACCUMULATE across feeds, then POST ulChunk-sized bodies with bounded
-      // in-flight (the CLI's send rate is not throttled by edge RTT).
+      // in-flight (the client's send rate is not throttled by edge RTT).
       pending = pending ? Buffer.concat([pending, buf]) : buf;
       while (pending.length >= cfg.ulChunk) {
         const body = pending.subarray(0, cfg.ulChunk);
@@ -454,8 +546,8 @@ function makeWorkerHttpBackend(connId) {
   };
 }
 
-/** worker-ws — one NetGauge WSS session per CLI connection (chunked
- *  DOWNLOAD commands, framing stripped; UPLOAD forwarded as frames). */
+/** worker-ws — one NetGauge WSS session per client connection (chunked
+ * DOWNLOAD commands, framing stripped; UPLOAD forwarded as frames). */
 function makeWorkerWsBackend(connId) {
   let ws = null, workerBase = null, opening = null, closedByWorker = false;
   const waiters = [];
@@ -594,7 +686,7 @@ function makeWorkerWsBackend(connId) {
     },
     async uploadEnd() {
       // The worker's "OK n <ts>" ack is the receipt; the FRONT already
-      // answered the CLI (daemon parity: OK right after consuming n).
+      // answered the client (daemon parity: OK right after consuming n).
       try {
         const item = await nextMsg(60000, 'ws upload ack');
         const text = (item.text ?? '').trim();
@@ -616,31 +708,76 @@ function makeBackend(connId) {
   if (cfg.backend === 'local') return makeLocalBackend(connId);
   if (cfg.backend === 'worker-ws') return makeWorkerWsBackend(connId);
   if (cfg.backend === 'worker-http') return makeWorkerHttpBackend(connId);
-  throw new Error('unknown BRIDGE_BACKEND: ' + cfg.backend);
+  throw new Error('unknown SPEEDTEST_BRIDGE_BACKEND: ' + cfg.backend);
+}
+
+// ---------------------------------------------------------------- TLS mux
+// Port unification, daemon parity (PROTOCOL_CONTRACT §1 [V]): the official
+// OoklaServer serves plain HTTP, HTTPS/TLS, WS/WSS and native NetGauge on
+// ONE TCP port via per-connection first-byte detection. Here the TLS branch
+// is a raw TCP proxy to the hybrid gateway on loopback — the gateway keeps
+// terminating TLS (its systemd LoadCredential) and serving the control
+// plane + web front. Everything else stays on the native NetGauge front.
+//
+// Detection is CONSERVATIVE: a TLS ClientHello record is
+//   0x16 (record: handshake) 0x03 <minor 0x00-0x04> <len:2> 0x01 (handshake:
+//   ClientHello) <len:3> …
+// with a sane record length (8..18432 — max TLS record 2^14+2048). The
+// official client's encrypted-binary hello is random-looking; the chance it
+// matches ALL of that is negligible, and it is still answered by the front
+// (ERROR → documented plaintext fallback) when it does not.
+function looksLikeTls(buf) {
+  if (buf.length < 1) return null;
+  if (buf[0] !== 0x16) return false;
+  if (buf.length < 2) return null;
+  if (buf[1] !== 0x03) return false;
+  if (buf.length < 3) return null;
+  if (buf[2] > 0x04) return false; // TLS 1.0–1.3 record version minor
+  if (buf.length < 6) return null;
+  const recLen = buf.readUInt16BE(3);
+  if (recLen < 8 || recLen > 18432) return false;
+  return buf[5] === 0x01; // first handshake message = ClientHello
+}
+
+function proxyTls(sock, prebuf, peer, peerIp) {
+  const upHost = cfg.tlsUpstreamHost;
+  const upPort = cfg.tlsUpstreamPort;
+  counters.tlsProxied++;
+  log({ k: 'tls_proxy_open', peer, upstream: `${upHost}:${upPort}` });
+  const up = net.connect({ host: upHost, port: upPort });
+  let closed = false;
+  const finish = () => {
+    if (closed) return;
+    closed = true;
+    counters.tlsClosed++;
+    connUnregister(peerIp);
+    log({ k: 'tls_proxy_close', peer });
+  };
+  up.on('connect', () => {
+    if (prebuf.length) up.write(prebuf);
+    sock.pipe(up);
+    up.pipe(sock);
+  });
+  up.on('error', (e) => { log({ k: 'tls_proxy_err', peer, error: String(e.message || e) }); sock.destroy(); up.destroy(); });
+  sock.on('error', () => { up.destroy(); });
+  up.on('close', finish);
+  sock.on('close', finish);
+  sock.setTimeout(cfg.idleMs * 2, () => { sock.destroy(); up.destroy(); });
 }
 
 // ---------------------------------------------------------------- TCP front
-const perIpConns = new Map();
-
-function handleConn(sock) {
+function handleConn(sock, prebuf) {
   const id = ++counters.conns;
   const peer = `${sock.remoteAddress}:${sock.remotePort}`;
   const peerIp = normIp(sock.remoteAddress || '');
-  const ipCount = (perIpConns.get(peerIp) || 0) + 1;
-  if (ipCount > cfg.maxConnPerIp) {
-    counters.rejected++;
-    log({ k: 'conn_rejected', id, peer, reason: 'max-conn-per-ip' });
-    sock.destroy();
-    return;
-  }
-  perIpConns.set(peerIp, ipCount);
   sock.setNoDelay(true);
   sock.setTimeout(cfg.idleMs);
   log({ k: 'conn_open', id, peer });
 
   const backend = makeBackend(id);
   const st = {
-    buf: Buffer.alloc(0), closed: false, muted: false, hiSeen: false,
+    buf: prebuf && prebuf.length ? Buffer.from(prebuf) : Buffer.alloc(0),
+    closed: false, muted: false, hiSeen: false,
     sessionUuid: null, uploadRemaining: 0, uploadTotal: 0, uploadCounted: 0,
     errorStrikes: 0, processing: false, firstRead: true,
     cmds: 0, bytesDown: 0, bytesUp: 0, dl: 0, ul: 0, openedRt: relMs(),
@@ -653,30 +790,35 @@ function handleConn(sock) {
     st.closed = 'logged';
     counters.closed++;
     counters.bytesDownCli += st.bytesDown; counters.bytesUpCli += st.bytesUp;
-    const n = perIpConns.get(peerIp) || 1;
-    if (n <= 1) perIpConns.delete(peerIp); else perIpConns.set(peerIp, n - 1);
+    connUnregister(peerIp);
     log({ k: 'conn_close', id, peer, commands: st.cmds, downloads: st.dl, uploads: st.ul,
       bytesDown: st.bytesDown, bytesUp: st.bytesUp, durMs: relMs() - st.openedRt });
     void backend.close().catch(() => {});
   });
-  sock.on('data', (chunk) => {
-    // Pre-session GETIP gate (F-12): before any HI on this connection, a
-    // read whose first line is exactly "GETIP" with trailing bytes in the
-    // same read mutes the connection (no reply ever, socket kept open).
-    if (st.firstRead) {
-      st.firstRead = false;
-      if (!st.hiSeen && st.uploadRemaining === 0 && chunk.length > 6 &&
-          chunk.subarray(0, 5).toString('latin1') === 'GETIP') {
-        const nl = chunk.indexOf(0x0a);
-        if (nl === -1 || nl + 1 < chunk.length) {
-          st.muted = true;
-          log({ k: 'conn_muted_getip_gate', conn: id, bytes: chunk.length });
-        }
+  // Pre-session GETIP gate (F-12): before any HI on this connection, a
+  // read whose first line is exactly "GETIP" with trailing bytes in the
+  // same read mutes the connection (no reply ever, socket kept open).
+  // Applies to the FIRST read — which may be the mux prebuf (the sniffer
+  // consumed the first TCP segment) or the first 'data' event.
+  function firstReadGate(chunk) {
+    if (!st.hiSeen && st.uploadRemaining === 0 && chunk.length > 6 &&
+        chunk.subarray(0, 5).toString('latin1') === 'GETIP') {
+      const nl = chunk.indexOf(0x0a);
+      if (nl === -1 || nl + 1 < chunk.length) {
+        st.muted = true;
+        log({ k: 'conn_muted_getip_gate', conn: id, bytes: chunk.length });
       }
     }
+  }
+  sock.on('data', (chunk) => {
+    if (st.firstRead) { st.firstRead = false; firstReadGate(chunk); }
     st.buf = Buffer.concat([st.buf, chunk]);
     void pump();
   });
+  if (st.buf.length) {
+    if (st.firstRead) { st.firstRead = false; firstReadGate(st.buf); }
+    void pump(); // the mux prebuf must be processed without waiting for more data
+  }
 
   function writeLine(line) {
     if (st.closed) return;
@@ -858,6 +1000,52 @@ function handleConn(sock) {
   }
 }
 
+// Connection entry: per-IP guards apply to BOTH lanes (native NetGauge and
+// the TLS mux) — they protect the port, not the protocol.
+function onConnection(sock) {
+  const peerIp = normIp(sock.remoteAddress || '');
+  const peer = `${sock.remoteAddress}:${sock.remotePort}`;
+
+  if (!connRegister(peerIp)) {
+    counters.rejected++;
+    log({ k: 'conn_rejected', peer, reason: 'max-conn-per-ip' });
+    sock.destroy();
+    return;
+  }
+  if (!connRate.allow(peerIp)) {
+    counters.rateRejected++;
+    connUnregister(peerIp);
+    log({ k: 'conn_rate_rejected', peer, limit: cfg.connRatePerMin });
+    sock.destroy();
+    return;
+  }
+
+  if (!cfg.tlsMux) { handleConn(sock, null); return; }
+
+  // First-byte detection (daemon parity). Buffer until looksLikeTls decides
+  // or the sniff window elapses; then hand the pre-read bytes to the chosen
+  // lane so no byte is ever lost or duplicated.
+  const parts = [];
+  let decided = false;
+  const onData = (c) => {
+    parts.push(c);
+    const r = looksLikeTls(Buffer.concat(parts));
+    if (r === null) return; // need more bytes (max 7)
+    settle(r ? 'tls' : 'netgauge');
+  };
+  const timer = setTimeout(() => settle('netgauge'), cfg.tlsSniffMs);
+  function settle(lane) {
+    if (decided) return;
+    decided = true;
+    clearTimeout(timer);
+    sock.removeListener('data', onData);
+    const pre = Buffer.concat(parts);
+    if (lane === 'tls') proxyTls(sock, pre, peer, peerIp);
+    else handleConn(sock, pre);
+  }
+  sock.on('data', onData);
+}
+
 function writeWait(sock, buf) {
   return new Promise((resolve, reject) => {
     if (sock.destroyed) return reject(new Error('socket destroyed'));
@@ -892,14 +1080,23 @@ udpSock.on('message', (msg, rinfo) => {
     log({ k: 'udp_count', uuid, seq, from: rinfo.address });
   }
 });
-udpSock.on('error', (e) => { console.error('[cli-bridge] udp error:', e.message); process.exit(1); });
+udpSock.on('error', (e) => { console.error('[speedtest-bridge] udp error:', e.message); process.exit(1); });
 
 // ---------------------------------------------------------------- server
-const server = net.createServer(handleConn);
-server.on('error', (e) => { console.error('[cli-bridge] tcp error:', e.message); process.exit(1); });
+{
+  const m = /^(\[[^\]]*\]|[^:]+):(\d+)$/.exec(cfg.tlsUpstream); // host:port or [v6]:port
+  if (!m) { console.error('[speedtest-bridge] bad SPEEDTEST_BRIDGE_TLS_UPSTREAM:', cfg.tlsUpstream); process.exit(1); }
+  cfg.tlsUpstreamHost = m[1];
+  cfg.tlsUpstreamPort = +m[2];
+}
+const server = net.createServer(onConnection);
+server.on('error', (e) => { console.error('[speedtest-bridge] tcp error:', e.message); process.exit(1); });
 server.listen(cfg.port, '::', () => {
-  console.log(`[cli-bridge] tcp+udp :${cfg.port} | backend=${cfg.backend} | gateway=${cfg.gatewayBase} | log=${cfg.log}`);
+  console.log(`[speedtest-bridge] tcp+udp :${cfg.port} | backend=${cfg.backend} | gateway=${cfg.gatewayBase}` +
+    ` | tlsMux=${cfg.tlsMux ? cfg.tlsUpstream : 'off'} | rate=${cfg.connRatePerMin}/min/ip | log=${cfg.log}`);
   log({ k: 'meta', pid: process.pid, port: cfg.port, backend: cfg.backend, gateway: cfg.gatewayBase,
+    tlsMux: cfg.tlsMux, tlsUpstream: cfg.tlsMux ? cfg.tlsUpstream : null,
+    connRatePerMin: cfg.connRatePerMin, maxConnPerIp: cfg.maxConnPerIp,
     wsChunk: cfg.wsChunk, httpChunk: cfg.httpChunk, wsPaceMs: cfg.wsPaceMs,
     versionString: cfg.versionString, instanceUuid: cfg.instanceUuid, node: process.version });
 });

@@ -1,19 +1,23 @@
 #!/usr/bin/env node
 /**
- * cli-bridge.test.mjs — protocol + backend battery for cli-bridge.mjs.
- *
- * Spawns the bridge (three backends) against a LOCAL mock worker
- * (HTTP /__down + /__up + a hand-rolled NetGauge-over-WS /ws server with the
- * Worker's verified WS semantics) and drives it with a synthetic client that
- * mimics the official CLI's observed pattern:
+ * speedtest-bridge.test.mjs — protocol + backend + mux + guard battery for
+ * speedtest-bridge.mjs (adapted from the validated 158-check lab battery;
+ * same synthetic client that mimics the official CLI's observed pattern:
  *   encrypted-binary hello → ERROR → HI → GETIP/PING/CAPABILITIES →
  *   DOWNLOAD <n> loops → UPLOAD <n> <ms> <c> + payload → UDP LOSS forms.
  *
- * Checks (labels) — protocol parity, byte-exactness, backpressure-safe
- * backends, receipts, UDP loss, three-strikes, GETIP gate/strict, caps.
+ * Sections:
+ *   1. protocolSuite × 3 backends (local / worker-http / worker-ws) —
+ *      parity, byte-exactness, backpressure-safe backends, receipts,
+ *      UDP loss, three-strikes, GETIP gate/strict, caps.
+ *   2. TLS mux — first-byte routing (ClientHello → loopback gateway proxy;
+ *      NetGauge/binary/garbage → front), split-ClientHello tolerance,
+ *      bad-record fallthrough, TLS_MUX=0 knob.
+ *   3. per-IP connection rate limit (CONN_RATE_PER_MIN).
+ *   4. concurrency smoke (worker-http, CLI pattern: 8 × DL 1 MiB + UL 256 KiB).
  *
- * Usage: node test/cli-bridge.test.mjs            (all backends)
- *        node test/cli-bridge.test.mjs local       (single backend)
+ * Usage: node test/speedtest-bridge.test.mjs            (everything)
+ *        node test/speedtest-bridge.test.mjs local       (single backend)
  * Run:   bash test/run-tests.sh
  */
 import { spawn } from 'node:child_process';
@@ -25,14 +29,16 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-const BRIDGE = new URL('../cli-bridge.mjs', import.meta.url).pathname;
+const BRIDGE = new URL('../speedtest-bridge.mjs', import.meta.url).pathname;
 const BRIDGE_PORT = 18080;
 const WORKER_PORT = 18081;
+const GW_MOCK_PORT = 18890; // TLS-mux upstream (plain TCP echo — routing only)
 const TOKEN = 'test-token-abcdef';
 const WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 let pass = 0, fail = 0;
 const fails = [];
+const children = []; // spawned bridge processes (killed on exit)
 function expect(cond, label) {
   if (cond) { pass++; }
   else { fail++; fails.push(label); console.error('  FAIL:', label); }
@@ -206,6 +212,24 @@ function startMockWorker() {
   });
 }
 
+// -------------------------------------------------- mock gateway (TLS-mux upstream)
+// Plain TCP echo server standing in for the loopback hybrid gateway: the mux
+// only ROUTES (raw proxy), so a TCP echo proves routing + byte fidelity.
+function startMockGateway() {
+  let conns = 0, closed = 0;
+  const received = [];
+  const server = net.createServer((sock) => {
+    conns++;
+    sock.setNoDelay(true);
+    sock.on('data', (c) => { received.push(c); sock.write(Buffer.concat([Buffer.from('ECHO:'), c])); });
+    sock.on('close', () => { closed++; });
+    sock.on('error', () => {});
+  });
+  return new Promise((resolve) => {
+    server.listen(GW_MOCK_PORT, '127.0.0.1', () => resolve({ server, stats: () => ({ conns, closed, received: Buffer.concat(received) }) }));
+  });
+}
+
 // Minimal WS server-side frame ENCODER (unmasked server frames)
 function wsSend(socket, opcode, payload) {
   const len = payload.length;
@@ -333,10 +357,14 @@ async function protocolSuite(label, checkLog) {
   // 1. encrypted-binary hello → ERROR → HI → HELLO (the CLI fallback drive).
   //    Deterministic content: opaque bytes with NO stray 0x0a (random
   //    newlines would produce 3+ ERROR strikes and close the connection
-  //    mid-test — the real CLI's hello is one line, one ERROR, fallback).
+  //    mid-test — the real CLI's hello is one line, one ERROR, fallback),
+  //    and a first-bytes shape that can NEVER look like a TLS ClientHello
+  //    (mux safety: 0x16 0x03 …) nor like "HI " (JWT disconnect path).
   {
     const c = connect();
-    const binHello = Buffer.from(Array.from(crypto.randomBytes(16), (v) => (v === 0x0a ? 0x0b : v)));
+    const binHello = crypto.randomBytes(16);
+    for (let i = 0; i < binHello.length; i++) if (binHello[i] === 0x0a) binHello[i] = 0x0b;
+    binHello[0] = 0x48; binHello[1] = 0x49; binHello[2] = 0x7e; // "HI~…" → unknown
     c.write(Buffer.concat([binHello, Buffer.from('\n', 'latin1')]));
     const e1 = await c.readLine();
     expect(e1 === 'ERROR', `${label}: binary hello → ERROR`);
@@ -490,17 +518,106 @@ async function protocolSuite(label, checkLog) {
   if (checkLog) await checkLog(label);
 }
 
+// ---------------------------------------------------------------- TLS mux suite
+async function tlsMuxSuite(gw) {
+  section('TLS mux (first-byte routing, daemon parity PROTOCOL_CONTRACT §1)');
+
+  // A well-formed fake ClientHello record: 16 03 01 <len:2> 01 <junk>.
+  const mkClientHello = () => {
+    const body = crypto.randomBytes(40);
+    const rec = Buffer.alloc(5 + body.length);
+    rec[0] = 0x16; rec[1] = 0x03; rec[2] = 0x01;      // handshake, TLS 1.0 record
+    rec.writeUInt16BE(body.length, 3);
+    body.copy(rec, 5);
+    // body[0] must be 0x01 (ClientHello) for the 6th byte check
+    rec[5] = 0x01;
+    return rec;
+  };
+
+  // 1. ClientHello → proxied to the loopback gateway (ECHO: prefix proves it)
+  {
+    const ch = mkClientHello();
+    const c = connect();
+    c.write(ch);
+    const back = await c.readExact(5 + ch.length, 5000);
+    expect(back.subarray(0, 5).toString('latin1') === 'ECHO:', 'mux: ClientHello routed to gateway upstream');
+    expect(back.subarray(5).equals(ch), 'mux: proxied bytes exact (prebuf forwarded, no loss/dup)');
+    c.destroy();
+  }
+  // 2. NetGauge stays on the front (no proxy)
+  {
+    const c = connect();
+    c.writeLine('HI');
+    const hello = await c.readLine();
+    expect(/^HELLO 2\.11 /.test(hello), 'mux: NetGauge HI → front HELLO (not proxied)');
+    c.destroy();
+  }
+  // 3. split ClientHello (byte 1 arrives, rest 300 ms later) → still proxied
+  {
+    const ch = mkClientHello();
+    const c = connect();
+    c.write(ch.subarray(0, 3));
+    await sleep(300);
+    c.write(ch.subarray(3));
+    const back = await c.readExact(5 + ch.length, 5000);
+    expect(back.subarray(0, 5).toString('latin1') === 'ECHO:' && back.subarray(5).equals(ch),
+      'mux: split ClientHello tolerated (waits for decisive bytes)');
+    c.destroy();
+  }
+  // 4. 0x16 0x03 with an IMPOSSIBLE record shape (minor 0x09) → NetGauge front
+  {
+    const c = connect();
+    const bad = Buffer.concat([Buffer.from([0x16, 0x03, 0x09, 0x00, 0x40, 0x01, 0x77]), Buffer.from('\n', 'latin1')]);
+    c.write(bad);
+    const line = await c.readLine();
+    expect(line === 'ERROR', 'mux: bad TLS record shape falls to NetGauge front (ERROR)');
+    c.destroy();
+  }
+  // 5. gateway-side accounting: exactly 2 proxied connections so far
+  await sleep(200);
+  const s = gw.stats();
+  expect(s.conns === 2, `mux: upstream saw exactly 2 proxied conns (got ${s.conns})`);
+  expect(s.received.length > 0, 'mux: upstream received the ClientHello bytes');
+}
+
+// ---------------------------------------------------------------- rate-limit suite
+async function rateLimitSuite() {
+  section('per-IP connection rate limit (SPEEDTEST_BRIDGE_CONN_RATE_PER_MIN=4)');
+  const b = await spawnBridge('local', { SPEEDTEST_BRIDGE_CONN_RATE_PER_MIN: '4' });
+  children.push(b.child);
+  const keep = [];
+  for (let i = 0; i < 4; i++) {
+    const c = connect();
+    c.writeLine('HI');
+    expect(/^HELLO /.test(await c.readLine()), `rate: conn ${i + 1}/4 served`);
+    keep.push(c);
+  }
+  // 5th connection within the same minute → destroyed without any reply
+  const c5 = connect();
+  const r = await c5.readMaybe(800);
+  expect(r === null, 'rate: 5th conn gets no reply');
+  await sleep(300);
+  expect(c5.closed(), 'rate: 5th conn destroyed');
+  for (const c of keep) c.destroy();
+  await waitExit(b.child);
+  await sleep(200);
+  const events = fs.readFileSync(b.logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  expect(events.some((e) => e.k === 'conn_rate_rejected'), 'rate: conn_rate_rejected logged');
+  expect(!events.some((e) => e.k === 'tls_proxy_open'), 'rate: no spurious TLS routing');
+}
+
 // ---------------------------------------------------------------- runner
 async function spawnBridge(backend, extraEnv = {}) {
-  const logPath = path.join(os.tmpdir(), `cli-bridge-test-${backend}-${Date.now()}.jsonl`);
+  const logPath = path.join(os.tmpdir(), `speedtest-bridge-test-${backend}-${Date.now()}.jsonl`);
   const child = spawn(process.execPath, [BRIDGE, '--port', String(BRIDGE_PORT), '--backend', backend, '--log', logPath], {
     env: {
       ...process.env,
-      BRIDGE_TOKEN: TOKEN,
-      BRIDGE_WORKER_BASE: `http://127.0.0.1:${WORKER_PORT}`,
-      BRIDGE_WS_CHUNK: String(64 * 1024), // exercise multi-chunk relays with small sizes
-      BRIDGE_HTTP_CHUNK: String(64 * 1024),
-      BRIDGE_UL_CHUNK: String(32 * 1024),
+      SPEEDTEST_BRIDGE_TOKEN: TOKEN,
+      SPEEDTEST_BRIDGE_WORKER_BASE: `http://127.0.0.1:${WORKER_PORT}`,
+      SPEEDTEST_BRIDGE_TLS_UPSTREAM: `127.0.0.1:${GW_MOCK_PORT}`,
+      SPEEDTEST_BRIDGE_WS_CHUNK: String(64 * 1024), // exercise multi-chunk relays with small sizes
+      SPEEDTEST_BRIDGE_HTTP_CHUNK: String(64 * 1024),
+      SPEEDTEST_BRIDGE_UL_CHUNK: String(32 * 1024),
       ...extraEnv,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -521,7 +638,7 @@ async function waitExit(child) {
 async function main() {
   const which = process.argv[2] || 'all';
   const mock = await startMockWorker();
-  const children = [];
+  const gw = await startMockGateway();
   process.on('unhandledRejection', (e) => {
     fail++; fails.push('unhandled rejection: ' + String((e && e.message) || e));
   });
@@ -536,6 +653,20 @@ async function main() {
     } finally {
       await waitExit(b.child);
     }
+  }
+
+  if (which === 'all' || which === 'mux') {
+    const b = await spawnBridge('local');
+    children.push(b.child);
+    try {
+      await protocolSuite('local');
+      await tlsMuxSuite(gw);
+    } finally {
+      await waitExit(b.child);
+    }
+  }
+  if (which === 'all' || which === 'rate') {
+    await rateLimitSuite();
   }
 
   if (which === 'all' || which === 'local') {
@@ -607,6 +738,7 @@ async function main() {
     process.exit(1);
   }
   mock.server.close();
+  gw.server.close();
   process.exit(0);
 }
 

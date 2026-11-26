@@ -1,0 +1,56 @@
+# speedtest-bridge.service — the permanent speedtest-bridge unit.
+#
+# Generated/installed by install.sh (this example shows the production
+# shape; install.sh writes the real unit with resolved paths). The bridge
+# owns the NATIVE OoklaServer port :8080 (TCP + UDP):
+#   - native NetGauge front for unmodified official Ookla clients
+#     (CLI / mobile apps), measurement payload from the Worker pool;
+#   - TLS ClientHello connections are raw-proxied to the hybrid gateway on
+#     loopback (port unification, daemon parity — PROTOCOL_CONTRACT §1),
+#     so :8790 never needs to be public.
+# The OoklaServer daemon itself keeps the other native port :5060.
+#
+# Auto-start on boot + auto-restart on crash are the whole point of this
+# unit (operator request, 27 Nov 2026): Restart=always + RestartSec=3,
+# enabled via WantedBy=multi-user.target.
+
+[Unit]
+Description=Speedtest Bridge (VPS front for native Ookla clients: NetGauge parity + Worker payload, :8080)
+Documentation=file:/opt/speedtest-hybrid/speedtest-bridge/README.md
+# The gateway mints the worker tokens the bridge relays; start order matters
+# (the bridge tolerates a late gateway: mint backoff + cached token).
+# Requires = start propagation (gateway start pulls the bridge up); the
+# native front deliberately SURVIVES a brief gateway restart — control
+# commands keep answering daemon-parity while mint backs off and recovers.
+After=network-online.target speedtest-hybrid-gateway.service
+Wants=network-online.target
+Requires=speedtest-hybrid-gateway.service
+
+[Service]
+Type=simple
+User=speedtest-hybrid
+Group=speedtest-hybrid
+EnvironmentFile=/etc/speedtest-hybrid/speedtest-bridge.env
+WorkingDirectory=/opt/speedtest-hybrid
+ExecStart=/usr/bin/node /opt/speedtest-hybrid/speedtest-bridge/speedtest-bridge.mjs
+# auto-start after reboot AND auto-restart after any crash/exit
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=120
+StartLimitBurst=10
+# Hardening (same profile as the gateway unit; no capabilities needed —
+# :8080/:5060 are unprivileged ports)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/speedtest-bridge
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
