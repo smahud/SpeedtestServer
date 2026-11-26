@@ -26,13 +26,19 @@ server cannot do:
 
 ```
                          ┌────────────────────────────┐
-   Ookla CLI (binary ────┤  VPS :8080/:5060           │  Lane A — native
-   NetGauge protocol)    │  SpeedtestServer daemon    │  (1:1 official
-                         │  full VPS link speed       │   protocol, TLS)
-                         └────────────────────────────┘
-                         ┌────────────────────────────┐
-   HTTP speedtest ───────┤  VPS :8790 hybrid gateway  │  Lane B — hybrid
-   clients + probe       │  control plane + front     │  (VPS lane at FULL
+   NATIVE Ookla ─────────┤  VPS :8080 speedtest-bridge│  Lane A — native bridge
+   clients (CLI/app,     │  NetGauge front (daemon    │  (unmodified clients:
+   NetGauge TCP+UDP)     │  parity) + TLS mux → gw    │  control on the VPS,
+                         │  payload ← Worker pool     │  payload edge-origin)
+                         ├───────────────────────────┤
+                         │  VPS :5060 daemon          │  Lane A′ — native daemon
+                         │  (OoklaServer.properties)  │  (full-parity fallback)
+                         └──────────┬─────────────────┘
+                                    │ TLS mux (daemon-parity
+                                    │ first-byte detection)
+                         ┌──────────┴─────────────────┐
+   HTTP speedtest ───────┤  hybrid gateway (loopback  │  Lane B — hybrid
+   clients + probe       │  :8790) control plane+front │  (VPS lane at FULL
                          │  .env watcher (live config)│   speed ∥ CF edge)
                          └──────────┬─────────────────┘
                                     │ 302 offload + HMAC tokens
@@ -40,13 +46,14 @@ server cannot do:
                     │  Cloudflare Worker pool 1..N  │
                     │  speedtest-hybrid-worker[-N]  │
                     │  .workers.dev (dynamic N)     │
-                    └───────────────────────────────┘
+                    └──────────────────────────────┘
 ```
 
 | Lane | Who it serves | Endpoint | Throughput |
 |---|---|---|---|
-| A — native | Official Ookla CLI / NetGauge TCP+UDP | VPS `:8080` / `:5060` | VPS link (uncapped) |
-| B — hybrid | HTTP speedtest clients (mini/probe) | Gateway `:8790` + worker pool | VPS **+** Cloudflare edge |
+| A — native bridge | **native Ookla clients** (official CLI today; mobile-app engine family) | `speedtest-bridge :8080` (TCP+UDP NetGauge + TLS mux) | VPS relay of edge-origin payload (honest label: no per-session capacity gain) |
+| A′ — native daemon | full-parity NetGauge incl. HTTP/TLS surface + TLS-wrapped NetGauge | daemon `:5060` | VPS link (uncapped) |
+| B — hybrid | HTTP speedtest clients (mini/probe/web) | gateway (public via the bridge TLS mux on `:8080`) + worker pool | VPS **+** Cloudflare edge |
 
 The two lanes share one HMAC secret; the gateway mints tokens, the Workers
 verify them locally (zero runtime coupling). Result records flow back to the
@@ -55,16 +62,21 @@ bytes.
 
 ## Ports — what this project touches
 
+Only the **two native OoklaServer ports** are open to the public
+(`OoklaServer.properties` stays the single source for them):
+
 | Port | Component | Notes |
 |---|---|---|
-| **8080** | SpeedtestServer daemon | OoklaServer-standard TCP/UDP/HTTP port |
-| **5060** | SpeedtestServer daemon | OoklaServer-standard secondary port |
-| 8790 | Hybrid gateway (control plane + front) | configurable in `.env` |
+| **8080** | **speedtest-bridge** (TCP+UDP) | native NetGauge front for native Ookla clients + daemon-parity TLS mux into the gateway |
+| **5060** | SpeedtestServer daemon (TCP+UDP) | OoklaServer-standard secondary port — narrowed here (in `OoklaServer.properties`) while the bridge owns 8080 |
+| 8790 | hybrid gateway | **loopback only** (the bridge TLS mux proxies into it; never public) |
 | — | Cloudflare Workers | `*.workers.dev` (no VPS port) |
 
 The project **never** binds 80, 443, 8081 or 8443, and never touches
 unrelated services on the host. `OoklaServer.properties` follows the
-official Ookla format exactly and is preserved across upgrades.
+official Ookla format exactly and is preserved across upgrades (the bridge
+narrowing writes it a timestamped backup first; `SPEEDTEST_BRIDGE_ENABLED=false`
+restores both native ports and removes the bridge unit).
 
 ## Quick start
 
@@ -101,7 +113,7 @@ preserved; unchanged workers are not redeployed).
 | `CF_WORKERS_SUBDOMAIN` / `CF_WORKER_NAME` | — | workers.dev URL derivation |
 | `HYBRID_SHARED_SECRET` | auto | HMAC secret (auto-generated; deployed to every worker) |
 | `HYBRID_VPS_DL_SHARE` | 0.15 | fraction of download requests served directly by the VPS at FULL speed; the rest is 302-assisted by the pool. 1.0 = pure VPS, 0.0 = pure edge |
-| `HYBRID_GATEWAY_PORT` | 8790 | gateway listener (avoid 80/443/5060/8080/8081/8443) |
+| `HYBRID_GATEWAY_PORT` | 8790 | gateway listener — loopback-only under the bridge TLS mux |
 | `HYBRID_GATEWAY_TLS_CERT/KEY` | daemon cert | gateway TLS (served via systemd `LoadCredential`) |
 
 Full field reference, Cloudflare token scopes and troubleshooting:
@@ -178,9 +190,9 @@ contract, verified with multi-server CLI campaigns.
 ### Hybrid lane (HTTP clients)
 
 ```bash
-HYBRID_FRONT_BASE=https://speedtest.lumajangnetworks.my.id:8790 \
+HYBRID_FRONT_BASE=https://speedtest.lumajangnetworks.my.id:8080 \
 HYBRID_WORKER_BASE=https://speedtest-hybrid-worker.lumajangnetworks.workers.dev \
-HYBRID_GATEWAY_BASE=https://speedtest.lumajangnetworks.my.id:8790 \
+HYBRID_GATEWAY_BASE=https://speedtest.lumajangnetworks.my.id:8080 \
 HYBRID_DL_THREADS=16 HYBRID_UL_THREADS=8 \
 python3 hybrid/probe-client/speedtest-cli-hybrid.py --json --server 99999
 ```

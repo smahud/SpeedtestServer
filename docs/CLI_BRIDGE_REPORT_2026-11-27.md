@@ -1,5 +1,12 @@
 # CLI BRIDGE REPORT 2026-11-27 — CLI resmi dilayani VPS + Cloudflare Worker
 
+> **Pembaruan 27 Nov (kemudian): nama "cli-bridge" dipensiunkan →
+> `speedtest-bridge`** (komponen produksi permanen
+> `hybrid/speedtest-bridge/`, unit `speedtest-bridge.service`, env
+> `SPEEDTEST_BRIDGE_*`, + mux TLS :8080 + guard rate-limit per-IP —
+> implementasi rekomendasi #1 laporan ini; tes 225/225). Laporan historis di
+> bawah tetap memakai nama lama dan angka window eksperimen asli.
+>
 > Lanjutan eksperimen `cli-bridge` (agent 26–27 Nov 2026). Evidence lengkap:
 > `hybrid/lab/evidence/cli-bridge-2026-11-27/` (checksums di
 > `lab-meta/checksums.txt`). Audit pendahulu:

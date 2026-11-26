@@ -5,6 +5,10 @@
 > dengan aman. Semua metode di sini sudah dipakai dan tervalidasi 27 Nov 2026
 > (evidence: `hybrid/lab/evidence/cli-bridge-2026-11-27/`).
 > Bahasa: Indonesia; konvensi istilah teknis mengikuti repo.
+> **Pembaruan 27 Nov (kemudian): mode bridge kini PERMANEN** —
+> `speedtest-bridge.service` (rename dari eksperimen lab `cli-bridge`),
+> daemon tetap di :5060, gateway loopback; tidak ada lagi window eksperimen
+> manual (lihat §4). Kontrak proyek: `CONTRACT.md`.
 
 ## 0. Prinsip yang tidak boleh dilanggar
 
@@ -87,34 +91,34 @@ Tanpa perubahan apa pun di VPS, run di §2 menguji **daemon produksi langsung**
 Worker = 0 request). Gunakan selalu 1 run kontrol sebelum/sesudah eksperimen
 bridge (b0/b4 pada evidence 27 Nov).
 
-## 4. Mode cli-bridge (VPS + Worker) — window eksperimen
+## 4. Mode speedtest-bridge (VPS + Worker) — PRODUKSI PERMANEN
 
-Bridge: `hybrid/lab/cli-bridge/cli-bridge.mjs` (dokumen: `README.md` di
-direktori itu). Front = protokol native di VPS; payload = origin Worker.
+Bridge produksi: `hybrid/speedtest-bridge/speedtest-bridge.mjs` (dokumen:
+`README.md` di direktori itu). Unit: `speedtest-bridge.service` — auto-start
+saat boot + auto-restart saat crash; env `SPEEDTEST_BRIDGE_*` dari
+`/etc/speedtest-hybrid/speedtest-bridge.env` (di-regenerate dari `.env` oleh
+install.sh; perubahan → `systemctl restart speedtest-bridge`). Front =
+protokol native di VPS; payload = origin Worker. Port :8080 juga membawa
+mux TLS → gateway loopback (penyatuan port: hanya 8080+5060 yang terbuka;
+daemon permanen di :5060, dikonfigurasi di `OoklaServer.properties` dengan
+backup `*.bak-speedtest-bridge-*`).
 
-**Window di VPS (via UAEG MCP, root):**
+**Tidak ada window eksperimen manual lagi** — run §2 dari sandbox langsung
+menguji mode produksi ini. Kontrol daemon (A/B): matikan bridge
+(`SPEEDTEST_BRIDGE_ENABLED=false` di `.env` + jalankan ulang
+`install.sh --start` — daemon kembali ke 8080+5060, gateway publik :8790),
+uji, lalu aktifkan lagi; atau pakai baseline historis b0/b4.
+
+**Ganti backend live** (worker-http / worker-ws / local):
 
 ```bash
-# 1. backup konfigurasi daemon + turunkan daemon dari :8080
-cp /etc/speedtestserver/OoklaServer.properties \
-   /etc/speedtestserver/OoklaServer.properties.exp-backup-$(date +%Y%m%d)
-sed -i 's|^OoklaServer.tcpPorts = .*|OoklaServer.tcpPorts = 5060|; s|^OoklaServer.udpPorts = .*|OoklaServer.udpPorts = 5060|' \
-   /etc/speedtestserver/OoklaServer.properties
-systemctl restart speedtestserver
-ss -tlnp | grep -E ':(5060|8080) '   # :5060 daemon ada, :8080 KOSONG
-
-# 2. nyalakan bridge (transient unit; pilih backend)
-mkdir -p /var/lib/cli-bridge
-systemd-run --unit=speedtest-clibridge --collect \
-  --setenv=BRIDGE_BACKEND=worker-http \
-  --setenv=BRIDGE_GATEWAY_BASE=https://127.0.0.1:8790 \
-  /usr/local/bin/node /opt/SpeedtestServer-src/hybrid/lab/cli-bridge/cli-bridge.mjs \
-  --port 8080 --log /var/lib/cli-bridge/<label>.jsonl
-
-# 3. (ganti backend: stop unit + systemd-run ulang dengan BRIDGE_BACKEND=worker-ws|local)
+# di VPS: edit SPEEDTEST_BRIDGE_BACKEND di .env, lalu:
+sudo systemctl restart speedtest-bridge
+journalctl -u speedtest-bridge -f          # meta: backend=…, tlsMux=…, rate=…
+ss -tlnp | grep -E ':(8080|5060) '         # bridge :8080, daemon :5060
 ```
 
-**Snapshot sebelum/sesudah** untuk atribusi eth0:
+**Snapshot sebelum/sesudah** untuk atribusi eth0 (tetap berlaku):
 
 ```bash
 date -u +%Y-%m-%dT%H:%M:%SZ
@@ -122,15 +126,8 @@ cat /sys/class/net/eth0/statistics/{rx,tx}_bytes
 ```
 
 **Uji**: jalankan §2 dari sandbox beberapa kali per backend (rekomendasi ≥2).
-Lalu **restore + verifikasi**:
-
-```bash
-systemctl stop speedtest-clibridge
-cp /etc/speedtestserver/OoklaServer.properties.exp-backup-<tgl> \
-   /etc/speedtestserver/OoklaServer.properties
-systemctl restart speedtestserver
-ss -tlnp | grep 8080     # harus daemon lagi; verifikasi 1 run §2 (exit 0)
-```
+Lane web/custom via port yang sama — verifikasi mux TLS (dari sandbox):
+`curl -sk https://speedtest.lumajangnetworks.my.id:8080/api/health`.
 
 ## 5. Atribusi 3 sisi — cara membaca
 
@@ -175,8 +172,8 @@ Catatan penting:
 
 ```bash
 # di VPS
-systemctl is-active speedtestserver speedtest-hybrid-gateway
-ss -tlnp | grep -E ':(8080|5060|8790) '        # daemon + gateway
+systemctl is-active speedtestserver speedtest-hybrid-gateway speedtest-bridge
+ss -tlnp | grep -E ':(8080|5060|8790) '   # bridge :8080, daemon :5060, gateway 127.0.0.1:8790 saja
 curl -sk https://127.0.0.1:8790/api/pool | head -c 300   # pool + quota
 # worker live (dari mana pun, pakai token dari gateway):
 TOKEN=$(curl -sk -X POST https://127.0.0.1:8790/api/sessions -H 'Content-Type: application/json' -d '{}' | grep -o '"token": "[^"]*"' | cut -d'"' -f4)

@@ -33,9 +33,16 @@ hybrid/
 │   ├── test/      conformance battery (62 checks) + token battery + runner
 │   └── DEPLOY.md  one-command production deployment
 ├── gateway/       VPS control plane (zero-dependency Node): discovery, HMAC
-│                  session tokens, result intake, TTFB ping
+│                  session tokens, result intake, TTFB ping — loopback-only
+│                  under the bridge TLS mux (public via :8080)
+├── speedtest-bridge/  PERMANENT VPS front for NATIVE Ookla clients:
+│                  NetGauge parity on :8080 + payload from the Worker pool +
+│                  daemon-parity TLS mux → gateway loopback (unit
+│                  speedtest-bridge.service, auto-start + auto-restart; tes
+│                  225/225) — v1.6 port unification: only native ports open
 ├── probe-client/  hybrid session instrument with per-endpoint byte accounting
-├── lab/           experiment harness + evidence (E-A … E-I)
+├── lab/           experiment harness + evidence (E-A … E-I; cli-bridge →
+│                  dipromosikan ke speedtest-bridge, folder jadi stub)
 └── reports/       research report + claims register
 ```
 
