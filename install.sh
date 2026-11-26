@@ -681,9 +681,12 @@ EOF
   GW_PROBE_PORT="18790"
   GW_PROBE_LOG="$(mktemp /tmp/sts-hybrid-verify.XXXXXX.log)"
   GW_PROBE_CFG="$(mktemp /tmp/sts-hybrid-verify.XXXXXX.env)"
-  # probe copy: local bind + free port + no TLS (cert is for the public name)
+  # probe copy: local bind + free port + no TLS (cert is for the public name);
+  # the plain loopback listener also gets a free probe port (otherwise the
+  # probe would EADDRINUSE against the live gateway's 8791 and fail).
   sed -e "s/^HYBRID_GATEWAY_BIND=.*/HYBRID_GATEWAY_BIND=127.0.0.1/" \
       -e "s/^HYBRID_GATEWAY_PORT=.*/HYBRID_GATEWAY_PORT=$GW_PROBE_PORT/" \
+      -e "s/^HYBRID_GATEWAY_PLAIN_PORT=.*/HYBRID_GATEWAY_PLAIN_PORT=18791/" \
       -e "/^HYBRID_GATEWAY_TLS_CERT=/d" -e "/^HYBRID_GATEWAY_TLS_KEY=/d" \
       -e "/^HYBRID_RESULTS_FILE=/d" -e "/^HYBRID_ENV_FILE=/d" \
       -e "/^HYBRID_WORKER_BUNDLE=/d" -e "/^HYBRID_WORKER_FP_FILE=/d" \
