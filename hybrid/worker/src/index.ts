@@ -312,6 +312,10 @@ function handleWsUpgrade(request: Request, url: URL, env: Env): Response {
     maxDownloadBytes: num(env.MAX_DOWNLOAD_BYTES, DEFAULTS.maxDownloadBytes),
     maxUploadBytes: num(env.MAX_UPLOAD_BYTES, DEFAULTS.maxUploadBytes),
     maxLineBytes: 1024 * 1024,
+    // cli-bridge lane: ?pace=<ms per 64 KiB frame> bounds the DOWNLOAD send
+    // rate per WS session (Free-tier buffer/CPU safety). Absent for stock
+    // hybrid clients (0 = legacy pacing).
+    downloadPaceMs: Math.max(0, Math.min(50, Number(url.searchParams.get("pace")) || 0)),
   });
 
   server.addEventListener('message', (event: MessageEvent) => {

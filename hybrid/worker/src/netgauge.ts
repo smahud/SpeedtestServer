@@ -50,6 +50,12 @@ export interface NetGaugeOptions {
   maxDownloadBytes: number;
   maxUploadBytes: number;
   maxLineBytes: number;
+  /** Per-64KiB-frame send delay for DOWNLOAD streams (ms). 0 = legacy
+   *  behavior (yield every 32 frames). Set from ?pace= by the cli-bridge
+   *  lane: Workers cannot sense WS send backpressure, and unpaced streams
+   *  balloon the isolate send buffer until exceededResources kills the
+   *  invocation (26 kills observed 2026-11-26 before this fix). */
+  downloadPaceMs?: number;
 }
 
 /** Accumulated evidence counters (surfaced via /__meta). */
@@ -309,9 +315,13 @@ export class NetGaugeEngine {
       sent += len;
       this.counters.bytesDown += len;
       frames++;
-      // Yield periodically so the isolate keeps servicing other events and
-      // the runtime can flush send buffers (no exposed backpressure API).
-      if (frames % 32 === 0) await new Promise((r) => setTimeout(r, 0));
+      // Pacing (?pace= from the cli-bridge lane): sleep after EVERY frame so
+      // the runtime send buffer drains at ~pace*64KiB/s per session. Absent
+      // (0) for stock clients: legacy yield every 32 frames (no exposed
+      // backpressure API in either mode).
+      const pace = this.opts.downloadPaceMs ?? 0;
+      if (pace > 0) await new Promise((r) => setTimeout(r, pace));
+      else if (frames % 32 === 0) await new Promise((r) => setTimeout(r, 0));
     }
     if (sent >= total) {
       this.downloadActive = false;
