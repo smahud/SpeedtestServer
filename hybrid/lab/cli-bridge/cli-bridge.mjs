@@ -110,6 +110,7 @@ const LOG = fs.createWriteStream(cfg.log, { flags: 'w' });
 const t0hr = process.hrtime.bigint();
 const relMs = () => Number((process.hrtime.bigint() - t0hr) / 1000000n);
 function log(o) { o.ts = Date.now(); o.rt = relMs(); LOG.write(JSON.stringify(o) + '\n'); }
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 const DOWNLOAD_PREFIX = 'DOWNLOAD ';
@@ -209,14 +210,14 @@ const tokenMgr = {
 
 // ---------------------------------------------------------------- http helper
 function isHttp(base) { return base.startsWith('http://'); }
-async function httpJson(method, urlStr, headers, body, timeoutMs = 120000) {
+async function httpJson(method, urlStr, headers, body, timeoutMs = 120000, agent = undefined) {
   const u = new URL(urlStr);
   const mod = u.protocol === 'https:' ? https : http;
   return new Promise((resolve, reject) => {
     const req = mod.request(
       { hostname: u.hostname, port: u.port || (u.protocol === 'https:' ? 443 : 80),
         path: u.pathname + u.search, method,
-        headers, rejectUnauthorized: false, timeout: timeoutMs },
+        headers, rejectUnauthorized: false, timeout: timeoutMs, agent },
       (res) => {
         const chunks = [];
         res.on('data', (c) => chunks.push(c));
@@ -280,6 +281,18 @@ function makeWorkerHttpBackend(connId) {
   let workerBase = null;
   let dlChunks = 0, ulPosts = 0, ulInFlight = 0, ulErrors = 0, wake = null;
   let receipts = [];
+  // Persistent between uploadFeed calls: the CLI socket delivers the payload
+  // in ~64 KiB TCP chunks — accumulation MUST span feeds (a per-call buffer
+  // dropped everything but the last chunk; fixed 2026-11-27 after run
+  // b2-wh-1 relayed only 55 478 of 181 873 801 upload bytes).
+  let pending = null;
+  // keep-alive agent: CF closes idle connections aggressively; combined with
+  // the retry below this is both fast and resilient (47 ECONNRESET observed
+  // 2026-11-27 run b2-wh-1 before this).
+  const agentOpts = { keepAlive: true, keepAliveMsecs: 1000, maxSockets: 128, scheduling: 'lifo' };
+  const agentHttps = new https.Agent(agentOpts);
+  const agentHttp = new http.Agent(agentOpts);
+  const RETRY_ERRORS = new Set(['ECONNRESET', 'EPIPE', 'ECONNABORTED']);
   async function base() {
     const t = await tokenMgr.get();
     workerBase = (t.workerBase || cfg.workerBase || workerBase || '').replace(/\/+$/, '');
@@ -288,19 +301,69 @@ function makeWorkerHttpBackend(connId) {
   }
   function kick() { if (wake) { const r = wake; wake = null; r(); } }
   async function postUp(body, token) {
+    // In-flight accounting lives in postUpTracked (single increment per
+    // tracked slot; the retry loop below re-attempts within the same slot).
+    for (let attempt = 1; ; attempt++) {
+      try {
+        const r = await httpJson('POST', workerBase + '/__up',
+          { Authorization: `Bearer ${token}`, 'Content-Length': String(body.length), 'User-Agent': 'cli-bridge/1.0' },
+          body, 120000, workerBase.startsWith('http://') ? agentHttp : agentHttps);
+        counters.workerRequests++;
+        if (r.status !== 200) throw new Error(`__up ${r.status}`);
+        const j = JSON.parse(r.body.toString('utf8'));
+        if (j.bytes !== body.length) throw new Error(`receipt ${j.bytes} != ${body.length}`);
+        receipts.push(j.bytes);
+        counters.workerReceipts++;
+        counters.bytesToWorkerUl += body.length;
+        ulPosts++;
+        return;
+      } catch (e) {
+        const code = String((e && e.code) || e.message || e);
+        if (attempt < 3 && (RETRY_ERRORS.has(code) || /hang up|reset/.test(code))) {
+          log({ k: 'worker_retry', conn: connId, lane: 'up', attempt, error: code });
+          await sleep(150);
+          continue;
+        }
+        throw e;
+      } finally { /* in-flight released by caller wrapper */ }
+    }
+  }
+  async function getDown(want, token) {
+    // Idempotent GET: retry once on connection-reset class errors with a
+    // fresh request (keep-alive reuse races with CF edge idle closes).
+    for (let attempt = 1; ; attempt++) {
+      try {
+        const u = new URL(workerBase + `/__down?bytes=${want}`);
+        const mod = u.protocol === 'https:' ? https : http;
+        return await new Promise((resolve, reject) => {
+          const req = mod.request(
+            { hostname: u.hostname, port: u.port || (u.protocol === 'https:' ? 443 : 80),
+              path: u.pathname + u.search, method: 'GET',
+              headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'cli-bridge/1.0' },
+              rejectUnauthorized: false, timeout: 60000,
+              agent: u.protocol === 'https:' ? agentHttps : agentHttp },
+            resolve);
+          req.on('timeout', () => req.destroy(new Error('down timeout')));
+          req.on('error', reject);
+          req.end();
+        });
+      } catch (e) {
+        const code = String((e && e.code) || e.message || e);
+        if (attempt < 3 && (RETRY_ERRORS.has(code) || /hang up|reset/.test(code))) {
+          log({ k: 'worker_retry', conn: connId, lane: 'down', attempt, error: code });
+          await sleep(150);
+          continue;
+        }
+        throw e;
+      }
+    }
+  }
+  async function postUpTracked(body, token) {
     ulInFlight++;
-    try {
-      const r = await httpJson('POST', workerBase + '/__up',
-        { Authorization: `Bearer ${token}`, 'Content-Length': String(body.length), 'User-Agent': 'cli-bridge/1.0' },
-        body);
-      counters.workerRequests++;
-      if (r.status !== 200) throw new Error(`__up ${r.status}`);
-      const j = JSON.parse(r.body.toString('utf8'));
-      if (j.bytes !== body.length) throw new Error(`receipt ${j.bytes} != ${body.length}`);
-      receipts.push(j.bytes);
-      counters.workerReceipts++;
-      counters.bytesToWorkerUl += body.length;
-      ulPosts++;
+    try { await postUp(body, token); }
+    catch (e) {
+      ulErrors++; counters.workerErrors++;
+      log({ k: 'worker_err', conn: connId, lane: 'up', error: String(e.message || e) });
     } finally { ulInFlight--; kick(); }
   }
   return {
@@ -311,19 +374,7 @@ function makeWorkerHttpBackend(connId) {
       while (off < n) {
         const want = Math.min(cfg.httpChunk, n - off);
         const t0 = Date.now();
-        const u = new URL(workerBase + `/__down?bytes=${want}`);
-        const mod = u.protocol === 'https:' ? https : http;
-        const res = await new Promise((resolve, reject) => {
-          const req = mod.request(
-            { hostname: u.hostname, port: u.port || (u.protocol === 'https:' ? 443 : 80),
-              path: u.pathname + u.search, method: 'GET',
-              headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'cli-bridge/1.0' },
-              rejectUnauthorized: false, timeout: 60000 },
-            resolve);
-          req.on('timeout', () => req.destroy(new Error('down timeout')));
-          req.on('error', reject);
-          req.end();
-        });
+        const res = await getDown(want, token);
         if (res.statusCode !== 200) {
           res.resume();
           throw new Error(`__down ${res.statusCode}`);
@@ -340,53 +391,33 @@ function makeWorkerHttpBackend(connId) {
         off += want;
       }
     },
-    async uploadStart() { receipts = []; ulPosts = 0; ulErrors = 0; },
+    async uploadStart() { receipts = []; ulPosts = 0; ulErrors = 0; pending = null; },
     async uploadFeed(buf) {
-      // Buffer payload; POST as ulChunk-sized requests with bounded
-      // in-flight, so the CLI's send rate is not throttled by edge RTT.
-      const parts = [buf];
-      let queued = buf.length;
-      while (queued >= cfg.ulChunk) {
-        const merged = [];
-        let need = cfg.ulChunk;
-        while (need > 0 && parts.length) {
-          const head = parts[0];
-          const take = Math.min(need, head.length);
-          merged.push(take === head.length ? head : head.subarray(0, take));
-          if (take === head.length) parts.shift(); else parts[0] = head.subarray(take);
-          need -= take;
-        }
-        const body = Buffer.concat(merged);
-        queued -= body.length;
+      // ACCUMULATE across feeds, then POST ulChunk-sized bodies with bounded
+      // in-flight (the CLI's send rate is not throttled by edge RTT).
+      pending = pending ? Buffer.concat([pending, buf]) : buf;
+      while (pending.length >= cfg.ulChunk) {
+        const body = pending.subarray(0, cfg.ulChunk);
+        pending = pending.subarray(cfg.ulChunk);
         while (ulInFlight >= cfg.ulInFlight) await new Promise((r) => { wake = r; });
         const token = await base();
-        postUp(body, token).catch((e) => {
-          ulErrors++; counters.workerErrors++;
-          log({ k: 'worker_err', conn: connId, lane: 'up', error: String(e.message || e) });
-        });
+        void postUpTracked(body, token);
       }
-      if (parts.length) {
-        const rest = Buffer.concat(parts);
-        // under ulChunk: keep for the next feed / uploadEnd
-        this.pending = rest;
-      } else this.pending = null;
     },
     async uploadEnd() {
-      const rest = this.pending || Buffer.alloc(0);
-      this.pending = null;
-      if (rest.length) {
+      const rest = pending;
+      pending = null;
+      if (rest && rest.length) {
         while (ulInFlight >= cfg.ulInFlight) await new Promise((r) => { wake = r; });
         const token = await base();
-        try { await postUp(rest, token); } catch (e) {
-          ulErrors++; counters.workerErrors++;
-          log({ k: 'worker_err', conn: connId, lane: 'up', error: String(e.message || e) });
-        }
+        await postUpTracked(rest, token);
       }
       while (ulInFlight > 0) await new Promise((r) => setTimeout(r, 20));
       return { receipts: receipts.length, posts: ulPosts, errors: ulErrors };
     },
     async close() {
-      // in-flight POSTs continue; their receipts/errors land in the log
+      // Per-connection teardown must NOT destroy the shared agents — in-flight
+      // POSTs continue; their receipts/errors land in the log.
     },
   };
 }
