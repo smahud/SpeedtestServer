@@ -263,7 +263,7 @@ PLAN=(
 
 if [ "$NO_HYBRID" = 0 ]; then
   PLAN+=(
-    "hybrid gw    zero-dep Node gateway →     $HYBRID_PREFIX/src (+ .env watcher)"
+    "hybrid gw    zero-dep Node gateway →     $HYBRID_PREFIX/gateway/src (+ .env watcher)"
     "hybrid user  dedicated non-root user       $HYBRID_USER"
     "hybrid env   gateway.env generated from    $ENV_FILE → $HYBRID_ETC/gateway.env"
     "hybrid unit  speedtest-hybrid-gateway.service (TLS via LoadCredential)"
@@ -455,8 +455,15 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
     useradd --system --home-dir "$HYBRID_STATE" --shell /usr/sbin/nologin "$HYBRID_USER"
     say "  service user created: $HYBRID_USER (no login shell)"
   fi
-  mkdir -p "$HYBRID_PREFIX/src" "$HYBRID_ETC" "$HYBRID_STATE"
-  rsync -a "$REPO_ROOT/hybrid/gateway/src/" "$HYBRID_PREFIX/src/"
+  # v1.5.1: install the gateway with the REPO-relative layout
+  # (hybrid/gateway/src → $HYBRID_PREFIX/gateway/src, sibling of worker/) so the
+  # relative import '../../worker/rest-deploy.mjs' in workersync.mjs resolves
+  # to $HYBRID_PREFIX/worker/rest-deploy.mjs exactly as in the repo tree.
+  # v1.5.0 flattened it to $HYBRID_PREFIX/src — from there the import escaped
+  # the prefix to /opt/worker and the gateway crashed with ERR_MODULE_NOT_FOUND.
+  mkdir -p "$HYBRID_PREFIX/gateway/src" "$HYBRID_ETC" "$HYBRID_STATE"
+  rm -rf "$HYBRID_PREFIX/src"   # purge the broken v1.5.0 flat layout
+  rsync -a "$REPO_ROOT/hybrid/gateway/src/" "$HYBRID_PREFIX/gateway/src/"
   rsync -a "$REPO_ROOT/hybrid/README.md" "$HYBRID_PREFIX/README.md" 2>/dev/null || true
   # Worker deploy toolchain + REST module (synced fully — incl. dist/ — in the
   # worker phase below, after the bundle is built).
@@ -588,7 +595,7 @@ User=$HYBRID_USER
 Group=$HYBRID_USER
 EnvironmentFile=$GW_ENV
 WorkingDirectory=$HYBRID_PREFIX
-ExecStart=$(command -v node) $HYBRID_PREFIX/src/gateway.mjs
+ExecStart=$(command -v node) $HYBRID_PREFIX/gateway/src/gateway.mjs
 Restart=on-failure
 RestartSec=2
 NoNewPrivileges=true
@@ -637,7 +644,7 @@ EOF
   # defeat the sed-strip above. Values are parsed WITHOUT shell evaluation.
   env -i PATH="$PATH" HOME="${HOME:-/root}" \
     HYBRID_GATEWAY_PORT="$GW_PROBE_PORT" HYBRID_GATEWAY_BIND=127.0.0.1 \
-    "$(command -v node)" --env-file="$GW_PROBE_CFG" "$HYBRID_PREFIX/src/gateway.mjs" > "$GW_PROBE_LOG" 2>&1 &
+    "$(command -v node)" --env-file="$GW_PROBE_CFG" "$HYBRID_PREFIX/gateway/src/gateway.mjs" > "$GW_PROBE_LOG" 2>&1 &
   GW_PROBE_PID=$!
   cleanup_gwprobe() { kill "$GW_PROBE_PID" 2>/dev/null || true; rm -f "$GW_PROBE_CFG" "$GW_PROBE_LOG"; }
   trap cleanup_gwprobe EXIT
