@@ -1,0 +1,54 @@
+{
+ "type": "result",
+ "timestamp": "2026-11-26T17:18:35Z",
+ "ping": {
+  "jitter": 0.777,
+  "latency": 64.845,
+  "low": 64.615,
+  "high": 66.199
+ },
+ "download": {
+  "bandwidth": 56287273,
+  "bytes": 462929944,
+  "elapsed": 8901,
+  "latency": {
+   "iqm": 92.891,
+   "low": 59.23,
+   "high": 422.993,
+   "jitter": 23.82
+  }
+ },
+ "upload": {
+  "bandwidth": 18758622,
+  "bytes": 221274923,
+  "elapsed": 12610,
+  "latency": {
+   "iqm": 92.349,
+   "low": 60.421,
+   "high": 441.172,
+   "jitter": 19.796
+  }
+ },
+ "packetLoss": 0.3861003861003861,
+ "isp": "Alibaba",
+ "interface": {
+  "internalIp": "<masked>",
+  "name": "eth0",
+  "macAddr": "<masked>",
+  "isVpn": false,
+  "externalIp": "45.126.249.249"
+ },
+ "server": {
+  "id": 66281,
+  "host": "speedtest.tuxsnet.id",
+  "port": 8080,
+  "name": "PT. Tuxsindo Cyber Networks",
+  "location": "Surabaya",
+  "country": "Indonesia",
+  "ip": "45.126.249.250"
+ },
+ "result": {
+  "id": "88cedd8f-8e85-4ff5-84b8-da6a931ce34d",
+  "persisted": false
+ }
+}

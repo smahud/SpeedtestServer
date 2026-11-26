@@ -1,0 +1,47 @@
+{
+  "auditRunId": "audit-2026-11-27",
+  "performedBy": "agent session (Z.ai sandbox, egress NAT 45.126.249.249)",
+  "dateUtc": "2026-11-26T17:00:00Z/2026-11-26T17:30:00Z",
+  "repoBaseline": {
+    "master": "0ac51ac1ad3022523c616948b35a3879ebc2c5de (v1.5.2, docs-only on top of b629642)",
+    "vpsDeployedRuntime": "/opt/speedtest-hybrid at b629642 (git verified via UAEG read-only)",
+    "branches": ["master", "hybrid-assist-lane", "vps-full-potential", "v1.5-dynamic-pool-autoupdate", "audit/native-hybrid-2026-11-26", "agent/native-client-lab-2026-11-27 (empty = master)", "audit/historical-native-worker-2026-11-27 (this audit, docs+evidence only)"]
+  },
+  "h0_worker_differential": {
+    "method": "workerd local via wrangler dev 4.168.0; two code snapshots x three postures; client fixed (conformance.mjs + z.ai clone v1.0.1)",
+    "old_snapshot": "d6b5f1e668 (2026-11-06) open mode, legacy always-on, no caps",
+    "new_snapshot": "master 0ac51ac (v1.5.2)",
+    "postures_tested": {
+      "old-open": {"conformance": "55/55 pass", "zai_clone": "10/10 pass, DL 1460.63 Mbps / 754 MB, UL 792.31 Mbps / 524 MB, traffic 1.25 GB"},
+      "new-testenv": {"vars": "LEGACY_HTTP_ENABLED:true, caps 32 MiB, no secret", "conformance": "55/55 pass", "zai_clone": "10/10 pass, DL 1639.85 Mbps / 844 MB, UL 934.80 Mbps / 436 MB"},
+      "new-prod": {"vars": "HYBRID_SHARED_SECRET set, LEGACY_HTTP_ENABLED:false, caps 25 MiB", "zai_clone": "3/6 (6 fail: ws 401 unauthorized, legacy paths 404) — intentional hardening boundary", "repo_test_suite": "free-hardening 16/16, pool 8/8"}
+    },
+    "verdict": "NO_REGRESSION in code; behavioral differences are intentional configuration (G-4/G-7/G-8/G-12) — INTENTIONAL_SECURITY_HARDENING"
+  },
+  "h3_official_cli_vps": {
+    "client": "Speedtest by Ookla 1.2.0.84 (ea6b6773cf) linux-x86_64, unmodified, from speedtest-cli_official tarball",
+    "method": "unshare --user --map-root-user --mount + /etc/hosts bind-mount; operator-authorized Surabaya hostnames + speedtest-mock -> 45.126.249.250; results.speedtest.net -> 127.0.0.1 (non-publishing); discovery left real (cli.speedtest.net untouched); server pinned --server-id 66281",
+    "runs": [
+      {"run": "r1", "exit": 0, "dlMbps": 481.6, "dlBytes": 506052502, "ulMbps": 126.1, "ulBytes": 199587854, "pingMs": 59.2, "lossPct": 0.383, "vpsEth0Tx": 533143005, "vpsEth0Rx": 228810148, "daemonConns": 42, "daemonBytesDown": 573581518, "daemonBytesUp": 202032459, "workerRequests": 0},
+      {"run": "r2", "exit": 0, "dlMbps": 440.9, "dlBytes": 505890428, "ulMbps": 131.3, "ulBytes": 170934716, "pingMs": 64.2, "lossPct": 0.450, "vpsEth0Tx": 534015182, "vpsEth0Rx": 198288280, "daemonConns": 34, "daemonBytesDown": 575673244, "daemonBytesUp": 4250, "workerRequests": 0, "note": "journal window ended before upload conns closed; eth0 rx is authoritative"},
+      {"run": "r3", "exit": 0, "dlMbps": 433.8, "dlBytes": 622467744, "ulMbps": 152.4, "ulBytes": 72908452, "pingMs": 65.7, "lossPct": 67.06, "vpsEth0Tx": 649006259, "vpsEth0Rx": 100184722, "daemonConns": 35, "daemonBytesDown": 696785178, "workerRequests": 0, "note": "UDP loss 67.06% reported (back-to-back run; late-window journal shows upload conns closed at +30-90s, bytesUp 75.8 MB); reported as-is"}
+    ],
+    "trial": {"run": "trial", "exit": 0, "dlMbps": 450.3, "ulMbps": 150.1, "persisted": false},
+    "verdict": "NATIVE_VPS_ONLY confirmed live on v1.5.2 stack: 4/4 runs exit 0, persisted=false (result url None), Worker requests = 0 in every window, client bytes ~= VPS eth0 deltas within TCP/TLS overhead"
+  },
+  "h2_hybrid_probe": {
+    "client": "hybrid/probe-client/src/hybrid-probe.mjs (custom instrument, NOT an Ookla client)",
+    "target": "production gateway https://speedtest.lumajangnetworks.my.id:8790 + worker pool (Free)",
+    "result": "payload 58720256 B at edge (10 WS sessions: 6x8MiB DL + 4x2MiB UL), VPS control plane 4780 B (accounting) / ~28 KB eth0 incl. overhead, worker invocations in window: 3 (0 errors), offload ratio 1:12284.6",
+    "verdict": "CUSTOM_CLIENT_ONLY lane still fully functional in production (positive control; matches E-I/E-J historical shape)"
+  },
+  "live_baseline_2026_11_27": {
+    "daemon": "speedtestserver active, PID 4412, listeners 0.0.0.0:8080+:5060 (v4+v6) — unchanged PID since 26 Nov audit (no restart)",
+    "gateway": "speedtest-hybrid-gateway active, PID 10052 (restarted 26 Nov 16:00 & 16:11 UTC after CF credential rotation: env watcher logged CLOUDFLARE_API_TOKEN/EMAIL/API_KEY/ACCOUNT_ID/AUTH_MODE change at 16:11:35Z; worker_sync_converged 100/100 at 16:11:37Z)",
+    "worker_sync": "deployed 100, deployStatus ok, quota 92/100000 (0.1%)",
+    "dns": "speedtest.lumajangnetworks.my.id A 45.126.249.250 proxied=false (DNS-only) — verified via API",
+    "zone": "lumajangnetworks.my.id plan Free Website, status active",
+    "no_mutations": "read-only via UAEG; no service restarts, no deploys, no DNS changes, no secret rotation performed by this audit"
+  },
+  "sanitization": "all evidence copies scrubbed: session tokens redacted (v1~<redacted>), secrets/passwords keys redacted; client egress IP (operator NAT 45.126.249.249) kept as in prior evidence convention"
+}

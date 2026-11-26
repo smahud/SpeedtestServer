@@ -1,0 +1,4 @@
+speedtest.tuxsnet.id: 45.126.249.250
+speedtest.somedigit.net: 45.126.249.250
+results.speedtest.net: 127.0.0.1
+cli.speedtest.net: 104.17.107.111

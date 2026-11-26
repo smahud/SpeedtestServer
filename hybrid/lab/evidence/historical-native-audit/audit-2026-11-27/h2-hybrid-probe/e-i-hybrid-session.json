@@ -1,0 +1,151 @@
+{
+ "label": "h2-prod-replay",
+ "mode": "ws",
+ "startedAt": "2026-11-26T17:23:11.637Z",
+ "gateway": "https://speedtest.lumajangnetworks.my.id:8790",
+ "worker": "https://speedtest-hybrid-worker.lumajangnetworks.workers.dev",
+ "totalMs": 2576,
+ "phases": [
+  {
+   "phase": "discovery-vps",
+   "ms": 242,
+   "status": 200,
+   "roles": [
+    "control",
+    "latency",
+    "throughput"
+   ],
+   "hasFallback": false
+  },
+  {
+   "phase": "session-token-vps",
+   "ms": 205,
+   "status": 200
+  },
+  {
+   "phase": "latency-vps",
+   "ms": 642,
+   "samples": [
+    63.64,
+    65.72,
+    61.94,
+    65.88,
+    62.45,
+    65.69,
+    63.56,
+    65.74,
+    61.95,
+    65.56
+   ],
+   "min": 61.94,
+   "median": 65.56
+  },
+  {
+   "phase": "latency-edge-ttfb",
+   "ms": 591,
+   "samples": [
+    73.08,
+    104.95,
+    44.04,
+    49.45,
+    48.03,
+    47.72,
+    76.39,
+    52.42,
+    46.9,
+    47.92
+   ],
+   "min": 44.04
+  },
+  {
+   "phase": "download-edge-ws",
+   "connections": 6,
+   "perConnection": 8388608,
+   "ms": 586,
+   "bytes": 50331648,
+   "throughputMBps": 81.91,
+   "throughputMbps": 687.1
+  },
+  {
+   "phase": "upload-edge-ws",
+   "connections": 4,
+   "perConnection": 2097152,
+   "ms": 177,
+   "bytes": 8388608,
+   "throughputMBps": 45.2,
+   "throughputMbps": 379.1
+  },
+  {
+   "phase": "result-intake-vps",
+   "ms": 66,
+   "status": 200,
+   "ok": true
+  },
+  {
+   "phase": "result-replay-vps",
+   "status": 200,
+   "ok": true,
+   "sameGuid": true
+  }
+ ],
+ "accounting": {
+  "vps": {
+   "requests": 14,
+   "bytesIn": 3368,
+   "bytesOut": 1412
+  },
+  "edge": {
+   "requests": 10,
+   "bytesIn": 50331648,
+   "bytesOut": 8388608,
+   "wsSessions": 10
+  }
+ },
+ "receipts": {
+  "up": [],
+  "downMeta": [],
+  "wsAcks": [
+   {
+    "declared": 1048576,
+    "ack": "OK 1048576 1795713794032"
+   },
+   {
+    "declared": 1048576,
+    "ack": "OK 1048576 1795713794040"
+   },
+   {
+    "declared": 1048576,
+    "ack": "OK 1048576 1795713794051"
+   },
+   {
+    "declared": 1048576,
+    "ack": "OK 1048576 1795713794052"
+   },
+   {
+    "declared": 1048576,
+    "ack": "OK 1048576 1795713794057"
+   },
+   {
+    "declared": 1048576,
+    "ack": "OK 1048576 1795713794057"
+   },
+   {
+    "declared": 1048576,
+    "ack": "OK 1048576 1795713794070"
+   },
+   {
+    "declared": 1048576,
+    "ack": "OK 1048576 1795713794076"
+   }
+  ]
+ },
+ "summary": {
+  "vpsBytes": 4780,
+  "edgeBytes": 58720256,
+  "payloadBytes": 58720256,
+  "receiptConfirmedUploadBytes": null,
+  "vpsShareOfPayload": 8.1e-05,
+  "offloadRatio": 12284.6,
+  "interpretation": "payloadBytes flowed client↔edge (Worker); the VPS served only the control plane (discovery+token+pings+results = 4780 B). Offload ratio: 1:12285 (payload/control bytes)."
+ }
+}

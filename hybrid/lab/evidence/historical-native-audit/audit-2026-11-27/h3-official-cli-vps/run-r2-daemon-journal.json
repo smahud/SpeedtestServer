@@ -1,0 +1,245 @@
+{
+ "connections": [
+  {
+   "id": 253,
+   "transport": "tcp",
+   "bytesDown": 167,
+   "bytesUp": 126,
+   "commands": 7
+  },
+  {
+   "id": 259,
+   "transport": "tcp",
+   "bytesDown": 29360172,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 264,
+   "transport": "tcp",
+   "bytesDown": 39321644,
+   "bytesUp": 54,
+   "commands": 3
+  },
+  {
+   "id": 263,
+   "transport": "tcp",
+   "bytesDown": 27787308,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 265,
+   "transport": "tcp",
+   "bytesDown": 37224492,
+   "bytesUp": 54,
+   "commands": 3
+  },
+  {
+   "id": 271,
+   "transport": "tcp",
+   "bytesDown": 9437228,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 269,
+   "transport": "tcp",
+   "bytesDown": 7340076,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 266,
+   "transport": "tcp",
+   "bytesDown": 25165868,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 279,
+   "transport": "tcp",
+   "bytesDown": 8388652,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 254,
+   "transport": "tcp",
+   "bytesDown": 42467372,
+   "bytesUp": 54,
+   "commands": 3
+  },
+  {
+   "id": 274,
+   "transport": "tcp",
+   "bytesDown": 11010092,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 284,
+   "transport": "tcp",
+   "bytesDown": 5242924,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 255,
+   "transport": "tcp",
+   "bytesDown": 39321644,
+   "bytesUp": 54,
+   "commands": 3
+  },
+  {
+   "id": 260,
+   "transport": "tcp",
+   "bytesDown": 56623148,
+   "bytesUp": 54,
+   "commands": 3
+  },
+  {
+   "id": 256,
+   "transport": "tcp",
+   "bytesDown": 24117292,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 261,
+   "transport": "tcp",
+   "bytesDown": 26738732,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 276,
+   "transport": "tcp",
+   "bytesDown": 8388652,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 272,
+   "transport": "tcp",
+   "bytesDown": 9437228,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 267,
+   "transport": "tcp",
+   "bytesDown": 9961516,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 257,
+   "transport": "tcp",
+   "bytesDown": 22544428,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 283,
+   "transport": "tcp",
+   "bytesDown": 5242924,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 278,
+   "transport": "tcp",
+   "bytesDown": 6291500,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 275,
+   "transport": "tcp",
+   "bytesDown": 8388652,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 285,
+   "transport": "tcp",
+   "bytesDown": 9961516,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 277,
+   "transport": "tcp",
+   "bytesDown": 6291500,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 281,
+   "transport": "tcp",
+   "bytesDown": 7340076,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 286,
+   "transport": "tcp",
+   "bytesDown": 7340076,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 268,
+   "transport": "tcp",
+   "bytesDown": 10485804,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 280,
+   "transport": "tcp",
+   "bytesDown": 8388652,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 273,
+   "transport": "tcp",
+   "bytesDown": 8388652,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 287,
+   "transport": "tcp",
+   "bytesDown": 38797356,
+   "bytesUp": 54,
+   "commands": 3
+  },
+  {
+   "id": 270,
+   "transport": "tcp",
+   "bytesDown": 9437228,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 282,
+   "transport": "tcp",
+   "bytesDown": 9437228,
+   "bytesUp": 36,
+   "commands": 2
+  },
+  {
+   "id": 262,
+   "transport": "tcp",
+   "bytesDown": 3445,
+   "bytesUp": 2864,
+   "commands": 178
+  }
+ ],
+ "count": 34,
+ "sumBytesDown": 575673244,
+ "sumBytesUp": 4250
+}

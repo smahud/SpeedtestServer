@@ -1,0 +1,25 @@
+  [2mOokla Server validation — same checks as speedtest.net/host-tester[0m
+[2K  [32m✔[0m Hostname resolution [2m.........................[0m [32mPASS[0m[2m 0ms[0m[2m  127.0.0.1[0m
+[2K  [33m![0m OoklaServer daemon connection [2m...............[0m [33mWARN[0m[2m 23ms[0m[2m  HTTP 404 — daemon banner not identified[0m
+[2K  [31m✘[0m OoklaServer daemon version [2m..................[0m [31mFAIL[0m[2m 0ms[0m[2m  version unavailable — netgauge handshake failed (server did not upgrade to websocket (HTTP 401))[0m
+[2K  [31m✘[0m Netgauge / WebSocket (port 8793) [2m............[0m [31mFAIL[0m[2m 0ms[0m[2m  server did not upgrade to websocket (HTTP 401)[0m
+[2K  [32m✔[0m HTTPS functionality [2m.........................[0m [32mPASS[0m[2m 8ms[0m[2m  HTTPS 404 · trust: not publicly trusted (DEPTH_ZERO_SELF_SIGNED_CERT)[0m
+[2K  [32m✔[0m Keep-Alive [2m..................................[0m [32mPASS[0m[2m 0ms[0m[2m  Connection: keep-alive[0m
+[2K  [31m✘[0m Latency file (speedtest/latency.txt) [2m........[0m [31mFAIL[0m[2m 8ms[0m[2m  HTTP 404[0m
+[2K  [31m✘[0m Download image files (random*.jpg) [2m..........[0m [31mFAIL[0m[2m 55ms[0m[2m  no download images found[0m
+[2K  [31m✘[0m Legacy HTTP upload script (upload.php) [2m......[0m [31mFAIL[0m[2m 8ms[0m[2m  HTTP 404[0m
+[2K  [31m✘[0m Crossdomain settings (crossdomain.xml) [2m......[0m [31mFAIL[0m[2m 4ms[0m[2m  HTTP 404[0m
+  [2m· Download test skipped: no download images available[0m
+  [2m· Upload test skipped: upload.php not usable[0m
+  [33mPing[0m     [1m        —[0m ms
+  [32mDownload[0m[1m        —[0m Mbps
+  [35mUpload[0m  [1m        —[0m Mbps
+  [2mTraffic[0m  0 B transferred in 0.1s
+  [31m[1m✘ Server configuration issues detected.[0m[0m
+    [31m•[0m OoklaServer daemon version
+    [31m•[0m Netgauge / WebSocket (port 8793)
+    [31m•[0m Latency file (speedtest/latency.txt)
+    [31m•[0m Download image files (random*.jpg)
+    [31m•[0m Legacy HTTP upload script (upload.php)
+    [31m•[0m Crossdomain settings (crossdomain.xml)
+  [2m3 passed / 6 failed · 127.0.0.1:8793[0m

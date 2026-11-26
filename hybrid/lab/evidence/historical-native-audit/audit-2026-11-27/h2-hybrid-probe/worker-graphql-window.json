@@ -1,0 +1,17 @@
+{
+ "rows": [
+  {
+   "dimensions": {
+    "datetimeMinute": "2026-11-26T17:22:00Z",
+    "scriptName": "speedtest-hybrid-worker",
+    "status": "success"
+   },
+   "sum": {
+    "errors": 0,
+    "requests": 3,
+    "subrequests": 0
+   }
+  }
+ ],
+ "totalRequests": 3
+}
