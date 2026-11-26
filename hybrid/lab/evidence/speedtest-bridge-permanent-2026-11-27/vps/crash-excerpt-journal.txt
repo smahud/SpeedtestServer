@@ -1,0 +1,19 @@
+Nov 27 04:26:06 debian node[20322]: node:events:505
+Nov 27 04:26:06 debian node[20322]:     throw er; // Unhandled 'error' event
+Nov 27 04:26:06 debian node[20322]:     ^
+Nov 27 04:26:06 debian node[20322]: Error: read ECONNRESET
+Nov 27 04:26:06 debian node[20322]:     at TCP.onStreamRead (node:internal/stream_base_commons:221:20)
+Nov 27 04:26:06 debian node[20322]: Emitted 'error' event on Socket instance at:
+Nov 27 04:26:06 debian node[20322]:     at emitErrorNT (node:internal/streams/destroy:170:8)
+Nov 27 04:26:06 debian node[20322]:     at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+Nov 27 04:26:06 debian node[20322]:     at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+Nov 27 04:26:06 debian node[20322]:   errno: -104,
+Nov 27 04:26:06 debian node[20322]:   code: 'ECONNRESET',
+Nov 27 04:26:06 debian node[20322]:   syscall: 'read'
+Nov 27 04:26:06 debian node[20322]: }
+Nov 27 04:26:06 debian node[20322]: Node.js v24.22.3
+Nov 27 04:26:06 debian systemd[1]: speedtest-bridge.service: Main process exited, code=exited, status=1/FAILURE
+Nov 27 04:26:06 debian systemd[1]: speedtest-bridge.service: Failed with result 'exit-code'.
+Nov 27 04:26:09 debian systemd[1]: speedtest-bridge.service: Scheduled restart job, restart counter is at 1.
+Nov 27 04:26:09 debian systemd[1]: Started speedtest-bridge.service - Speedtest Bridge (VPS front for native Ookla clients: NetGauge parity + Worker payload, :8080).
+Nov 27 04:26:10 debian node[20462]: [speedtest-bridge] tcp+udp :8080 | backend=worker-http | gateway=https://127.0.0.1:8790 | tlsMux=127.0.0.1:8790 | rate=240/min/ip | log=/var/lib/speedtest-bridge/speedtest-bridge.jsonl

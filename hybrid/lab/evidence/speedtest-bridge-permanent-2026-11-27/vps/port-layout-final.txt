@@ -1,0 +1,26 @@
+2026-11-26T21:53:51Z
+— units —
+active
+active
+active
+enabled
+— listeners —
+LISTEN 0      511        127.0.0.1:8791      0.0.0.0:*    users:(("MainThread",pid=22358,fd=22))
+LISTEN 0      511        127.0.0.1:8790      0.0.0.0:*    users:(("MainThread",pid=22358,fd=21))
+LISTEN 0      511          0.0.0.0:5060      0.0.0.0:*    users:(("MainThread",pid=22304,fd=22))
+LISTEN 0      511             [::]:5060         [::]:*    users:(("MainThread",pid=22304,fd=23))
+LISTEN 0      511                *:8080            *:*    users:(("MainThread",pid=22421,fd=22))
+UNCONN 0      0                  0.0.0.0:5060       0.0.0.0:*    users:(("MainThread",pid=22304,fd=24))
+UNCONN 0      0                        *:8080             *:*    users:(("MainThread",pid=22421,fd=23))
+UNCONN 0      0                     [::]:5060          [::]:*    users:(("MainThread",pid=22304,fd=25))
+— OoklaServer.properties —
+OoklaServer.tcpPorts = 5060
+OoklaServer.udpPorts = 5060
+— gateway env (sanitized) —
+HYBRID_GATEWAY_BIND=127.0.0.1
+HYBRID_GATEWAY_PLAIN_PORT=8791
+HYBRID_VPS_PUBLIC_BASE=https://speedtest.lumajangnetworks.my.id:8080
+HYBRID_STS_BASE=https://speedtest.lumajangnetworks.my.id:5060
+HYBRID_TOKEN_BIND_IP=false
+
+---EXIT=0---
