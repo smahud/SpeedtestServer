@@ -47,6 +47,12 @@ const PORT = Number(process.env.HYBRID_GATEWAY_PORT || 8090);
 const BIND = process.env.HYBRID_GATEWAY_BIND || '127.0.0.1';
 const TLS_CERT = process.env.HYBRID_GATEWAY_TLS_CERT || '';
 const TLS_KEY = process.env.HYBRID_GATEWAY_TLS_KEY || '';
+// v1.6: optional SECOND, plain-HTTP, LOOPBACK-ONLY listener (default 8791) —
+// the speedtest-bridge terminates TLS on :8080 (daemon parity) and pipes the
+// decrypted HTTP lane here, so the public VPS opens only the native
+// OoklaServer ports. Never exposed publicly; bind address is fixed to
+// loopback. Empty = disabled.
+const PLAIN_PORT = Number(process.env.HYBRID_GATEWAY_PLAIN_PORT || 0);
 const WORKER_BASE_FALLBACK = process.env.HYBRID_WORKER_BASE || 'http://127.0.0.1:8790';
 const VPS_BASE = process.env.HYBRID_VPS_PUBLIC_BASE || 'http://127.0.0.1:8090';
 const STS_BASE = process.env.HYBRID_STS_BASE || 'http://127.0.0.1:8080';
@@ -542,6 +548,7 @@ listener.listen(PORT, BIND, () => {
     port: PORT,
     bind: BIND,
     tls: Boolean(TLS_CERT),
+    plainPort: PLAIN_PORT || null,
     mode: cfg.frontEnabled ? (edgeAvailable() ? 'hybrid' : 'vps-only') : 'control-only',
     deployTarget: RT.deployTarget(),
     front: cfg.frontEnabled,
@@ -559,3 +566,17 @@ listener.listen(PORT, BIND, () => {
     secretConfigured: Boolean(cfg.secret),
   }));
 });
+
+// v1.6: plain-HTTP loopback listener for the speedtest-bridge TLS mux (the
+// bridge terminates TLS on :8080 and pipes the decrypted HTTP lane here).
+// Same handler as the main listener; bind address is FIXED to loopback.
+if (PLAIN_PORT > 0) {
+  const plainListener = http.createServer(safeHandler);
+  plainListener.on('error', (e) => {
+    console.error(JSON.stringify({ kind: 'gateway_error', listener: 'plain', error: String(e && e.code ? e.code : e).slice(0, 200), port: PLAIN_PORT, bind: '127.0.0.1' }));
+    process.exit(1);
+  });
+  plainListener.listen(PLAIN_PORT, '127.0.0.1', () => {
+    log('gateway_plain_started', { port: PLAIN_PORT, bind: '127.0.0.1', note: 'speedtest-bridge TLS-mux upstream (loopback only)' });
+  });
+}

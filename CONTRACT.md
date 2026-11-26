@@ -46,22 +46,26 @@ engineering) dengan hosts-mock — lihat §6.
 
 | Port | Pemilik | Protokol yang dilayani |
 |---|---|---|
-| TCP **:8080** | speedtest-bridge | NetGauge plaintext (HI/GETIP/PING/DOWNLOAD/UPLOAD …) **+** mux TLS daemon-parity: ClientHello `0x16 0x03…` → proxy mentah ke gateway loopback |
+| TCP **:8080** | speedtest-bridge | mux daemon-parity penuh: ClientHello `0x16 0x03…` → **TLS diterminasi di bridge** → NetGauge native DI DALAM TLS (jalur UTAMA klien resmi) atau (metode HTTP di dalam TLS) → pipe ke gateway plain loopback; metode HTTP plaintext → pipe ke gateway plain loopback; lainnya → front NetGauge plaintext |
 | UDP **:8080** | speedtest-bridge | loss plane (LOSS init/loaded + `RECV`) |
 | TCP **:5060** | daemon OoklaServer | NetGauge + HTTP + TLS + WS/WSS (multiplex penuh — paritas daemon asli) |
 | UDP **:5060** | daemon OoklaServer | loss plane daemon |
-| :8790 | gateway | **loopback SAJA** (upstream mux; tidak publik) |
+| :8790 | gateway (TLS) | **loopback SAJA** (admin lokal + mint token; tidak publik) |
+| :8791 | gateway (plain HTTP) | **loopback SAJA** (upstream pipe HTTP dari bridge; tidak publik) |
 
 - Deteksi per-koneksi by first-byte di :8080 adalah **paritas daemon**
   (PROTOCOL_CONTRACT §1 [V]: "One TCP port multiplexes everything"), bukan
-  hack — daemon asli melakukan hal yang sama.
+  hack — daemon asli melakukan hal yang sama, termasuk **TLS diterminasi lalu
+  dideteksi ulang di dalamnya** (NetGauge-in-TLS = jalur UTAMA klien resmi;
+  tanpa ini klien resmi gagal "Latency test failed" — pelajaran 27 Nov).
 - Port daemon dikonfigurasi **di `OoklaServer.properties`** (file config
   resminya OoklaServer — satu-satunya tempat). `install.sh` menyempitkannya
   ke `5060` saat bridge aktif, dengan backup bertanda-waktu;
   `SPEEDTEST_BRIDGE_ENABLED=false` memulihkan `5060,8080` + melepas unit.
-- Deviasi terdokumentasi: HTTP polos (non-TLS) ke :8080 jatuh ke front
-  NetGauge (ERROR/3-strikes) — produksi TLS-only; permukaan HTTP/TLS penuh
-  tetap ada di daemon :5060.
+- Deviasi terdokumentasi: HTTP (plain maupun dalam TLS) di :8080 dilayani
+  **rute gateway** (control plane + front lane), BUKAN permukaan HTTP legacy
+  daemon (`upload.php`, `randomNxN.jpg`, dsb.) — permukaan legacy penuh
+  tetap dilayani daemon :5060. Guard abuse (rate per-IP) di bridge.
 
 ## 4. speedtest-bridge — kontrak runtime
 
@@ -81,8 +85,9 @@ engineering) dengan hosts-mock — lihat §6.
   (append; rollover 64 MiB → `.old`). Kunci atribusi: `bytesFromWorkerDl`,
   `bytesToWorkerUl`, `workerReceipts`, per-event `dl_done`/`ul_done`,
   `tls_proxy_*`.
-- Uji: `bash hybrid/speedtest-bridge/test/run-tests.sh` — **225/225**
-  (paritas protokol 3 backend + mux TLS + rate-limit + konkurensi).
+- Uji: `bash hybrid/speedtest-bridge/test/run-tests.sh` — **236/236**
+  (paritas protokol 3 backend + mux TLS routing + **terminasi TLS: NetGauge
+  di dalam TLS** + crash-regression RST saat sniff + rate-limit + konkurensi).
 
 ## 5. Instalasi — `.env` dulu, lalu satu perintah
 

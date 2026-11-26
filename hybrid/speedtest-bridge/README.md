@@ -27,20 +27,23 @@ klien Ookla native (tanpa modifikasi) --NetGauge TCP/UDP--> speedtest-bridge :80
   upload:   payload → Worker /__up (POST per-chunk, receipt {bytes:N})
             atau → Worker /ws (frame; ack "OK n <ts>" = receipt)
 
-TLS ClientHello (0x16 0x03 …) di :8080 → raw-proxy ke gateway hybrid
-            (loopback, default 127.0.0.1:8790) — paritas daemon
-            PROTOCOL_CONTRACT §1: satu port TCP multiplex TLS + NetGauge.
+TLS ClientHello (0x16 0x03 …) di :8080 → TLS DITERMINASI DI BRIDGE
+            (cert wildcard daemon via LoadCredential) → di dalam TLS dideteksi
+            ulang: NetGauge native (jalur UTAMA klien resmi — paritas daemon,
+            PROTOCOL_CONTRACT §1) atau metode HTTP → pipe ke gateway plain
+            loopback (:8791). Metode HTTP plaintext juga → pipe ke :8791.
 ```
 
 Tata letak port (hanya port native OoklaServer yang terbuka):
 
 | Port | Pemilik | Fungsi |
 |---|---|---|
-| TCP :8080 | **speedtest-bridge** | front NetGauge native + mux TLS → gateway (loopback) |
+| TCP :8080 | **speedtest-bridge** | front NetGauge (plaintext **dan di dalam TLS**) + mux HTTP → gateway |
 | UDP :8080 | **speedtest-bridge** | loss plane (LOSS/RECV) |
 | TCP :5060 | **OoklaServer daemon** | port native satunya (konfigurasi di `OoklaServer.properties` — TIDAK diubah bridge) |
 | UDP :5060 | **OoklaServer daemon** | loss plane daemon |
-| :8790 | gateway hybrid | **loopback saja** (upstream mux; tidak lagi publik) |
+| :8790 | gateway hybrid (TLS) | **loopback saja** (admin + mint; tidak publik) |
+| :8791 | gateway hybrid (plain) | **loopback saja** (upstream pipe HTTP; tidak publik) |
 
 - Front bridge men-TERMINASI protokol native persis seperti daemon (port
   `NetGaugeEngine.ts` yang sudah diverifikasi): binary-hello→ERROR (memicu
@@ -73,6 +76,7 @@ Tata letak port (hanya port native OoklaServer yang terbuka):
 systemctl status speedtest-bridge
 journalctl -u speedtest-bridge -f
 # log JSONL: /var/lib/speedtest-bridge/speedtest-bridge.jsonl
+# lane web via mux (dari luar): curl -sk https://<host>:8080/api/health
 
 # foreground (debug):
 SPEEDTEST_BRIDGE_BACKEND=worker-http \
@@ -103,17 +107,18 @@ bash hybrid/speedtest-bridge/test/run-tests.sh   # (3 backend + mux + rate-limit
 Baterai: mock worker lokal (HTTP + WS NetGauge semantik-worker) × klien
 sintetis peniru pola CLI (binary-hello fallback → HI/GETIP/PING/CAP →
 DOWNLOAD/UPLOAD → UDP LOSS), mux TLS (routing + split-ClientHello),
-rate-limit per-IP, plus smoke konkurensi 8 sesi.
+**terminasi TLS** (NetGauge di dalam TLS = jalur utama klien resmi, HTTP
+dalam TLS → pipe gateway, crash-regression RST saat sniff), rate-limit
+per-IP, plus smoke konkurensi 8 sesi — 236/236.
 
 ## Batasan (jujur)
 
 - **Relay VPS**: byte edge tetap transit link VPS — throughput satu sesi
   tidak bisa melebihi kapasitas VPS; klaim "dilayani VPS + Worker" = asal
   byte di edge, bukan tambahan kapasitas.
-- **Deviasi terdokumentasi**: HTTP polos (non-TLS) ke :8080 jatuh ke front
-  NetGauge (ERROR/3-strikes) — gateway produksi TLS-only; permukaan
-  HTTP/TLS penuh tetap di daemon :5060 (paritas penuh), dan TLS-wrapped
-  NetGauge hanya di daemon.
+- **Deviasi terdokumentasi**: HTTP (plain/dalam TLS) di :8080 dilayani rute
+  GATEWAY (control plane + front lane), bukan permukaan HTTP legacy daemon
+  (`upload.php`, `randomNxN.jpg`) — permukaan itu tetap di daemon :5060.
 - worker-ws: tanpa chunking/pacing → kill `exceededResources` (sudah
   diatasi chunk default 1 MiB).
 - Atribusi: `/__meta` worker per-isolate (bukan agregat) — gunakan

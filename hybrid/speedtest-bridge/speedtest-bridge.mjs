@@ -101,6 +101,7 @@
  */
 
 import net from 'node:net';
+import tls from 'node:tls';
 import dgram from 'node:dgram';
 import http from 'node:http';
 import https from 'node:https';
@@ -140,6 +141,14 @@ const cfg = {
   tlsMux: envBool(process.env.SPEEDTEST_BRIDGE_TLS_MUX, true),
   tlsUpstream: process.env.SPEEDTEST_BRIDGE_TLS_UPSTREAM || '127.0.0.1:8790',
   tlsSniffMs: Number(process.env.SPEEDTEST_BRIDGE_TLS_SNIFF_MS || 2000),
+  // TLS TERMINATION in the bridge (daemon parity: the daemon serves native
+  // NetGauge INSIDE TLS on the same port). When both are set the TLS branch
+  // terminates TLS here and runs the SAME front (and the HTTP lane pipes to
+  // httpUpstream) INSIDE the decrypted stream. When unset, the TLS branch
+  // falls back to a raw TCP passthrough proxy (tlsUpstream; lab mode).
+  tlsCertPath: process.env.SPEEDTEST_BRIDGE_TLS_CERT || '',
+  tlsKeyPath: process.env.SPEEDTEST_BRIDGE_TLS_KEY || '',
+  httpUpstream: process.env.SPEEDTEST_BRIDGE_HTTP_UPSTREAM || '127.0.0.1:8791',
   versionString: process.env.SPEEDTEST_BRIDGE_VERSION_STRING || '2.11 (2.11.5) 2026-06-04.1737.7d0993d',
   instanceUuid: crypto.randomUUID(), // lower-case, daemon parity
   startedAt: Date.now(),
@@ -177,6 +186,8 @@ const counters = {
   bytesFromWorkerDl: 0, bytesToWorkerUl: 0, bytesLocalDl: 0,
   workerRequests: 0, workerErrors: 0, workerReceipts: 0,
   tlsProxied: 0, tlsClosed: 0,
+  tlsTerminated: 0, tlsHandshakeErr: 0,
+  httpPiped: 0, httpClosed: 0,
 };
 
 // ---------------------------------------------------------------- per-IP guards
@@ -711,13 +722,23 @@ function makeBackend(connId) {
   throw new Error('unknown SPEEDTEST_BRIDGE_BACKEND: ' + cfg.backend);
 }
 
-// ---------------------------------------------------------------- TLS mux
+// ---------------------------------------------------------------- port mux
 // Port unification, daemon parity (PROTOCOL_CONTRACT §1 [V]): the official
-// OoklaServer serves plain HTTP, HTTPS/TLS, WS/WSS and native NetGauge on
-// ONE TCP port via per-connection first-byte detection. Here the TLS branch
-// is a raw TCP proxy to the hybrid gateway on loopback — the gateway keeps
-// terminating TLS (its systemd LoadCredential) and serving the control
-// plane + web front. Everything else stays on the native NetGauge front.
+// OoklaServer serves plain HTTP, HTTPS/TLS (with native NetGauge INSIDE the
+// TLS stream), WS/WSS and plain NetGauge on ONE TCP port via per-connection
+// first-byte detection:
+//   0x16 0x03 …            → TLS (terminates HERE when a cert is configured —
+//                            daemon parity: NetGauge runs inside the decrypted
+//                            stream, which is the official client's PRIMARY
+//                            path; the HTTP method inside TLS pipes to the
+//                            gateway's loopback plain listener)
+//   HTTP method + space     → HTTP lane → raw pipe to the gateway's loopback
+//                            plain listener (httpUpstream)
+//   anything else           → the native NetGauge front (handleConn)
+// When NO cert is configured (lab), the TLS branch becomes a raw TCP
+// passthrough proxy to tlsUpstream (the loopback gateway) — the encrypted
+// hello then gets a plaintext ERROR (gateway speaks HTTP inside TLS), which
+// is exactly the fallback the validated lab experiment relied on.
 //
 // Detection is CONSERVATIVE: a TLS ClientHello record is
 //   0x16 (record: handshake) 0x03 <minor 0x00-0x04> <len:2> 0x01 (handshake:
@@ -739,6 +760,51 @@ function looksLikeTls(buf) {
   return buf[5] === 0x01; // first handshake message = ClientHello
 }
 
+// HTTP method prefix detection (daemon parity: "GET|POST|HEAD|… + space").
+// null = all bytes so far are uppercase letters (still could become a
+// method — wait for the space or a non-letter).
+const HTTP_METHODS = new Set(['GET', 'POST', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']);
+function looksLikeHttpMethod(buf) {
+  for (let i = 0; i < buf.length && i < 16; i++) {
+    const c = buf[i];
+    if (c === 0x20) return HTTP_METHODS.has(buf.subarray(0, i).toString('latin1'));
+    if (c < 0x41 || c > 0x5a) return false; // not [A-Z] → cannot be a method
+  }
+  return null; // all letters so far, <16 bytes — wait for more
+}
+
+// Raw TCP pipe to the gateway's loopback PLAIN listener (HTTP lane).
+// The pre-read bytes are written first, then a bidirectional pipe.
+function plainPipe(sock, prebuf, peer, peerIp, kind) {
+  counters.httpPiped++;
+  log({ k: 'http_pipe_open', kind, peer, upstream: cfg.httpUpstream });
+  const up = net.connect({ host: cfg.httpUpstreamHost, port: cfg.httpUpstreamPort });
+  let closed = false;
+  const finish = () => {
+    if (closed) return;
+    closed = true;
+    counters.httpClosed++;
+    connUnregister(peerIp);
+    log({ k: 'http_pipe_close', kind, peer });
+  };
+  up.on('connect', () => {
+    if (prebuf && prebuf.length) up.write(prebuf);
+    sock.pipe(up);
+    up.pipe(sock);
+  });
+  up.on('error', (e) => {
+    log({ k: 'http_pipe_err', kind, peer, error: String((e && e.message) || e).slice(0, 120) });
+    sock.destroy();
+    up.destroy();
+  });
+  sock.on('error', () => { up.destroy(); });
+  up.on('close', finish);
+  sock.on('close', finish);
+  sock.setTimeout(cfg.idleMs * 2, () => { sock.destroy(); up.destroy(); });
+}
+
+// TLS branch, lab mode (no cert configured): raw passthrough proxy to the
+// loopback gateway TLS listener.
 function proxyTls(sock, prebuf, peer, peerIp) {
   const upHost = cfg.tlsUpstreamHost;
   const upPort = cfg.tlsUpstreamPort;
@@ -763,6 +829,72 @@ function proxyTls(sock, prebuf, peer, peerIp) {
   up.on('close', finish);
   sock.on('close', finish);
   sock.setTimeout(cfg.idleMs * 2, () => { sock.destroy(); up.destroy(); });
+}
+
+// TLS branch, production (cert configured): TERMINATE TLS here — daemon
+// parity. Inside the decrypted stream the same first-byte detection runs
+// again: an HTTP method pipes to the gateway; ANYTHING ELSE (including the
+// official client's encrypted-binary hello) goes to the NATIVE FRONT on the
+// TLS socket — the client then completes its test INSIDE TLS, exactly as it
+// would against the daemon.
+function tlsTerminate(sock, peer, peerIp) {
+  counters.tlsTerminated++;
+  let done = false;
+  const tlsSock = new tls.TLSSocket(sock, {
+    isServer: true,
+    cert: cfg.tlsCertPem,
+    key: cfg.tlsKeyPem,
+    minVersion: 'TLSv1.2',
+    ALPNProtocols: ['http/1.1'],
+  });
+  sock.setTimeout(cfg.tlsSniffMs + cfg.idleMs, () => { try { tlsSock.destroy(); sock.destroy(); } catch { /* already gone */ } });
+  const abandon = (why, e) => {
+    if (done) return;
+    done = true;
+    connUnregister(peerIp);
+    log({ k: why, peer, error: e ? String((e && e.message) || e).slice(0, 120) : null });
+    try { tlsSock.destroy(); } catch { /* noop */ }
+  };
+  tlsSock.on('error', (e) => {
+    counters.tlsHandshakeErr++;
+    abandon('tls_handshake_err', e); // handshake failure → the client falls back (lab parity)
+  });
+  tlsSock.on('close', () => {
+    if (!done) { done = true; connUnregister(peerIp); log({ k: 'tls_close', peer }); }
+  });
+  tlsSock.on('secure', () => {
+    tlsSock.setNoDelay(true);
+    log({ k: 'tls_open', peer, alpn: tlsSock.alpnProtocol || null });
+    // Inside-TLS first-byte detection (daemon parity §1 again).
+    const parts = [];
+    let settled = false;
+    const onData = (c) => {
+      parts.push(c);
+      const r = looksLikeHttpMethod(Buffer.concat(parts));
+      if (r === null) return; // still letters — wait
+      settle(r ? 'http' : 'netgauge');
+    };
+    function settle(lane) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      tlsSock.removeListener('data', onData);
+      tlsSock.removeListener('close', onClose);
+      const pre = Buffer.concat(parts);
+      if (lane === 'http') plainPipe(tlsSock, pre, peer, peerIp, 'tls-http');
+      else handleConn(tlsSock, pre); // native front INSIDE TLS (socket = TLSSocket)
+    }
+    const onClose = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      connUnregister(peerIp);
+      log({ k: 'tls_close', peer, phase: 'inside-mux' });
+    };
+    const timer = setTimeout(() => settle('netgauge'), cfg.tlsSniffMs);
+    tlsSock.on('close', onClose);
+    tlsSock.on('data', onData);
+  });
 }
 
 // ---------------------------------------------------------------- TCP front
@@ -1000,8 +1132,13 @@ function handleConn(sock, prebuf) {
   }
 }
 
-// Connection entry: per-IP guards apply to BOTH lanes (native NetGauge and
-// the TLS mux) — they protect the port, not the protocol.
+// Connection entry: per-IP guards apply to ALL lanes (native NetGauge, the
+// TLS branch and the HTTP pipe) — they protect the port, not the protocol.
+// An 'error' handler is attached IMMEDIATELY: a client abort (ECONNRESET)
+// during the sniff window must NEVER become an unhandled 'error' event —
+// that crashed the very first official-CLI run against this mux (27 Nov:
+// "Latency test failed" + Main process exited; systemd Restart=always
+// recovered in 3 s, but the run was dead).
 function onConnection(sock) {
   const peerIp = normIp(sock.remoteAddress || '');
   const peer = `${sock.remoteAddress}:${sock.remotePort}`;
@@ -1019,31 +1156,52 @@ function onConnection(sock) {
     sock.destroy();
     return;
   }
+  // Never let a client-side reset/abort crash the process (any phase).
+  sock.on('error', () => {});
 
   if (!cfg.tlsMux) { handleConn(sock, null); return; }
 
-  // First-byte detection (daemon parity). Buffer until looksLikeTls decides
-  // or the sniff window elapses; then hand the pre-read bytes to the chosen
-  // lane so no byte is ever lost or duplicated.
+  // First-byte detection (daemon parity): TLS ClientHello / HTTP method /
+  // anything else → NetGauge. The buffered first bytes are handed to the
+  // chosen lane un-split (or unshifted back for the TLS handshake).
   const parts = [];
   let decided = false;
   const onData = (c) => {
     parts.push(c);
-    const r = looksLikeTls(Buffer.concat(parts));
-    if (r === null) return; // need more bytes (max 7)
-    settle(r ? 'tls' : 'netgauge');
+    const buf = Buffer.concat(parts);
+    const t = looksLikeTls(buf);
+    if (t === true) return settle('tls');
+    if (t === null) return; // could still become a ClientHello — wait
+    const h = looksLikeHttpMethod(buf);
+    if (h === true) return settle('http');
+    if (h === null) return; // could still become "METHOD " — wait
+    settle('netgauge');
   };
+  const onSniffClose = () => settle('closed');
   const timer = setTimeout(() => settle('netgauge'), cfg.tlsSniffMs);
+  sock.on('data', onData);
+  sock.on('close', onSniffClose);
   function settle(lane) {
     if (decided) return;
     decided = true;
     clearTimeout(timer);
     sock.removeListener('data', onData);
+    sock.removeListener('close', onSniffClose);
+    if (lane === 'closed') { connUnregister(peerIp); return; } // aborted during sniff
+    if (lane === 'tls') {
+      // Give the handshake bytes back to the socket before wrapping it.
+      // pause() FIRST: unshifting into a flowing-mode socket silently breaks
+      // the TLSSocket handshake (verified repro: handshake never completes).
+      sock.pause();
+      for (let i = parts.length - 1; i >= 0; i--) sock.unshift(parts[i]);
+      if (cfg.tlsCertPem) tlsTerminate(sock, peer, peerIp);
+      else proxyTls(sock, Buffer.concat(parts), peer, peerIp); // lab mode
+      return;
+    }
     const pre = Buffer.concat(parts);
-    if (lane === 'tls') proxyTls(sock, pre, peer, peerIp);
+    if (lane === 'http') plainPipe(sock, pre, peer, peerIp, 'plain-http');
     else handleConn(sock, pre);
   }
-  sock.on('data', onData);
 }
 
 function writeWait(sock, buf) {
@@ -1088,14 +1246,34 @@ udpSock.on('error', (e) => { console.error('[speedtest-bridge] udp error:', e.me
   if (!m) { console.error('[speedtest-bridge] bad SPEEDTEST_BRIDGE_TLS_UPSTREAM:', cfg.tlsUpstream); process.exit(1); }
   cfg.tlsUpstreamHost = m[1];
   cfg.tlsUpstreamPort = +m[2];
+  const h = /^(\[[^\]]*\]|[^:]+):(\d+)$/.exec(cfg.httpUpstream);
+  if (!h) { console.error('[speedtest-bridge] bad SPEEDTEST_BRIDGE_HTTP_UPSTREAM:', cfg.httpUpstream); process.exit(1); }
+  cfg.httpUpstreamHost = h[1];
+  cfg.httpUpstreamPort = +h[2];
+  if (cfg.tlsCertPath && cfg.tlsKeyPath) {
+    cfg.tlsCertPem = fs.readFileSync(cfg.tlsCertPath); // systemd LoadCredential (read-only)
+    cfg.tlsKeyPem = fs.readFileSync(cfg.tlsKeyPath);
+  } else if (cfg.tlsCertPath || cfg.tlsKeyPath) {
+    console.error('[speedtest-bridge] SPEEDTEST_BRIDGE_TLS_CERT/KEY must be set as a pair');
+    process.exit(1);
+  } else {
+    cfg.tlsCertPem = null; cfg.tlsKeyPem = null;
+  }
 }
+function tlsMode() {
+  if (!cfg.tlsMux) return 'off';
+  return cfg.tlsCertPem ? 'terminate' : 'raw-proxy';
+}
+
 const server = net.createServer(onConnection);
 server.on('error', (e) => { console.error('[speedtest-bridge] tcp error:', e.message); process.exit(1); });
 server.listen(cfg.port, '::', () => {
   console.log(`[speedtest-bridge] tcp+udp :${cfg.port} | backend=${cfg.backend} | gateway=${cfg.gatewayBase}` +
-    ` | tlsMux=${cfg.tlsMux ? cfg.tlsUpstream : 'off'} | rate=${cfg.connRatePerMin}/min/ip | log=${cfg.log}`);
+    ` | tls=${tlsMode()} | httpUpstream=${cfg.tlsMux ? cfg.httpUpstream : '-'} | rate=${cfg.connRatePerMin}/min/ip | log=${cfg.log}`);
   log({ k: 'meta', pid: process.pid, port: cfg.port, backend: cfg.backend, gateway: cfg.gatewayBase,
-    tlsMux: cfg.tlsMux, tlsUpstream: cfg.tlsMux ? cfg.tlsUpstream : null,
+    tlsMux: cfg.tlsMux, tlsMode: tlsMode(),
+    tlsUpstream: cfg.tlsMux && !cfg.tlsCertPem ? cfg.tlsUpstream : null,
+    httpUpstream: cfg.tlsMux ? cfg.httpUpstream : null,
     connRatePerMin: cfg.connRatePerMin, maxConnPerIp: cfg.maxConnPerIp,
     wsChunk: cfg.wsChunk, httpChunk: cfg.httpChunk, wsPaceMs: cfg.wsPaceMs,
     versionString: cfg.versionString, instanceUuid: cfg.instanceUuid, node: process.version });

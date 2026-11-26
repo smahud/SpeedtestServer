@@ -211,6 +211,9 @@ case "${SPEEDTEST_BRIDGE_ENABLED:-true}" in false|0|off|no) BRIDGE_ENABLED=0 ;; 
 BRIDGE_PORT="${SPEEDTEST_BRIDGE_PORT:-8080}"
 BRIDGE_TLS_MUX="${SPEEDTEST_BRIDGE_TLS_MUX:-1}"
 case "$BRIDGE_TLS_MUX" in 0|false|off|no) BRIDGE_TLS_MUX=0 ;; esac
+# Gateway loopback PLAIN listener (the bridge pipes the decrypted HTTP lane
+# here after terminating TLS on the bridge port, daemon parity).
+PLAIN_GW_PORT="${HYBRID_GATEWAY_PLAIN_PORT:-8791}"
 # Daemon ports = the native list minus the bridge port (5060 when the
 # bridge takes 8080, 8080 when it takes 5060). Explicit override:
 # SPEEDTEST_BRIDGE_DAEMON_PORTS (comma list, written to OoklaServer.properties).
@@ -550,6 +553,10 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
   gw_emit HYBRID_SHARED_SECRET
   gw_emit HYBRID_GATEWAY_PORT 8790
   gw_emit HYBRID_GATEWAY_BIND 0.0.0.0
+  # v1.6: loopback plain listener for the speedtest-bridge TLS mux
+  if [ "$BRIDGE_ENABLED" = 1 ] && [ "$BRIDGE_TLS_MUX" = 1 ]; then
+    printf 'HYBRID_GATEWAY_PLAIN_PORT=%s\n' "$PLAIN_GW_PORT" >> "$GW_TMP"
+  fi
   # TLS: the unit reads the daemon wildcard cert via systemd LoadCredential
   # (root-only readable) and exposes private copies under /run/credentials —
   # the gateway never needs direct access to the 0600 privkey.
@@ -765,6 +772,14 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ] && [ "$BRIDGE_ENABLED" = 1 ]; then
   sb_emit SPEEDTEST_BRIDGE_WS_PACE_MS
   printf 'SPEEDTEST_BRIDGE_TLS_MUX=%s\n' "$BRIDGE_TLS_MUX" >> "$SB_TMP"
   printf 'SPEEDTEST_BRIDGE_TLS_UPSTREAM=127.0.0.1:%s\n' "${HYBRID_GATEWAY_PORT:-8790}" >> "$SB_TMP"
+  printf 'SPEEDTEST_BRIDGE_HTTP_UPSTREAM=127.0.0.1:%s\n' "$PLAIN_GW_PORT" >> "$SB_TMP"
+  # TLS TERMINATION in the bridge (daemon parity: native NetGauge served
+  # INSIDE TLS on :8080 — the official client's PRIMARY path): the unit reads
+  # the same wildcard cert as the gateway via systemd LoadCredential.
+  if [ -n "${HYBRID_GATEWAY_TLS_CERT:-}" ] && [ -n "${HYBRID_GATEWAY_TLS_KEY:-}" ]; then
+    printf 'SPEEDTEST_BRIDGE_TLS_CERT=/run/credentials/%s/cert\n' "speedtest-bridge.service" >> "$SB_TMP"
+    printf 'SPEEDTEST_BRIDGE_TLS_KEY=/run/credentials/%s/key\n' "speedtest-bridge.service" >> "$SB_TMP"
+  fi
   sb_emit SPEEDTEST_BRIDGE_TLS_SNIFF_MS
   sb_emit SPEEDTEST_BRIDGE_VERSION_STRING
   install -m 0640 -o root -g "$HYBRID_USER" "$SB_TMP" "$SB_ENV"
@@ -823,6 +838,17 @@ RestrictSUIDSGID=true
 CapabilityBoundingSet=
 AmbientCapabilities=
 LimitNOFILE=65536
+EOF
+  if [ -n "${HYBRID_GATEWAY_TLS_CERT:-}" ] && [ -n "${HYBRID_GATEWAY_TLS_KEY:-}" ]; then
+    # systemd (root) reads the READ-ONLY wildcard certs and exposes private
+    # copies at /run/credentials/<unit>/{cert,key} — same pattern as the
+    # gateway unit. The bridge terminates TLS on :8080 (daemon parity).
+    cat >> "$SYSTEMD_DIR/speedtest-bridge.service" <<EOF
+LoadCredential=cert:${HYBRID_GATEWAY_TLS_CERT}
+LoadCredential=key:${HYBRID_GATEWAY_TLS_KEY}
+EOF
+  fi
+  cat >> "$SYSTEMD_DIR/speedtest-bridge.service" <<EOF
 
 [Install]
 WantedBy=multi-user.target

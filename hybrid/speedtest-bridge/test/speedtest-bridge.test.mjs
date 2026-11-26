@@ -20,8 +20,9 @@
  *        node test/speedtest-bridge.test.mjs local       (single backend)
  * Run:   bash test/run-tests.sh
  */
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import net from 'node:net';
+import tls from 'node:tls';
 import dgram from 'node:dgram';
 import http from 'node:http';
 import crypto from 'node:crypto';
@@ -32,7 +33,9 @@ import path from 'node:path';
 const BRIDGE = new URL('../speedtest-bridge.mjs', import.meta.url).pathname;
 const BRIDGE_PORT = 18080;
 const WORKER_PORT = 18081;
-const GW_MOCK_PORT = 18890; // TLS-mux upstream (plain TCP echo — routing only)
+const GW_MOCK_PORT = 18890; // TLS-mux upstream, lab raw-proxy mode (plain TCP echo)
+const GW_PLAIN_PORT = 18891; // gateway plain loopback listener stand-in (echo)
+const TLS_CERT_PORT = 18892; // (unused port range guard)
 const TOKEN = 'test-token-abcdef';
 const WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
@@ -228,6 +231,88 @@ function startMockGateway() {
   return new Promise((resolve) => {
     server.listen(GW_MOCK_PORT, '127.0.0.1', () => resolve({ server, stats: () => ({ conns, closed, received: Buffer.concat(received) }) }));
   });
+}
+
+// Plain gateway stand-in: echoes "PLAIN-GW:" + the first line of whatever it
+// receives — proves the HTTP lane pipes through (request line fidelity).
+function startMockPlainGateway() {
+  let conns = 0;
+  const seen = [];
+  const server = net.createServer((sock) => {
+    conns++;
+    let buf = Buffer.alloc(0);
+    let answered = false;
+    sock.on('data', (c) => {
+      if (answered) return;
+      buf = Buffer.concat([buf, c]);
+      const nl = buf.indexOf(0x0d);
+      if (nl !== -1) {
+        answered = true;
+        seen.push(buf.subarray(0, nl).toString('latin1'));
+        sock.write(Buffer.from('PLAIN-GW: ' + buf.subarray(0, nl).toString('latin1') + '\r\n'));
+      }
+    });
+    sock.on('error', () => {});
+  });
+  return new Promise((resolve) => {
+    server.listen(GW_PLAIN_PORT, '127.0.0.1', () => resolve({ server, stats: () => ({ conns, seen }) }));
+  });
+}
+
+// Self-signed cert for the TLS-termination tests (openssl at runtime).
+function makeSelfSignedCert(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+  const cert = path.join(dir, 'test-cert.pem');
+  const key = path.join(dir, 'test-key.pem');
+  const r = spawnSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes',
+    '-keyout', key, '-out', cert, '-days', '2', '-subj', '/CN=localhost'], { stdio: 'ignore' });
+  if (r.status !== 0) return null;
+  return { cert, key };
+}
+
+// TLS client helper (rejectUnauthorized:false — the mux serves its own cert).
+function tlsConnect(port = BRIDGE_PORT) {
+  const sock = tls.connect({ host: '127.0.0.1', port, rejectUnauthorized: false, ALPNProtocols: ['http/1.1'] });
+  sock.setNoDelay(true);
+  const state = { buf: Buffer.alloc(0), closed: false, waiters: [] };
+  sock.on('data', (c) => {
+    state.buf = Buffer.concat([state.buf, c]);
+    while (state.waiters.length) {
+      const w = state.waiters[0];
+      const r = w.try();
+      if (r !== undefined) { state.waiters.shift(); w.consume(); w.resolve(r); }
+      else break;
+    }
+  });
+  sock.on('close', () => { state.closed = true; for (const w of state.waiters.splice(0)) w.reject(new Error('closed')); });
+  sock.on('error', () => {});
+  const api = {
+    sock, state,
+    write(b) { sock.write(b); },
+    writeLine(s) { sock.write(s + '\n'); },
+    async readExact(n, timeoutMs = 10000) {
+      const t0 = Date.now();
+      for (;;) {
+        if (state.buf.length >= n) { const out = state.buf.subarray(0, n); state.buf = state.buf.subarray(n); return out; }
+        if (state.closed) throw new Error('closed');
+        if (Date.now() - t0 > timeoutMs) throw new Error('readExact timeout');
+        await sleep(20);
+      }
+    },
+    async readLine(timeoutMs = 10000) {
+      const t0 = Date.now();
+      for (;;) {
+        const idx = state.buf.indexOf(0x0a);
+        if (idx !== -1) { const line = state.buf.subarray(0, idx).toString('latin1'); state.buf = state.buf.subarray(idx + 1); return line; }
+        if (state.closed) throw new Error('closed');
+        if (Date.now() - t0 > timeoutMs) throw new Error('readLine timeout');
+        await sleep(20);
+      }
+    },
+    closed() { return state.closed; },
+    destroy() { sock.destroy(); },
+  };
+  return api;
 }
 
 // Minimal WS server-side frame ENCODER (unmasked server frames)
@@ -578,6 +663,22 @@ async function tlsMuxSuite(gw) {
   const s = gw.stats();
   expect(s.conns === 2, `mux: upstream saw exactly 2 proxied conns (got ${s.conns})`);
   expect(s.received.length > 0, 'mux: upstream received the ClientHello bytes');
+
+  // 6. CRASH REGRESSION: a client that RSTs mid-sniff (0x16 0x03 … sent,
+  //    then abort) must never kill the process — the very first official-CLI
+  //    run against the mux died exactly this way (unhandled ECONNRESET,
+  //    27 Nov 2026). The bridge must keep serving afterwards.
+  for (let i = 0; i < 3; i++) {
+    const c = connect();
+    c.write(Buffer.from([0x16, 0x03]));
+    await sleep(60);
+    try { c.sock.resetAndDestroy ? c.sock.resetAndDestroy() : c.sock.destroy(); } catch { /* race */ }
+  }
+  await sleep(250);
+  const c6 = connect();
+  c6.writeLine('HI');
+  expect(/^HELLO 2\.11 /.test(await c6.readLine()), 'mux: survives client RST during sniff (no crash)');
+  c6.destroy();
 }
 
 // ---------------------------------------------------------------- rate-limit suite
@@ -604,6 +705,76 @@ async function rateLimitSuite() {
   const events = fs.readFileSync(b.logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
   expect(events.some((e) => e.k === 'conn_rate_rejected'), 'rate: conn_rate_rejected logged');
   expect(!events.some((e) => e.k === 'tls_proxy_open'), 'rate: no spurious TLS routing');
+}
+
+// ------------------------------------------------ TLS-termination suite (production mode)
+// Production mux shape: TLS terminates IN the bridge (daemon parity) so the
+// official client's PRIMARY path — NetGauge INSIDE TLS — is served by the
+// front; an HTTP method (outside or inside TLS) pipes to the gateway's
+// loopback plain listener.
+async function tlsTerminateSuite() {
+  section('TLS mux — terminate in-bridge (daemon parity: NetGauge INSIDE TLS)');
+  const certDir = path.join(os.tmpdir(), `speedtest-bridge-tlscert-${Date.now()}`);
+  const pem = makeSelfSignedCert(certDir);
+  if (!pem) { console.error('  SKIP: openssl not available'); return; }
+
+  const b = await spawnBridge('local', {
+    SPEEDTEST_BRIDGE_TLS_CERT: pem.cert,
+    SPEEDTEST_BRIDGE_TLS_KEY: pem.key,
+    SPEEDTEST_BRIDGE_HTTP_UPSTREAM: `127.0.0.1:${GW_PLAIN_PORT}`,
+  });
+  children.push(b.child);
+  try {
+    // 1. THE official-CLI primary path: TLS handshake, encrypted-binary hello
+    //    → ERROR INSIDE TLS → HI → HELLO → full NetGauge semantics inside TLS.
+    {
+      const c = tlsConnect();
+      const binHello = crypto.randomBytes(16);
+      for (let i = 0; i < binHello.length; i++) if (binHello[i] === 0x0a) binHello[i] = 0x0b;
+      binHello[0] = 0x48; binHello[1] = 0x49; binHello[2] = 0x7e;
+      c.write(Buffer.concat([binHello, Buffer.from('\n', 'latin1')]));
+      expect((await c.readLine()) === 'ERROR', 'tls-term: binary hello → ERROR (inside TLS)');
+      c.writeLine('HI');
+      expect(/^HELLO 2\.11 /.test(await c.readLine()), 'tls-term: HI → HELLO inside TLS');
+      c.writeLine('GETIP');
+      expect(/^YOURIP /.test(await c.readLine()), 'tls-term: GETIP → YOURIP inside TLS');
+      c.writeLine('DOWNLOAD 100');
+      const d = await c.readExact(100);
+      expect(d.length === 100 && d[99] === 0x0a && d.subarray(0, 9).toString('latin1') === 'DOWNLOAD ',
+        'tls-term: DOWNLOAD 100 byte-exact inside TLS');
+      c.destroy();
+    }
+    // 2. HTTP INSIDE TLS → piped to the gateway plain listener.
+    {
+      const c = tlsConnect();
+      c.write('GET /api/health HTTP/1.0\r\nHost: x\r\n\r\n');
+      const line = (await c.readLine()).replace(/\r$/, '');
+      expect(line === 'PLAIN-GW: GET /api/health HTTP/1.0', `tls-term: HTTP-inside-TLS piped to gateway (got "${line}")`);
+      c.destroy();
+    }
+    // 3. Plain HTTP (outside TLS) → same gateway pipe.
+    {
+      const c = connect();
+      c.write('POST /api/sessions HTTP/1.0\r\nHost: x\r\n\r\n');
+      const line = (await c.readLine()).replace(/\r$/, '');
+      expect(line === 'PLAIN-GW: POST /api/sessions HTTP/1.0', `tls-term: plain HTTP piped to gateway (got "${line}")`);
+      c.destroy();
+    }
+    // 4. Plain NetGauge (outside TLS) still on the front (the fallback lane).
+    {
+      const c = connect();
+      c.writeLine('HI');
+      expect(/^HELLO 2\.11 /.test(await c.readLine()), 'tls-term: plain NetGauge HI → HELLO (front unchanged)');
+      c.destroy();
+    }
+    await sleep(200);
+    const logText = fs.readFileSync(b.logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+    expect(logText.some((e) => e.k === 'tls_open'), 'tls-term: tls_open logged');
+    expect(!logText.some((e) => e.k === 'tls_handshake_err'), 'tls-term: zero tls_handshake_err');
+  } finally {
+    await waitExit(b.child);
+    try { fs.rmSync(certDir, { recursive: true, force: true }); } catch { /* tmp */ }
+  }
 }
 
 // ---------------------------------------------------------------- runner
@@ -639,6 +810,7 @@ async function main() {
   const which = process.argv[2] || 'all';
   const mock = await startMockWorker();
   const gw = await startMockGateway();
+  const gwPlain = await startMockPlainGateway();
   process.on('unhandledRejection', (e) => {
     fail++; fails.push('unhandled rejection: ' + String((e && e.message) || e));
   });
@@ -667,6 +839,13 @@ async function main() {
   }
   if (which === 'all' || which === 'rate') {
     await rateLimitSuite();
+  }
+  if (which === 'all' || which === 'tls-term') {
+    await tlsTerminateSuite();
+    await sleep(150);
+    const s = gwPlain.stats();
+    expect(s.seen.includes('GET /api/health HTTP/1.0') && s.seen.includes('POST /api/sessions HTTP/1.0'),
+      `tls-term: gateway plain listener saw both piped requests (${JSON.stringify(s.seen)})`);
   }
 
   if (which === 'all' || which === 'local') {
@@ -739,6 +918,7 @@ async function main() {
   }
   mock.server.close();
   gw.server.close();
+  gwPlain.server.close();
   process.exit(0);
 }
 
