@@ -35,7 +35,18 @@
 #         verifies a sample via /__meta;
 #      c. VPS-ONLY FALLBACK: when no usable Cloudflare credential is present
 #         the install still completes (daemon + gateway, everything served
-#         by the VPS); fix .env and re-run install.sh to enable hybrid.
+#         by the VPS); fix .env and re-run install.sh to enable hybrid;
+#      d. SPEEDTEST-BRIDGE (v1.6, default on): installs the permanent VPS
+#         front for NATIVE Ookla clients (unmodified official CLI / mobile
+#         apps — NetGauge protocol parity + measurement payload from the
+#         Worker pool) as speedtest-bridge.service (auto-start on boot +
+#         auto-restart on crash). PORT UNIFICATION: the bridge owns the
+#         native :8080 (TCP+UDP) and muxes TLS ClientHellos to the gateway
+#         (now loopback-only, :8790 never public) — so the VPS opens ONLY
+#         the two native OoklaServer ports: :8080 (bridge) + :5060 (daemon,
+#         narrowed in OoklaServer.properties itself with a timestamped
+#         backup). SPEEDTEST_BRIDGE_ENABLED=false restores the daemon to
+#         both native ports and disables the unit.
 #   9. AUTO-UPDATE (v1.5): installs speedtest-autoupdate.service + .timer
 #      (daily 04:30 + jitter, Persistent) — the stack pulls repo updates,
 #      reinstalls and restarts itself. See docs/AUTO_UPDATE.md.
@@ -186,7 +197,25 @@ HYBRID_PREFIX="${HYBRID_PREFIX:-/opt/speedtest-hybrid}"
 HYBRID_USER="${HYBRID_USER:-speedtest-hybrid}"
 HYBRID_ETC="${HYBRID_ETC:-/etc/speedtest-hybrid}"
 HYBRID_STATE="${HYBRID_STATE:-/var/lib/speedtest-hybrid}"
+SPEEDTEST_BRIDGE_STATE="${SPEEDTEST_BRIDGE_STATE:-/var/lib/speedtest-bridge}"
 CF_WORKER_DEPLOY_COUNT="${CF_WORKER_DEPLOY_COUNT:-0}"
+
+# ------------------------------------------------------------- bridge ------
+# speedtest-bridge enablement + port layout (v1.6 port unification):
+# enabled with the hybrid stack unless .env says otherwise. The bridge owns
+# OoklaServer's primary native port (default 8080); the daemon is narrowed to
+# the other native port(s) — configured ONLY in OoklaServer.properties.
+BRIDGE_ENABLED=1
+[ "$NO_HYBRID" = 1 ] && BRIDGE_ENABLED=0
+case "${SPEEDTEST_BRIDGE_ENABLED:-true}" in false|0|off|no) BRIDGE_ENABLED=0 ;; esac
+BRIDGE_PORT="${SPEEDTEST_BRIDGE_PORT:-8080}"
+BRIDGE_TLS_MUX="${SPEEDTEST_BRIDGE_TLS_MUX:-1}"
+case "$BRIDGE_TLS_MUX" in 0|false|off|no) BRIDGE_TLS_MUX=0 ;; esac
+# Daemon ports = the native list minus the bridge port (5060 when the
+# bridge takes 8080, 8080 when it takes 5060). Explicit override:
+# SPEEDTEST_BRIDGE_DAEMON_PORTS (comma list, written to OoklaServer.properties).
+DAEMON_PORTS="${SPEEDTEST_BRIDGE_DAEMON_PORTS:-$(printf '5060\n8080\n' | grep -vx "$BRIDGE_PORT" | paste -sd, -)}"
+[ -n "$DAEMON_PORTS" ] || DAEMON_PORTS="5060"
 
 # Sanity: worker count bounds (Cloudflare Workers Free = 100 scripts/account).
 if [ "$NO_HYBRID" = 0 ] && [ "$NO_WORKERS" = 0 ] && [ "$CF_WORKER_DEPLOY_COUNT" != "0" ]; then
@@ -492,6 +521,20 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
     HYBRID_WORKER_POOL_MAX="$CF_WORKER_DEPLOY_COUNT"
   fi
 
+  # --- v1.6 port-unification overrides (speedtest-bridge TLS mux) -------
+  # When the bridge owns the public native port, the gateway serves from
+  # LOOPBACK ONLY: its TLS traffic arrives through the bridge's daemon-parity
+  # first-byte mux on :<BRIDGE_PORT>. The public base URL follows the bridge
+  # port; the WS-NetGauge fallback base follows the daemon's own port.
+  if [ "$BRIDGE_ENABLED" = 1 ] && [ "$BRIDGE_TLS_MUX" = 1 ]; then
+    PUB_HOST="$(printf '%s' "${HYBRID_VPS_PUBLIC_BASE:-${HYBRID_STS_BASE:-}}" | sed -E 's#^[a-zA-Z]+://##; s#[:/].*$##')"
+    [ -n "$PUB_HOST" ] || PUB_HOST="127.0.0.1"
+    HYBRID_GATEWAY_BIND="127.0.0.1"
+    HYBRID_VPS_PUBLIC_BASE="https://${PUB_HOST}:${BRIDGE_PORT}"
+    HYBRID_STS_BASE="https://${PUB_HOST}:${DAEMON_PORTS%%,*}"
+    say "  port unification: bridge :${BRIDGE_PORT} (NetGauge front + TLS mux) → gateway loopback; daemon :${DAEMON_PORTS}; VPS opens ONLY native OoklaServer ports"
+  fi
+
   # --- /etc/speedtest-hybrid/gateway.env — regenerated from .env ----------
   # .env is the source of truth; a previous manual gateway.env is backed up.
   GW_ENV="$HYBRID_ETC/gateway.env"
@@ -674,6 +717,158 @@ setTimeout(() => { req.destroy(); process.exit(1); }, 5000);
   cleanup_gwprobe
   trap - EXIT
 fi
+
+# ---------------------------------------------------- speedtest-bridge -----
+# v1.6: the PERMANENT VPS front for NATIVE Ookla clients (unmodified official
+# CLI today — the same NetGauge engine family powers the mobile apps): the
+# bridge terminates the native protocol exactly like the daemon (control +
+# identity + loss stay on the VPS) while the measurement payload originates
+# from the Cloudflare Worker pool. It also carries the daemon-parity TLS mux
+# on the same port (ClientHello → the loopback gateway), so the VPS opens
+# ONLY the two native OoklaServer ports: :<BRIDGE_PORT> (bridge) + daemon
+# ports (narrowed in OoklaServer.properties — the official config file —
+# with a timestamped backup). Runs as speedtest-bridge.service with
+# Restart=always (auto-start on boot, auto-restart on crash).
+if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ] && [ "$BRIDGE_ENABLED" = 1 ]; then
+  say "Installing speedtest-bridge (permanent :${BRIDGE_PORT} — native clients + Worker payload + TLS mux)…"
+  BRIDGE_DST="$HYBRID_PREFIX/speedtest-bridge"
+  mkdir -p "$BRIDGE_DST" "$SPEEDTEST_BRIDGE_STATE"
+  rsync -a --delete "$REPO_ROOT/hybrid/speedtest-bridge/" "$BRIDGE_DST/"
+  chown -R "$HYBRID_USER:$HYBRID_USER" "$SPEEDTEST_BRIDGE_STATE"
+  say "  files: $BRIDGE_DST (state: $SPEEDTEST_BRIDGE_STATE)"
+
+  # --- /etc/speedtest-hybrid/speedtest-bridge.env — regenerated ----------
+  SB_ENV="$HYBRID_ETC/speedtest-bridge.env"
+  [ -f "$SB_ENV" ] && cp -a "$SB_ENV" "$SB_ENV.bak.$(date +%Y%m%d%H%M%S)" || true
+  SB_TMP="$(mktemp)"
+  sb_emit() { # sb_emit <KEY> [default]
+    local key="$1" v="${!1:-}"
+    [ -z "$v" ] && v="${2:-}"
+    [ -z "$v" ] && return 0
+    printf '%s=%s\n' "$key" "$v" >> "$SB_TMP"
+  }
+  printf 'SPEEDTEST_BRIDGE_PORT=%s\n' "$BRIDGE_PORT" >> "$SB_TMP"
+  sb_emit SPEEDTEST_BRIDGE_BACKEND worker-http
+  printf 'SPEEDTEST_BRIDGE_GATEWAY_BASE=https://127.0.0.1:%s\n' "${HYBRID_GATEWAY_PORT:-8790}" >> "$SB_TMP"
+  sb_emit SPEEDTEST_BRIDGE_WORKER_BASE
+  sb_emit SPEEDTEST_BRIDGE_TOKEN
+  printf 'SPEEDTEST_BRIDGE_LOG=%s\n' "$SPEEDTEST_BRIDGE_STATE/speedtest-bridge.jsonl" >> "$SB_TMP"
+  sb_emit SPEEDTEST_BRIDGE_IDLE_MS
+  sb_emit SPEEDTEST_BRIDGE_MAX_CONN_PER_IP 500
+  sb_emit SPEEDTEST_BRIDGE_CONN_RATE_PER_MIN 240
+  sb_emit SPEEDTEST_BRIDGE_MAX_DL_BYTES
+  sb_emit SPEEDTEST_BRIDGE_MAX_UL_BYTES
+  sb_emit SPEEDTEST_BRIDGE_HTTP_CHUNK
+  sb_emit SPEEDTEST_BRIDGE_UL_CHUNK
+  sb_emit SPEEDTEST_BRIDGE_UL_INFLIGHT
+  sb_emit SPEEDTEST_BRIDGE_WS_CHUNK
+  sb_emit SPEEDTEST_BRIDGE_WS_PACE_MS
+  printf 'SPEEDTEST_BRIDGE_TLS_MUX=%s\n' "$BRIDGE_TLS_MUX" >> "$SB_TMP"
+  printf 'SPEEDTEST_BRIDGE_TLS_UPSTREAM=127.0.0.1:%s\n' "${HYBRID_GATEWAY_PORT:-8790}" >> "$SB_TMP"
+  sb_emit SPEEDTEST_BRIDGE_TLS_SNIFF_MS
+  sb_emit SPEEDTEST_BRIDGE_VERSION_STRING
+  install -m 0640 -o root -g "$HYBRID_USER" "$SB_TMP" "$SB_ENV"
+  rm -f "$SB_TMP"
+  say "  speedtest-bridge.env written: $SB_ENV (0640 root:$HYBRID_USER)"
+
+  # --- daemon ports in OoklaServer.properties (the official config) -----
+  # The bridge must own its port, so the daemon is narrowed to the other
+  # native port(s) — configured ONLY in OoklaServer.properties, backed up
+  # first (idempotent: no rewrite when the daemon no longer holds the port).
+  PROP_TCP="$(grep -E '^OoklaServer\.tcpPorts' "$CONFIG_INSTALLED" | head -1 | sed 's/^[^=]*= *//' | tr -d ' ')"
+  PROP_UDP="$(grep -E '^OoklaServer\.udpPorts' "$CONFIG_INSTALLED" | head -1 | sed 's/^[^=]*= *//' | tr -d ' ')"
+  list_has_port() { case ",$1," in *",$2,"*) return 0 ;; *) return 1 ;; esac; }
+  if list_has_port "$PROP_TCP" "$BRIDGE_PORT" || list_has_port "$PROP_UDP" "$BRIDGE_PORT"; then
+    cp -a "$CONFIG_INSTALLED" "$CONFIG_INSTALLED.bak-speedtest-bridge.$(date +%Y%m%d%H%M%S)"
+    sed -i -e "s/^OoklaServer\.tcpPorts.*/OoklaServer.tcpPorts = ${DAEMON_PORTS}/" \
+           -e "s/^OoklaServer\.udpPorts.*/OoklaServer.udpPorts = ${DAEMON_PORTS}/" "$CONFIG_INSTALLED"
+    say "  OoklaServer.properties: daemon → ${DAEMON_PORTS} (bridge owns :${BRIDGE_PORT}; timestamped backup kept)"
+  else
+    say "  OoklaServer.properties already leaves :${BRIDGE_PORT} to the bridge (daemon on ${PROP_TCP:-?})"
+  fi
+
+  # --- systemd unit (auto-start + auto-restart) ---------------------------
+  cat > "$SYSTEMD_DIR/speedtest-bridge.service" <<EOF
+[Unit]
+Description=Speedtest Bridge (VPS front for native Ookla clients: NetGauge parity + Worker payload, :${BRIDGE_PORT})
+Documentation=file://${BRIDGE_DST}/README.md
+# Start order: the gateway mints the worker tokens the bridge relays (the
+# bridge tolerates a late gateway: cached token + 5s mint backoff). Requires
+# = start propagation only — the native front deliberately SURVIVES a brief
+# gateway restart.
+After=network-online.target speedtest-hybrid-gateway.service
+Wants=network-online.target
+Requires=speedtest-hybrid-gateway.service
+
+[Service]
+Type=simple
+User=$HYBRID_USER
+Group=$HYBRID_USER
+EnvironmentFile=$SB_ENV
+WorkingDirectory=$HYBRID_PREFIX
+ExecStart=$(command -v node) $BRIDGE_DST/speedtest-bridge.mjs
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=120
+StartLimitBurst=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=$SPEEDTEST_BRIDGE_STATE
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  if command -v systemd-analyze >/dev/null 2>&1; then
+    if UNIT_ERR="$(systemd-analyze verify "$SYSTEMD_DIR/speedtest-bridge.service" 2>&1 | grep -v '^$' | head -5)"; [ -z "$UNIT_ERR" ]; then
+      say "  systemd-analyze verify (bridge): OK"
+    else
+      warn "systemd-analyze verify (bridge) reported: $UNIT_ERR"
+    fi
+  fi
+
+  # --- live probe of the exact bridge entrypoint (temporary instance) ----
+  say "Verifying the speedtest-bridge starts and answers…"
+  SB_PROBE_PORT="18808"
+  SB_PROBE_LOG="$(mktemp /tmp/sts-bridge-verify.XXXXXX.log)"
+  env -i PATH="$PATH" HOME="${HOME:-/root}" \
+    "$(command -v node)" "$BRIDGE_DST/speedtest-bridge.mjs" \
+    --port "$SB_PROBE_PORT" --backend local --no-tls-mux --log "$SB_PROBE_LOG" > "$SB_PROBE_LOG" 2>&1 &
+  SB_PROBE_PID=$!
+  cleanup_sbprobe() { kill "$SB_PROBE_PID" 2>/dev/null || true; rm -f "$SB_PROBE_LOG"; }
+  trap cleanup_sbprobe EXIT
+  SB_LISTENING=0
+  for _ in $(seq 1 20); do
+    if ss -tln 2>/dev/null | grep ":${SB_PROBE_PORT} " >/dev/null; then SB_LISTENING=1; break; fi
+    sleep 0.5
+  done
+  [ "$SB_LISTENING" = 1 ] || { cat "$SB_PROBE_LOG" >&2; fail "speedtest-bridge did not listen on $SB_PROBE_PORT"; }
+  SB_PROBE="$(node -e "
+const net = require('net');
+const s = net.connect({ host: '127.0.0.1', port: process.argv[1] });
+let out = '';
+const t = setTimeout(() => { console.error('timeout'); process.exit(1); }, 5000);
+s.on('connect', () => s.write('HI\nGETIP\n'));
+s.on('data', (d) => { out += d.toString(); if (out.includes('\n')) { clearTimeout(t); console.log(out.split('\n')[0]); s.destroy(); } });
+s.on('error', (e) => { clearTimeout(t); console.error(e.message); process.exit(1); });
+" "$SB_PROBE_PORT")"
+  case "$SB_PROBE" in
+    HELLO\ *) say "  bridge protocol probe: $SB_PROBE" ;;
+    *) cat "$SB_PROBE_LOG" >&2; fail "speedtest-bridge protocol probe failed" ;;
+  esac
+  cleanup_sbprobe
+  trap - EXIT
+fi
+# (bridge disable path — SPEEDTEST_BRIDGE_ENABLED=false or --no-hybrid — is
+# handled in the systemctl section below: unit removed, daemon restored to
+# both native ports from the oldest pre-narrowing backup.)
 
 # ------------------------------------------------- cloudflare workers -----
 # v1.5: builds the esbuild bundle once, then converges the deployed 1..N
@@ -868,6 +1063,25 @@ fi
 
 # ------------------------------------------------------------ systemctl ----
 if [ "$AS_ROOT" = 1 ]; then
+  # --- speedtest-bridge disable path (SPEEDTEST_BRIDGE_ENABLED=false) ---
+  # Remove the unit and restore the daemon to BOTH native ports from the
+  # oldest pre-narrowing OoklaServer.properties backup (only when the bridge
+  # was previously narrowed by us — recognized by the backup's presence).
+  if [ "$BRIDGE_ENABLED" = 0 ] && [ -f "$SYSTEMD_DIR/speedtest-bridge.service" ]; then
+    say "speedtest-bridge DISABLED — removing the unit and restoring the daemon's ports…"
+    systemctl disable --now speedtest-bridge 2>/dev/null || true
+    rm -f "$SYSTEMD_DIR/speedtest-bridge.service"
+    systemctl daemon-reload
+    say "  speedtest-bridge.service removed (the bridge front is gone)"
+    if ls "$CONFIG_INSTALLED".bak-speedtest-bridge.* >/dev/null 2>&1; then
+      SB_OLDEST_BAK="$(ls -1tr "$CONFIG_INSTALLED".bak-speedtest-bridge.* | head -1)"
+      cp -a "$SB_OLDEST_BAK" "$CONFIG_INSTALLED"
+      rm -f "$CONFIG_INSTALLED".bak-speedtest-bridge.*
+      say "  OoklaServer.properties restored from $SB_OLDEST_BAK (daemon back on both native ports)"
+    else
+      warn "  no OoklaServer.properties.bak-speedtest-bridge.* found — daemon ports UNCHANGED (check $CONFIG_INSTALLED manually)"
+    fi
+  fi
   systemctl daemon-reload
   if [ "$SYSTEMD_AVAILABLE" = 1 ]; then
     # enable + (re)start: a re-install on an already-running unit RESTARTS it
@@ -892,6 +1106,19 @@ if [ "$AS_ROOT" = 1 ]; then
       systemctl enable --now speedtest-hybrid-gateway || fail "failed to start speedtest-hybrid-gateway"
       sleep 2
     fi
+    # speedtest-bridge LAST (the daemon must have released :<BRIDGE_PORT>
+    # and the gateway must be up for the mint). Restart starts it when
+    # stopped, so this covers both fresh installs and code updates.
+    if [ "$BRIDGE_ENABLED" = 1 ] && [ -f "$SYSTEMD_DIR/speedtest-bridge.service" ]; then
+      say "Enabling + (re)starting speedtest-bridge…"
+      systemctl enable speedtest-bridge >/dev/null 2>&1 || true
+      if [ "$START" = 1 ] || systemctl is-active --quiet speedtest-bridge || systemctl is-enabled --quiet speedtest-bridge; then
+        systemctl restart speedtest-bridge || fail "failed to start speedtest-bridge"
+        sleep 1
+        systemctl is-active --quiet speedtest-bridge || fail "speedtest-bridge is NOT active after start"
+        say "  speedtest-bridge: active on :${BRIDGE_PORT} (auto-start on boot + auto-restart on crash)"
+      fi
+    fi
     if [ -f "$SYSTEMD_DIR/speedtest-autoupdate.timer" ]; then
       systemctl enable speedtest-autoupdate.timer >/dev/null 2>&1 || true
       systemctl start speedtest-autoupdate.timer 2>/dev/null || true
@@ -910,8 +1137,12 @@ if [ "$AS_ROOT" = 1 ]; then
         curl -sk -m 10 "https://127.0.0.1:$GW_PORT_LIVE/api/health" | head -c 500 || true; echo
       fi
     fi
+    if systemctl is-active --quiet speedtest-bridge; then
+      say "Bridge logs:     journalctl -u speedtest-bridge -f  (JSONL: $SPEEDTEST_BRIDGE_STATE/speedtest-bridge.jsonl)"
+      say "Public ports:    ss -tlnp | grep -E ':(8080|5060) '  → bridge :8080 + daemon :5060 (native OoklaServer ports only)"
+    fi
     if [ "$START" != 1 ]; then
-      say "Units installed. To start now: systemctl enable --now speedtestserver speedtest-hybrid-gateway"
+      say "Units installed. To start now: systemctl enable --now speedtestserver speedtest-hybrid-gateway speedtest-bridge"
     fi
   else
     warn "systemd not running in this environment — service NOT started (BLOCKED)."
@@ -929,9 +1160,15 @@ say "Done (VERSION $APP_VERSION). Upgrade: re-run this script (configuration and
 say "Recovery: systemctl restart speedtestserver  (or re-run with --start)"
 if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
   say "Hybrid recovery: systemctl restart speedtest-hybrid-gateway"
+  if [ "$BRIDGE_ENABLED" = 1 ]; then
+    say "Bridge recovery: systemctl restart speedtest-bridge   (owns :${BRIDGE_PORT} — native clients + TLS mux)"
+  fi
   say "Pool status:   curl -sk https://127.0.0.1:${HYBRID_GATEWAY_PORT:-8790}/api/pool"
   say "Worker sync:   curl -sk https://127.0.0.1:${HYBRID_GATEWAY_PORT:-8790}/api/workers"
   say "On-the-fly:    edit .env — the running gateway applies it within seconds"
   say "Auto-update:   systemctl list-timers speedtest-autoupdate.timer"
   say "Documentation: docs/HYBRID_ASSIST_MODE.md · docs/WORKER_POOL.md · docs/CLOUDFLARE_CREDENTIALS.md · docs/AUTO_UPDATE.md"
+  if [ "$BRIDGE_ENABLED" = 1 ]; then
+    say "Contract + official-CLI test method: CONTRACT.md · docs/OFFICIAL_CLI_TESTING_GUIDE.md"
+  fi
 fi

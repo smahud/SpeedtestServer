@@ -90,10 +90,18 @@ systemctl restart speedtestserver || log "WARN: speedtestserver restart failed"
 if systemctl list-unit-files 2>/dev/null | grep '^speedtest-hybrid-gateway' >/dev/null; then
   systemctl restart speedtest-hybrid-gateway || log "WARN: hybrid gateway restart failed"
 fi
+# speedtest-bridge (permanent :8080 front) follows the gateway — restart it
+# too so the running bridge matches the freshly pulled sources.
+if systemctl list-unit-files 2>/dev/null | grep '^speedtest-bridge' >/dev/null; then
+  systemctl restart speedtest-bridge || log "WARN: speedtest-bridge restart failed"
+fi
 
 sleep 2
 systemctl is-active --quiet speedtestserver && log "speedtestserver: active" || log "WARN: speedtestserver NOT active"
 if systemctl list-unit-files 2>/dev/null | grep '^speedtest-hybrid-gateway' >/dev/null; then
   systemctl is-active --quiet speedtest-hybrid-gateway && log "speedtest-hybrid-gateway: active" || log "WARN: speedtest-hybrid-gateway NOT active"
+fi
+if systemctl list-unit-files 2>/dev/null | grep '^speedtest-bridge' >/dev/null; then
+  systemctl is-active --quiet speedtest-bridge && log "speedtest-bridge: active" || log "WARN: speedtest-bridge NOT active"
 fi
 log "update complete: VERSION $NEW_V @ $(git rev-parse --short HEAD)"
