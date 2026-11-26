@@ -16,15 +16,17 @@
 
 [Unit]
 Description=Speedtest Bridge (VPS front for native Ookla clients: NetGauge parity + Worker payload, :8080)
-Documentation=file:/opt/speedtest-hybrid/speedtest-bridge/README.md
-# The gateway mints the worker tokens the bridge relays; start order matters
-# (the bridge tolerates a late gateway: mint backoff + cached token).
-# Requires = start propagation (gateway start pulls the bridge up); the
-# native front deliberately SURVIVES a brief gateway restart — control
-# commands keep answering daemon-parity while mint backs off and recovers.
+Documentation=file:///opt/speedtest-hybrid/speedtest-bridge/README.md
+# Start order: the gateway mints the worker tokens the bridge relays (the
+# bridge tolerates a late gateway: cached token + 5s mint backoff). Requires
+# = start propagation only — the native front deliberately SURVIVES a brief
+# gateway restart.
 After=network-online.target speedtest-hybrid-gateway.service
 Wants=network-online.target
 Requires=speedtest-hybrid-gateway.service
+# Restart rate-limiting (unit-level keys since systemd 230)
+StartLimitIntervalSec=120
+StartLimitBurst=10
 
 [Service]
 Type=simple
@@ -36,8 +38,6 @@ ExecStart=/usr/bin/node /opt/speedtest-hybrid/speedtest-bridge/speedtest-bridge.
 # auto-start after reboot AND auto-restart after any crash/exit
 Restart=always
 RestartSec=3
-StartLimitIntervalSec=120
-StartLimitBurst=10
 # Hardening (same profile as the gateway unit; no capabilities needed —
 # :8080/:5060 are unprivileged ports)
 NoNewPrivileges=true

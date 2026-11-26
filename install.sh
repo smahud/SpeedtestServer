@@ -799,6 +799,9 @@ Documentation=file://${BRIDGE_DST}/README.md
 After=network-online.target speedtest-hybrid-gateway.service
 Wants=network-online.target
 Requires=speedtest-hybrid-gateway.service
+# Restart rate-limiting (unit-level keys since systemd 230)
+StartLimitIntervalSec=120
+StartLimitBurst=10
 
 [Service]
 Type=simple
@@ -809,8 +812,6 @@ WorkingDirectory=$HYBRID_PREFIX
 ExecStart=$(command -v node) $BRIDGE_DST/speedtest-bridge.mjs
 Restart=always
 RestartSec=3
-StartLimitIntervalSec=120
-StartLimitBurst=10
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
