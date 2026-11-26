@@ -23,8 +23,8 @@ WS_FRAME_LIMIT_BYTES = "5242880"
 # G-4: per-request caps for Workers Free — initial values from the spec
 # (16-25 MiB); FINAL values are set from the real-edge measurements
 # (hybrid/lab/evidence/e-j-real-edge/, Fase C.3).
-MAX_DOWNLOAD_BYTES = "26214400"
-MAX_UPLOAD_BYTES = "26214400"
+MAX_DOWNLOAD_BYTES = "134217728"
+MAX_UPLOAD_BYTES = "134217728"
 # G-7/K-7: daemon-parity legacy HTTP surface OFF in production.
 LEGACY_HTTP_ENABLED = "false"
 # Worker-pool identity (worker 1 = this canonical primary script). The pool
