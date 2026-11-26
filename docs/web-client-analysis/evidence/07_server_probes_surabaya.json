@@ -1,0 +1,4176 @@
+{
+ "74964": {
+  "id": 74964,
+  "sponsor": "somedigit.net",
+  "hosts": {
+   "speedtest.somedigit.net": {
+    "dns": {
+     "ipv4": [
+      "103.134.66.6"
+     ],
+     "ipv6": []
+    },
+    "user_provided_ip": "103.134.66.6",
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 248.88
+     },
+     "443": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 169.11
+     },
+     "80": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     }
+    },
+    "tls_8080": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)')"
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:36 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 124.93
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:36 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n",
+     "body_len": 44,
+     "total_ms": 310.82
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:36 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "13"
+     },
+     "body_text": "8.212.10.159\n",
+     "body_len": 13,
+     "total_ms": 126.45
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:36 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 137.32
+    },
+    "http_8080_ping_rtts_ms": [
+     135.17,
+     294.11,
+     138.9,
+     128.77,
+     129.24
+    ],
+    "https_8080_hello": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)')"
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:38 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": "fX#My0#F9$@ZAP0/IVoPYE8snXGK0H{m9v{W2VM%SE@c?*V] EJ]j36X<Z=y`w'M&)60 ci#'G\"#3D3\\rBrKQi=+d+6'/*XqG\"YL\"PUh--POYo,-2\\ycVL$@z70qH/\\BKBR2u^AHP25)M`|npbn?h%1U@7~-xP!IK%13cxaN<l|U%1>0MF*`-q2,$tEm\\y;Gi{-b@bjz",
+     "body_len": 1000,
+     "total_ms": 138.43
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 130.19
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:38 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 129.61
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:38 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 131.78
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:38 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "120"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*\" to-ports=\"5060,8080\"/>\n</cross-domain-policy>\n",
+     "body_len": 120,
+     "total_ms": 138.63
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:30:38 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 135.06
+    },
+    "ws_plain": {
+     "url": "ws://speedtest.somedigit.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d",
+       "raw": "b'HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d'",
+       "at_ms": 63.58
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 127.39
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 127.42
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728638977\n",
+       "raw": "b'PONG 1795728638977\\n'",
+       "at_ms": 127.51
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728639041\n",
+       "raw": "b'PONG 1795728639041\\n'",
+       "rtt_ms": 63.59
+      }
+     ],
+     "ok": true,
+     "total_ms": 320.62
+    },
+    "ws_tls": {
+     "url": "wss://speedtest.somedigit.net:8080/ws",
+     "ok": false,
+     "error": "SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1011)')"
+    },
+    "user_ip_matches_dns": true
+   }
+  }
+ },
+ "61853": {
+  "id": 61853,
+  "sponsor": "PT XLSMART Telecom Sejahtera",
+  "hosts": {
+   "speedtest-sby.xl.co.id": {
+    "dns": {
+     "ipv4": [
+      "112.215.223.4",
+      "2400:9800:b010:120::4"
+     ],
+     "ipv6": [
+      "2400:9800:b010:120::4"
+     ]
+    },
+    "user_provided_ip": null,
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 135.15
+     },
+     "443": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 122.52
+     },
+     "80": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     }
+    },
+    "tls_8080": {
+     "ok": true,
+     "subject": [
+      [
+       [
+        "countryName",
+        "ID"
+       ]
+      ],
+      [
+       [
+        "stateOrProvinceName",
+        "Daerah Khusus Ibukota Jakarta"
+       ]
+      ],
+      [
+       [
+        "localityName",
+        "Jakarta Selatan"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "PT XLSMART TELECOM SEJAHTERA TBK"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "*.xl.co.id"
+       ]
+      ]
+     ],
+     "issuer": [
+      [
+       [
+        "countryName",
+        "US"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "DigiCert Inc"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "DigiCert Global G2 TLS RSA SHA256 2020 CA1"
+       ]
+      ]
+     ],
+     "san": [
+      [
+       "DNS",
+       "*.xl.co.id"
+      ],
+      [
+       "DNS",
+       "xl.co.id"
+      ]
+     ],
+     "notAfter": "Jan 23 23:59:59 2027 GMT",
+     "version": 3
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:11 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019947; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 137.23
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:11 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019947; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n",
+     "body_len": 44,
+     "total_ms": 140.1
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:11 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019947; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "14"
+     },
+     "body_text": "47.57.242.119\n",
+     "body_len": 14,
+     "total_ms": 141.29
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:12 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019946; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 137.09
+    },
+    "http_8080_ping_rtts_ms": [
+     138.46,
+     137.28,
+     134.57,
+     197.8,
+     136.22
+    ],
+    "https_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:13 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019945; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n",
+     "body_len": 44,
+     "total_ms": 317.16
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:13 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019945; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": ",2nY6CN[:Cgfm1#GG&lG4C_OKQ^#$e*U%mH%s7l)1ORTVE-x>G$Hx^@mekNCA|&2%s,BEtOil4zGX;c*0]$x;z*5g%)-R=rX%M2e}ISDsEY0UB:9`Dme#C1VAORspVHM ,NtHW l Z!95xbRotLH\",\"INWdw4f~#0#H%Ob&y~WG\\\u007f92Swd),PAWy([N~T]jkWf:b99eF",
+     "body_len": 1000,
+     "total_ms": 145.07
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 137.94
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:13 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019945; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 146.64
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:13 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019945; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 139.78
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:13 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019945; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "332"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=",
+     "body_len": 332,
+     "total_ms": 251.71
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:14 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5019944; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.xl.co.id *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 136.15
+    },
+    "ws_plain": {
+     "url": "ws://speedtest-sby.xl.co.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d",
+       "raw": "b'HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d'",
+       "at_ms": 62.41
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 8.212.10.159\n",
+       "raw": "b'YOURIP 8.212.10.159\\n'",
+       "at_ms": 125.45
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 125.48
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728854281\n",
+       "raw": "b'PONG 1795728854281\\n'",
+       "at_ms": 125.48
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728854344\n",
+       "raw": "b'PONG 1795728854344\\n'",
+       "rtt_ms": 62.59
+      }
+     ],
+     "ok": true,
+     "total_ms": 315.56
+    },
+    "ws_tls": {
+     "url": "wss://speedtest-sby.xl.co.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d",
+       "raw": "b'HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d'",
+       "at_ms": 66.97
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 133.84
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 133.86
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728854794\n",
+       "raw": "b'PONG 1795728854794\\n'",
+       "at_ms": 133.88
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728854861\n",
+       "raw": "b'PONG 1795728854861\\n'",
+       "rtt_ms": 68.12
+      }
+     ],
+     "ok": true,
+     "total_ms": 518.74
+    },
+    "user_ip_matches_dns": null
+   }
+  }
+ },
+ "62314": {
+  "id": 62314,
+  "sponsor": "PT. Pratama Hasta Utama Solusindo",
+  "hosts": {
+   "speedtest.patas.id": {
+    "dns": {
+     "ipv4": [
+      "103.1.51.67"
+     ],
+     "ipv6": []
+    },
+    "user_provided_ip": "103.1.51.67",
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 101.45
+     },
+     "443": {
+      "ok": true,
+      "connect_ms": 158.78
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 64.53
+     },
+     "80": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     }
+    },
+    "tls_8080": {
+     "ok": true,
+     "subject": [
+      [
+       [
+        "commonName",
+        "speedtest.patas.id"
+       ]
+      ]
+     ],
+     "issuer": [
+      [
+       [
+        "countryName",
+        "US"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "Let's Encrypt"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "YE1"
+       ]
+      ]
+     ],
+     "san": [
+      [
+       "DNS",
+       "speedtest.patas.id"
+      ]
+     ],
+     "notAfter": "Jan 20 05:17:26 2027 GMT",
+     "version": 3
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:15 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693390; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 319.72
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:15 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693390; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 139.69
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:16 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693389; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "13"
+     },
+     "body_text": "8.212.10.159\n",
+     "body_len": 13,
+     "total_ms": 157.5
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:16 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693389; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 121.5
+    },
+    "http_8080_ping_rtts_ms": [
+     193.95,
+     127.33,
+     128.84,
+     124.84,
+     134.85
+    ],
+    "https_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:17 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693388; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 337.79
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:17 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693388; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": "XJ5;gB=N'_2XVU[6m9AY5B+ Glw$U-WlF{\"?Cg!co1a9#\\N_~w5aozbHk?Rf?2g?I>Z!C`nV5'_uKf}JCD}r4 `gT+/D1i5[7y8;#dH7(JcF#1POF;|K&hp[ZlRRD+*Tr,-Pp?u*q0&1wT^!F#Vjj*rFQ@dU>3Of_WRU:BYa+NU8Iz)/J'28 P+E2Dv:%0d6CPa1P%o`",
+     "body_len": 1000,
+     "total_ms": 128.31
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 136.97
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:17 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693388; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 121.69
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:17 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693388; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 127.13
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:17 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693388; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "282"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"443,5060,8080\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"443,5060,8080\"/>\n<allow-access-from",
+     "body_len": 282,
+     "total_ms": 128.01
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:17 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4693388; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 121.45
+    },
+    "ws_plain": {
+     "url": "ws://speedtest.patas.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 59.04
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 8.212.10.159\n",
+       "raw": "b'YOURIP 8.212.10.159\\n'",
+       "at_ms": 118.07
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 118.09
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728858196\n",
+       "raw": "b'PONG 1795728858196\\n'",
+       "at_ms": 118.09
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728858255\n",
+       "raw": "b'PONG 1795728858255\\n'",
+       "rtt_ms": 59.01
+      }
+     ],
+     "ok": true,
+     "total_ms": 298.4
+    },
+    "ws_tls": {
+     "url": "wss://speedtest.patas.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 64.01
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 126.79
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 126.83
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728858678\n",
+       "raw": "b'PONG 1795728858678\\n'",
+       "at_ms": 126.94
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728858741\n",
+       "raw": "b'PONG 1795728858741\\n'",
+       "rtt_ms": 62.52
+      }
+     ],
+     "ok": true,
+     "total_ms": 489.21
+    },
+    "user_ip_matches_dns": true
+   }
+  }
+ },
+ "66281": {
+  "id": 66281,
+  "sponsor": "PT. Tuxsindo Cyber Networks",
+  "hosts": {
+   "speedtest.tuxsnet.id": {
+    "dns": {
+     "ipv4": [
+      "160.25.58.7"
+     ],
+     "ipv6": []
+    },
+    "user_provided_ip": "160.25.58.7",
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 124.54
+     },
+     "443": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 134.8
+     },
+     "80": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     }
+    },
+    "tls_8080": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'speedtest.tuxsnet.id'. (_ssl.c:1011)\")"
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:19 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 197.2
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:19 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/hello?guid=5d016376-1911-47e9-ac4c-8f7ed2c80fd5&nocache=probe"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 192.9
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:19 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/getip"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 142.55
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:20 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/capabilities"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 121.09
+    },
+    "http_8080_ping_rtts_ms": [
+     137.23,
+     142.57,
+     137.19,
+     122.36,
+     135.06
+    ],
+    "https_8080_hello": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'speedtest.tuxsnet.id'. (_ssl.c:1011)\")"
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:20 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/download?size=1000"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 137.18
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "body": "",
+     "body_len": 0,
+     "sent_bytes": 1024,
+     "total_ms": 128.13
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:21 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/upload-stats?testDurationMillis=500&updatePeriodMillis=50"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 193.07
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:21 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/speedtest/latency.txt"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 135.61
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:21 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/speedtest/crossdomain.xml"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 129.5
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:21 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-66281.prod.hosts.ooklaserver.net:8080/speedtest/upload.php"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 129.38
+    },
+    "ws_plain": {
+     "url": "ws://speedtest.tuxsnet.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 63.48
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 127.24
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 127.26
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728861946\n",
+       "raw": "b'PONG 1795728861946\\n'",
+       "at_ms": 127.26
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728862009\n",
+       "raw": "b'PONG 1795728862009\\n'",
+       "rtt_ms": 63.7
+      }
+     ],
+     "ok": true,
+     "total_ms": 319.86
+    },
+    "ws_tls": {
+     "url": "wss://speedtest.tuxsnet.id:8080/ws",
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'speedtest.tuxsnet.id'. (_ssl.c:1011)\")"
+    },
+    "user_ip_matches_dns": true
+   },
+   "speedtest.tuxsnet.id.prod.hosts.ooklaserver.net": {
+    "dns": {
+     "ipv4": [
+      "160.25.58.7"
+     ],
+     "ipv6": []
+    },
+    "user_provided_ip": "160.25.58.7",
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 137.95
+     },
+     "443": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 65.17
+     },
+     "80": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     }
+    },
+    "tls_8080": {
+     "ok": true,
+     "subject": [
+      [
+       [
+        "commonName",
+        "server-66281.prod.hosts.ooklaserver.net"
+       ]
+      ]
+     ],
+     "issuer": [
+      [
+       [
+        "countryName",
+        "US"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "Let's Encrypt"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "YR2"
+       ]
+      ]
+     ],
+     "san": [
+      [
+       "DNS",
+       "server-66281.prod.hosts.ooklaserver.net"
+      ],
+      [
+       "DNS",
+       "speedtest.tuxsnet.id.prod.hosts.ooklaserver.net"
+      ]
+     ],
+     "notAfter": "Jan 18 08:09:22 2027 GMT",
+     "version": 3
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:22 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530899; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 127.76
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:22 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530899; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 143.92
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:23 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530898; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "13"
+     },
+     "body_text": "8.212.10.159\n",
+     "body_len": 13,
+     "total_ms": 127.31
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:23 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530898; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 122.22
+    },
+    "http_8080_ping_rtts_ms": [
+     127.55,
+     138.49,
+     125.53,
+     130.04,
+     135.71
+    ],
+    "https_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:24 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530897; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 289.28
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:24 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530897; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": "B+'^o|65`}|Aj)*E>8VP#>KYfXU9:f`3?\u007f^3R#7\u007fYCX}\\)}3[=nk`b_C90  \u007fJBdO6ud`VlLI&G1z%*H@V'*(3l3kA:4Z;NMLk~04+*c'?<yb`sNl:%Eg'JCT443>`$4J\u007fc#ZFR\\biZT9CKL\"iT\\P</{|v+E`n|Hsq\"v!,oVUrK-mao;U;`(/9\\0DYLJ*oc-mP4ntFb$",
+     "body_len": 1000,
+     "total_ms": 214.3
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 129.23
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:24 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530897; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 122.09
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:24 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530897; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 124.77
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:24 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530897; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "270"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=",
+     "body_len": 270,
+     "total_ms": 129.93
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:24 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4530897; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 142.45
+    },
+    "ws_plain": {
+     "url": "ws://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 70.14
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.242.119\n",
+       "raw": "b'YOURIP 47.57.242.119\\n'",
+       "at_ms": 141.58
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 141.6
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728865231\n",
+       "raw": "b'PONG 1795728865231\\n'",
+       "at_ms": 141.61
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728865302\n",
+       "raw": "b'PONG 1795728865302\\n'",
+       "rtt_ms": 70.15
+      }
+     ],
+     "ok": true,
+     "total_ms": 355.21
+    },
+    "ws_tls": {
+     "url": "wss://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 63.45
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 126.68
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 127.69
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728865739\n",
+       "raw": "b'PONG 1795728865739\\n'",
+       "at_ms": 127.83
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728865804\n",
+       "raw": "b'PONG 1795728865804\\n'",
+       "rtt_ms": 64.36
+      }
+     ],
+     "ok": true,
+     "total_ms": 499.33
+    },
+    "user_ip_matches_dns": true
+   }
+  }
+ },
+ "65429": {
+  "id": 65429,
+  "sponsor": "Atharva",
+  "hosts": {
+   "ookla.sub.atharva.co.id": {
+    "dns": {
+     "ipv4": [
+      "222.167.229.10",
+      "2001:df1:7340:396::83"
+     ],
+     "ipv6": [
+      "2001:df1:7340:396::83"
+     ]
+    },
+    "user_provided_ip": null,
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 67.61
+     },
+     "443": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 63.31
+     },
+     "80": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     }
+    },
+    "tls_8080": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'ookla.sub.atharva.co.id'. (_ssl.c:1011)\")"
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:26 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 123.51
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:26 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/hello?guid=5d016376-1911-47e9-ac4c-8f7ed2c80fd5&nocache=probe"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 131.23
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:26 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/getip"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 116.13
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:26 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/capabilities"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 130.29
+    },
+    "http_8080_ping_rtts_ms": [
+     116.71,
+     129.3,
+     125.89,
+     121.52,
+     125.69
+    ],
+    "https_8080_hello": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'ookla.sub.atharva.co.id'. (_ssl.c:1011)\")"
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:27 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/download?size=1000"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 117.46
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "body": "",
+     "body_len": 0,
+     "sent_bytes": 1024,
+     "total_ms": 131.18
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:27 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/upload-stats?testDurationMillis=500&updatePeriodMillis=50"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 124.89
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:27 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/speedtest/latency.txt"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 125.96
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:28 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/speedtest/crossdomain.xml"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 119.84
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:28 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-65429.prod.hosts.ooklaserver.net:8080/speedtest/upload.php"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 125.01
+    },
+    "ws_plain": {
+     "url": "ws://ookla.sub.atharva.co.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 65.54
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.242.119\n",
+       "raw": "b'YOURIP 47.57.242.119\\n'",
+       "at_ms": 131.17
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 131.2
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728868480\n",
+       "raw": "b'PONG 1795728868480\\n'",
+       "at_ms": 131.21
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728868545\n",
+       "raw": "b'PONG 1795728868545\\n'",
+       "rtt_ms": 64.78
+      }
+     ],
+     "ok": true,
+     "total_ms": 328.61
+    },
+    "ws_tls": {
+     "url": "wss://ookla.sub.atharva.co.id:8080/ws",
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'ookla.sub.atharva.co.id'. (_ssl.c:1011)\")"
+    },
+    "user_ip_matches_dns": null
+   },
+   "ookla.sub.atharva.co.id.prod.hosts.ooklaserver.net": {
+    "dns": {
+     "ipv4": [
+      "222.167.229.10",
+      "2001:df1:7340:396::83"
+     ],
+     "ipv6": [
+      "2001:df1:7340:396::83"
+     ]
+    },
+    "user_provided_ip": null,
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 57.49
+     },
+     "443": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 112.53
+     },
+     "80": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     }
+    },
+    "tls_8080": {
+     "ok": true,
+     "subject": [
+      [
+       [
+        "commonName",
+        "server-65429.prod.hosts.ooklaserver.net"
+       ]
+      ]
+     ],
+     "issuer": [
+      [
+       [
+        "countryName",
+        "US"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "Let's Encrypt"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "YR1"
+       ]
+      ]
+     ],
+     "san": [
+      [
+       "DNS",
+       "ookla.sub.atharva.co.id.prod.hosts.ooklaserver.net"
+      ],
+      [
+       "DNS",
+       "server-65429.prod.hosts.ooklaserver.net"
+      ]
+     ],
+     "notAfter": "Feb  7 00:54:22 2027 GMT",
+     "version": 3
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:29 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232792; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 124.87
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:29 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232792; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 118.7
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:29 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232792; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "14"
+     },
+     "body_text": "47.57.232.232\n",
+     "body_len": 14,
+     "total_ms": 124.46
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:29 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232792; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 118.08
+    },
+    "http_8080_ping_rtts_ms": [
+     124.04,
+     128.94,
+     125.06,
+     120.15,
+     124.43
+    ],
+    "https_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:30 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232791; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 292.51
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:30 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232791; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": ";HxhVI~[96y?REp$Yn+6yl\u007fWk'8d6+D ?9]:R<LrGCs=+vuS;[,9?jJr4(#%DhNIQJ2HRP+$:t3Ej:>XF1G!mLc.u-QgSWWWP-(ZW#V}@s1<rh{6Q=6V K=Q9=BFo}GX\"u=O\u007fjn)]p5_y7Ovgop=i,:o\\-uH\u007f6M}ks-dH~[[O`|n61(9WM#d/,=VSu|KHO(j_],,vEN+",
+     "body_len": 1000,
+     "total_ms": 120.14
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 119.23
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:30 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232791; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 128.9
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:31 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232790; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 117.38
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:31 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232790; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "270"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=",
+     "body_len": 270,
+     "total_ms": 131.93
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:31 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=6232790; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 128.25
+    },
+    "ws_plain": {
+     "url": "ws://ookla.sub.atharva.co.id.prod.hosts.ooklaserver.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 61.66
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 123.9
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 123.92
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728871518\n",
+       "raw": "b'PONG 1795728871518\\n'",
+       "at_ms": 123.93
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728871579\n",
+       "raw": "b'PONG 1795728871579\\n'",
+       "rtt_ms": 61.74
+      }
+     ],
+     "ok": true,
+     "total_ms": 312.29
+    },
+    "ws_tls": {
+     "url": "wss://ookla.sub.atharva.co.id.prod.hosts.ooklaserver.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 57.44
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 114.24
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 114.27
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728871967\n",
+       "raw": "b'PONG 1795728871967\\n'",
+       "at_ms": 114.27
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728872025\n",
+       "raw": "b'PONG 1795728872025\\n'",
+       "rtt_ms": 57.4
+      }
+     ],
+     "ok": true,
+     "total_ms": 444.84
+    },
+    "user_ip_matches_dns": null
+   }
+  }
+ },
+ "68214": {
+  "id": 68214,
+  "sponsor": "PT. ERA NETWORK INDONESIA",
+  "hosts": {
+   "speedtest.era.net.id": {
+    "dns": {
+     "ipv4": [
+      "157.20.239.243"
+     ],
+     "ipv6": []
+    },
+    "user_provided_ip": "157.20.239.243",
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 68.8
+     },
+     "443": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 66.55
+     },
+     "80": {
+      "ok": false,
+      "error": "ConnectionRefusedError(111, 'Connection refused')"
+     }
+    },
+    "tls_8080": {
+     "ok": true,
+     "subject": [
+      [
+       [
+        "commonName",
+        "speedtest.era.net.id"
+       ]
+      ]
+     ],
+     "issuer": [
+      [
+       [
+        "countryName",
+        "US"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "Let's Encrypt"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "YR2"
+       ]
+      ]
+     ],
+     "san": [
+      [
+       "DNS",
+       "speedtest.era.net.id"
+      ]
+     ],
+     "notAfter": "Jan 30 09:59:29 2027 GMT",
+     "version": 3
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:32 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574296; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 128.48
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:32 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574296; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 139.03
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:32 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574296; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "14"
+     },
+     "body_text": "47.57.242.119\n",
+     "body_len": 14,
+     "total_ms": 131.13
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:32 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574296; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 129.23
+    },
+    "http_8080_ping_rtts_ms": [
+     128.6,
+     134.73,
+     132.02,
+     128.13,
+     135.68
+    ],
+    "https_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:33 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574295; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 296.82
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:34 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574294; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": "(2\"D y?|M3A_C.\"~23X=C-ZlvUtVhNyd(vM6mt9*'\"Gq0lgjhn.blqO[%!jK+hO7J,PP*I%Rf'FiW9w)<ur6C]I U)_'U.s{Q_uc70:A#K|,X@j2 oQ}O^9>?*5@h7OYe5F09>pV>d.e_V`|QD:]{DDYBah~l_:Lk@cz+%'juq~VV 3sb4q@\u007f876@5U>5d}bX^n'%u,J",
+     "body_len": 1000,
+     "total_ms": 135.88
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 133.21
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:34 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574294; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 132.52
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:34 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574294; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 134.69
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:34 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574294; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "270"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=",
+     "body_len": 270,
+     "total_ms": 129.86
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:34 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=5574294; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 125.89
+    },
+    "ws_plain": {
+     "url": "ws://speedtest.era.net.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 62.56
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 8.212.10.159\n",
+       "raw": "b'YOURIP 8.212.10.159\\n'",
+       "at_ms": 125.03
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 125.05
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728874969\n",
+       "raw": "b'PONG 1795728874969\\n'",
+       "at_ms": 125.05
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728875032\n",
+       "raw": "b'PONG 1795728875032\\n'",
+       "rtt_ms": 62.38
+      }
+     ],
+     "ok": true,
+     "total_ms": 315.3
+    },
+    "ws_tls": {
+     "url": "wss://speedtest.era.net.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 63.34
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.242.119\n",
+       "raw": "b'YOURIP 47.57.242.119\\n'",
+       "at_ms": 126.77
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 126.81
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728875464\n",
+       "raw": "b'PONG 1795728875464\\n'",
+       "at_ms": 126.86
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728875527\n",
+       "raw": "b'PONG 1795728875527\\n'",
+       "rtt_ms": 63.37
+      }
+     ],
+     "ok": true,
+     "total_ms": 495.88
+    },
+    "user_ip_matches_dns": true
+   }
+  }
+ },
+ "73025": {
+  "id": 73025,
+  "sponsor": "LINTAS MEDIA SOLUSINDO",
+  "hosts": {
+   "speedtest2.lintasmediasolusindo.com": {
+    "dns": {
+     "ipv4": [
+      "160.22.217.82",
+      "2001:df4:cc0:3:20c:29ff:fe8b:c0b2"
+     ],
+     "ipv6": [
+      "2001:df4:cc0:3:20c:29ff:fe8b:c0b2"
+     ]
+    },
+    "user_provided_ip": null,
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 70.63
+     },
+     "443": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 103.14
+     },
+     "80": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     }
+    },
+    "tls_8080": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'speedtest2.lintasmediasolusindo.com'. (_ssl.c:1011)\")"
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:36 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 125.35
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:36 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/hello?guid=5d016376-1911-47e9-ac4c-8f7ed2c80fd5&nocache=probe"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 133.92
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:36 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/getip"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 130.23
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:36 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/capabilities"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 127.06
+    },
+    "http_8080_ping_rtts_ms": [
+     129.44,
+     186.33,
+     137.85,
+     147.14,
+     135.08
+    ],
+    "https_8080_hello": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'speedtest2.lintasmediasolusindo.com'. (_ssl.c:1011)\")"
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:37 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/download?size=1000"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 139.97
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "body": "",
+     "body_len": 0,
+     "sent_bytes": 1024,
+     "total_ms": 122.95
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:37 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/upload-stats?testDurationMillis=500&updatePeriodMillis=50"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 125.45
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:37 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/speedtest/latency.txt"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 135.7
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:38 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/speedtest/crossdomain.xml"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 135.32
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:38 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-73025.prod.hosts.ooklaserver.net:8080/speedtest/upload.php"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 135.02
+    },
+    "ws_plain": {
+     "url": "ws://speedtest2.lintasmediasolusindo.com:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 58.66
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.242.119\n",
+       "raw": "b'YOURIP 47.57.242.119\\n'",
+       "at_ms": 117.44
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 117.46
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728878439\n",
+       "raw": "b'PONG 1795728878439\\n'",
+       "at_ms": 117.47
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728878499\n",
+       "raw": "b'PONG 1795728878499\\n'",
+       "rtt_ms": 59.6
+      }
+     ],
+     "ok": true,
+     "total_ms": 297.64
+    },
+    "ws_tls": {
+     "url": "wss://speedtest2.lintasmediasolusindo.com:8080/ws",
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'speedtest2.lintasmediasolusindo.com'. (_ssl.c:1011)\")"
+    },
+    "user_ip_matches_dns": null
+   },
+   "speedtest2.lintasmediasolusindo.com.prod.hosts.ooklaserver.net": {
+    "dns": {
+     "ipv4": [
+      "160.22.217.82",
+      "2001:df4:cc0:3:20c:29ff:fe8b:c0b2"
+     ],
+     "ipv6": [
+      "2001:df4:cc0:3:20c:29ff:fe8b:c0b2"
+     ]
+    },
+    "user_provided_ip": null,
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 123.29
+     },
+     "443": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 68.17
+     },
+     "80": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     }
+    },
+    "tls_8080": {
+     "ok": true,
+     "subject": [
+      [
+       [
+        "commonName",
+        "server-73025.prod.hosts.ooklaserver.net"
+       ]
+      ]
+     ],
+     "issuer": [
+      [
+       [
+        "countryName",
+        "US"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "Let's Encrypt"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "YR2"
+       ]
+      ]
+     ],
+     "san": [
+      [
+       "DNS",
+       "server-73025.prod.hosts.ooklaserver.net"
+      ],
+      [
+       "DNS",
+       "speedtest2.lintasmediasolusindo.com.prod.hosts.ooklaserver.net"
+      ]
+     ],
+     "notAfter": "Jan  5 04:14:19 2027 GMT",
+     "version": 3
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:39 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393579; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 137.58
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:39 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393579; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 137.99
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:39 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393579; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "14"
+     },
+     "body_text": "47.57.242.119\n",
+     "body_len": 14,
+     "total_ms": 129.93
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:39 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393579; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 216.74
+    },
+    "http_8080_ping_rtts_ms": [
+     119.84,
+     119.62,
+     124.12,
+     126.48,
+     137.41
+    ],
+    "https_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:40 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393578; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 320.49
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:40 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393578; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": ":IUu;vQ&6j`&+oEm)j({\u007f=43 &/u6QRH_fi_cNhz\"?y4NVM1AHL'&#}x~g nEWj%.cXsI{awB\"htChV?iqM,)>118'\\r$6^}d-L0^&`cb[O~T!r3;hOU85mkS3a&]H-;\u007f7k4oQ(J-UIl5Kj4e2\u007f(&7IaH%W;RpnR?l|:@!D&Bqo$%Xkg/^3LA/z- ah%-:V5,w,[lu\u007f,",
+     "body_len": 1000,
+     "total_ms": 131.75
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 129.61
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:41 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393577; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 129.96
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:41 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393577; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 132.84
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:41 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393577; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "348"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=",
+     "body_len": 348,
+     "total_ms": 135.87
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:34:41 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=3393577; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.lintasmediasolusindo.com *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 136.14
+    },
+    "ws_plain": {
+     "url": "ws://speedtest2.lintasmediasolusindo.com.prod.hosts.ooklaserver.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 70.9
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 141.97
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 141.99
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728881732\n",
+       "raw": "b'PONG 1795728881732\\n'",
+       "at_ms": 141.99
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728881803\n",
+       "raw": "b'PONG 1795728881803\\n'",
+       "rtt_ms": 71.03
+      }
+     ],
+     "ok": true,
+     "total_ms": 356.9
+    },
+    "ws_tls": {
+     "url": "wss://speedtest2.lintasmediasolusindo.com.prod.hosts.ooklaserver.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 61.79
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 8.212.10.159\n",
+       "raw": "b'YOURIP 8.212.10.159\\n'",
+       "at_ms": 123.55
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 123.58
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728882226\n",
+       "raw": "b'PONG 1795728882226\\n'",
+       "at_ms": 123.6
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795728882287\n",
+       "raw": "b'PONG 1795728882287\\n'",
+       "rtt_ms": 61.65
+      }
+     ],
+     "ok": true,
+     "total_ms": 479.46
+    },
+    "user_ip_matches_dns": null
+   }
+  }
+ },
+ "72945": {
+  "id": 72945,
+  "sponsor": "BLiP Integrator Provider",
+  "hosts": {
+   "ookla-sby.blip.co.id": {
+    "dns": {
+     "ipv4": [
+      "43.252.159.5"
+     ],
+     "ipv6": []
+    },
+    "user_provided_ip": null,
+    "ports": {
+     "8080": {
+      "ok": false,
+      "error": "TimeoutError('timed out')"
+     },
+     "443": {
+      "ok": false,
+      "error": "TimeoutError('timed out')"
+     },
+     "5060": {
+      "ok": false,
+      "error": "TimeoutError('timed out')"
+     },
+     "80": {
+      "ok": false,
+      "error": "TimeoutError('timed out')"
+     }
+    },
+    "tls_8080": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "http_8080_root": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "http_8080_hello": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "http_8080_getip": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "http_8080_capabilities": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "http_8080_ping_rtts_ms": [
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "https_8080_hello": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "http_8080_download_1k": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "http_8080_upload": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "http_8080_upload_stats": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "legacy_latency_txt": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "legacy_crossdomain": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "legacy_upload_get": {
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "ws_plain": {
+     "url": "ws://ookla-sby.blip.co.id:8080/ws",
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "ws_tls": {
+     "url": "wss://ookla-sby.blip.co.id:8080/ws",
+     "ok": false,
+     "error": "TimeoutError('timed out')"
+    },
+    "user_ip_matches_dns": null
+   }
+  }
+ },
+ "48532": {
+  "id": 48532,
+  "sponsor": "Faznet",
+  "hosts": {
+   "v137170.faznet.co.id": {
+    "dns": {
+     "ipv4": [
+      "103.111.137.170"
+     ],
+     "ipv6": []
+    },
+    "user_provided_ip": "103.111.137.170",
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 915.0
+     },
+     "443": {
+      "ok": true,
+      "connect_ms": 66.48
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 168.09
+     },
+     "80": {
+      "ok": true,
+      "connect_ms": 65.82
+     }
+    },
+    "tls_8080": {
+     "ok": true,
+     "subject": [
+      [
+       [
+        "commonName",
+        "*.faznet.co.id"
+       ]
+      ]
+     ],
+     "issuer": [
+      [
+       [
+        "countryName",
+        "GB"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "Sectigo Limited"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "Sectigo Public Server Authentication CA DV R36"
+       ]
+      ]
+     ],
+     "san": [
+      [
+       "DNS",
+       "*.faznet.co.id"
+      ],
+      [
+       "DNS",
+       "faznet.co.id"
+      ]
+     ],
+     "notAfter": "Mar 31 23:59:59 2027 GMT",
+     "version": 3
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:36:57 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 123.62
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:36:58 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.1) 2024-02-13.1456.91c4f93\n",
+     "body_len": 44,
+     "total_ms": 178.21
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:36:58 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "16"
+     },
+     "body_text": "103.111.137.169\n",
+     "body_len": 16,
+     "total_ms": 120.91
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:36:58 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 173.06
+    },
+    "http_8080_ping_rtts_ms": [
+     120.04,
+     1835.17,
+     128.32,
+     128.56,
+     122.68
+    ],
+    "https_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:00 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.1) 2024-02-13.1456.91c4f93\n",
+     "body_len": 44,
+     "total_ms": 263.63
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:01 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": "X%\u007fR==l*:+5''.uq(NjEK)Nt[/`DDqMCD|=)[27^#\u007fC^;gx'-e8bG5K5^V>SZOE}ba31N:$~)~fm{paIwaf1{I=Yh(LPBorvRoX3F=|__b!<c;C0VnPwl7,K!?R,\\!^AbvguoTR<: MHxYbYzaR-WT-V^k;=l^5gW/CIF\"Ba#$ C_bR(wG\u007fkco:{;MZvW56yOvk:n!=7",
+     "body_len": 1000,
+     "total_ms": 127.38
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 145.54
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:03 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 1791.04
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:03 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 124.01
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:03 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "120"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*\" to-ports=\"5060,8080\"/>\n</cross-domain-policy>\n",
+     "body_len": 120,
+     "total_ms": 142.68
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:03 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 126.91
+    },
+    "ws_plain": {
+     "url": "ws://v137170.faznet.co.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.1) 2024-02-13.1456.91c4f93",
+       "raw": "b'HELLO 2.11 (2.11.1) 2024-02-13.1456.91c4f93'",
+       "at_ms": 63.3
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 103.111.137.169\n",
+       "raw": "b'YOURIP 103.111.137.169\\n'",
+       "at_ms": 126.66
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 126.73
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729023679\n",
+       "raw": "b'PONG 1795729023679\\n'",
+       "at_ms": 126.73
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729023742\n",
+       "raw": "b'PONG 1795729023742\\n'",
+       "rtt_ms": 63.34
+      }
+     ],
+     "ok": true,
+     "total_ms": 318.96
+    },
+    "ws_tls": {
+     "url": "wss://v137170.faznet.co.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.1) 2024-02-13.1456.91c4f93",
+       "raw": "b'HELLO 2.11 (2.11.1) 2024-02-13.1456.91c4f93'",
+       "at_ms": 62.8
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 103.111.137.169\n",
+       "raw": "b'YOURIP 103.111.137.169\\n'",
+       "at_ms": 125.54
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 125.58
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729024127\n",
+       "raw": "b'PONG 1795729024127\\n'",
+       "at_ms": 125.61
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729024190\n",
+       "raw": "b'PONG 1795729024190\\n'",
+       "rtt_ms": 62.85
+      }
+     ],
+     "ok": true,
+     "total_ms": 448.24
+    },
+    "user_ip_matches_dns": true
+   }
+  }
+ },
+ "55749": {
+  "id": 55749,
+  "sponsor": "RingNet",
+  "hosts": {
+   "sby.speedtest.ring.net.id": {
+    "dns": {
+     "ipv4": [
+      "103.202.226.242",
+      "2401:13e0:2:1::2"
+     ],
+     "ipv6": [
+      "2401:13e0:2:1::2"
+     ]
+    },
+    "user_provided_ip": null,
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 914.61
+     },
+     "443": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 69.08
+     },
+     "80": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     }
+    },
+    "tls_8080": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'sby.speedtest.ring.net.id'. (_ssl.c:1011)\")"
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:06 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 194.41
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:06 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/hello?guid=5d016376-1911-47e9-ac4c-8f7ed2c80fd5&nocache=probe"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 135.36
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:06 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/getip"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 135.34
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:07 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/capabilities"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 130.04
+    },
+    "http_8080_ping_rtts_ms": [
+     249.19,
+     128.04,
+     135.45,
+     131.5,
+     132.28
+    ],
+    "https_8080_hello": {
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'sby.speedtest.ring.net.id'. (_ssl.c:1011)\")"
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:08 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/download?size=1000"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 201.22
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "body": "",
+     "body_len": 0,
+     "sent_bytes": 1024,
+     "total_ms": 132.3
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:08 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/upload-stats?testDurationMillis=500&updatePeriodMillis=50"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 137.6
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:08 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/speedtest/latency.txt"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 131.24
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:08 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/speedtest/crossdomain.xml"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 135.46
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 307 Temporary Redirect",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:08 GMT",
+      "connection": "Close",
+      "content-length": "0",
+      "location": "https://server-55749.prod.hosts.ooklaserver.net:8080/speedtest/upload.php"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 130.05
+    },
+    "ws_plain": {
+     "url": "ws://sby.speedtest.ring.net.id:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 64.61
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 8.212.10.159\n",
+       "raw": "b'YOURIP 8.212.10.159\\n'",
+       "at_ms": 129.04
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 129.06
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729029074\n",
+       "raw": "b'PONG 1795729029074\\n'",
+       "at_ms": 129.11
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729029139\n",
+       "raw": "b'PONG 1795729029139\\n'",
+       "rtt_ms": 64.69
+      }
+     ],
+     "ok": true,
+     "total_ms": 324.86
+    },
+    "ws_tls": {
+     "url": "wss://sby.speedtest.ring.net.id:8080/ws",
+     "ok": false,
+     "error": "SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'sby.speedtest.ring.net.id'. (_ssl.c:1011)\")"
+    },
+    "user_ip_matches_dns": null
+   },
+   "sby.speedtest.ring.net.id.prod.hosts.ooklaserver.net": {
+    "dns": {
+     "ipv4": [
+      "103.202.226.242",
+      "2401:13e0:2:1::2"
+     ],
+     "ipv6": [
+      "2401:13e0:2:1::2"
+     ]
+    },
+    "user_provided_ip": null,
+    "ports": {
+     "8080": {
+      "ok": true,
+      "connect_ms": 70.08
+     },
+     "443": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     },
+     "5060": {
+      "ok": true,
+      "connect_ms": 66.27
+     },
+     "80": {
+      "ok": false,
+      "error": "OSError(101, 'Network is unreachable')"
+     }
+    },
+    "tls_8080": {
+     "ok": true,
+     "subject": [
+      [
+       [
+        "commonName",
+        "server-55749.prod.hosts.ooklaserver.net"
+       ]
+      ]
+     ],
+     "issuer": [
+      [
+       [
+        "countryName",
+        "US"
+       ]
+      ],
+      [
+       [
+        "organizationName",
+        "Let's Encrypt"
+       ]
+      ],
+      [
+       [
+        "commonName",
+        "YR2"
+       ]
+      ]
+     ],
+     "san": [
+      [
+       "DNS",
+       "sby.speedtest.ring.net.id.prod.hosts.ooklaserver.net"
+      ],
+      [
+       "DNS",
+       "server-55749.prod.hosts.ooklaserver.net"
+      ]
+     ],
+     "notAfter": "Jan 17 00:13:50 2027 GMT",
+     "version": 3
+    },
+    "http_8080_root": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:09 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415800; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/html",
+      "content-length": "109"
+     },
+     "body_text": "<html><head><title>OoklaServer</title></head><body><h1>OoklaServer</h1><p>It worked!<br /></p></body></html>\n",
+     "body_len": 109,
+     "total_ms": 131.47
+    },
+    "http_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:10 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415799; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 129.69
+    },
+    "http_8080_getip": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:10 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415799; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "14"
+     },
+     "body_text": "47.57.232.232\n",
+     "body_len": 14,
+     "total_ms": 130.65
+    },
+    "http_8080_capabilities": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:10 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415799; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "43"
+     },
+     "body_text": "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n",
+     "body_len": 43,
+     "total_ms": 221.34
+    },
+    "http_8080_ping_rtts_ms": [
+     137.48,
+     130.31,
+     137.35,
+     138.58,
+     136.78
+    ],
+    "https_8080_hello": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:11 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415798; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "44"
+     },
+     "body_text": "hello 2.11 (2.11.7) 2026-10-26.2035.bc130b4\n",
+     "body_len": 44,
+     "total_ms": 301.41
+    },
+    "http_8080_download_1k": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:11 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415798; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "application/octet-stream",
+      "content-length": "1000"
+     },
+     "body_text": "]Y`W1\"gwhQA%u@hK$&Kji.s /}uLYQh{0x#&1R+l]~~b~w.dj77R&9Y74_8]]Hq.G'>ORyQ9JKQ&Go;\u007fepZC1%etqFsL]%aqJ-se7Bo,*(KI .R<TK~d~7NC\"{X5].|CJh8J#TMwCTZaQLKqa<?QV;/`'ZfC(i;ereJAD3?JR]fgu(DX$bF$<JmPK#y6E!EO80:=r?wz",
+     "body_len": 1000,
+     "total_ms": 133.15
+    },
+    "http_8080_upload": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "body": "size=1024\n",
+     "body_len": 10,
+     "sent_bytes": 1024,
+     "total_ms": 138.52
+    },
+    "http_8080_upload_stats": {
+     "ok": true,
+     "status": "HTTP/1.1 400 Bad Request",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:11 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415798; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 120.41
+    },
+    "legacy_latency_txt": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:11 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415798; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/plain; charset=UTF-8",
+      "content-length": "10"
+     },
+     "body_text": "test=test\n",
+     "body_len": 10,
+     "total_ms": 125.31
+    },
+    "legacy_crossdomain": {
+     "ok": true,
+     "status": "HTTP/1.1 200 OK",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:11 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415798; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin",
+      "content-type": "text/xml",
+      "content-length": "270"
+     },
+     "body_text": "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n<allow-access-from domain=\"*.ookla.com\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=\"*.speedtest.net\" to-ports=\"5060,8080\"/>\n<allow-access-from domain=",
+     "body_len": 270,
+     "total_ms": 129.77
+    },
+    "legacy_upload_get": {
+     "ok": true,
+     "status": "HTTP/1.1 404 Not Found",
+     "headers": {
+      "date": "Thu, 26 Nov 2026 21:37:12 GMT",
+      "connection": "Close",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "strict-transport-security": "max-age=4415797; includeSubDomains",
+      "content-security-policy": "default-src 'none'; frame-ancestors 'none'; script-src 'none'; object-src 'none';  connect-src *.ookla.com *.speedtest.net *.speedtestcustom.com; upgrade-insecure-requests",
+      "access-control-allow-origin": "https://www.speedtest.net",
+      "vary": "Origin"
+     },
+     "body_text": "",
+     "body_len": 0,
+     "total_ms": 131.86
+    },
+    "ws_plain": {
+     "url": "ws://sby.speedtest.ring.net.id.prod.hosts.ooklaserver.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 64.53
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 47.57.232.232\n",
+       "raw": "b'YOURIP 47.57.232.232\\n'",
+       "at_ms": 129.15
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 129.16
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729032383\n",
+       "raw": "b'PONG 1795729032383\\n'",
+       "at_ms": 129.17
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729032447\n",
+       "raw": "b'PONG 1795729032447\\n'",
+       "rtt_ms": 64.52
+      }
+     ],
+     "ok": true,
+     "total_ms": 324.6
+    },
+    "ws_tls": {
+     "url": "wss://sby.speedtest.ring.net.id.prod.hosts.ooklaserver.net:8080/ws",
+     "handshake": "HTTP/1.1 101 Switching Protocols",
+     "messages": [
+      {
+       "opcode": 1,
+       "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4",
+       "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'",
+       "at_ms": 63.16
+      },
+      {
+       "opcode": 1,
+       "text": "YOURIP 8.212.10.159\n",
+       "raw": "b'YOURIP 8.212.10.159\\n'",
+       "at_ms": 126.35
+      },
+      {
+       "opcode": 1,
+       "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS",
+       "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'",
+       "at_ms": 126.37
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729032873\n",
+       "raw": "b'PONG 1795729032873\\n'",
+       "at_ms": 126.4
+      },
+      {
+       "opcode": 1,
+       "text": "PONG 1795729032936\n",
+       "raw": "b'PONG 1795729032936\\n'",
+       "rtt_ms": 63.29
+      }
+     ],
+     "ok": true,
+     "total_ms": 487.99
+    },
+    "user_ip_matches_dns": null
+   }
+  }
+ },
+ "_followup": {
+  "somedigit_cert": {
+   "ok": true,
+   "tls": "TLSv1.3",
+   "cert": "subject=C=US, O=OoklaServer, CN=localhost\nissuer=C=US, O=OoklaServer, CN=localhost\nnotBefore=Nov 26 21:19:13 2026 GMT\nnotAfter=Nov 25 21:19:13 2028 GMT\n"
+  },
+  "legacy_random": {
+   "speedtest.somedigit.net": {
+    "/speedtest/random350x350.jpg": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/speedtest/random1000x1000.jpg": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/speedtest/random4000x4000x4.jpg": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/speedtest/upload.php": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/speedtest/latency.txt": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close"
+   },
+   "speedtest-sby.xl.co.id": {
+    "/speedtest/random350x350.jpg": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/speedtest/random1000x1000.jpg": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/speedtest/random4000x4000x4.jpg": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/speedtest/upload.php": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/speedtest/latency.txt": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close",
+    "/": "HTTP/1.1 500 Internal Server Error\r\nConnection: Close"
+   }
+  }
+ }
+}

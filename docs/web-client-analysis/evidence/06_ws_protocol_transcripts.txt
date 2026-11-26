@@ -1,0 +1,80 @@
+# Transkrip protokol WebSocket / HTTP OoklaServer (bukti mentah)
+
+## A. Probe langsung — speedtest.somedigit.net:8080 (ws:// polos, id 74964, versi 2.11.5)
+handshake: HTTP/1.1 101 Switching Protocols
+  S->C: {"opcode": 1, "text": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d", "raw": "b'HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d'", "at_ms": 63.58}
+  S->C: {"opcode": 1, "text": "YOURIP 47.57.232.232\n", "raw": "b'YOURIP 47.57.232.232\\n'", "at_ms": 127.39}
+  S->C: {"opcode": 1, "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS", "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'", "at_ms": 127.42}
+  S->C: {"opcode": 1, "text": "PONG 1795728638977\n", "raw": "b'PONG 1795728638977\\n'", "at_ms": 127.51}
+  S->C: {"opcode": 1, "text": "PONG 1795728639041\n", "raw": "b'PONG 1795728639041\\n'", "rtt_ms": 63.59}
+
+## B. Probe langsung — speedtest.tuxsnet.id:8080 (ws:// polos di host sponsor; HTTP GET di host ini di-307 ke https://server-66281.prod.hosts.ooklaserver.net:8080/)
+handshake: HTTP/1.1 101 Switching Protocols
+  S->C: {"opcode": 1, "text": "HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4", "raw": "b'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'", "at_ms": 63.48}
+  S->C: {"opcode": 1, "text": "YOURIP 47.57.232.232\n", "raw": "b'YOURIP 47.57.232.232\\n'", "at_ms": 127.24}
+  S->C: {"opcode": 1, "text": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS", "raw": "b'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'", "at_ms": 127.26}
+  S->C: {"opcode": 1, "text": "PONG 1795728861946\n", "raw": "b'PONG 1795728861946\\n'", "at_ms": 127.26}
+  S->C: {"opcode": 1, "text": "PONG 1795728862009\n", "raw": "b'PONG 1795728862009\\n'", "rtt_ms": 63.7}
+
+## C. Run nyata (Playwright) — fase seleksi server otomatis, 1 dari 10 koneksi WSS paralel
+    3998ms C->S: 'HI'
+    3998ms C->S: 'GETIP'
+    3998ms C->S: 'CAPABILITIES'
+    3998ms C->S: 'PING '
+    4007ms S->C: 'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'
+    4008ms S->C: 'YOURIP 47.57.232.232\n'
+    4008ms S->C: 'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'
+    4009ms S->C: 'PONG 1795727559700\n'
+    4012ms C->S: 'PING 2550.2000000001863'
+    4019ms S->C: 'PONG 1795727559714\n'
+    4019ms C->S: 'PING 2556.4000000003725'
+    4025ms S->C: 'PONG 1795727559720\n'
+    4025ms C->S: 'PING 2562.9000000003725'
+    4031ms S->C: 'PONG 1795727559727\n'
+    4031ms C->S: 'PING 2569'
+    4060ms S->C: 'PONG 1795727559733\n'
+    4060ms C->S: 'PING 2589.2000000001863'
+    4091ms S->C: 'PONG 1795727559755\n'
+
+## D. Run nyata manual (Tuxsindo) — stage latency di server terpilih
+   16568ms C->S: 'HI 5d016376-1911-47e9-ac4c-8f7ed2c80fd5'
+   16569ms C->S: 'GETIP'
+   16569ms C->S: 'CAPABILITIES'
+   16569ms C->S: 'PING '
+   16630ms S->C: 'HELLO 2.11 (2.11.7) 2026-10-26.2035.bc130b4'
+   16630ms S->C: 'YOURIP 47.57.232.232\n'
+   16630ms S->C: 'CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS'
+   16630ms S->C: 'PONG 1795728654225\n'
+   16632ms C->S: 'PING 16510.700000000186'
+   16691ms S->C: 'PONG 1795728654286\n'
+   16691ms C->S: 'PING 16570.30000000028'
+   16753ms S->C: 'PONG 1795728654347\n'
+   16753ms C->S: 'PING 16631.80000000028'
+   16815ms S->C: 'PONG 1795728654409\n'
+   16815ms C->S: 'PING 16693.700000000186'
+   16875ms S->C: 'PONG 1795728654469\n'
+   16875ms C->S: 'PING 16753.900000000373'
+   16938ms S->C: 'PONG 1795728654531\n'
+   16938ms C->S: 'PING 16817.100000000093'
+   16999ms S->C: 'PONG 1795728654594\n'
+   16999ms C->S: 'PING 16878.30000000028'
+   17059ms S->C: 'PONG 1795728654654\n'
+   17059ms C->S: 'PING 16937.900000000373'
+   17122ms S->C: 'PONG 1795728654715\n'
+   17122ms C->S: 'PING 17000.80000000028'
+   17182ms S->C: 'PONG 1795728654776\n'
+
+## E. Run nyata otomatis — UPLOAD_STATS stream (misaka, misal 3 baris pertama + 2 terakhir)
+   26683ms S->C: '{"t":"u"}\n'
+   26786ms S->C: '{"b":8192,"e":0,"i":0,"t":"u"}\n'
+   26848ms S->C: '{"b":8658944,"e":50,"i":1,"t":"u"}\n'
+   41714ms S->C: '{"b":1137199872,"e":14977,"i":299,"t":"u"}\n'
+   41767ms S->C: '{"b":1140556608,"e":15027,"i":300,"t":"u"}\n'
+
+## F. Probe HTTP langsung (id 74964) — path XHR baru
+  GET/POST hello: HTTP/1.1 200 OK | body[:60]='hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n'
+  GET/POST getip: HTTP/1.1 200 OK | body[:60]='8.212.10.159\n'
+  GET/POST capabilities: HTTP/1.1 200 OK | body[:60]='capabilities SERVER_HOST_AUTH UPLOAD_STATS\n'
+  GET/POST download_1k: HTTP/1.1 200 OK | body[:60]='fX#My0#F9$@ZAP0/IVoPYE8snXGK0H{m9v{W2VM%SE@c?*V] EJ]j36X<Z=y'
+  GET/POST upload: HTTP/1.1 200 OK | body[:60]='size=1024\n'
+  GET/POST (legacy) latency_txt: HTTP/1.1 200 OK | body[:60]='test=test\n'
