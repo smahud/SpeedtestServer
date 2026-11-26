@@ -383,21 +383,43 @@ function makeWorkerHttpBackend(connId) {
       let off = 0;
       while (off < n) {
         const want = Math.min(cfg.httpChunk, n - off);
-        const t0 = Date.now();
-        const res = await getDown(want, token);
-        if (res.statusCode !== 200) {
-          res.resume();
-          throw new Error(`__down ${res.statusCode}`);
-        }
-        counters.workerRequests++;
-        // async iteration = real backpressure: the worker only generates
-        // what this loop drains (emit awaits the CLI socket drain).
-        for await (const c of res) {
-          counters.bytesFromWorkerDl += c.length;
-          await emit(c);
+        let got = 0; // bytes of THIS chunk already emitted to the CLI
+        let attempt = 0;
+        for (;;) {
+          try {
+            const res = await getDown(want - got, token);
+            if (res.statusCode !== 200) {
+              res.resume();
+              throw new Error(`__down ${res.statusCode}`);
+            }
+            counters.workerRequests++;
+            // async iteration = real backpressure: the worker only generates
+            // what this loop drains (emit awaits the CLI socket drain).
+            for await (const c of res) {
+              counters.bytesFromWorkerDl += c.length;
+              await emit(c);
+              got += c.length;
+            }
+            if (got === want) break; // chunk complete
+            throw new Error(`short chunk ${got}/${want}`);
+          } catch (e) {
+            const msg = String((e && e.code) || e.message || e);
+            attempt++;
+            const cliGone = /conn closed|socket destroyed/.test(msg);
+            const retriable = attempt < 4 && got < want && !cliGone &&
+              (RETRY_ERRORS.has(msg) || /reset|hang up|timeout|premature/i.test(msg));
+            if (retriable) {
+              // Mid-stream worker/edge resets (24/227 requests observed run
+              // b2-wh-3): refetch just the remainder of this chunk.
+              log({ k: 'worker_retry', conn: connId, lane: 'down', attempt, error: msg.slice(0, 60), refetch: want - got });
+              await sleep(150);
+              continue;
+            }
+            throw e;
+          }
         }
         dlChunks++;
-        log({ k: 'worker_chunk_dl', conn: connId, bytes: want, chunks: dlChunks, ms: Date.now() - t0 });
+        log({ k: 'worker_chunk_dl', conn: connId, bytes: want, chunks: dlChunks });
         off += want;
       }
     },
