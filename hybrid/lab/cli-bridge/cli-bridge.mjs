@@ -479,7 +479,7 @@ function makeWorkerWsBackend(connId) {
       const s = new WebSocket(u);
       s.binaryType = 'arraybuffer';
       const to = setTimeout(() => { try { s.close(); } catch {} reject(new Error('ws open timeout')); }, 15000);
-      s.addEventListener('open', () => { clearTimeout(to); ws = s; resolve(s); });
+      s.addEventListener('open', () => { clearTimeout(to); closedByWorker = false; ws = s; resolve(s); });
       s.addEventListener('error', () => { clearTimeout(to); reject(new Error('ws open error')); });
       s.addEventListener('close', () => {
         closedByWorker = true; ws = null;
@@ -506,12 +506,36 @@ function makeWorkerWsBackend(connId) {
       else waiters.push(w);
     });
   }
+  async function drainChunk(poolBytes, emit) {
+    // One worker DOWNLOAD command; strip its 9-byte prefix + trailing "\n".
+    let received = 0, skipped = 0;
+    const needSkip = 9;
+    while (received < poolBytes) {
+      const item = await nextMsg(30000, `ws download stall at ${received}/${poolBytes}`);
+      if (item.text !== undefined) throw new Error('unexpected text frame during download: ' + JSON.stringify(item.text.slice(0, 60)));
+      let buf = item.bin;
+      received += buf.length;
+      counters.bytesFromWorkerDl += buf.length;
+      let emitBuf = buf;
+      if (skipped < needSkip) {
+        const skip = Math.min(needSkip - skipped, emitBuf.length);
+        emitBuf = emitBuf.subarray(skip);
+        skipped += skip;
+      }
+      if (received >= poolBytes && emitBuf.length > 0) emitBuf = emitBuf.subarray(0, emitBuf.length - 1); // strip trailing "\n"
+      if (emitBuf.length > 0) await emit(emitBuf);
+    }
+  }
   return {
     name: 'worker-ws',
     async download(n, emit) {
       // n = pure pool bytes wanted. Each worker DOWNLOAD k answers
       // "DOWNLOAD " + (k-10) pool bytes + "\n" — the framing (9-byte prefix
       // + trailing "\n") is stripped, so the emitted stream is pure pool.
+      // Mid-session resets (32 observed run b3-ww-1) are recovered by
+      // re-opening the session and refetching ONLY the un-emitted remainder
+      // of the current chunk (byte-count exactness preserved; pool content
+      // offset is not observable by byte-counting clients).
       const sizes = [];
       if (n > 0) {
         const full = Math.floor(n / cfg.wsChunk);
@@ -523,31 +547,44 @@ function makeWorkerWsBackend(connId) {
         }
       }
       for (const poolBytes of sizes) {
-        const k = poolBytes + 10; // worker command total (framing inclusive)
         dlCommands++;
-        const s = await session();
-        s.send(`DOWNLOAD ${k}`);
-        let received = 0, skipped = 0;
-        const needSkip = 9;
-        while (received < k) {
-          const item = await nextMsg(30000, `ws download stall at ${received}/${k}`);
-          if (item.text !== undefined) throw new Error('unexpected text frame during download: ' + JSON.stringify(item.text.slice(0, 60)));
-          let buf = item.bin;
-          received += buf.length;
-          counters.bytesFromWorkerDl += buf.length;
-          let emitBuf = buf;
-          if (skipped < needSkip) {
-            const skip = Math.min(needSkip - skipped, emitBuf.length);
-            emitBuf = emitBuf.subarray(skip);
-            skipped += skip;
+        let emitted = 0;
+        let attempt = 0;
+        for (;;) {
+          try {
+            const s = await session();
+            s.send(`DOWNLOAD ${poolBytes - emitted + 10}`);
+            counters.workerRequests++;
+            await drainChunk(poolBytes - emitted, emit);
+            break;
+          } catch (e) {
+            const msg = String((e && e.code) || e.message || e);
+            attempt++;
+            const cliGone = /conn closed|socket destroyed/.test(msg);
+            if (attempt < 4 && !cliGone) {
+              log({ k: 'worker_retry', conn: connId, lane: 'ws-down', attempt, error: msg.slice(0, 60), refetch: poolBytes - emitted });
+              try { if (ws) ws.close(4000, 'retry'); } catch { /* noop */ }
+              await sleep(250);
+              continue;
+            }
+            throw e;
           }
-          if (received >= k && emitBuf.length > 0) emitBuf = emitBuf.subarray(0, emitBuf.length - 1); // strip trailing "\n"
-          if (emitBuf.length > 0) await emit(emitBuf);
         }
-        counters.workerRequests++;
       }
     },
-    async uploadStart() { acks = 0; },
+    async uploadStart(n, cmd) {
+      acks = 0;
+      // Forward the RAW UPLOAD command to the session FIRST — without it
+      // the payload frames arrive as garbage commands (no OK ack, no
+      // receipt; observed run b3-ww-1: receipts 0, one ERROR per frame).
+      try {
+        const s = await session();
+        s.send(cmd + '\n');
+      } catch (e) {
+        log({ k: 'worker_err', conn: connId, lane: 'up-cmd', error: String(e.message || e) });
+        throw e;
+      }
+    },
     async uploadFeed(buf) {
       const s = await session();
       for (let off = 0; off < buf.length; off += 64 * 1024) {
@@ -808,7 +845,7 @@ function handleConn(sock) {
       st.uploadRemaining = n - lineLen;
       st.uploadCounted = 0;
       log({ k: 'ul_start', conn: id, declared: n, cmdLen: lineLen, lane: backend.name });
-      await backend.uploadStart(n).catch(() => {});
+      await backend.uploadStart(n, s).catch(() => {});
       if (st.uploadRemaining === 0) {
         st.ul++;
         counters.uploads++;
