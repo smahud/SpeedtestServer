@@ -179,7 +179,7 @@ Penjelasan baris terakhir (jujur dan singkat): uji end-to-end memakai sandbox Al
 2. Ping Mode B dihitung lewat front gateway TLS (port 8790) sehingga ±127 ms; latensi langsung ke VPS tetap ±66 ms (E-J: median 66,02 ms, min 64,88 ms).
 3. Dari 10 server daftar operator, 9 diuji end-to-end; 72945 (BLiP) dikecualikan karena hostname servernya tidak resolve.
 4. Dua errata kecil di laporan riset lama (uji E-G memakai clone host tester lokal; 1 unit test jest gagal sudah ada sebelum perubahan) tidak berhubungan dengan angka-angka di dokumen ini.
-5. Dokumen ini disusun dari bukti uji yang terdokumentasi di repo. Angka berasal dari hasil uji nyata tanggal 4, 23–25 November 2026. Deploy ulang v1.5 ke VPS dilakukan 26 November 2026 setelah VPS aktif kembali, lewat jalur ringan: push GitHub → `git pull` di VPS → `./install.sh --start`.
+5. Dokumen ini disusun dari bukti uji yang terdokumentasi di repo. Angka berasal dari hasil uji nyata tanggal 4, 23–25 November 2026. Deploy ulang ke VPS (v1.5.2) dilakukan 26 November 2026 setelah VPS aktif kembali, lewat jalur ringan: push GitHub → `git pull` di VPS → `./install.sh --start`. Verifikasi pasca-deploy: daemon :8080 aktif (probe protokol HELLO), gateway :8790 mode hybrid, pool 100 worker ter-deploy ulang penuh (fullRedeploy + secret baru di semua worker), uji unduh edge 302→200 OK, unit legacy port-80 dihapus, timer auto-update harian aktif.
 
 ---
 
