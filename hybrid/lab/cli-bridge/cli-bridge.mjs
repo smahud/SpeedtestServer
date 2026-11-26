@@ -174,12 +174,22 @@ const loss = {
 
 // ---------------------------------------------------------------- token mint
 const tokenMgr = {
-  cached: null, inflight: null,
+  cached: null, inflight: null, cooldownUntil: 0,
   async get() {
     if (cfg.token) return { token: cfg.token, workerBase: cfg.workerBase || null, expMs: Infinity };
     const now = Date.now();
     if (this.cached && this.cached.expMs - 60000 > now) return this.cached;
-    if (!this.inflight) this.inflight = this.mint().finally(() => { this.inflight = null; });
+    // Mint backoff: a failed mint (429 rate-limited / network) must not
+    // hammer the gateway — every connection's first measurement would
+    // otherwise re-mint (92 mints observed run b2-wh-2 → gateway 429 →
+    // CLI connection aborts). One shared token serves ALL connections.
+    if (now < this.cooldownUntil) throw new Error(`mint cooling down (${Math.ceil((this.cooldownUntil - now) / 1000)}s)`);
+    if (!this.inflight) {
+      this.inflight = this.mint()
+        .then((t) => { this.cached = t; return t; })
+        .catch((e) => { this.cooldownUntil = Date.now() + 5000; throw e; })
+        .finally(() => { this.inflight = null; });
+    }
     return this.inflight;
   },
   mint() {
