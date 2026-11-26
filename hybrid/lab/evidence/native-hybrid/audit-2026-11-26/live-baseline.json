@@ -1,0 +1,71 @@
+{
+  "audit": "native-hybrid-2026-11-26",
+  "window_utc": "2026-11-26T15:05..15:16Z",
+  "method": "read-only probes from external sandbox (egress 45.126.249.249) against the production VPS + Cloudflare REST API (token auth) + public DNS (DoH); no mutations performed",
+  "git_baseline": {
+    "repo": "https://github.com/smahud/SpeedtestServer",
+    "branch_master_head": "0ac51ac1ad3022523c616948b35a3879ebc2c5de",
+    "version_file": "1.5.2",
+    "working_tree": "clean (fresh clone)",
+    "branches": ["master", "audit/native-hybrid-2026-11-26", "hybrid-assist-lane", "v1.5-dynamic-pool-autoupdate", "vps-full-potential"],
+    "note": "audit reference snapshot (master, 1.5.2, 0ac51ac) re-verified as CURRENT master HEAD, not stale"
+  },
+  "tcp_ports_45_126_249_250": {
+    "8080": "OPEN (daemon)",
+    "5060": "OPEN (daemon secondary)",
+    "8790": "OPEN (hybrid gateway)",
+    "3902": "OPEN (uaeg MCP)",
+    "80": "OPEN (other service, not this project)",
+    "443": "OPEN (other service, not this project)"
+  },
+  "daemon_http_hi": {
+    "request": "GET /hi (HTTPS, SNI/Host speedtest.lumajangnetworks.my.id, resolve -> 45.126.249.250:8080)",
+    "response": "hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d",
+    "tls": "certificate chain verified against system CA (no -k needed)"
+  },
+  "gateway_api_health": {
+    "endpoint": "https://speedtest.lumajangnetworks.my.id:8790/api/health",
+    "server": "hybrid-gateway/1.5",
+    "version": "1.5.2",
+    "mode": "hybrid",
+    "uptimeSeconds_at_probe": 5474,
+    "front_assist_vpsDlShare": 0.15,
+    "front_counters": { "frontDownloads": 1, "frontDownRedirects": 1, "frontTokensMinted": 1 }
+  },
+  "gateway_api_pool": {
+    "poolMax": 100,
+    "activeCount": 2,
+    "activeMin": 2,
+    "reconfigures": 5,
+    "mintsTotal": 1,
+    "quotaGuard": { "enabled": true, "used": 89, "quota": 100000, "usedPct": 0.1, "checkedAt": 1795704155521 }
+  },
+  "gateway_api_workers": {
+    "mode": "hybrid",
+    "target": 100,
+    "deployed": 100,
+    "deployStatus": "ok",
+    "lastSyncAt": "2026-11-26T13:42:30.273Z",
+    "lastError": null,
+    "bundlePath": "/opt/speedtest-hybrid/worker/dist/worker-bundle.js"
+  },
+  "worker1_meta": {
+    "url": "https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/__meta",
+    "server": "speedtest-hybrid-worker/1.2",
+    "colo": "HKG",
+    "worker_id": 1,
+    "poolMax": 100,
+    "status": "live (anonymous GET 200)"
+  },
+  "public_dns": {
+    "doh": "speedtest.lumajangnetworks.my.id A -> 45.126.249.250, TTL 300",
+    "interpretation": "resolves DIRECT to the VPS; no Cloudflare HTTP proxy in path (DNS-only)"
+  },
+  "uaeg_mcp_access": {
+    "endpoint": "https://45.126.249.250:3902/mcp",
+    "server": "UAEG 1.0.0",
+    "initialize": "PASS (bearer key accepted, session established)",
+    "usage": "read-only shell_exec for service status verification only"
+  },
+  "redaction": "API tokens / HMAC secrets / uaeg keys are NOT stored in this evidence; only non-secret identifiers (zone id, account id, IPs, worker names) appear."
+}

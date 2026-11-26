@@ -1,0 +1,27 @@
+{
+  "audit": "native-hybrid-2026-11-26",
+  "source": "Cloudflare REST API (v4), API token auth, read-only GETs, 2026-11-26 ~15:10Z",
+  "token_status": "active (verified via /user/tokens/verify)",
+  "zone": {
+    "id": "c299f26316fb0615d05d00c3d1e436a3",
+    "name": "lumajangnetworks.my.id",
+    "status": "active",
+    "plan": "Free Website",
+    "type": "full",
+    "paused": false
+  },
+  "dns_records_total": 11,
+  "dns_records_relevant": [
+    { "type": "A", "name": "speedtest.lumajangnetworks.my.id", "content": "45.126.249.250", "proxied": false },
+    { "type": "AAAA", "name": "speedtest.lumajangnetworks.my.id", "content": "::ffff:45.126.249.250", "proxied": false }
+  ],
+  "constraint_check": "VPS hostname is DNS-only (grey cloud, proxied=false) — satisfies the master-prompt constraint; NO record in this zone is proxied",
+  "workers_scripts": {
+    "total_scripts_in_account": 100,
+    "hybrid_pool": "speedtest-hybrid-worker + speedtest-hybrid-worker-2 .. -100 (100 scripts)",
+    "other_scripts": []
+  },
+  "workers_routes_on_zone": [],
+  "workers_subdomain": "lumajangnetworks",
+  "interpretation": "edge lane is reachable ONLY via *.lumajangnetworks.workers.dev (no zone routes, no custom domains); the 100-script pool sits at the Free per-account script limit"
+}

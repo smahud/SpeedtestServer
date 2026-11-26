@@ -1,0 +1,14 @@
+{
+  "probe": "netgauge-raw-tcp-handshake",
+  "utc": "2026-11-26T15:15:41Z",
+  "target": "45.126.249.250:8080",
+  "client_egress_ip_seen_by_server": "45.126.249.249",
+  "exchange": [
+    { "sent": "HI\n", "received": "HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d" },
+    { "sent": "CAPABILITIES\n", "received": "CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS" },
+    { "sent": "GETIP\n", "received": "YOURIP 45.126.249.249" },
+    { "sent": "QUIT\n", "received": "(connection closed)" }
+  ],
+  "byte_exact_vs_contract": "HELLO/CAPABILITIES/YOURIP replies byte-exact with validation/PROTOCOL_CONTRACT.md (OoklaServer 2.11.5.2 banner)",
+  "status": "PASS — native protocol path alive on the production daemon"
+}

@@ -1,0 +1,22 @@
+# VPS service status — read-only verification via uaeg MCP (shell_exec)
+# Date: 2026-11-26 ~15:12Z · Channel: https://45.126.249.250:3902/mcp (UAEG 1.0.0, bearer key)
+# Scope: status queries only; no mutations.
+
+systemctl show speedtestserver            -> MainPID=4412  ActiveState=active  SubState=running
+systemctl show speedtest-hybrid-gateway   -> MainPID=4465  ActiveState=active  SubState=running
+systemctl show speedtest-autoupdate.timer -> ActiveState=active
+
+--- listeners (ss -tlnp) ---
+LISTEN 0.0.0.0:8790   users:(("MainThread",pid=4465,fd=21))    # hybrid gateway
+LISTEN 0.0.0.0:5060  users:(("MainThread",pid=4412,fd=22))     # daemon TCP
+LISTEN 0.0.0.0:8080  users:(("MainThread",pid=4412,fd=24))     # daemon TCP
+LISTEN [::]:5060     users:(("MainThread",pid=4412,fd=23))     # daemon TCP v6
+LISTEN [::]:8080      users:(("MainThread",pid=4412,fd=25))     # daemon TCP v6
+
+--- versions ---
+/opt/speedtestserver/VERSION -> 1.5.2
+
+Notes:
+- Daemon binds ONLY 8080/5060 (OoklaServer.properties standard) — port discipline intact.
+- No listeners of this project on 80/443/8081/8443.
+- uaeg MCP listener (:3902) is a separate operator service used for this audit's read-only access.
