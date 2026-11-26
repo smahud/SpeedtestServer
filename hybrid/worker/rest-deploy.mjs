@@ -226,11 +226,19 @@ export async function converge({
       stored = '';
     }
   }
-  const fullRedeploy = Boolean(stored) && stored !== fp;
 
   const existing = await listPool(ctx);
   const existingIds = new Set(existing.map((w) => w.id));
   const actions = { deployed: [], deleted: [], verified: [], errors: [] };
+
+  // v1.5.2: full redeploy when the fingerprint changed OR when workers exist
+  // with NO recorded fingerprint — a pool deployed outside rest-deploy (e.g.
+  // via wrangler) has UNKNOWN bundle/secret state, and trusting it left the
+  // production workers on the previous shared secret while the gateway signed
+  // with a new one (26 Nov 2026 incident). No stored fp + existing pool =
+  // converge everything once, then the fingerprint file tracks reality.
+  const fullRedeploy =
+    (Boolean(stored) && stored !== fp) || (!stored && existing.length > 0);
 
   const toDeploy = [];
   for (let id = 1; id <= poolSize; id++) {

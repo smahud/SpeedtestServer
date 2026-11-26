@@ -84,13 +84,16 @@ fi
 
 log "restarting services to load the new code…"
 systemctl restart speedtestserver || log "WARN: speedtestserver restart failed"
-if systemctl list-unit-files 2>/dev/null | grep -q '^speedtest-hybrid-gateway'; then
+# SIGPIPE-safe: "systemctl … | grep -q" under "set -euo pipefail" evaluates
+# FALSE on a match (grep -q exits first → systemctl SIGPIPE 141) — the
+# gateway would NEVER be restarted or post-checked after updates.
+if systemctl list-unit-files 2>/dev/null | grep '^speedtest-hybrid-gateway' >/dev/null; then
   systemctl restart speedtest-hybrid-gateway || log "WARN: hybrid gateway restart failed"
 fi
 
 sleep 2
 systemctl is-active --quiet speedtestserver && log "speedtestserver: active" || log "WARN: speedtestserver NOT active"
-if systemctl list-unit-files 2>/dev/null | grep -q '^speedtest-hybrid-gateway'; then
+if systemctl list-unit-files 2>/dev/null | grep '^speedtest-hybrid-gateway' >/dev/null; then
   systemctl is-active --quiet speedtest-hybrid-gateway && log "speedtest-hybrid-gateway: active" || log "WARN: speedtest-hybrid-gateway NOT active"
 fi
 log "update complete: VERSION $NEW_V @ $(git rev-parse --short HEAD)"

@@ -402,7 +402,7 @@ cleanup_verify() { kill "$VERIFY_PID" 2>/dev/null || true; rm -f "$VERIFY_CFG" "
 trap cleanup_verify EXIT
 LISTENING=0
 for _ in $(seq 1 20); do
-  if ss -tln 2>/dev/null | grep -q ":${VERIFY_PORT} "; then LISTENING=1; break; fi
+  if ss -tln 2>/dev/null | grep ":${VERIFY_PORT} " >/dev/null; then LISTENING=1; break; fi
   sleep 0.5
 done
 [ "$LISTENING" = 1 ] || { cat "$VERIFY_LOG" >&2; fail "installed server did not listen on $VERIFY_PORT"; }
@@ -846,7 +846,13 @@ fi
 # (this project's own speedtestserver-legacy) and any stray legacy-http.js
 # instance of ours. Unrelated services are never touched.
 if [ "$AS_ROOT" = 1 ]; then
-  if systemctl list-unit-files 2>/dev/null | grep -q '^speedtestserver-legacy'; then
+  # SIGPIPE-safe probe: under "set -o pipefail", "systemctl … | grep -q" is a
+  # trap — grep -q exits on first match, systemctl (still writing) gets
+  # SIGPIPE 141 and the pipeline evaluates FALSE in the if, so the purge
+  # silently never ran (production incident, 26 Nov 2026: the legacy unit
+  # stayed enabled through the v1.5.0/v1.5.1 installs). grep WITHOUT -q
+  # consumes the whole stream, so systemctl always exits cleanly.
+  if systemctl list-unit-files 2>/dev/null | grep '^speedtestserver-legacy' >/dev/null; then
     say "Purging the legacy port-80 unit (speedtestserver-legacy)…"
     systemctl disable --now speedtestserver-legacy.service 2>/dev/null || true
     rm -f "$SYSTEMD_DIR/speedtestserver-legacy.service"
@@ -875,7 +881,7 @@ if [ "$AS_ROOT" = 1 ]; then
     done
     sleep 2
     if [ "$START" = 1 ] || systemctl is-active --quiet speedtest-hybrid-gateway; then
-      if [ "$NO_HYBRID" = 0 ] || systemctl list-unit-files | grep -q '^speedtest-hybrid-gateway'; then
+      if [ "$NO_HYBRID" = 0 ] || systemctl list-unit-files 2>/dev/null | grep '^speedtest-hybrid-gateway' >/dev/null; then
         say "Enabling + (re)starting speedtest-hybrid-gateway…"
         systemctl enable speedtest-hybrid-gateway >/dev/null 2>&1 || true
         systemctl restart speedtest-hybrid-gateway || fail "failed to start speedtest-hybrid-gateway"
@@ -897,7 +903,11 @@ if [ "$AS_ROOT" = 1 ]; then
       if command -v curl >/dev/null 2>&1; then
         GW_PORT_LIVE="${HYBRID_GATEWAY_PORT:-8790}"
         say "Live health check: https://127.0.0.1:$GW_PORT_LIVE/api/health"
-        curl -sk -m 10 "https://127.0.0.1:$GW_PORT_LIVE/api/health" | head -c 500; echo
+        # || true: head -c closes the pipe early → curl gets SIGPIPE 141 →
+        # under "set -euo pipefail" the installer DIED right here (missing
+        # "Done" output, exit swallowed by a tee pipeline) and auto-update
+        # treated every reinstall as failed. The health display is cosmetic.
+        curl -sk -m 10 "https://127.0.0.1:$GW_PORT_LIVE/api/health" | head -c 500 || true; echo
       fi
     fi
     if [ "$START" != 1 ]; then
