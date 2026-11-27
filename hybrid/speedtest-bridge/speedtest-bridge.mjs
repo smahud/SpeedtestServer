@@ -30,26 +30,28 @@
  *   DIRECT (non-relay) edge path for native clients remains blocked per
  *   the 26–27 Nov 2026 audit. Per-lane byte attribution is logged to JSONL.
  *
- * PORT UNIFICATION (daemon parity — PROTOCOL_CONTRACT §1 [V])
- *   The official OoklaServer multiplexes plain HTTP, HTTPS/TLS, WebSocket,
- *   WSS and native NetGauge on ONE TCP port via per-connection first-byte
- *   detection (native ports 5060 + 8080). speedtest-bridge reproduces that
- *   on :8080 so the VPS opens ONLY the two native OoklaServer ports:
+ * PORT AUTHORITY (operator contract, 27 Nov 2026)
+ *   The ONLY listening TCP/UDP ports of the whole project are the ones
+ *   configured in the official OoklaServer.properties
+ *   (OoklaServer.tcpPorts / OoklaServer.udpPorts — port 8080 is mandatory).
+ *   The installer derives the bridge's port lists from THAT file — it never
+ *   assumes "the other native port" (e.g. 5060) exists. If the operator
+ *   configures a single port, only that port is served; if they configure
+ *   several, EVERY port serves the complete daemon-parity mux below. The
+ *   gateway is reached over a Unix domain socket (no TCP port at all):
  *
- *     TCP :8080  → first bytes TLS ClientHello (0x16 0x03 …) → raw-proxied
- *                  to the hybrid gateway on loopback
- *                  (SPEEDTEST_BRIDGE_TLS_UPSTREAM, default 127.0.0.1:8790)
- *                  — anything else → the native NetGauge front below.
- *     UDP :8080  → NetGauge packet-loss / loaded-latency (LOSS/RECV)
- *     TCP :5060  → the OoklaServer daemon itself (its other native port,
- *                  configured in OoklaServer.properties — untouched here)
- *     UDP :5060  → daemon loss plane
- *
- *   The daemon keeps full parity on :5060 (including the HTTP/TLS surface
- *   and TLS-wrapped NetGauge); the bridge front serves native plaintext
- *   NetGauge + the TLS mux on :8080 (documented deviation: plain-HTTP
- *   requests on :8080 fall to the NetGauge front → ERROR/3-strikes; use
- *   https:// — the gateway is TLS in production).
+ *     TCP <each tcpPorts entry>  → first bytes TLS ClientHello (0x16 0x03 …)
+ *                  → TLS TERMINATED on the bridge (cert via systemd
+ *                  LoadCredential) and the same detection re-runs INSIDE
+ *                  the decrypted stream — NetGauge stays on the front (the
+ *                  official client's PRIMARY path), an HTTP method pipes to
+ *                  the gateway socket; anything else → NetGauge front.
+ *                  Lab (no cert): raw-proxied to SPEEDTEST_BRIDGE_TLS_UPSTREAM.
+ *     UDP <each udpPorts entry>  → NetGauge packet-loss / loaded-latency
+ *                  (LOSS/RECV), one socket per port, one shared registry.
+ *     gateway      → SPEEDTEST_BRIDGE_GATEWAY_BASE=unix:/run/speedtest-hybrid/
+ *                  gateway.sock (token mint) + SPEEDTEST_BRIDGE_HTTP_UPSTREAM=
+ *                  unix:<same socket> (HTTP lane pipe) — NO TCP listener.
  *
  * PROTOCOL PARITY (front) — faithful port of the verified daemon semantics
  *   (engine reference: reverse-engineered/typescript/src/server/NetGaugeEngine.ts):
@@ -91,9 +93,10 @@
  *   CONTRACT.md. Manual foreground run for debugging:)
  *   SPEEDTEST_BRIDGE_BACKEND=worker-http \
  *     node hybrid/speedtest-bridge/speedtest-bridge.mjs \
- *     --port 8080 --log /var/lib/speedtest-bridge/speedtest-bridge.jsonl
+ *     --ports 8080,5060 --log /var/lib/speedtest-bridge/speedtest-bridge.jsonl
  *   Token: minted from the hybrid gateway (SPEEDTEST_BRIDGE_GATEWAY_BASE,
- *   default https://127.0.0.1:8790) or fixed via SPEEDTEST_BRIDGE_TOKEN +
+ *   default https://127.0.0.1:8790; production unix:/run/speedtest-hybrid/
+ *   gateway.sock) or fixed via SPEEDTEST_BRIDGE_TOKEN +
  *   SPEEDTEST_BRIDGE_WORKER_BASE.
  *
  * Env (SPEEDTEST_BRIDGE_*): see README.md. Zero dependencies (node:net/
@@ -115,10 +118,32 @@ const envBool = (v, dflt) => {
 };
 
 // ---------------------------------------------------------------- config
+// PORT AUTHORITY (operator contract, 27 Nov): the ONLY listening TCP/UDP
+// ports of this whole project are the ones configured in the official
+// OoklaServer.properties (OoklaServer.tcpPorts / OoklaServer.udpPorts). The
+// installer derives SPEEDTEST_BRIDGE_PORTS / SPEEDTEST_BRIDGE_UDP_PORTS from
+// THAT file and nothing else — never a hardcoded assumption that "the other
+// native port" (e.g. 5060) exists. Default here = the OoklaServer default
+// (8080) so a bare lab run still works.
+function parsePortList(raw, what) {
+  const out = [];
+  for (const tok of String(raw).split(',')) {
+    const t = tok.trim();
+    if (!t) continue;
+    if (!/^\d+$/.test(t) || +t < 1 || +t > 65535) {
+      console.error(`[speedtest-bridge] bad port in ${what}: '${t}' (expected 1..65535)`);
+      process.exit(1);
+    }
+    if (!out.includes(+t)) out.push(+t);
+  }
+  return out;
+}
 const cfg = {
-  port: 8080,
+  ports: [],      // TCP front ports (SPEEDTEST_BRIDGE_PORTS; every port serves the FULL mux)
+  udpPorts: [],   // UDP loss-plane ports (SPEEDTEST_BRIDGE_UDP_PORTS; default = ports)
   backend: (process.env.SPEEDTEST_BRIDGE_BACKEND || 'worker-http').toLowerCase(),
   gatewayBase: process.env.SPEEDTEST_BRIDGE_GATEWAY_BASE || 'https://127.0.0.1:8790',
+  gatewaySocket: '', // set when gatewayBase = unix:/path (production: gateway has NO TCP port)
   workerBase: process.env.SPEEDTEST_BRIDGE_WORKER_BASE || '',
   token: process.env.SPEEDTEST_BRIDGE_TOKEN || '',
   log: process.env.SPEEDTEST_BRIDGE_LOG || 'speedtest-bridge.jsonl',
@@ -149,19 +174,34 @@ const cfg = {
   tlsCertPath: process.env.SPEEDTEST_BRIDGE_TLS_CERT || '',
   tlsKeyPath: process.env.SPEEDTEST_BRIDGE_TLS_KEY || '',
   httpUpstream: process.env.SPEEDTEST_BRIDGE_HTTP_UPSTREAM || '127.0.0.1:8791',
+  httpUpstreamSocket: '', // set when httpUpstream = unix:/path (production: pipe to the gateway socket)
   versionString: process.env.SPEEDTEST_BRIDGE_VERSION_STRING || '2.11 (2.11.5) 2026-06-04.1737.7d0993d',
   instanceUuid: crypto.randomUUID(), // lower-case, daemon parity
   startedAt: Date.now(),
 };
+const argvPortArgs = [];
 for (let i = 2; i < process.argv.length; i++) {
   const t = process.argv[i];
-  if (t === '--port') cfg.port = +process.argv[++i];
+  if (t === '--port' || t === '--ports') argvPortArgs.push(process.argv[++i]);
   else if (t === '--backend') cfg.backend = process.argv[++i].toLowerCase();
   else if (t === '--log') cfg.log = process.argv[++i];
   else if (t === '--gateway') cfg.gatewayBase = process.argv[++i];
   else if (t === '--worker') cfg.workerBase = process.argv[++i];
   else if (t === '--tls-upstream') cfg.tlsUpstream = process.argv[++i];
   else if (t === '--no-tls-mux') cfg.tlsMux = false;
+}
+// Resolution order: argv (--port/--ports, last wins) > SPEEDTEST_BRIDGE_PORTS
+// (comma list) > SPEEDTEST_BRIDGE_PORT (single, legacy) > 8080 (OoklaServer
+// default). UDP list defaults to the TCP list (daemon parity: the official
+// config ships the same list on both lines).
+{
+  const raw = argvPortArgs.length
+    ? argvPortArgs[argvPortArgs.length - 1]
+    : (process.env.SPEEDTEST_BRIDGE_PORTS || process.env.SPEEDTEST_BRIDGE_PORT || '8080');
+  cfg.ports = parsePortList(raw, 'SPEEDTEST_BRIDGE_PORTS/--port');
+  if (!cfg.ports.length) { console.error('[speedtest-bridge] empty port list'); process.exit(1); }
+  const rawUdp = process.env.SPEEDTEST_BRIDGE_UDP_PORTS || '';
+  cfg.udpPorts = rawUdp ? parsePortList(rawUdp, 'SPEEDTEST_BRIDGE_UDP_PORTS') : cfg.ports.slice();
 }
 fs.mkdirSync(path.dirname(cfg.log), { recursive: true });
 // Permanent-service log: append, but roll over a previous run that left a
@@ -297,6 +337,30 @@ const tokenMgr = {
   },
   mint() {
     return new Promise((resolve, reject) => {
+      // Production wiring: the gateway has NO TCP port — it listens on a Unix
+      // domain socket (filesystem permissions = the access boundary), so the
+      // mint goes over http on the socketPath.
+      if (cfg.gatewaySocket) {
+        const req = http.request(
+          { socketPath: cfg.gatewaySocket, path: '/api/sessions', method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Content-Length': '2', 'User-Agent': UA },
+            timeout: 10000 },
+          (res) => {
+            let b = '';
+            res.on('data', (c) => { b += c; });
+            res.on('end', () => {
+              try {
+                const d = JSON.parse(b);
+                if (res.statusCode !== 200 || !d.token) throw new Error(`mint ${res.statusCode}: ${b.slice(0, 120)}`);
+                resolve({ token: d.token, workerBase: d.worker ? d.worker.url : null, expMs: Date.parse(d.expiresAt) || Infinity });
+              } catch (e) { reject(e); }
+            });
+          });
+        req.on('timeout', () => req.destroy(new Error('mint timeout')));
+        req.on('error', reject);
+        req.end('{}');
+        return;
+      }
       const u = new URL(cfg.gatewayBase.replace(/\/+$/, '') + '/api/sessions');
       if (u.protocol !== 'https:') return reject(new Error('gateway must be https'));
       const req = https.request(
@@ -778,7 +842,9 @@ function looksLikeHttpMethod(buf) {
 function plainPipe(sock, prebuf, peer, peerIp, kind) {
   counters.httpPiped++;
   log({ k: 'http_pipe_open', kind, peer, upstream: cfg.httpUpstream });
-  const up = net.connect({ host: cfg.httpUpstreamHost, port: cfg.httpUpstreamPort });
+  const up = cfg.httpUpstreamSocket
+    ? net.connect({ path: cfg.httpUpstreamSocket })
+    : net.connect({ host: cfg.httpUpstreamHost, port: cfg.httpUpstreamPort });
   let closed = false;
   const finish = () => {
     if (closed) return;
@@ -1220,36 +1286,63 @@ function writeWait(sock, buf) {
 }
 
 // ---------------------------------------------------------------- UDP front
-const udpSock = dgram.createSocket({ type: 'udp6', ipv6Only: false });
-udpSock.on('message', (msg, rinfo) => {
-  if (msg.length > 2048) return;
-  const s = msg.toString('latin1');
-  const parts = s.trim().split(/\s+/);
-  if (parts[0] !== 'LOSS' || (parts.length !== 4 && parts.length !== 5)) return;
-  const seq = parseInt(parts[2], 10);
-  const uuid = parts[3];
-  const clientTimer = parts[4];
-  if (!UUID_RE.test(uuid) || !Number.isFinite(seq)) return;
-  const reply = loss.record(uuid, normIp(rinfo.address), seq, clientTimer);
-  if (reply !== null) {
-    udpSock.send(Buffer.from(reply + '\n', 'latin1'), rinfo.port, rinfo.address);
-    log({ k: 'udp_recv', uuid, seq, from: rinfo.address });
-  } else {
-    log({ k: 'udp_count', uuid, seq, from: rinfo.address });
-  }
-});
-udpSock.on('error', (e) => { console.error('[speedtest-bridge] udp error:', e.message); process.exit(1); });
+// One loss-plane socket per UDP port from the properties list (default =
+// the TCP list — daemon parity). Every socket shares the one loss registry.
+const udpSocks = [];
+function startUdpFront(port) {
+  const sock = dgram.createSocket({ type: 'udp6', ipv6Only: false });
+  sock.on('message', (msg, rinfo) => {
+    if (msg.length > 2048) return;
+    const s = msg.toString('latin1');
+    const parts = s.trim().split(/\s+/);
+    if (parts[0] !== 'LOSS' || (parts.length !== 4 && parts.length !== 5)) return;
+    const seq = parseInt(parts[2], 10);
+    const uuid = parts[3];
+    const clientTimer = parts[4];
+    if (!UUID_RE.test(uuid) || !Number.isFinite(seq)) return;
+    const reply = loss.record(uuid, normIp(rinfo.address), seq, clientTimer);
+    if (reply !== null) {
+      sock.send(Buffer.from(reply + '\n', 'latin1'), rinfo.port, rinfo.address);
+      log({ k: 'udp_recv', uuid, seq, from: rinfo.address, port });
+    } else {
+      log({ k: 'udp_count', uuid, seq, from: rinfo.address, port });
+    }
+  });
+  sock.on('error', (e) => { console.error(`[speedtest-bridge] udp :${port} error:`, e.message); process.exit(1); });
+  sock.bind(port);
+  udpSocks.push(sock);
+}
 
 // ---------------------------------------------------------------- server
 {
+  // Gateway base: 'unix:/path' (production — gateway has NO TCP port) or an
+  // http(s):// URL (lab).
+  if (cfg.gatewayBase.startsWith('unix:')) {
+    cfg.gatewaySocket = cfg.gatewayBase.slice(5);
+    if (!cfg.gatewaySocket.startsWith('/')) {
+      console.error('[speedtest-bridge] bad unix gateway base (need unix:/abs/path):', cfg.gatewayBase);
+      process.exit(1);
+    }
+  }
+  // TLS raw-proxy upstream (lab mode, no cert): host:port only.
   const m = /^(\[[^\]]*\]|[^:]+):(\d+)$/.exec(cfg.tlsUpstream); // host:port or [v6]:port
   if (!m) { console.error('[speedtest-bridge] bad SPEEDTEST_BRIDGE_TLS_UPSTREAM:', cfg.tlsUpstream); process.exit(1); }
   cfg.tlsUpstreamHost = m[1];
   cfg.tlsUpstreamPort = +m[2];
-  const h = /^(\[[^\]]*\]|[^:]+):(\d+)$/.exec(cfg.httpUpstream);
-  if (!h) { console.error('[speedtest-bridge] bad SPEEDTEST_BRIDGE_HTTP_UPSTREAM:', cfg.httpUpstream); process.exit(1); }
-  cfg.httpUpstreamHost = h[1];
-  cfg.httpUpstreamPort = +h[2];
+  // HTTP-lane upstream: 'unix:/path' (production — pipes to the gateway
+  // socket) or host:port (lab plain listener).
+  if (cfg.httpUpstream.startsWith('unix:')) {
+    cfg.httpUpstreamSocket = cfg.httpUpstream.slice(5);
+    if (!cfg.httpUpstreamSocket.startsWith('/')) {
+      console.error('[speedtest-bridge] bad unix http upstream (need unix:/abs/path):', cfg.httpUpstream);
+      process.exit(1);
+    }
+  } else {
+    const h = /^(\[[^\]]*\]|[^:]+):(\d+)$/.exec(cfg.httpUpstream);
+    if (!h) { console.error('[speedtest-bridge] bad SPEEDTEST_BRIDGE_HTTP_UPSTREAM:', cfg.httpUpstream); process.exit(1); }
+    cfg.httpUpstreamHost = h[1];
+    cfg.httpUpstreamPort = +h[2];
+  }
   if (cfg.tlsCertPath && cfg.tlsKeyPath) {
     cfg.tlsCertPem = fs.readFileSync(cfg.tlsCertPath); // systemd LoadCredential (read-only)
     cfg.tlsKeyPem = fs.readFileSync(cfg.tlsKeyPath);
@@ -1265,20 +1358,31 @@ function tlsMode() {
   return cfg.tlsCertPem ? 'terminate' : 'raw-proxy';
 }
 
-const server = net.createServer(onConnection);
-server.on('error', (e) => { console.error('[speedtest-bridge] tcp error:', e.message); process.exit(1); });
-server.listen(cfg.port, '::', () => {
-  console.log(`[speedtest-bridge] tcp+udp :${cfg.port} | backend=${cfg.backend} | gateway=${cfg.gatewayBase}` +
-    ` | tls=${tlsMode()} | httpUpstream=${cfg.tlsMux ? cfg.httpUpstream : '-'} | rate=${cfg.connRatePerMin}/min/ip | log=${cfg.log}`);
-  log({ k: 'meta', pid: process.pid, port: cfg.port, backend: cfg.backend, gateway: cfg.gatewayBase,
-    tlsMux: cfg.tlsMux, tlsMode: tlsMode(),
-    tlsUpstream: cfg.tlsMux && !cfg.tlsCertPem ? cfg.tlsUpstream : null,
-    httpUpstream: cfg.tlsMux ? cfg.httpUpstream : null,
-    connRatePerMin: cfg.connRatePerMin, maxConnPerIp: cfg.maxConnPerIp,
-    wsChunk: cfg.wsChunk, httpChunk: cfg.httpChunk, wsPaceMs: cfg.wsPaceMs,
-    versionString: cfg.versionString, instanceUuid: cfg.instanceUuid, node: process.version });
-});
-udpSock.bind(cfg.port);
+// One TCP front server per port in the properties list — EVERY port serves
+// the complete daemon-parity mux (first-byte detection: TLS ClientHello →
+// terminate + re-detect inside; HTTP method → gateway lane; anything else →
+// the native NetGauge front). No port is special; 8080 is only the mandatory
+// member of the list (enforced by the installer).
+const listening = [];
+for (const p of cfg.ports) {
+  const server = net.createServer(onConnection);
+  server.on('error', (e) => { console.error(`[speedtest-bridge] tcp :${p} error:`, e.message); process.exit(1); });
+  server.listen(p, '::', () => {
+    listening.push(p);
+    console.log(`[speedtest-bridge] tcp+udp ${cfg.ports.map((x) => `:${x}`).join('')} (this :${p}) | backend=${cfg.backend} | gateway=${cfg.gatewayBase}` +
+      ` | tls=${tlsMode()} | httpUpstream=${cfg.tlsMux ? cfg.httpUpstream : '-'} | rate=${cfg.connRatePerMin}/min/ip | log=${cfg.log}`);
+    if (listening.length === cfg.ports.length) {
+      log({ k: 'meta', pid: process.pid, ports: cfg.ports, udpPorts: cfg.udpPorts, backend: cfg.backend, gateway: cfg.gatewayBase,
+        tlsMux: cfg.tlsMux, tlsMode: tlsMode(),
+        tlsUpstream: cfg.tlsMux && !cfg.tlsCertPem ? cfg.tlsUpstream : null,
+        httpUpstream: cfg.tlsMux ? cfg.httpUpstream : null,
+        connRatePerMin: cfg.connRatePerMin, maxConnPerIp: cfg.maxConnPerIp,
+        wsChunk: cfg.wsChunk, httpChunk: cfg.httpChunk, wsPaceMs: cfg.wsPaceMs,
+        versionString: cfg.versionString, instanceUuid: cfg.instanceUuid, node: process.version });
+    }
+  });
+}
+for (const p of cfg.udpPorts) startUdpFront(p);
 
 setInterval(() => { log({ k: 'heartbeat', ...counters }); }, 5000).unref();
 

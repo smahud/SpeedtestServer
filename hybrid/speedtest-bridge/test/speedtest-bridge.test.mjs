@@ -15,6 +15,10 @@
  *      bad-record fallthrough, TLS_MUX=0 knob.
  *   3. per-IP connection rate limit (CONN_RATE_PER_MIN).
  *   4. concurrency smoke (worker-http, CLI pattern: 8 × DL 1 MiB + UL 256 KiB).
+ *   5. PORT AUTHORITY wiring — OoklaServer.properties is the only port
+ *      source: SPEEDTEST_BRIDGE_PORTS multi-port (every port serves the FULL
+ *      mux), per-port UDP loss plane, and the gateway reached over a UNIX
+ *      domain socket (mint + HTTP lane) with NO gateway TCP port at all.
  *
  * Usage: node test/speedtest-bridge.test.mjs            (everything)
  *        node test/speedtest-bridge.test.mjs local       (single backend)
@@ -32,9 +36,11 @@ import path from 'node:path';
 
 const BRIDGE = new URL('../speedtest-bridge.mjs', import.meta.url).pathname;
 const BRIDGE_PORT = 18080;
+const BRIDGE_PORT_2 = 18082; // second properties port (multi-port front)
 const WORKER_PORT = 18081;
 const GW_MOCK_PORT = 18890; // TLS-mux upstream, lab raw-proxy mode (plain TCP echo)
 const GW_PLAIN_PORT = 18891; // gateway plain loopback listener stand-in (echo)
+const GW_UNIX_SOCK = path.join(os.tmpdir(), `speedtest-bridge-test-gw-${process.pid}.sock`); // production wiring: gateway over a Unix socket
 const TLS_CERT_PORT = 18892; // (unused port range guard)
 const TOKEN = 'test-token-abcdef';
 const WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -259,6 +265,35 @@ function startMockPlainGateway() {
   });
 }
 
+// Unix-socket gateway stand-in — the PRODUCTION wiring (the gateway has NO
+// TCP port): POST /api/sessions mints the fixed TOKEN (so the worker-http
+// backend's lazy mint over the socket is exercised end-to-end); GET
+// /api/health answers JSON (proves the bridge's HTTP lane pipes over the
+// same socket).
+function startMockUnixGateway() {
+  let mints = 0, healths = 0;
+  const server = http.createServer((req, res) => {
+    const u = new URL(req.url, 'http://x');
+    if (u.pathname === '/api/sessions' && req.method === 'POST') {
+      mints++;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ token: TOKEN, guid: 'unix-gw-guid', expiresAt: new Date(Date.now() + 300000).toISOString(), worker: { id: 1, url: `http://127.0.0.1:${WORKER_PORT}` } }));
+      return;
+    }
+    if (u.pathname === '/api/health') {
+      healths++;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, via: 'unix-socket' }));
+      return;
+    }
+    res.writeHead(404); res.end();
+  });
+  return new Promise((resolve) => {
+    try { fs.unlinkSync(GW_UNIX_SOCK); } catch {}
+    server.listen(GW_UNIX_SOCK, () => resolve({ server, stats: () => ({ mints, healths }) }));
+  });
+}
+
 // Self-signed cert for the TLS-termination tests (openssl at runtime).
 function makeSelfSignedCert(dir) {
   fs.mkdirSync(dir, { recursive: true });
@@ -420,12 +455,12 @@ function connect(port = BRIDGE_PORT, host = '127.0.0.1') {
 }
 
 // ---------------------------------------------------------------- UDP client
-function udpClient() {
+function udpClient(port = BRIDGE_PORT) {
   const sock = dgram.createSocket('udp4');
   const state = { msgs: [], waiters: [] };
   sock.on('message', (m) => { state.msgs.push(m); if (state.waiters.length) state.waiters.shift()(); });
   const api = {
-    send(s) { sock.send(Buffer.from(s, 'latin1'), BRIDGE_PORT, '127.0.0.1'); },
+    send(s) { sock.send(Buffer.from(s, 'latin1'), port, '127.0.0.1'); },
     async next(timeoutMs = 1500) {
       if (state.msgs.length) return state.msgs.shift().toString('latin1').replace(/\n$/, '');
       await Promise.race([new Promise((r) => state.waiters.push(r)), sleep(timeoutMs).then(() => null)]);
@@ -681,7 +716,95 @@ async function tlsMuxSuite(gw) {
   c6.destroy();
 }
 
-// ---------------------------------------------------------------- rate-limit suite
+// ------------------------------------------------- port-authority suite
+// The operator contract: OoklaServer.properties is the ONLY port authority —
+// multiple ports, every port serves the FULL mux, per-port UDP loss plane,
+// and the gateway reached over a UNIX SOCKET (mint + HTTP lane) with no
+// gateway TCP port anywhere.
+async function portAuthoritySuite(gwUnix) {
+  section('port authority: multi-port front + unix-socket gateway');
+  const logPath = path.join(os.tmpdir(), `speedtest-bridge-test-portauth-${Date.now()}.jsonl`);
+  const child = spawn(process.execPath, [BRIDGE, '--log', logPath], {
+    env: {
+      ...process.env,
+      SPEEDTEST_BRIDGE_PORTS: `${BRIDGE_PORT},${BRIDGE_PORT_2}`,
+      SPEEDTEST_BRIDGE_UDP_PORTS: `${BRIDGE_PORT},${BRIDGE_PORT_2}`,
+      SPEEDTEST_BRIDGE_GATEWAY_BASE: `unix:${GW_UNIX_SOCK}`,
+      SPEEDTEST_BRIDGE_HTTP_UPSTREAM: `unix:${GW_UNIX_SOCK}`,
+      SPEEDTEST_BRIDGE_BACKEND: 'worker-http',
+      // NOTE: no SPEEDTEST_BRIDGE_TOKEN — the mint MUST go over the socket.
+      SPEEDTEST_BRIDGE_WORKER_BASE: `http://127.0.0.1:${WORKER_PORT}`,
+      SPEEDTEST_BRIDGE_HTTP_CHUNK: String(64 * 1024),
+    },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  children.push(child);
+  let out = '';
+  child.stdout.on('data', (c) => { out += c; });
+  child.stderr.on('data', (c) => { out += c; });
+  await sleep(700);
+  try {
+    expect(child.exitCode === null, `portauth: bridge started (multi-port ${BRIDGE_PORT}+${BRIDGE_PORT_2})`);
+
+    // 1. EVERY port serves the full native front (no port is "special").
+    for (const p of [BRIDGE_PORT, BRIDGE_PORT_2]) {
+      const c = connect(p);
+      c.writeLine('HI');
+      expect(/^HELLO /.test(await c.readLine()), `portauth: :${p} HI → HELLO (full mux on every port)`);
+      c.writeLine('DOWNLOAD 4096');
+      const d = await c.readExact(4096);
+      expect(d.length === 4096 && d[4095] === 0x0a, `portauth: :${p} DOWNLOAD 4096 byte-exact`);
+      c.destroy();
+    }
+
+    // 2. The lazy mint went over the UNIX socket (no TCP gateway exists).
+    await sleep(300);
+    expect(gwUnix.stats().mints >= 1, `portauth: token minted over the unix socket (${gwUnix.stats().mints})`);
+    const events = fs.readFileSync(logPath, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+    const meta = events.find((e) => e.k === 'meta');
+    expect(meta && Array.isArray(meta.ports) && meta.ports.join(',') === `${BRIDGE_PORT},${BRIDGE_PORT_2}`,
+      `portauth: meta logs the port list (${meta && JSON.stringify(meta.ports)})`);
+    expect(meta && Array.isArray(meta.udpPorts) && meta.udpPorts.length === 2, 'portauth: meta logs the udp port list');
+    expect(events.filter((e) => e.k === 'dl_done').length >= 2, 'portauth: dl_done on both ports');
+    expect(events.filter((e) => e.k === 'worker_err').length === 0, 'portauth: zero worker_err');
+
+    // 3. Per-port UDP loss plane on BOTH udp ports.
+    for (const p of [BRIDGE_PORT, BRIDGE_PORT_2]) {
+      const c = connect();
+      const uuid = crypto.randomUUID();
+      c.writeLine(`HI ${uuid}`);
+      await c.readLine();
+      c.writeLine('INITPLOSS');
+      await c.readLine();
+      const u = udpClient(p);
+      u.send(`LOSS 125 2 ${uuid} 999`);
+      const recv = await u.next(2500);
+      expect(recv !== null && recv.startsWith('RECV 2 999 ['), `portauth: UDP :${p} LOSS loaded → RECV`);
+      u.close();
+      c.destroy();
+    }
+
+    // 4. HTTP lane: a plain-HTTP request on a front port pipes to the
+    //    gateway over the SAME unix socket and the answer comes back.
+    {
+      const resp = await new Promise((resolve, reject) => {
+        const s = net.connect({ port: BRIDGE_PORT, host: '127.0.0.1' });
+        let buf = '';
+        const t = setTimeout(() => { s.destroy(); reject(new Error('http-pipe timeout')); }, 5000);
+        s.on('connect', () => s.write('GET /api/health HTTP/1.0\r\nHost: x\r\n\r\n'));
+        s.on('data', (c) => { buf += c.toString('latin1'); });
+        s.on('close', () => { clearTimeout(t); resolve(buf); });
+        s.on('error', (e) => { clearTimeout(t); reject(e); });
+      });
+      expect(/^HTTP\/1\.[01] 200/.test(resp) && resp.includes('"ok":true'),
+        `portauth: HTTP on :${BRIDGE_PORT} → piped via unix socket → gateway 200 (${resp.split('\r\n')[0]})`);
+      expect(gwUnix.stats().healths >= 1, 'portauth: gateway saw the piped /api/health');
+    }
+  } finally {
+    await waitExit(child);
+  }
+}
+
 async function rateLimitSuite() {
   section('per-IP connection rate limit (SPEEDTEST_BRIDGE_CONN_RATE_PER_MIN=4)');
   const b = await spawnBridge('local', { SPEEDTEST_BRIDGE_CONN_RATE_PER_MIN: '4' });
@@ -811,6 +934,7 @@ async function main() {
   const mock = await startMockWorker();
   const gw = await startMockGateway();
   const gwPlain = await startMockPlainGateway();
+  const gwUnix = await startMockUnixGateway();
   process.on('unhandledRejection', (e) => {
     fail++; fails.push('unhandled rejection: ' + String((e && e.message) || e));
   });
@@ -839,6 +963,9 @@ async function main() {
   }
   if (which === 'all' || which === 'rate') {
     await rateLimitSuite();
+  }
+  if (which === 'all' || which === 'portauth') {
+    await portAuthoritySuite(gwUnix);
   }
   if (which === 'all' || which === 'tls-term') {
     await tlsTerminateSuite();
@@ -919,6 +1046,8 @@ async function main() {
   mock.server.close();
   gw.server.close();
   gwPlain.server.close();
+  gwUnix.server.close();
+  try { fs.unlinkSync(GW_UNIX_SOCK); } catch {}
   process.exit(0);
 }
 
