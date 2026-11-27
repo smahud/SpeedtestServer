@@ -141,6 +141,7 @@ function parsePortList(raw, what) {
 const cfg = {
   ports: [],      // TCP front ports (SPEEDTEST_BRIDGE_PORTS; every port serves the FULL mux)
   udpPorts: [],   // UDP loss-plane ports (SPEEDTEST_BRIDGE_UDP_PORTS; default = ports)
+  bind: process.env.SPEEDTEST_BRIDGE_BIND || '::', // dual-stack by default (daemon parity); install-time self-probes pin 127.0.0.1
   backend: (process.env.SPEEDTEST_BRIDGE_BACKEND || 'worker-http').toLowerCase(),
   gatewayBase: process.env.SPEEDTEST_BRIDGE_GATEWAY_BASE || 'https://127.0.0.1:8790',
   gatewaySocket: '', // set when gatewayBase = unix:/path (production: gateway has NO TCP port)
@@ -1367,7 +1368,7 @@ const listening = [];
 for (const p of cfg.ports) {
   const server = net.createServer(onConnection);
   server.on('error', (e) => { console.error(`[speedtest-bridge] tcp :${p} error:`, e.message); process.exit(1); });
-  server.listen(p, '::', () => {
+  server.listen(p, cfg.bind, () => {
     listening.push(p);
     console.log(`[speedtest-bridge] tcp+udp ${cfg.ports.map((x) => `:${x}`).join('')} (this :${p}) | backend=${cfg.backend} | gateway=${cfg.gatewayBase}` +
       ` | tls=${tlsMode()} | httpUpstream=${cfg.tlsMux ? cfg.httpUpstream : '-'} | rate=${cfg.connRatePerMin}/min/ip | log=${cfg.log}`);

@@ -1,21 +1,25 @@
 # speedtest-bridge.service — the permanent speedtest-bridge unit.
 #
-# Generated/installed by install.sh (this example shows the production
-# shape; install.sh writes the real unit with resolved paths). The bridge
-# owns the NATIVE OoklaServer port :8080 (TCP + UDP):
+# Generated/installed by the installer core (this example shows the production
+# shape; the core writes the real unit with resolved paths). PORT AUTHORITY:
+# the bridge owns EVERY port listed in OoklaServer.properties
+# (SPEEDTEST_BRIDGE_PORTS / SPEEDTEST_BRIDGE_UDP_PORTS are derived from
+# OoklaServer.tcpPorts / udpPorts — port 8080 mandatory; no port assumption):
 #   - native NetGauge front for unmodified official Ookla clients
 #     (CLI / mobile apps), measurement payload from the Worker pool;
-#   - TLS ClientHello connections are raw-proxied to the hybrid gateway on
-#     loopback (port unification, daemon parity — PROTOCOL_CONTRACT §1),
-#     so :8790 never needs to be public.
-# The OoklaServer daemon itself keeps the other native port :5060.
+#   - TLS is TERMINATED ON THE BRIDGE on every TCP port (daemon parity —
+#     NetGauge inside TLS = the official client's primary path) and HTTP
+#     methods pipe to the gateway over its Unix socket — the gateway has NO
+#     TCP port at all.
+# The OoklaServer daemon unit is parked while the bridge owns the ports
+# (SPEEDTEST_BRIDGE_ENABLED=false re-enables it on ALL properties ports).
 #
 # Auto-start on boot + auto-restart on crash are the whole point of this
 # unit (operator request, 27 Nov 2026): Restart=always + RestartSec=3,
 # enabled via WantedBy=multi-user.target.
 
 [Unit]
-Description=Speedtest Bridge (VPS front for native Ookla clients: NetGauge parity + Worker payload, :8080)
+Description=Speedtest Bridge (VPS front for native Ookla clients: NetGauge parity + Worker payload, ports from OoklaServer.properties)
 Documentation=file:///opt/speedtest-hybrid/speedtest-bridge/README.md
 # Start order: the gateway mints the worker tokens the bridge relays (the
 # bridge tolerates a late gateway: cached token + 5s mint backoff). Requires
@@ -38,8 +42,8 @@ ExecStart=/usr/bin/node /opt/speedtest-hybrid/speedtest-bridge/speedtest-bridge.
 # auto-start after reboot AND auto-restart after any crash/exit
 Restart=always
 RestartSec=3
-# Hardening (same profile as the gateway unit; no capabilities needed —
-# :8080/:5060 are unprivileged ports)
+# Hardening (same profile as the gateway unit; no capabilities needed — the
+# OoklaServer.properties ports are unprivileged ports)
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict

@@ -19,7 +19,7 @@ client produksi bisa aplikasi Ookla mana pun.
 ## Arsitektur
 
 ```
-klien Ookla native (tanpa modifikasi) --NetGauge TCP/UDP--> speedtest-bridge :8080 (VPS)
+klien Ookla native (tanpa modifikasi) --NetGauge TCP/UDP--> speedtest-bridge <SEMUA port properties> (VPS)
   control:  HI/HELLO · GETIP · PING · CAPABILITIES · INITPLOSS/PLOSS · UDP LOSS
             → LOKAL di VPS (paritas semantik daemon, PROTOCOL_CONTRACT.md §2–3)
   download: byte pool ← Worker /__down (chunk 4 MiB, streaming + backpressure NYATA)
@@ -27,23 +27,27 @@ klien Ookla native (tanpa modifikasi) --NetGauge TCP/UDP--> speedtest-bridge :80
   upload:   payload → Worker /__up (POST per-chunk, receipt {bytes:N})
             atau → Worker /ws (frame; ack "OK n <ts>" = receipt)
 
-TLS ClientHello (0x16 0x03 …) di :8080 → TLS DITERMINASI DI BRIDGE
+TLS ClientHello (0x16 0x03 …) di SETIAP port TCP → TLS DITERMINASI DI BRIDGE
             (cert wildcard daemon via LoadCredential) → di dalam TLS dideteksi
             ulang: NetGauge native (jalur UTAMA klien resmi — paritas daemon,
-            PROTOCOL_CONTRACT §1) atau metode HTTP → pipe ke gateway plain
-            loopback (:8791). Metode HTTP plaintext juga → pipe ke :8791.
+            PROTOCOL_CONTRACT §1) atau metode HTTP → pipe ke gateway UNIX
+            SOCKET. Metode HTTP plaintext juga → pipe ke socket itu.
 ```
 
-Tata letak port (hanya port native OoklaServer yang terbuka):
+Tata letak port — **PORT AUTHORITY: `OoklaServer.properties` adalah
+satu-satunya sumber port** (installer TIDAK PERNAH menulis file itu):
 
-| Port | Pemilik | Fungsi |
+| Entitas | Sumber | Fungsi |
 |---|---|---|
-| TCP :8080 | **speedtest-bridge** | front NetGauge (plaintext **dan di dalam TLS**) + mux HTTP → gateway |
-| UDP :8080 | **speedtest-bridge** | loss plane (LOSS/RECV) |
-| TCP :5060 | **OoklaServer daemon** | port native satunya (konfigurasi di `OoklaServer.properties` — TIDAK diubah bridge) |
-| UDP :5060 | **OoklaServer daemon** | loss plane daemon |
-| :8790 | gateway hybrid (TLS) | **loopback saja** (admin + mint; tidak publik) |
-| :8791 | gateway hybrid (plain) | **loopback saja** (upstream pipe HTTP; tidak publik) |
+| TCP <tiap `OoklaServer.tcpPorts`> | **speedtest-bridge** | front NetGauge (plaintext **dan di dalam TLS**) + mux HTTP → gateway; port 8080 WAJIB ada |
+| UDP <tiap `OoklaServer.udpPorts`> | **speedtest-bridge** | loss plane (LOSS/RECV), satu socket per port |
+| `/run/speedtest-hybrid/gateway.sock` | gateway hybrid (Unix socket) | admin (`curl --unix-socket`) + mint + upstream pipe HTTP — **TANPA port TCP** |
+| daemon OoklaServer (`speedtestserver.service`) | di-park saat bridge aktif | front standalone di SEMUA port properties bila `SPEEDTEST_BRIDGE_ENABLED=false` |
+
+- **Jangan berasumsi port 5060 ada**: operator boleh hanya mengisi 1 port
+  (mis. 8080 saja) — maka hanya port itu yang dipakai. 5060 setara 8080 bila
+  tertulis di properties. Jumlah port berapapun, SETIAP port TCP melayani mux
+  penuh paritas daemon.
 
 - Front bridge men-TERMINASI protokol native persis seperti daemon (port
   `NetGaugeEngine.ts` yang sudah diverifikasi): binary-hello→ERROR (memicu
@@ -80,12 +84,15 @@ journalctl -u speedtest-bridge -f
 
 # foreground (debug):
 SPEEDTEST_BRIDGE_BACKEND=worker-http \
-SPEEDTEST_BRIDGE_GATEWAY_BASE=https://127.0.0.1:8790 \
+SPEEDTEST_BRIDGE_GATEWAY_BASE=unix:/run/speedtest-hybrid/gateway.sock \
   node hybrid/speedtest-bridge/speedtest-bridge.mjs \
-  --port 8080 --log /tmp/speedtest-bridge.jsonl
+  --ports 8080,5060 --log /tmp/speedtest-bridge.jsonl
 
 # token tetap (tanpa gateway): SPEEDTEST_BRIDGE_TOKEN=… SPEEDTEST_BRIDGE_WORKER_BASE=https://…
 # backend: SPEEDTEST_BRIDGE_BACKEND=worker-ws|local
+# port: SPEEDTEST_BRIDGE_PORTS=8080,5060 (TCP) + SPEEDTEST_BRIDGE_UDP_PORTS (default=TCP)
+#       — produksi diisi installer dari OoklaServer.properties; --port = satu port
+# bind: SPEEDTEST_BRIDGE_BIND (default '::' dual-stack; self-test installer 127.0.0.1)
 # knob: SPEEDTEST_BRIDGE_HTTP_CHUNK / UL_CHUNK / WS_CHUNK / WS_PACE_MS /
 #       TLS_MUX / TLS_UPSTREAM / TLS_SNIFF_MS / IDLE_MS / MAX_CONN_PER_IP /
 #       CONN_RATE_PER_MIN / MAX_DL_BYTES / MAX_UL_BYTES / VERSION_STRING
@@ -109,16 +116,20 @@ sintetis peniru pola CLI (binary-hello fallback → HI/GETIP/PING/CAP →
 DOWNLOAD/UPLOAD → UDP LOSS), mux TLS (routing + split-ClientHello),
 **terminasi TLS** (NetGauge di dalam TLS = jalur utama klien resmi, HTTP
 dalam TLS → pipe gateway, crash-regression RST saat sniff), rate-limit
-per-IP, plus smoke konkurensi 8 sesi — 236/236.
+per-IP, **port-authority** (multi-port full mux + per-port UDP + gateway
+via Unix socket: mint end-to-end + pipe HTTP), plus smoke konkurensi 8 sesi
+— 250/250.
 
 ## Batasan (jujur)
 
 - **Relay VPS**: byte edge tetap transit link VPS — throughput satu sesi
   tidak bisa melebihi kapasitas VPS; klaim "dilayani VPS + Worker" = asal
   byte di edge, bukan tambahan kapasitas.
-- **Deviasi terdokumentasi**: HTTP (plain/dalam TLS) di :8080 dilayani rute
-  GATEWAY (control plane + front lane), bukan permukaan HTTP legacy daemon
-  (`upload.php`, `randomNxN.jpg`) — permukaan itu tetap di daemon :5060.
+- **Deviasi terdokumentasi**: HTTP (plain/dalam TLS) di port properties
+  dilayani rute GATEWAY (control plane + front lane), bukan permukaan HTTP
+  legacy daemon (`upload.php`, `randomNxN.jpg`) — permukaan itu hanya
+  terjangkau saat daemon jadi front standalone (`SPEEDTEST_BRIDGE_ENABLED=
+  false`).
 - worker-ws: tanpa chunking/pacing → kill `exceededResources` (sudah
   diatasi chunk default 1 MiB).
 - Atribusi: `/__meta` worker per-isolate (bukan agregat) — gunakan

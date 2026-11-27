@@ -1,24 +1,28 @@
 #!/usr/bin/env bash
-# auto-update.sh — daily self-update for the SpeedtestServer stack (v1.5).
+# auto-update.sh — STABLE daily self-update wrapper for the SpeedtestServer
+# stack (v2 — frozen like install.sh; see docs/INSTALL_BOOTSTRAP.md).
 #
-# Installed by install.sh as speedtest-autoupdate.service, triggered daily by
-# speedtest-autoupdate.timer (04:30 + up to 30 min jitter, Persistent=true so
-# missed runs while powered off catch up on boot). Manual run:
+# Installed by the installer as speedtest-autoupdate.service, triggered daily
+# by speedtest-autoupdate.timer (04:30 + up to 30 min jitter, Persistent=true
+# so missed runs while powered off catch up on boot). Manual run:
 #   systemctl start speedtest-autoupdate.service
 #   bash /opt/SpeedtestServer-src/auto-update.sh
 #
-# Flow:
+# FROZEN-UPDATER CONTRACT (modeled on uaeg U-13, operator request 27 Nov):
+# this file contains NO project logic and must NEVER change when the project
+# code changes. Its whole job:
 #   1. flock guard (never two updaters at once)
 #   2. allowlist check: origin must be the official GitHub repo
 #   3. clean-tree guard (untracked .env is fine — it is never committed)
-#   4. git fetch origin <branch>; compare HEAD vs origin/<branch>
-#   5. up to date → log VERSION and exit 0
-#   6. ff-only pull; then reinstall via install.sh --start (idempotent:
-#      OoklaServer.properties/certs preserved, .env drives the hybrid stack,
-#      worker redeploy fingerprint-gated)
-#   7. restart speedtestserver + speedtest-hybrid-gateway so running code
-#      matches the new HEAD (install.sh only starts units, never restarts)
-#   8. post-checks: units active + a health probe
+#   4. git fetch origin <branch>; up to date → log VERSION and exit 0
+#   5. ff-only pull (the fresh tree includes the current installer CORE —
+#      installer/install-core.sh)
+#   6. delegate EVERYTHING else to `install.sh --start`: the FROZEN bootstrap
+#      fetches the LATEST installer core from GitHub and runs it. The core
+#      performs the (re)install, worker redeploy, ALL unit transitions
+#      (bridge enabled / daemon parked / standalone restore) and restarts —
+#      so even an ancient checkout updates with CURRENT logic.
+# A docs-only change skips the reinstall (no service disruption).
 #
 # Safety: never touches /etc/speedtestserver/OoklaServer.properties,
 # certificates, DNS, firewall rules, unrelated services, or .env.
@@ -77,31 +81,13 @@ if [ -z "$CHANGED" ] && [ "$OLD_V" = "$NEW_V" ]; then
   exit 0
 fi
 
-log "reinstalling stack (install.sh --start)…"
+# Delegate the ENTIRE update to the frozen bootstrap → it fetches the LATEST
+# installer core from GitHub (installer/install-core.sh) and runs it. The
+# core is responsible for reinstall + ALL unit transitions + restarts, so
+# this wrapper never needs to know the stack layout of any release.
+log "reinstalling stack via install.sh --start (frozen bootstrap → latest installer core)…"
 if ! bash "$REPO_ROOT/install.sh" --start; then
   die "install.sh failed — services keep their previous state; check the log above"
 fi
 
-log "restarting services to load the new code…"
-systemctl restart speedtestserver || log "WARN: speedtestserver restart failed"
-# SIGPIPE-safe: "systemctl … | grep -q" under "set -euo pipefail" evaluates
-# FALSE on a match (grep -q exits first → systemctl SIGPIPE 141) — the
-# gateway would NEVER be restarted or post-checked after updates.
-if systemctl list-unit-files 2>/dev/null | grep '^speedtest-hybrid-gateway' >/dev/null; then
-  systemctl restart speedtest-hybrid-gateway || log "WARN: hybrid gateway restart failed"
-fi
-# speedtest-bridge (permanent :8080 front) follows the gateway — restart it
-# too so the running bridge matches the freshly pulled sources.
-if systemctl list-unit-files 2>/dev/null | grep '^speedtest-bridge' >/dev/null; then
-  systemctl restart speedtest-bridge || log "WARN: speedtest-bridge restart failed"
-fi
-
-sleep 2
-systemctl is-active --quiet speedtestserver && log "speedtestserver: active" || log "WARN: speedtestserver NOT active"
-if systemctl list-unit-files 2>/dev/null | grep '^speedtest-hybrid-gateway' >/dev/null; then
-  systemctl is-active --quiet speedtest-hybrid-gateway && log "speedtest-hybrid-gateway: active" || log "WARN: speedtest-hybrid-gateway NOT active"
-fi
-if systemctl list-unit-files 2>/dev/null | grep '^speedtest-bridge' >/dev/null; then
-  systemctl is-active --quiet speedtest-bridge && log "speedtest-bridge: active" || log "WARN: speedtest-bridge NOT active"
-fi
-log "update complete: VERSION $NEW_V @ $(git rev-parse --short HEAD)"
+log "update complete: VERSION $NEW_V @ $(git rev-parse --short HEAD) (unit transitions handled by the installer core)"

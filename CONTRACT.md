@@ -4,7 +4,7 @@
 > target proyek, siapa berjalan di mana, tata letak port, cara instalasi,
 > cara menguji dengan aplikasi RESMI Ookla, dan peta reverse engineering.
 > Bahasa: Indonesia; istilah teknis mengikuti repo. Terakhir diperbarui:
-> 27 Nov 2026 (speedtest-bridge permanen + penyatuan port).
+> 27 Nov 2026 (PORT AUTHORITY + installer beku).
 
 ## 1. Target proyek (kalimat pembuka yang tidak boleh berubah)
 
@@ -15,10 +15,15 @@ Menjadi **pengganti mandiri (standalone) OoklaServer** yang:
    menyusul. **Tidak pernah ada komponen yang dipasang di sisi klien.**
 2. berjalan di **VPS + Cloudflare Worker pool** (Free tier): kontrol +
    identitas + loss di VPS, payload pengukuran bisa ber-origin di edge.
-3. membuka **hanya port native OoklaServer** (`8080` + `5060` — dua port
-   yang ditawarkan `OoklaServer.properties` resmi), tidak ada port lain.
-4. terpasang penuh dari **satu file `.env` + satu perintah instalasi**
-   (lihat §5).
+3. membuka **hanya port yang tertulis di `OoklaServer.properties`** — file
+   konfigurasi RESMINYA OoklaServer, **satu-satunya sumber port** proyek
+   (port **8080 wajib** ada di `OoklaServer.tcpPorts`; boleh 1 port, boleh
+   lebih; TIDAK ada asumsi port lain — mis. 5060 — wajib ada). Semua port
+   yang tertulis di situ — dan HANYA port itu — mengikat seluruh
+   infrastruktur proyek ini.
+4. terpasang penuh dari **satu file `.env` + satu perintah instalasi** via
+   **installer beku** yang tidak pernah berubah meski code berubah
+   (lihat §5 dan docs/INSTALL_BOOTSTRAP.md).
 
 ### Label jujur (wajib dipertahankan saat mengutip hasil)
 
@@ -32,9 +37,9 @@ Menjadi **pengganti mandiri (standalone) OoklaServer** yang:
 
 | Komponen | Berjalan di | Fungsi |
 |---|---|---|
-| **speedtest-bridge** (`hybrid/speedtest-bridge/`) | **VPS** — service permanen `speedtest-bridge.service` | front NetGauge :8080 untuk klien native (paritas daemon) + mux TLS; payload ← Worker |
-| **hybrid gateway** (`hybrid/gateway/`) | **VPS** — `speedtest-hybrid-gateway.service`, **loopback :8790** | control plane + front HTTP + mint token + sync pool Worker (watcher .env live) |
-| **daemon OoklaServer** (`reverse-engineered/typescript`) | **VPS** — `speedtestserver.service`, **:5060** | induk proyek; paritas PENUH (termasuk permukaan HTTP/TLS + NetGauge-TLS) di port native satunya |
+| **speedtest-bridge** (`hybrid/speedtest-bridge/`) | **VPS** — service permanen `speedtest-bridge.service` | front untuk klien native di **SEMUA port `OoklaServer.properties`** (TCP+UDP; mux paritas daemon penuh di SETIAP port: TLS diterminasi di bridge + NetGauge di dalam TLS + HTTP lane + loss) + payload ← Worker |
+| **hybrid gateway** (`hybrid/gateway/`) | **VPS** — `speedtest-hybrid-gateway.service`, **UNIX SOCKET `/run/speedtest-hybrid/gateway.sock`** (tanpa port TCP) | control plane + front HTTP + mint token + sync pool Worker (watcher .env live); diakses bridge via socket atau admin via `curl --unix-socket` |
+| **daemon OoklaServer** (`reverse-engineered/typescript`) | **VPS** — `speedtestserver.service`, **DI-PARK saat bridge aktif** | induk proyek + implementasi referensi; front standalone di SEMUA port properties bila `SPEEDTEST_BRIDGE_ENABLED=false` |
 | **Worker pool** (`hybrid/worker/`) | Cloudflare edge (`*.workers.dev`, 1..100) | origin payload `/__down` `/__up` `/ws` (NetGauge WSS) |
 | **Klien** | **mana pun — selalu aplikasi asli Ookla, tanpa modifikasi** | CLI resmi (hari ini), app Android/iOS, web. `hybrid/probe-client/` hanyalah alat bantu pengujian |
 
@@ -42,30 +47,37 @@ Menjadi **pengganti mandiri (standalone) OoklaServer** yang:
 sandbox agent memakai CLI resmi hanya sebagai TESTER (fase reverse
 engineering) dengan hosts-mock — lihat §6.
 
-## 3. Tata letak port (penyatuan port — hanya port native OoklaServer)
+## 3. Tata letak port — PORT AUTHORITY (OoklaServer.properties)
 
-| Port | Pemilik | Protokol yang dilayani |
+**Satu-satunya sumber port TCP/UDP proyek ini adalah file konfigurasi resmi
+OoklaServer**: `/etc/speedtestserver/OoklaServer.properties`
+(`OoklaServer.tcpPorts` / `OoklaServer.udpPorts`). Installer **tidak pernah
+menulis** ke file itu; semua front diturunkan darinya saat runtime:
+
+| Entitas | Sumber | Isi |
 |---|---|---|
-| TCP **:8080** | speedtest-bridge | mux daemon-parity penuh: ClientHello `0x16 0x03…` → **TLS diterminasi di bridge** → NetGauge native DI DALAM TLS (jalur UTAMA klien resmi) atau (metode HTTP di dalam TLS) → pipe ke gateway plain loopback; metode HTTP plaintext → pipe ke gateway plain loopback; lainnya → front NetGauge plaintext |
-| UDP **:8080** | speedtest-bridge | loss plane (LOSS init/loaded + `RECV`) |
-| TCP **:5060** | daemon OoklaServer | NetGauge + HTTP + TLS + WS/WSS (multiplex penuh — paritas daemon asli) |
-| UDP **:5060** | daemon OoklaServer | loss plane daemon |
-| :8790 | gateway (TLS) | **loopback SAJA** (admin lokal + mint token; tidak publik) |
-| :8791 | gateway (plain HTTP) | **loopback SAJA** (upstream pipe HTTP dari bridge; tidak publik) |
+| `SPEEDTEST_BRIDGE_PORTS` | `OoklaServer.tcpPorts` | daftar port TCP — **bridge mengikat SEMUA-nya**, setiap port = mux paritas daemon penuh |
+| `SPEEDTEST_BRIDGE_UDP_PORTS` | `OoklaServer.udpPorts` (default = tcpPorts) | daftar port UDP — plane loss, satu socket per port |
+| Port 8080 | **WAJIB** anggota tcpPorts | bila tidak ada → installer MENOLAK dengan pesan jelas (tidak pernah menambah port sendiri) |
+| Gateway | Unix socket `/run/speedtest-hybrid/gateway.sock` | **TANPA port TCP sama sekali** (dihubungi bridge + admin `curl --unix-socket`) |
+| Daemon | unit di-park saat bridge aktif | aktif lagi di SEMUA port properties bila bridge dimatikan |
 
-- Deteksi per-koneksi by first-byte di :8080 adalah **paritas daemon**
-  (PROTOCOL_CONTRACT §1 [V]: "One TCP port multiplexes everything"), bukan
-  hack — daemon asli melakukan hal yang sama, termasuk **TLS diterminasi lalu
-  dideteksi ulang di dalamnya** (NetGauge-in-TLS = jalur UTAMA klien resmi;
-  tanpa ini klien resmi gagal "Latency test failed" — pelajaran 27 Nov).
-- Port daemon dikonfigurasi **di `OoklaServer.properties`** (file config
-  resminya OoklaServer — satu-satunya tempat). `install.sh` menyempitkannya
-  ke `5060` saat bridge aktif, dengan backup bertanda-waktu;
-  `SPEEDTEST_BRIDGE_ENABLED=false` memulihkan `5060,8080` + melepas unit.
-- Deviasi terdokumentasi: HTTP (plain maupun dalam TLS) di :8080 dilayani
-  **rute gateway** (control plane + front lane), BUKAN permukaan HTTP legacy
-  daemon (`upload.php`, `randomNxN.jpg`, dsb.) — permukaan legacy penuh
-  tetap dilayani daemon :5060. Guard abuse (rate per-IP) di bridge.
+Aturan:
+
+- **Jangan berasumsi port 5060 ada** — operator mungkin hanya mengisi 1 port
+  (mis. hanya 8080); maka hanya port itu yang dipakai. 5060 setara 8080
+  **bila** tertulis di properties.
+- **Tidak ada port lain** yang dipakai proyek ini di luar daftar properties
+  (port self-test installer bersifat transien, loopback, mati dalam
+  hitungan detik).
+- Deteksi per-koneksi by first-byte di SETIAP port TCP adalah **paritas
+  daemon** (PROTOCOL_CONTRACT §1 [V]: "One TCP port multiplexes
+  everything"), termasuk **TLS diterminasi lalu dideteksi ulang di
+  dalamnya** (NetGauge-in-TLS = jalur UTAMA klien resmi; tanpa ini klien
+  resmi gagal "Latency test failed" — pelajaran 27 Nov).
+- HTTP (plain maupun di dalam TLS) di port properties dilayani **rute
+  gateway** (control plane + front lane) melalui pipe Unix socket. Guard
+  abuse (rate per-IP) di bridge.
 
 ## 4. speedtest-bridge — kontrak runtime
 
@@ -85,11 +97,12 @@ engineering) dengan hosts-mock — lihat §6.
   (append; rollover 64 MiB → `.old`). Kunci atribusi: `bytesFromWorkerDl`,
   `bytesToWorkerUl`, `workerReceipts`, per-event `dl_done`/`ul_done`,
   `tls_proxy_*`.
-- Uji: `bash hybrid/speedtest-bridge/test/run-tests.sh` — **236/236**
+- Uji: `bash hybrid/speedtest-bridge/test/run-tests.sh` — **250/250**
   (paritas protokol 3 backend + mux TLS routing + **terminasi TLS: NetGauge
-  di dalam TLS** + crash-regression RST saat sniff + rate-limit + konkurensi).
+  di dalam TLS** + crash-regression RST saat sniff + rate-limit + konkurensi
+  + **port-authority: multi-port full mux + gateway via Unix socket**).
 
-## 5. Instalasi — `.env` dulu, lalu satu perintah
+## 5. Instalasi — `.env` dulu, lalu satu perintah (installer BEKU)
 
 ```bash
 git clone https://github.com/smahud/SpeedtestServer.git && cd SpeedtestServer
@@ -99,19 +112,33 @@ nano .env        # isi bagian [WAJIB] saja (kredensial CF + account id);
 sudo ./install.sh --start
 ```
 
+- **`install.sh` adalah bootstrap BEKU** (pola uaeg U-13): file itu tidak
+  pernah berubah meski code berubah banyak — setiap eksekusi mengambil
+  **installer core terbaru** dari GitHub (`installer/install-core.sh`, ref
+  default `master`) dan menjalankannya. Checkout/`install.sh` LAWAS tetap
+  selalu memasang dengan logika TERKINI. Kontrak lengkap:
+  **docs/INSTALL_BOOTSTRAP.md**.
 - **Urutan `.env`**: variabel **[WAJIB] di urutan paling atas**
   (kredensial Cloudflare, Account ID, jumlah worker, shared secret bisa
   dikosongkan → auto-generate). **Config tambahan dengan default ada di
-  bawah** (mode, port, bridge, guard, knob) — user cukup edit bila perlu.
-- `install.sh` memasang SEMUA: daemon + gateway (loopback) + **speedtest-
-  bridge** + deploy pool Worker (REST, fingerprint-gated) + auto-update
-  timer harian + verifikasi probe tiap komponen. Aman diulang (idempoten;
-  konfigurasi/sertifikat/.env dipertahankan).
+  bawah** (mode, bridge, guard, knob) — user cukup edit bila perlu. **Port
+  TIDAK diatur dari `.env`** — satu-satunya sumber port adalah
+  `OoklaServer.properties` (§3).
+- Installer core memasang SEMUA: daemon + gateway (Unix socket) +
+  **speedtest-bridge** (SEMUA port properties) + deploy pool Worker (REST,
+  fingerprint-gated) + auto-update timer harian + verifikasi probe tiap
+  komponen. Aman diulang (idempoten; konfigurasi/sertifikat/.env
+  dipertahankan; properties TIDAK PERNAH ditulis).
 - Yang berlaku ON-THE-FLY (gateway watcher .env): jumlah worker, lane
   share, front limits, kredensial, shared secret. Kunci `SPEEDTEST_BRIDGE_*`:
   `systemctl restart speedtest-bridge` (atau jalankan ulang install.sh).
-- Pulihkan mode lama (daemon pegang 8080+5060, gateway publik :8790):
-  set `SPEEDTEST_BRIDGE_ENABLED=false` lalu jalankan ulang `install.sh --start`.
+- Ganti port: edit `OoklaServer.properties` (tcpPorts/udpPorts; 8080 wajib
+  ada) lalu jalankan ulang `install.sh --start` — bridge mengikat ulang
+  SEMUA port baru, tanpa port lain dipakai.
+- Mode standalone daemon (bridge dilepas; daemon pegang SEMUA port
+  properties): set `SPEEDTEST_BRIDGE_ENABLED=false` lalu jalankan ulang
+  `install.sh --start` — properties TIDAK pernah disentuh, jadi tidak ada
+  yang perlu dipulihkan.
 
 ## 6. Metode uji klien RESMI (mock IP) — ringkas
 
@@ -135,7 +162,8 @@ tervalidasi 27 Nov 2026). Prinsip yang tidak boleh dilanggar:
    restore → verifikasi** (via UAEG MCP; kredensial di luar repo).
 
 Kini mode bridge sudah PERMANEN (tidak perlu window eksperimen/manual):
-CLI resmi + hosts-mock langsung dilayani `speedtest-bridge :8080`.
+CLI resmi + hosts-mock langsung dilayani `speedtest-bridge` di SEMUA port
+`OoklaServer.properties`.
 
 ## 7. Peta reverse engineering (di mana ilmunya)
 
@@ -147,6 +175,7 @@ CLI resmi + hosts-mock langsung dilayani `speedtest-bridge :8080`.
 | Semantik Worker `/__down` `/__up` `/ws` + cap 128 MiB + `?pace=` | `hybrid/worker/` (suite conformance/token/free-hardening/pool) |
 | Audit jalur edge langsung (verdict BLOCKED) | `audit/historical-native-worker-2026-11-27` (branch) |
 | Eksperimen bridge asli + kronologi perbaikan | `docs/CLI_BRIDGE_REPORT_2026-11-27.md` + `hybrid/lab/evidence/cli-bridge-2026-11-27/` |
+| Kontrak installer beku (bootstrap ↔ core ↔ updater) | `docs/INSTALL_BOOTSTRAP.md` |
 | Perbandingan hasil VPS murni vs VPS+Worker | `Result_Comparison.md` |
 
 ## 8. Kontribusi & kualitas (aturan main agent)
@@ -154,7 +183,7 @@ CLI resmi + hosts-mock langsung dilayani `speedtest-bridge :8080`.
 1. **Commit + push ke GitHub setiap unit pekerjaan selesai** — sesi bisa
    putus; agent berikutnya melanjutkan dari repo, bukan dari memori.
 2. Tes wajib hijau sebelum push: `hybrid/speedtest-bridge/test/run-tests.sh`
-   (225), suite gateway/worker, build TS.
+   (250), suite gateway/worker, build TS.
 3. Klaim hasil selalu 3-sisi + label jujur (§1). Angka tanpa bukti 3 sisi
    bukan bukti.
 4. Produksi hanya disentuh dengan alur §6.6 (push → pull → deploy → uji →
