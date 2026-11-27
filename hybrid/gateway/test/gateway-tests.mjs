@@ -31,6 +31,9 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import http from 'node:http';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 const GATEWAY = new URL('../src/gateway.mjs', import.meta.url).pathname;
 
@@ -95,6 +98,21 @@ function req(port, method, path, { body, headers } = {}) {
 
 let nextPort = 18230;
 const freePort = () => nextPort++;
+
+/** HTTP request over a UNIX domain socket (the production wiring — the
+ * gateway has NO TCP port; the bridge mints and pipes over this socket). */
+function reqSocket(sockPath, method, reqPath, { body, headers } = {}) {
+  return new Promise((resolve, reject) => {
+    const r = http.request({ socketPath: sockPath, method, path: reqPath, headers: { ...headers } }, (res) => {
+      const chunks = [];
+      res.on('data', (c) => chunks.push(c));
+      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks).toString() }));
+    });
+    r.on('error', (e) => resolve({ status: 0, error: String(e) }));
+    if (body !== undefined) r.write(body);
+    r.end();
+  });
+}
 
 const SECRET = 'testsecret-abc123';
 
@@ -678,4 +696,34 @@ test('T19: rest-deploy — name mapping, form shape, auth headers, listPool filt
   });
   const pool = await mod.listPool(ctxList);
   assert.deepEqual(pool.map((w) => w.id), [1, 2, 10]);
+});
+
+test('T20: PORT AUTHORITY — socket mode: gateway serves over a UNIX socket, NO TCP listener', async () => {
+  const sockPath = path.join(os.tmpdir(), `gw-sock-test-${process.pid}.sock`);
+  const g = spawnNode({
+    HYBRID_SHARED_SECRET: SECRET,
+    HYBRID_FRONT_ENABLED: 'false',
+    HYBRID_GATEWAY_SOCKET: sockPath,
+  }, 0);
+  try {
+    await g.waitReady();
+    const startedLine = g.logs.join('').split('\n').filter((l) => l.includes('gateway_started')).pop();
+    const meta = JSON.parse(startedLine);
+    assert.equal(meta.socketMode, true, 'gateway_started must announce socketMode');
+    assert.equal(meta.socket, sockPath);
+    // health + mint over the socket (the bridge's production path)
+    const health = await reqSocket(sockPath, 'GET', '/api/health');
+    assert.equal(health.status, 200);
+    const h = JSON.parse(health.body);
+    assert.equal(h.config.socket, sockPath);
+    const mint = await reqSocket(sockPath, 'POST', '/api/sessions', { body: '{}' });
+    assert.equal(mint.status, 200);
+    assert.ok(JSON.parse(mint.body).token, 'mint works over the socket');
+    // the socket file itself is mode 0660 (permission boundary)
+    const mode = (fs.statSync(sockPath).mode & 0o777).toString(8);
+    assert.equal(mode, '660', `socket mode 0660 (got 0${mode})`);
+  } finally {
+    await g.stop();
+    try { fs.unlinkSync(sockPath); } catch {}
+  }
 });

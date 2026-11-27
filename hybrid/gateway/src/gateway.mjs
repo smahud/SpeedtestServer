@@ -37,6 +37,7 @@
 import http from 'node:http';
 import https from 'node:https';
 import fs from 'node:fs';
+import path from 'node:path';
 import crypto from 'node:crypto';
 import { createFront } from './front.mjs';
 import { createWorkerPool, createRateLimiter } from './workerpool.mjs';
@@ -45,6 +46,15 @@ import { createWorkerSync } from './workersync.mjs';
 
 const PORT = Number(process.env.HYBRID_GATEWAY_PORT || 8090);
 const BIND = process.env.HYBRID_GATEWAY_BIND || '127.0.0.1';
+// PORT AUTHORITY (operator contract, 27 Nov): in production the gateway has
+// NO TCP port at all — it listens on a UNIX domain socket
+// (HYBRID_GATEWAY_SOCKET, default /run/speedtest-hybrid/gateway.sock). The
+// only TCP/UDP ports of the whole project are the native OoklaServer ports
+// from OoklaServer.properties (8080 mandatory), served by the speedtest-
+// bridge front; the bridge reaches this gateway over the socket (mint +
+// HTTP lane). Socket mode = plain HTTP (filesystem permissions are the
+// access boundary — 0660 root:<service-group>); TCP mode stays for lab/tests.
+const SOCKET = process.env.HYBRID_GATEWAY_SOCKET || '';
 const TLS_CERT = process.env.HYBRID_GATEWAY_TLS_CERT || '';
 const TLS_KEY = process.env.HYBRID_GATEWAY_TLS_KEY || '';
 // v1.6: optional SECOND, plain-HTTP, LOOPBACK-ONLY listener (default 8791) —
@@ -465,18 +475,22 @@ const requestHandler = async (req, res) => {
         lastChangeKeys: RT.state.lastChangeKeys,
         lastError: RT.state.lastError,
       },
-      config: { workerBase: cfg.workerBase || WORKER_BASE_FALLBACK, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: cfg.tokenTtlMs, tokenBindIp: cfg.tokenBindIp, discoveryFallback: DISCOVERY_FALLBACK, tls: Boolean(TLS_CERT), resultsDedupMs: RESULTS_DEDUP_MS, secretConfigured: Boolean(cfg.secret), sessionsRateLimitMpm: cfg.sessionsRateLimitMpm },
+      config: { workerBase: cfg.workerBase || WORKER_BASE_FALLBACK, vpsBase: VPS_BASE, stsBase: STS_BASE, tokenTtlMs: cfg.tokenTtlMs, tokenBindIp: cfg.tokenBindIp, discoveryFallback: DISCOVERY_FALLBACK, socket: SOCKET || null, tls: Boolean(TLS_CERT) && !SOCKET, resultsDedupMs: RESULTS_DEDUP_MS, secretConfigured: Boolean(cfg.secret), sessionsRateLimitMpm: cfg.sessionsRateLimitMpm },
     });
   }
 
   return json(res, 404, { error: 'not found', path });
 };
 
-if (TLS_CERT) {
+if (TLS_CERT && !SOCKET) {
   if (!TLS_KEY) {
     console.error(JSON.stringify({ kind: 'gateway_error', error: 'HYBRID_GATEWAY_TLS_CERT set without HYBRID_GATEWAY_TLS_KEY' }));
     process.exit(2);
   }
+} else if (TLS_CERT && SOCKET) {
+  // Socket mode: plain HTTP over the socket (filesystem permissions are the
+  // boundary) — TLS material is not used.
+  console.error(JSON.stringify({ kind: 'gateway_note', note: 'HYBRID_GATEWAY_SOCKET set — TLS_CERT/KEY ignored (plain HTTP on the socket)' }));
 }
 const safeHandler = (req, res) => {
   // BUG FIX (kept, process crash): Node does NOT catch rejections returned by
@@ -493,7 +507,7 @@ const safeHandler = (req, res) => {
   });
 };
 
-const listener = TLS_CERT
+const listener = TLS_CERT && !SOCKET
   ? https.createServer(
       { cert: fs.readFileSync(TLS_CERT), key: fs.readFileSync(TLS_KEY), minVersion: 'TLSv1.2' },
       safeHandler,
@@ -503,7 +517,7 @@ const listener = TLS_CERT
 // BUG FIX (kept): an EADDRINUSE/EACCES on listen surfaced as an unhandled
 // 'error' event → hard crash → systemd restart loop. Fail loudly ONCE.
 listener.on('error', (e) => {
-  console.error(JSON.stringify({ kind: 'gateway_error', error: String(e && e.code ? e.code : e).slice(0, 200), syscall: e && e.syscall, port: PORT, bind: BIND }));
+  console.error(JSON.stringify({ kind: 'gateway_error', error: String(e && e.code ? e.code : e).slice(0, 200), syscall: e && e.syscall, socket: SOCKET || null, port: PORT, bind: BIND }));
   process.exit(1);
 });
 
@@ -540,37 +554,81 @@ if (cfg.envFile || cfg.workerSyncIntervalMs > 0) {
     .catch((e) => log('worker_sync_initial_error', { error: String(e).slice(0, 160) }));
 }
 
-listener.listen(PORT, BIND, () => {
-  console.log(JSON.stringify({
-    kind: 'gateway_started',
-    version: readVersion(),
-    server: 'hybrid-gateway/1.5',
-    port: PORT,
-    bind: BIND,
-    tls: Boolean(TLS_CERT),
-    plainPort: PLAIN_PORT || null,
-    mode: cfg.frontEnabled ? (edgeAvailable() ? 'hybrid' : 'vps-only') : 'control-only',
-    deployTarget: RT.deployTarget(),
-    front: cfg.frontEnabled,
-    frontRateLimitMpm: cfg.frontRateLimitMpm,
-    frontTokenCacheMs: cfg.frontTokenCacheMs,
-    vpsDlShare: cfg.vpsDlShare,
-    workerBase: cfg.workerBase || WORKER_BASE_FALLBACK,
-    workerPoolMax: pool.poolMax,
-    vpsBase: VPS_BASE,
-    stsBase: STS_BASE,
-    tokenTtlMs: cfg.tokenTtlMs,
-    tokenBindIp: cfg.tokenBindIp,
-    discoveryFallback: DISCOVERY_FALLBACK,
-    envFile: cfg.envFile || null,
-    secretConfigured: Boolean(cfg.secret),
-  }));
-});
+if (SOCKET) {
+  // SOCKET MODE (production): no TCP listener at all. A stale socket file
+  // from a previous crash would block listen (EADDRINUSE) — unlink first
+  // (only a real socket/sidecar file; never follow into other paths), then
+  // listen and restrict the socket to 0660 (owner+group; the gateway user
+  // and the bridge share the group).
+  try {
+    const st = fs.statSync(SOCKET);
+    if (st.isSocket()) fs.unlinkSync(SOCKET);
+    else {
+      console.error(JSON.stringify({ kind: 'gateway_error', error: `HYBRID_GATEWAY_SOCKET exists and is not a socket: ${SOCKET}` }));
+      process.exit(1);
+    }
+  } catch { /* not present — fresh start */ }
+  fs.mkdirSync(path.dirname(SOCKET), { recursive: true });
+  listener.listen(SOCKET, () => {
+    try { fs.chmodSync(SOCKET, 0o660); } catch { /* best effort */ }
+    console.log(JSON.stringify({
+      kind: 'gateway_started',
+      version: readVersion(),
+      server: 'hybrid-gateway/1.5',
+      socket: SOCKET,
+      socketMode: true,
+      mode: cfg.frontEnabled ? (edgeAvailable() ? 'hybrid' : 'vps-only') : 'control-only',
+      deployTarget: RT.deployTarget(),
+      front: cfg.frontEnabled,
+      frontRateLimitMpm: cfg.frontRateLimitMpm,
+      frontTokenCacheMs: cfg.frontTokenCacheMs,
+      vpsDlShare: cfg.vpsDlShare,
+      workerBase: cfg.workerBase || WORKER_BASE_FALLBACK,
+      workerPoolMax: pool.poolMax,
+      vpsBase: VPS_BASE,
+      stsBase: STS_BASE,
+      tokenTtlMs: cfg.tokenTtlMs,
+      tokenBindIp: cfg.tokenBindIp,
+      discoveryFallback: DISCOVERY_FALLBACK,
+      envFile: cfg.envFile || null,
+      secretConfigured: Boolean(cfg.secret),
+    }));
+  });
+} else {
+  listener.listen(PORT, BIND, () => {
+    console.log(JSON.stringify({
+      kind: 'gateway_started',
+      version: readVersion(),
+      server: 'hybrid-gateway/1.5',
+      port: PORT,
+      bind: BIND,
+      tls: Boolean(TLS_CERT),
+      plainPort: PLAIN_PORT || null,
+      mode: cfg.frontEnabled ? (edgeAvailable() ? 'hybrid' : 'vps-only') : 'control-only',
+      deployTarget: RT.deployTarget(),
+      front: cfg.frontEnabled,
+      frontRateLimitMpm: cfg.frontRateLimitMpm,
+      frontTokenCacheMs: cfg.frontTokenCacheMs,
+      vpsDlShare: cfg.vpsDlShare,
+      workerBase: cfg.workerBase || WORKER_BASE_FALLBACK,
+      workerPoolMax: pool.poolMax,
+      vpsBase: VPS_BASE,
+      stsBase: STS_BASE,
+      tokenTtlMs: cfg.tokenTtlMs,
+      tokenBindIp: cfg.tokenBindIp,
+      discoveryFallback: DISCOVERY_FALLBACK,
+      envFile: cfg.envFile || null,
+      secretConfigured: Boolean(cfg.secret),
+    }));
+  });
+}
 
 // v1.6: plain-HTTP loopback listener for the speedtest-bridge TLS mux (the
 // bridge terminates TLS on :8080 and pipes the decrypted HTTP lane here).
 // Same handler as the main listener; bind address is FIXED to loopback.
-if (PLAIN_PORT > 0) {
+// NOT used in socket mode (production): the bridge pipes the HTTP lane to
+// the SAME gateway socket — no second listener needed.
+if (!SOCKET && PLAIN_PORT > 0) {
   const plainListener = http.createServer(safeHandler);
   plainListener.on('error', (e) => {
     console.error(JSON.stringify({ kind: 'gateway_error', listener: 'plain', error: String(e && e.code ? e.code : e).slice(0, 200), port: PLAIN_PORT, bind: '127.0.0.1' }));
