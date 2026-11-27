@@ -110,21 +110,27 @@ Dua temuan jaringan penting selama PoC (sudah diimplementasi di kode):
   **wajib** meng-echo ACAH (bug kedua — tanpa ini stage upload mati
   sebelum mengirim byte).
 
-## 4. Verifikasi produksi (alur deploy — status saat dokumen dibuat)
+## 4. Verifikasi produksi (VPS asli 45.126.249.250 — 27 Nov, post-deploy 1.7.0)
 
-Flow produksi: **push GitHub → VPS `git pull` → deploy via UAEG → uji →
-verifikasi** (kontrak §6.6). Setelah deploy produksi, uji ulang E2E dari
-sandbox ke VPS asli `45.126.249.250` (host ter-publish 66281 di-mock via
-`--host-resolver-rules` `MOCK_IP=45.126.249.250`) — checklist atribusi 3 sisi:
+Deploy: push `f094541` → VPS `git pull` → `install.sh --start` (VERSION
+1.7.0; bridge `backend: local`; worker produksi ter-redeploy dengan
+permukaan `ooklaXhr`) → `SPEEDTEST_BRIDGE_BACKEND=local` + restart bridge.
 
-- gateway JSONL: event `web_download_redirect` / `web_upload_redirect`
-  (lane=edge) + counter `webDownRedirects`/`webUlRedirects` di `/api/health`;
-- Worker: event `xhr_dl`/`xhr_ul` (guid cocok, `wrangler tail`/observability);
-- browser: per-host byte accounting (payload harus ~100% ke `*.workers.dev`).
+E2E dari sandbox (metode §6-C, host 66281 → 45.126.249.250, halaman
+speedtest.net asli):
 
-*(Tabel hasil run produksi diperbarui di bagian ini setelah kampanye —
-format sama dengan §3. Status: deploy + kampanye = langkah berikutnya
-setelah push commit ini; jangan mengutip angka produksi sebelum terisi.)*
+| Bukti | Nilai |
+|---|---|
+| Worker produksi melayani DL | **458.046.142 byte (458 MB)** di 52 response — semuanya via 307 dari VPS; `redirects_followed=52` |
+| VPS (host mock) | 300 request control, **total 1.865 byte** respons body (hello/ping/pong/307) — **0 byte payload** |
+| Run | selesai penuh + `POST /api/results.php` (payload 10.637 byte terkirim) |
+| Perbaikan lapangan | gateway produksi awalnya `webws_unavailable` (ws tidak ter-ship ke $HYBRID_PREFIX) → SDK fallback XHR ping (run tetap selesai); FIXED: ws di-copy ke `/opt/speedtest-hybrid/gateway/node_modules` + installer kini selalu menship ws (commit ini) → upgrade **101 Switching Protocols** terverifikasi via Unix socket |
+
+Catatan: angka DL/UL final run produksi (payload hasil resmi) dicatat dari
+`results.php` capture; atribusi byte di atas adalah sisi browser +
+`web_download_redirect`/`web_upload_redirect` di JSONL gateway (cek
+`/api/health` counter `webDownRedirects`/`webUlRedirects`) + event `xhr_dl`
+/`xhr_ul` worker (guid cocok).
 
 ## 5. Keputusan desain + batasan jujur
 

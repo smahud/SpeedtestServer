@@ -559,6 +559,22 @@ if [ "$NO_HYBRID" = 0 ] && [ "$AS_ROOT" = 1 ]; then
   rm -rf "$HYBRID_PREFIX/src"   # purge the broken v1.5.0 flat layout
   rsync -a "$REPO_ROOT/hybrid/gateway/src/" "$HYBRID_PREFIX/gateway/src/"
   rsync -a "$REPO_ROOT/hybrid/README.md" "$HYBRID_PREFIX/README.md" 2>/dev/null || true
+  # DIRECT LANE (27 Nov): the gateway's WSS control engine (webws.mjs) needs
+  # the `ws` package. Ship it from the daemon's production node_modules (the
+  # same tree $PREFIX/node_modules is built from) into the gateway's module
+  # resolution path. Without it the gateway stays alive but logs
+  # `webws_unavailable` and the web client falls back to XHR pings.
+  if [ -d "$TS_DIR/node_modules_prod/ws" ] || [ -d "$PREFIX/node_modules/ws" ]; then
+    mkdir -p "$HYBRID_PREFIX/gateway/node_modules"
+    WS_SRC="$PREFIX/node_modules/ws"
+    [ -d "$WS_SRC" ] || WS_SRC="$TS_DIR/node_modules_prod/ws"
+    rm -rf "$HYBRID_PREFIX/gateway/node_modules/ws"
+    cp -r "$WS_SRC" "$HYBRID_PREFIX/gateway/node_modules/ws"
+    chown -R "$HYBRID_USER:$HYBRID_USER" "$HYBRID_PREFIX/gateway/node_modules" 2>/dev/null || true
+    say "  gateway runtime dep: ws shipped (WSS control lane)"
+  else
+    say "  WARN: ws package not found for the gateway — WSS lane will log webws_unavailable"
+  fi
   # Worker deploy toolchain + REST module (synced fully — incl. dist/ — in the
   # worker phase below, after the bundle is built).
   rsync -a --delete \
