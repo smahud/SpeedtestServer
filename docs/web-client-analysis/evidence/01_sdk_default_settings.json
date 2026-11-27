@@ -1,0 +1,88 @@
+{
+  "_source": "index-CUbMX1WR.js (r.cdnst.net) — speedtestJsEngine bundle, SDK 3.1.3, diekstrak dari minified bundle 2026-11-26",
+  "_note": "Override runtime: window.ENV (ENV==='test' memakai ws://localhost:8080). Browsers: firefox->download xhr; edge->upload {numInitialConnections:1, ws}. shortTests: latency 3 sampel, download/upload 3 detik.",
+  "saveResults": true,
+  "engineElementSelector": "#engine",
+  "engine": "js",
+  "host": "ws://sea.speedtest.net:8889/ws",
+  "ipv6AddressQueryUrl": "https://ipv6-api.speedtest.net/getip",
+  "vpnDetected": false,
+  "automaticStageProgression": true,
+  "logErrorsToServer": false,
+  "api": { "baseUrl": "http://www.speedtest.net" },
+  "stagesList": ["latency", "download", "upload", "save"],
+  "sampling": {
+    "numInitialConnections": 1,
+    "maxConnections": 1,
+    "maxConnectionsPerServer": 1,
+    "connectionScalingBandwidthThreshold": 750000,
+    "connectionSoftTimeoutMillis": 3000,
+    "connectionHardTimeoutMillis": 20000,
+    "connectionHardTimeoutMillisFirstPing": 10000,
+    "maintenanceIntervalMillis": 500,
+    "connectionProtocol": "ws",
+    "connectionStrategies": { "default": "single-server" }
+  },
+  "serverSelection": { "numSamples": 5, "maxFailedConnections": 1, "maxAttempts": 1 },
+  "latency": { "numSamples": 10, "maxFailedConnections": 3, "maxServers": 10 },
+  "loadedLatency": {
+    "enabled": false,
+    "hasReservedConnection": false,
+    "numSamples": 1000,
+    "maxFailedConnections": 3,
+    "maxServers": 10,
+    "aggregateIntervalMillis": 500,
+    "maxXhrConnections": 6
+  },
+  "throughput": {
+    "connectionProtocol": "xhr",
+    "durationSeconds": 15,
+    "progressIntervalMillis": 50,
+    "maxTimeoutConnectionsPercent": 100,
+    "messageTimeoutMillis": 10000,
+    "numInitialConnections": 4,
+    "maxConnections": 32,
+    "maxConnectionsPerServer": 32,
+    "messageLengthMillis": 1000,
+    "startMessageSizeBytes": 100000,
+    "minMessageSizeBytes": 50000,
+    "maxMessageSizeBytes": 1000000,
+    "messageSizeMultiplier": 1
+  },
+  "download": {
+    "bufferLengthMillis": 3000,
+    "reportConnectionStats": true,
+    "connectionStrategies": { "default": { "type": "round-robin", "numServers": 4 } }
+  },
+  "upload": { "bufferLengthMillis": 1000 },
+  "connectionProtocols": {
+    "xhr": {
+      "responseType": "arraybuffer",
+      "throughput": { "maxConnections": 6, "maxConnectionsPerServer": 6 },
+      "upload": {
+        "maxMessageSizeBytes": 10000000,
+        "withRemoteStats": {
+          "startMessageSizeBytes": 25000000,
+          "minMessageSizeBytes": 25000000,
+          "maxMessageSizeBytes": 25000000,
+          "messageLengthMillis": 5000
+        }
+      },
+      "download": {
+        "maxConnections": 24,
+        "startMessageSizeBytes": 25000000,
+        "minMessageSizeBytes": 25000000,
+        "maxMessageSizeBytes": 250000000,
+        "messageLengthMillis": 5000
+      }
+    },
+    "ws": { "upload": { "maxMessageSizeBytes": 130000 } }
+  },
+  "jsEngine": {
+    "savePath": "/api/results.php",
+    "saveType": "st4-js",
+    "saveContentType": "application/json"
+  },
+  "maxSupplementalSaveDataBytes": 1000,
+  "shortTestsOverride": { "latency": { "numSamples": 3 }, "download": { "durationSeconds": 3 }, "upload": { "durationSeconds": 3 } }
+}

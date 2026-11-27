@@ -36,7 +36,7 @@ import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import { Duplex } from 'node:stream';
 import { WebSocketServer, WebSocket } from 'ws';
-import { NetGaugeEngine, LossRegistry, NetGaugeSessionHooks } from './NetGaugeEngine';
+import { NetGaugeEngine, LossRegistry, NetGaugeSessionHooks, UploadSessionRegistry } from './NetGaugeEngine';
 import { UdpLossEngine } from './UdpLossEngine';
 import { createRequestHandler, isHttpHead } from './HttpApi';
 
@@ -153,6 +153,10 @@ export class ServerCore {
   /** Certificate host info (mutable: refreshed by reloadTls). */
   public readonly hostInfo: TlsHostInfo;
   private loss = new LossRegistry();
+  /** Per-run-GUID upload accounting shared by ALL transports (XHR upload
+   *  bodies via "?guid=", WS raw upload frames, CLI UPLOAD payloads) — the
+   *  web client's UPLOAD_STATS stream reads from it (verified 2026-11-27). */
+  private uploadSessions = new UploadSessionRegistry();
   private pool = generateAsciiPool(2 * 1024 * 1024); // 2 MiB ASCII pool (daemon parity)
   private instanceUuid = crypto.randomUUID(); // LOWER-CASE (daemon parity, F-8)
   private startedAt = Date.now();
@@ -214,6 +218,7 @@ export class ServerCore {
       allowedDomains: opts.allowedDomains,
       excludeDefaultDomains: opts.excludeDefaultDomains,
       userAgentFilterEnabled: opts.userAgentFilterEnabled === true,
+      uploadSessions: this.uploadSessions,
       onEvent: (k, d) => {
         this.counters.httpRequests++;
         this.ev(k, d);
@@ -777,6 +782,7 @@ export class ServerCore {
       startedAt: this.startedAt,
       quitMode: 'close',
       errorStrikeLimit: 3, // verified F-24: TCP "three strikes" closes the connection
+      uploadSessions: this.uploadSessions,
     });
     stream.on('data', (c: Buffer) => {
       connStats.bytesUp += c.length;
@@ -898,10 +904,13 @@ export class ServerCore {
       writeLine: (line, noNewline) => {
         connStats.bytesDown += line.length + 1;
         this.counters.bytesDown += line.length + 1;
-        // Observed daemon quirk (2026-11-03 z.ai capture, re-verified in our
-        // lab): over WS the HELLO reply carries no trailing newline; other
-        // replies do.
-        const payload = line.startsWith('HELLO ') || noNewline ? line : line + '\n';
+        // Observed daemon quirk (production-verified 2026-11-27 on OoklaServer
+        // 2.11.5 & 2.11.7 + captured real web runs): over WS the HELLO and
+        // CAPABILITIES replies carry NO trailing newline; YOURIP, PONG, OK and
+        // the UPLOAD_STATS JSON lines do. The web client parses HELLO and
+        // CAPABILITIES with `$`-anchored regexes that do NOT match a trailing
+        // newline — this quirk is load-bearing for the web client.
+        const payload = line.startsWith('HELLO ') || line.startsWith('CAPABILITIES ') || noNewline ? line : line + '\n';
         return send(payload);
       },
       peerIp: () => peerIp,
@@ -919,11 +928,25 @@ export class ServerCore {
       startedAt: this.startedAt,
       quitMode: 'error', // verified F-14: QUIT over WS answers ERROR (no close)
       errorStrikeLimit: 0, // verified F-24: the "three strikes" rule does NOT apply over WebSocket
+      transport: 'ws', // WS-specific daemon quirks (DOWNLOAD 0 → ERROR, raw upload frames)
+      uploadSessions: this.uploadSessions,
     });
     ws.on('message', (data: Buffer, isBinary: boolean) => {
       const buf = isBinary ? data : Buffer.from(data.toString('utf8'), 'utf8');
       connStats.bytesUp += buf.length;
       this.counters.bytesUp += buf.length;
+      // RAW UPLOAD FRAME (verified 2026-11-27, production 2.11.5/2.11.7): a
+      // WS frame whose first 7 bytes are the ASCII prefix "UPLOAD " is upload
+      // DATA counted by its full frame length — the CLI size-command form
+      // ("UPLOAD <n>") does NOT exist over WebSocket (a 9-byte "UPLOAD 50"
+      // frame is answered `OK 9 <epoch>` by the production daemon). The web
+      // client's WS upload lane sends exactly these frames (7-byte prefix +
+      // random bytes, no newline). Checked BEFORE the one-command-per-frame
+      // rule (F-13) so the random payload is never parsed as commands.
+      if (buf.length >= 7 && buf.subarray(0, 7).toString('latin1') === 'UPLOAD ') {
+        engine.feedRawUploadFrame(buf);
+        return;
+      }
       // Verified F-13: the daemon processes (at most) the FIRST command of
       // each WS frame and discards the rest — e.g. a "HI\nGETIP\n" frame
       // yields exactly one HELLO. Upload payload frames are exempt.

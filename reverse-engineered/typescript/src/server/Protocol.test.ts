@@ -12,9 +12,10 @@ import crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { NetGaugeEngine, LossRegistry, NetGaugeSessionHooks } from '../server/NetGaugeEngine';
+import { NetGaugeEngine, LossRegistry, NetGaugeSessionHooks, UploadSessionRegistry } from '../server/NetGaugeEngine';
 import { ServerCore, generateAsciiPool } from '../server/ServerCore';
 import { normalizePath, connectSrcList } from '../server/HttpApi';
+import WebSocket, { RawData } from 'ws';
 
 /* ---------------- helpers ---------------- */
 
@@ -212,7 +213,7 @@ describe('NetGaugeEngine command contract', () => {
     expect(t.text()).toBe('OK\nPLOSS 0 0 0\n');
   });
 
-  test('UPLOAD_STATS → ERROR (daemon parity)', () => {
+  test('UPLOAD_STATS argless → ERROR (daemon parity, re-verified 2026-11-27 on production 2.11.5/2.11.7)', () => {
     const t = makeEngine();
     t.engine.feed(Buffer.from('UPLOAD_STATS\n'));
     expect(t.text()).toBe('ERROR\n');
@@ -608,7 +609,133 @@ describe('LossRegistry (UDP LOSS/RECV contract)', () => {
   });
 });
 
-/* ---------------- HTTP helpers ---------------- */
+/* ---------------- Web client (speedtest.net) contract ----------------
+ * Ground truth: production OoklaServer 2.11.5 (XL) & 2.11.7 (Tuxsindo) probes
+ * + captured real web runs, 2026-11-26/27 — see
+ * docs/WEB_CLIENT_REVERSE_ENGINEERING_2026-11-26.md. */
+
+describe('Web client contract: raw upload frames + UPLOAD_STATS (2026-11-27 production verification)', () => {
+  const UUID = '11111111-2222-3333-4444-555566667777';
+
+  function makeWebEngine(transport: 'tcp' | 'ws' = 'ws') {
+    const { hooks, writes, text, wasClosed } = makeHooks([], '203.0.113.9');
+    const uploadSessions = new UploadSessionRegistry();
+    const engine = new NetGaugeEngine(hooks, {
+      versionString: '2.11 (2.11.5) 2026-06-04.1737.7d0993d',
+      instanceUuid: 'aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000',
+      maxLineBytes: 1024 * 1024,
+      maxDownloadBytes: 0x7fffffff,
+      maxUploadBytes: 0x7fffffff,
+      pool: generateAsciiPool(2 * 1024 * 1024),
+      loss: new LossRegistry(),
+      startedAt: Date.now() - 5000,
+      quitMode: 'error',
+      errorStrikeLimit: 0,
+      transport,
+      uploadSessions,
+    });
+    return { engine, uploadSessions, writes, text, wasClosed };
+  }
+
+  test('raw upload frame → OK <frame-length> <epoch-ms>, whole frame counted (production-verified)', () => {
+    const w = makeWebEngine();
+    w.engine.feed(Buffer.from(`HI ${UUID}\n`));
+    // A 100-byte frame "UPLOAD " + 93 payload bytes (the web client's exact
+    // WS upload lane format: 7-byte prefix + random bytes, no newline).
+    w.engine.feedRawUploadFrame(Buffer.concat([Buffer.from('UPLOAD '), Buffer.alloc(93, 0x41)]));
+    const out = w.text();
+    expect(out).toContain('HELLO 2.11 (2.11.5)');
+    expect(out).toMatch(/OK 100 \d{13}\n/);
+    // The whole frame (incl. the "UPLOAD " prefix) counts toward the session.
+    expect(w.uploadSessions.get(UUID)).toBe(100);
+  });
+
+  test('production-verified: a 9-byte "UPLOAD 50" frame is a RAW 9-byte upload, not a size command', () => {
+    const w = makeWebEngine();
+    w.engine.feed(Buffer.from(`HI ${UUID}\n`));
+    w.engine.feedRawUploadFrame(Buffer.from('UPLOAD 50'));
+    expect(w.text()).toMatch(/OK 9 \d{13}\n/);
+  });
+
+  test('UPLOAD_STATS with no session (bare HI) → ERROR (production-verified)', () => {
+    const w = makeWebEngine();
+    w.engine.feed(Buffer.from('HI\n'));
+    w.engine.feed(Buffer.from('UPLOAD_STATS 1000 100 0\n'));
+    expect(w.text()).toBe('HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d\nERROR\n');
+  });
+
+  test('UPLOAD_STATS argless WITH a session → ERROR (production-verified)', () => {
+    const w = makeWebEngine();
+    w.engine.feed(Buffer.from(`HI ${UUID}\n`));
+    w.engine.feed(Buffer.from('UPLOAD_STATS\n'));
+    expect(w.text()).toMatch(/HELLO [^\n]+\nERROR\n$/);
+  });
+
+  test('UPLOAD_STATS <dur> <int> <idx> with a session → ack + ticked JSON lines + close', async () => {
+    const w = makeWebEngine();
+    w.engine.feed(Buffer.from(`HI ${UUID}\n`));
+    w.engine.feed(Buffer.from('UPLOAD_STATS 120 40 0\n'));
+    await new Promise((r) => setTimeout(r, 260));
+    const out = w.text();
+    expect(out).toContain('{"t":"u"}\n'); // immediate ack (no b/e/i fields)
+    expect(out).toContain('"e":0,"i":0'); // immediate first data line
+    expect(out).toContain('"e":40,"i":1');
+    expect(out).toContain('"e":80,"i":2');
+    expect(w.wasClosed()).toBe(true); // stream end closes the transport (WS close 1000)
+  });
+
+  test('UPLOAD_STATS "b" counts session upload bytes received since the stream started', async () => {
+    const w = makeWebEngine();
+    w.engine.feed(Buffer.from(`HI ${UUID}\n`));
+    w.engine.feed(Buffer.from('UPLOAD_STATS 160 40 0\n'));
+    // Upload bytes attributed DURING the stream appear in the next line's "b".
+    w.engine.feedRawUploadFrame(Buffer.concat([Buffer.from('UPLOAD '), Buffer.alloc(93, 0x42)]));
+    await new Promise((r) => setTimeout(r, 300));
+    const out = w.text();
+    expect(out).toMatch(/"b":100,"e":40/);
+  });
+
+  test('UPLOAD_STATS 2-arg form works (index defaults to 0) — production-verified', async () => {
+    const w = makeWebEngine();
+    w.engine.feed(Buffer.from(`HI ${UUID}\n`));
+    w.engine.feed(Buffer.from('UPLOAD_STATS 80 40\n'));
+    await new Promise((r) => setTimeout(r, 200));
+    expect(w.text()).toContain('"e":0,"i":0');
+  });
+
+  test('UPLOAD_STATS malformed args → ERROR', () => {
+    for (const cmd of ['UPLOAD_STATS 100\n', 'UPLOAD_STATS abc def\n', 'UPLOAD_STATS 100 0 0\n', 'UPLOAD_STATS 0 50 0\n', 'UPLOAD_STATS 100 50 0 extra\n']) {
+      const w = makeWebEngine();
+      w.engine.feed(Buffer.from(`HI ${UUID}\n`));
+      w.engine.feed(Buffer.from(cmd + '\n'));
+      expect(w.text()).toMatch(/ERROR\n$/);
+    }
+  });
+
+  test('DOWNLOAD 0 over WS → ERROR (production-verified quirk; TCP stays "\\n")', () => {
+    const w = makeWebEngine('ws');
+    w.engine.feed(Buffer.from('DOWNLOAD 0\n'));
+    expect(w.text()).toBe('ERROR\n');
+    const t = makeWebEngine('tcp');
+    t.engine.feed(Buffer.from('DOWNLOAD 0\n'));
+    expect(t.writes[0].toString('latin1')).toBe('\n');
+  });
+
+  test('UploadSessionRegistry: bounded + UUID-shaped keys only', () => {
+    const reg = new UploadSessionRegistry(2);
+    reg.add('not-a-uuid', 100); // invalid key → ignored
+    expect(reg.get('not-a-uuid')).toBe(0);
+    reg.add(UUID, 10);
+    reg.add('99999999-8888-7777-6666-555544443333', 20);
+    reg.add('aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000', 30); // evicts the oldest (UUID)
+    expect(reg.size()).toBe(2);
+    expect(reg.get(UUID)).toBe(0);
+    expect(reg.get('99999999-8888-7777-6666-555544443333')).toBe(20);
+    expect(reg.get('aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000')).toBe(30);
+  });
+});
+
+
 
 describe('HttpApi helpers', () => {
   test('normalizePath collapses //, . and .. segments (F-19)', () => {
@@ -862,6 +989,148 @@ describe('ServerCore single-port multiplexing (integration)', () => {
         .on('error', reject);
     });
     expect(status).toBe(404);
+  });
+
+  /* ---- web client (speedtest.net) surface, production-verified 2026-11-27 ---- */
+
+  test('GET /hello → hello banner (exact alias of /hi)', async () => {
+    const r = await rawRequest(port, `GET /hello HTTP/1.1\r\nHost: 127.0.0.1\r\nUser-Agent: t\r\nOrigin: https://www.speedtest.net\r\nConnection: close\r\n\r\n`);
+    const s = r.data.toString('latin1');
+    expect(s).toMatch(/^HTTP\/1\.1 200 OK\r\n/);
+    expect(s).toContain('Access-Control-Allow-Origin: https://www.speedtest.net\r\n');
+    expect(s.endsWith('hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n')).toBe(true);
+  });
+
+  test('GET /getip → peer ip line; GET /capabilities → capabilities line; GET /ping → pong', async () => {
+    const ip = await new Promise<string>((resolve, reject) => {
+      http.get({ host: '127.0.0.1', port, path: '/getip', headers: { 'User-Agent': 'test' } }, (res) => {
+        let b = '';
+        res.on('data', (c) => (b += c));
+        res.on('end', () => resolve(b));
+      }).on('error', reject);
+    });
+    expect(ip).toBe('127.0.0.1\n');
+    const caps = await new Promise<string>((resolve, reject) => {
+      http.get({ host: '127.0.0.1', port, path: '/capabilities', headers: { 'User-Agent': 'test' } }, (res) => {
+        let b = '';
+        res.on('data', (c) => (b += c));
+        res.on('end', () => resolve(b));
+      }).on('error', reject);
+    });
+    expect(caps).toBe('capabilities SERVER_HOST_AUTH UPLOAD_STATS\n');
+    const pong = await new Promise<string>((resolve, reject) => {
+      http.get({ host: '127.0.0.1', port, path: '/ping?nocache=abc', headers: { 'User-Agent': 'test' } }, (res) => {
+        let b = '';
+        res.on('data', (c) => (b += c));
+        res.on('end', () => resolve(b));
+      }).on('error', reject);
+    });
+    expect(pong).toBe('pong\n');
+  });
+
+  test('GET /download?size=N → exactly N octet-stream bytes with no-store + CORS; missing/bad size → CL 0', async () => {
+    const dl = await new Promise<{ n: number; ct: string; cache: string; acao: string }>((resolve, reject) => {
+      http.get({ host: '127.0.0.1', port, path: '/download?size=5000&guid=x&nocache=y', headers: { 'User-Agent': 'test', Origin: 'https://www.speedtest.net' } }, (res) => {
+        let n = 0;
+        res.on('data', (c) => (n += c.length));
+        res.on('end', () => resolve({ n, ct: String(res.headers['content-type']), cache: String(res.headers['cache-control']), acao: String(res.headers['access-control-allow-origin']) }));
+      }).on('error', reject);
+    });
+    expect(dl.n).toBe(5000);
+    expect(dl.ct).toBe('application/octet-stream');
+    expect(dl.cache).toBe('no-store');
+    expect(dl.acao).toBe('https://www.speedtest.net');
+    // HEAD advertises the exact size (production-verified).
+    const head = await rawRequest(port, `HEAD /download?size=1000 HTTP/1.1\r\nHost: 127.0.0.1\r\nUser-Agent: t\r\nConnection: close\r\n\r\n`);
+    expect(head.data.toString('latin1')).toContain('Content-Length: 1000\r\n');
+    // Missing / unparsable size → Content-Length 0 (documented deviation:
+    // production streams its 10 GiB default here).
+    for (const q of ['/download', '/download?size=abc', '/download?size=-5']) {
+      const h = await rawRequest(port, `HEAD ${q} HTTP/1.1\r\nHost: 127.0.0.1\r\nUser-Agent: t\r\nConnection: close\r\n\r\n`);
+      expect(h.data.toString('latin1')).toContain('Content-Length: 0\r\n');
+    }
+  });
+
+  test('GET /upload-stats → 400 Bad Request (production-verified)', async () => {
+    const r = await rawRequest(port, `GET /upload-stats?testDurationMillis=500&updatePeriodMillis=50&index=0 HTTP/1.1\r\nHost: 127.0.0.1\r\nUser-Agent: t\r\nConnection: close\r\n\r\n`);
+    expect(r.data.toString('latin1')).toMatch(/^HTTP\/1\.1 400 Bad Request\r\n/);
+  });
+
+  test('WS selection-ping flow: HI/GETIP/CAPABILITIES/PING newline quirks (production-verified)', async () => {
+    const ws = new WebSocket(`ws://127.0.0.1:${port}/ws`);
+    const received: string[] = [];
+    await new Promise<void>((resolve) => ws.on('open', resolve));
+    ws.on('message', (m: RawData) => received.push(m.toString('latin1')));
+    ws.send('HI 11111111-2222-3333-4444-555566667777');
+    ws.send('GETIP');
+    ws.send('CAPABILITIES');
+    ws.send('PING 123.456');
+    await new Promise((r) => setTimeout(r, 300));
+    ws.close();
+    // Production-verified newline quirks over WS (2026-11-27, OoklaServer
+    // 2.11.5 & 2.11.7 + captured real web runs): HELLO and CAPABILITIES carry
+    // NO trailing newline (the web client's $-anchored regexes do not match
+    // one); YOURIP and PONG do.
+    expect(received[0]).toBe('HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d');
+    expect(received[1]).toBe('YOURIP 127.0.0.1\n');
+    expect(received[2]).toBe('CAPABILITIES SERVER_HOST_AUTH UPLOAD_STATS');
+    expect(received[3]).toMatch(/^PONG \d{13}\n$/);
+  });
+
+  test('WS raw upload frame → OK <frame-length> <epoch-ms> (production-verified)', async () => {
+    const ws = new WebSocket(`ws://127.0.0.1:${port}/ws`);
+    const received: string[] = [];
+    const closed = new Promise<void>((resolve) => ws.on('close', () => resolve()));
+    await new Promise<void>((resolve) => ws.on('open', resolve));
+    ws.on('message', (m: RawData) => received.push(m.toString('latin1')));
+    ws.send('HI 11111111-2222-3333-4444-555566667777');
+    // The web client's WS upload lane: one binary frame = "UPLOAD " + random
+    // bytes, exactly the requested message size (no newline, no size field).
+    ws.send(Buffer.concat([Buffer.from('UPLOAD '), Buffer.alloc(93, 0x41)]), { binary: true });
+    await new Promise((r) => setTimeout(r, 300));
+    ws.close();
+    await closed;
+    expect(received[0]).toBe('HELLO 2.11 (2.11.5) 2026-06-04.1737.7d0993d'); // WS HELLO quirk: no trailing newline
+    expect(received[1]).toMatch(/^OK 100 \d{13}\n$/);
+  });
+
+  test('WS UPLOAD_STATS: XHR upload bytes (?guid=) and WS frames feed the same session stream', async () => {
+    const guid = '12345678-1234-5678-1234-567812345678';
+    // 1) XHR-lane upload first (HTTP POST /upload?guid=…), like the real client.
+    const up = await new Promise<string>((resolve, reject) => {
+      const body = Buffer.alloc(500, 0x43);
+      const req = http.request(
+        { host: '127.0.0.1', port, path: `/upload?guid=${guid}&nocache=probe`, method: 'POST', headers: { 'User-Agent': 'test', 'Content-Length': String(body.length), 'Content-Type': 'application/octet-stream' } },
+        (res) => {
+          let b = '';
+          res.on('data', (c) => (b += c));
+          res.on('end', () => resolve(b));
+        },
+      );
+      req.on('error', reject);
+      req.end(body);
+    });
+    expect(up).toBe('size=500\n');
+    // 2) WS lane: register the same session, start the stats stream, upload a
+    //    raw frame during it — the stream must see BOTH transports' bytes.
+    const ws = new WebSocket(`ws://127.0.0.1:${port}/ws`);
+    const received: string[] = [];
+    const closed = new Promise<void>((resolve) => ws.on('close', () => resolve()));
+    await new Promise<void>((resolve) => ws.on('open', resolve));
+    ws.on('message', (m: RawData) => received.push(m.toString('latin1')));
+    ws.send(`HI ${guid}`);
+    await new Promise((r) => setTimeout(r, 60));
+    ws.send('UPLOAD_STATS 200 50 0');
+    await new Promise((r) => setTimeout(r, 20));
+    ws.send(Buffer.concat([Buffer.from('UPLOAD '), Buffer.alloc(93, 0x44)]), { binary: true });
+    await closed.catch(() => undefined);
+    await new Promise((r) => setTimeout(r, 100));
+    const stats = received.filter((l) => l.startsWith('{"b"'));
+    expect(received).toContain('{"t":"u"}\n');
+    expect(stats.length).toBeGreaterThanOrEqual(3); // e=0,50,100,150,200 lines
+    // The pre-stream XHR bytes (500) are the BASELINE at stream start; the
+    // raw frame uploaded DURING the stream (100) must show up in "b".
+    expect(stats.some((l) => l.startsWith('{"b":100,"e":'))).toBe(true);
   });
 });
 
