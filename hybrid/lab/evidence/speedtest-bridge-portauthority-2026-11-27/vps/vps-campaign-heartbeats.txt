@@ -1,0 +1,24 @@
+{
+  "exit_code": 0,
+  "stdout": "heartbeats: 81\n{\"conns\": 3, \"downloads\": 0, \"uploads\": 0, \"bytesDownCli\": 169, \"bytesUpCli\": 0, \"bytesFromWorkerDl\": 0, \"bytesToWorkerUl\": 0, \"workerRequests\": 0, \"workerReceipts\": 0, \"workerErrors\": 0, \"tlsTerminated\": 0, \"httpPiped\": 0, \"ts\": 1795747604234}\n{\"conns\": 3, \"downloads\": 0, \"uploads\": 0, \"bytesDownCli\": 169, \"bytesUpCli\": 0, \"bytesFromWorkerDl\": 0, \"bytesToWorkerUl\": 0, \"workerRequests\": 0, \"workerReceipts\": 0, \"workerErrors\": 0, \"tlsTerminated\": 0, \"httpPiped\": 1, \"ts\": 1795747654265}\n{\"conns\": 42, \"downloads\": 33, \"uploads\": 0, \"bytesDownCli\": 455953420, \"bytesUpCli\": 0, \"bytesFromWorkerDl\": 456175042, \"bytesToWorkerUl\": 67108864, \"workerRequests\": 158, \"workerReceipts\": 16, \"workerErrors\": 30, \"tlsTerminated\": 0, \"httpPiped\": 1, \"ts\": 1795747704285}\n{\"conns\": 42, \"downloads\": 33, \"uploads\": 1, \"bytesDownCli\": 455957070, \"bytesUpCli\": 121762205, \"bytesFromWorkerDl\": 456175042, \"bytesToWorkerUl\": 111691751, \"workerRequests\": 169, \"workerReceipts\": 27, \"workerErrors\": 30, \"tlsTerminated\": 0, \"httpPiped\": 2, \"ts\": 1795747754320}\n{\"conns\": 88, \"downloads\": 70, \"uploads\": 3, \"bytesDownCli\": 965869255, \"bytesUpCli\": 121762205, \"bytesFromWorkerDl\": 966256533, \"bytesToWorkerUl\": 242800565, \"workerRequests\": 356, \"workerReceipts\": 59, \"workerErrors\": 64, \"tlsTerminated\": 1, \"httpPiped\": 2, \"ts\": 1795747804342}\n{\"conns\": 1, \"downloads\": 0, \"uploads\": 0, \"bytesDownCli\": 42, \"bytesUpCli\": 0, \"bytesFromWorkerDl\": 0, \"bytesToWorkerUl\": 0, \"workerRequests\": 0, \"workerReceipts\": 0, \"workerErrors\": 0, \"tlsTerminated\": 0, \"httpPiped\": 1, \"ts\": 1795747856279}\n{\"conns\": 0, \"downloads\": 0, \"uploads\": 0, \"bytesDownCli\": 0, \"bytesUpCli\": 0, \"bytesFromWorkerDl\": 0, \"bytesToWorkerUl\": 0, \"workerRequests\": 0, \"workerReceipts\": 0, \"workerErrors\": 0, \"tlsTerminated\": 0, \"httpPiped\": 0, \"ts\": 1795747908288}\n{\"conns\": 0, \"downloads\": 0, \"uploads\": 0, \"bytesDownCli\": 0, \"bytesUpCli\": 0, \"bytesFromWorkerDl\": 0, \"bytesToWorkerUl\": 0, \"workerRequests\": 0, \"workerReceipts\": 0, \"workerErrors\": 0, \"tlsTerminated\": 0, \"httpPiped\": 0, \"ts\": 1795747958326}\n{\"conns\": 0, \"downloads\": 0, \"uploads\": 0, \"bytesDownCli\": 0, \"bytesUpCli\": 0, \"bytesFromWorkerDl\": 0, \"bytesToWorkerUl\": 0, \"workerRequests\": 0, \"workerReceipts\": 0, \"workerErrors\": 0, \"tlsTerminated\": 0, \"httpPiped\": 1, \"ts\": 1795748008351}\ndl_done count: 9 ul_done: 9\n",
+  "stderr": "",
+  "duration_ms": 39,
+  "timed_out": false,
+  "stdout_bytes": 2340,
+  "stderr_bytes": 0,
+  "stdout_truncated": false,
+  "stderr_truncated": false,
+  "ok": true
+}
+{
+  "exit_code": 0,
+  "stdout": "{\"conns\": 42, \"downloads\": 35, \"uploads\": 3, \"bytesDownCli\": 485883996, \"bytesUpCli\": 173187699, \"bytesFromWorkerDl\": 485943700, \"bytesToWorkerUl\": 173187699, \"workerRequests\": 486, \"workerReceipts\": 3, \"workerErrors\": 32, \"ts\": 1795747886282}\n",
+  "stderr": "",
+  "duration_ms": 46,
+  "timed_out": false,
+  "stdout_bytes": 244,
+  "stderr_bytes": 0,
+  "stdout_truncated": false,
+  "stderr_truncated": false,
+  "ok": true
+}

@@ -96,26 +96,30 @@ bridge (b0/b4 pada evidence 27 Nov).
 Bridge produksi: `hybrid/speedtest-bridge/speedtest-bridge.mjs` (dokumen:
 `README.md` di direktori itu). Unit: `speedtest-bridge.service` — auto-start
 saat boot + auto-restart saat crash; env `SPEEDTEST_BRIDGE_*` dari
-`/etc/speedtest-hybrid/speedtest-bridge.env` (di-regenerate dari `.env` oleh
-install.sh; perubahan → `systemctl restart speedtest-bridge`). Front =
-protokol native di VPS; payload = origin Worker. Port :8080 juga membawa
-mux TLS → gateway loopback (penyatuan port: hanya 8080+5060 yang terbuka;
-daemon permanen di :5060, dikonfigurasi di `OoklaServer.properties` dengan
-backup `*.bak-speedtest-bridge-*`).
+`/etc/speedtest-hybrid/speedtest-bridge.env` (di-regenerate oleh installer
+core; perubahan manual → `systemctl restart speedtest-bridge`). Front =
+protokol native di VPS; payload = origin Worker. PORT AUTHORITY: bridge
+mengikat SEMUA port `OoklaServer.properties` (TCP+UDP, mux penuh di setiap
+port; 8080 wajib), TLS diterminasi di bridge, HTTP lane → gateway UNIX
+SOCKET `/run/speedtest-hybrid/gateway.sock` (gateway TANPA port TCP), daemon
+unit di-park selama bridge aktif (properties TIDAK PERNAH ditulis).
 
 **Tidak ada window eksperimen manual lagi** — run §2 dari sandbox langsung
 menguji mode produksi ini. Kontrol daemon (A/B): matikan bridge
 (`SPEEDTEST_BRIDGE_ENABLED=false` di `.env` + jalankan ulang
-`install.sh --start` — daemon kembali ke 8080+5060, gateway publik :8790),
-uji, lalu aktifkan lagi; atau pakai baseline historis b0/b4.
+`install.sh --start` — daemon kembali aktif di SEMUA port properties,
+tanpa restore apa pun), uji, lalu aktifkan lagi; atau pakai baseline
+historis b0/b4.
 
 **Ganti backend live** (worker-http / worker-ws / local):
 
 ```bash
-# di VPS: edit SPEEDTEST_BRIDGE_BACKEND di .env, lalu:
+# di VPS: ubah backend di env runtime bridge, lalu restart:
+sudo sed -i "s/^SPEEDTEST_BRIDGE_BACKEND=.*/SPEEDTEST_BRIDGE_BACKEND=worker-ws/" \
+  /etc/speedtest-hybrid/speedtest-bridge.env
 sudo systemctl restart speedtest-bridge
 journalctl -u speedtest-bridge -f          # meta: backend=…, tlsMux=…, rate=…
-ss -tlnp | grep -E ':(8080|5060) '         # bridge :8080, daemon :5060
+ss -tlnp | grep -E ":(8080|5060) "         # bridge: SEMUA port properties
 ```
 
 **Snapshot sebelum/sesudah** untuk atribusi eth0 (tetap berlaku):

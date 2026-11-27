@@ -1,0 +1,28 @@
+{
+ "window": [
+  "2026-11-27T02:45:00+00:00",
+  "2026-11-27T03:00:00+00:00"
+ ],
+ "script": "speedtest-hybrid-worker",
+ "totalRequests": 407,
+ "totalErrors": 0,
+ "totalSubrequests": 0,
+ "perMinute": {
+  "2026-11-27T02:48": {
+   "requests": 169,
+   "errors": 0
+  },
+  "2026-11-27T02:49": {
+   "requests": 173,
+   "errors": 0
+  },
+  "2026-11-27T02:50": {
+   "requests": 28,
+   "errors": 0
+  },
+  "2026-11-27T02:51": {
+   "requests": 37,
+   "errors": 0
+  }
+ }
+}
