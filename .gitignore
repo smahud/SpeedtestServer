@@ -16,3 +16,7 @@ validation/harness/tls-cases/
 # NEVER commit a filled .env — it holds the Cloudflare token/global key
 # and the hybrid shared secret.
 /.env
+
+# audit 27 Nov: backup .env (berisi token CF + shared secret) jangan pernah masuk repo
+.env.bak*
+*.secured

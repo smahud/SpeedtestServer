@@ -197,3 +197,26 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 
 Jika angka jauh di bawah itu, cek `worker_retry`/`worker_err` di JSONL bridge
 dan window GraphQL sebelum menyimpulkan.
+
+## 9. Catatan sesi audit 27 Nov (tambahan)
+
+1. **Kanal kontrol UAEG cadangan via Cloudflare** — bila IP VPS langsung tak
+   terjangkau (mis. window reboot, atau blokir jaringan agent), UAEG tetap
+   bisa dijangkau lewat `https://gw.lumajangnetworks.my.id/mcp` (DNS proxied
+   CF + Origin Rule rewrite port 3902; zone SSL mode *Full*). Bearer key sama.
+   Catatan: zone memakai **Bot Fight Mode** — klien otomasi wajib User-Agent
+   custom (python-urllib default diblokir Error 1010).
+2. **Buffer TCP sandbox uji** — sandbox platform agent (kernel 5.10) punya
+   `tcp_rmem/tcp_wmem` max 931 KiB: per-flow ≈ 112 Mbps pada RTT 63 ms. Ini
+   menjelaskan UL 115–160 Mbps lintas lane. Untuk menguji UL lebih tinggi,
+   jalankan CLI dari host dengan buffer lebih besar (atau tuning rmem host uji).
+3. **Loss UDP lane worker-http** — run beruntun bisa menunjukkan packetLoss
+   3–33% (fase loss overlap drain retry worker pasca-UL); lane local/worker-ws
+   0–0,8%. Beri jeda lebih panjang (>60 s) atau investigasi
+   `net.core.rmem_default` bila angka loss mau dipakai.
+4. **Rate-limit per-IP di belakang NAT provider** — VPS melihat semua klien
+   eksternal sebagai `::ffff:45.126.249.249` (NAT gateway), sehingga bucket
+   `CONN_RATE_PER_MIN`/`MAX_CONN_PER_IP` bridge berlaku agregat; angkat nilai
+   ini sebelum uji multi-klien paralel.
+5. Evidence kampanye audit: `hybrid/lab/evidence/speedtest-bridge-audit-2026-11-27/`
+   (9 run CLI resmi, atribusi 3 sisi, pengukuran kapasitas link VPS).

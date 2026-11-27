@@ -1,0 +1,79 @@
+[
+  {
+    "type": "A",
+    "name": "lumajangnetworks.my.id",
+    "content": "34.128.166.114",
+    "proxied": false,
+    "id": "dc7afc9eb45b34042d5e28ad29000058"
+  },
+  {
+    "type": "A",
+    "name": "speedtest.lumajangnetworks.my.id",
+    "content": "45.126.249.250",
+    "proxied": false,
+    "id": "7af4050abc57b8ab66bf35c8480b17de"
+  },
+  {
+    "type": "AAAA",
+    "name": "speedtest2.lumajangnetworks.my.id",
+    "content": "::ffff:45.126.249.250",
+    "proxied": false,
+    "id": "c9aa44302a2448be3de67e35fcb50c9a"
+  },
+  {
+    "type": "CNAME",
+    "name": "www.lumajangnetworks.my.id",
+    "content": "sites.soloist.ai",
+    "proxied": false,
+    "id": "a72c9f851f2236e0d54adf722404e8cc"
+  },
+  {
+    "type": "MX",
+    "name": "lumajangnetworks.my.id",
+    "content": "mx3.zoho.com",
+    "proxied": false,
+    "id": "f1ff69a4f680fafd8746f3f78d5a3ffb"
+  },
+  {
+    "type": "MX",
+    "name": "lumajangnetworks.my.id",
+    "content": "mx.zoho.com",
+    "proxied": false,
+    "id": "5ff6d6a2b8d8d6e09ba756a162c06fc9"
+  },
+  {
+    "type": "MX",
+    "name": "lumajangnetworks.my.id",
+    "content": "mx2.zoho.com",
+    "proxied": false,
+    "id": "5515c41089bab5b19636a88020cff7aa"
+  },
+  {
+    "type": "TXT",
+    "name": "lumajangnetworks.my.id",
+    "content": "\"6302f002-6ac3-4871-83b7-373342e4314c\"",
+    "proxied": false,
+    "id": "50348c36e76e0f851c8ec69c3b4e070f"
+  },
+  {
+    "type": "TXT",
+    "name": "lumajangnetworks.my.id",
+    "content": "\"v=spf1 include:zohomail.com ~all\"",
+    "proxied": false,
+    "id": "91fa3d3aaefe433562e97e95b1234265"
+  },
+  {
+    "type": "TXT",
+    "name": "lumajangnetworks.my.id",
+    "content": "\"zoho-verification=zb17741681.zmverify.zoho.com\"",
+    "proxied": false,
+    "id": "57079cca19d179a5392b593e511f9660"
+  },
+  {
+    "type": "TXT",
+    "name": "zmail._domainkey.lumajangnetworks.my.id",
+    "content": "\"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCpXJVn+w5d9g7Rh4mMIcTM7yVlYUuewvjc0WqClakwlAwVBi2Nz7vxY+7b9bEGAyJ11szeQ4qBKP1JJnLVMNxAntBNUbg5IFyJ037yDjpxOMxS9tv199NXmETDyNTY26KavNDxYX9DTS2EIiScoX/pP5Gjj3mA3hY0O9CDBvqTYQIDAQAB\"",
+    "proxied": false,
+    "id": "2d6db7ce5ae6a3d0ea20a6525e5d1c01"
+  }
+]

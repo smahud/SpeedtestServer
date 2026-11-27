@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "errors": [],
+  "rules": [
+    {
+      "ref": "audit_front_uaeg_3902",
+      "expression": "(http.host eq \"gw.lumajangnetworks.my.id\")",
+      "enabled": true,
+      "action_parameters": {
+        "origin": {
+          "port": 3902
+        }
+      }
+    }
+  ]
+}

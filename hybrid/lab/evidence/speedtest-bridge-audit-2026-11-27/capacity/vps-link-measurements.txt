@@ -1,0 +1,11 @@
+# Pengukuran kapasitas link VPS 45.126.249.250 — 27 Nov 2026 (audit)
+# Metode: curl paralel dari VPS ke Cloudflare (worker sendiri + speed.cloudflare.com)
+[ingress VPS<-CF worker] 6x paralel GET /__down?bytes=100000000 (token sesi gateway):
+  dl1: 18893195 B/s  dl2: 17519532  dl3: 17514542  dl4: 20165201  dl5: 16435863  dl6: 18946872
+  TOTAL ≈ 109.5 MB/s ≈ 872 Mbps (kandidat batas ingress port/path; tidak saturasi penuh)
+[egress VPS->CF] POST 150MB ke speed.cloudflare.com/__up:
+  53692870 B/s ≈ 429 Mbps
+[egress VPS->sandbox (via CLI lokal)] lihat runs/c6-tuned-lo-1: DL 472.8 Mbps (post-tuning sysctl)
+[pre-tuning] c3-lo-1: DL 459.0 Mbps — path sandbox<->VPS konsisten ≈ egress VPS
+[catatan] speed.cloudflare.com/__down menolak dari VPS (body 1B) — pakai worker sendiri.
+[sysctl] sebelum: rmem_max=wmem_max=212992 (cubic); sesudah 16MB (lihat config/99-speedtest-tuning.conf)
