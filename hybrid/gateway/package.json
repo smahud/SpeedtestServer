@@ -1,0 +1,10 @@
+{
+  "name": "speedtest-hybrid-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hybrid gateway (control plane + front lanes). Runtime deps mirror the production install (the installer ships node_modules from the TS daemon's prod deps to \$PREFIX/node_modules).",
+  "dependencies": {
+    "ws": "^8.14.2"
+  }
+}

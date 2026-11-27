@@ -31,6 +31,7 @@ import { NetGaugeEngine, firstCommandLine } from './netgauge';
 import { handleLegacyHttp, poolResponse, countBody, originAllowed } from './http-legacy';
 import { verifyToken, extractToken } from './token';
 import { fillFromPool } from './pool';
+import { handleOoklaXhr, isOoklaXhrPath } from './ookla-xhr';
 
 // Per-isolate identity (daemon parity: one instance UUID / uptime per
 // process). Lazily initialized — the runtime forbids random generation and
@@ -246,6 +247,7 @@ function handleMeta(request: Request, env: Env): Response {
           legacyHttp: '/, /hi, /latency.txt, /speedtest/random{N}x{N}.jpg, /speedtest/upload.php, /crossdomain.xml',
           hybridDown: '/__down?bytes=N (N=0 for TTFB ping)',
           hybridUp: 'POST /__up (drain + count)',
+          ooklaXhr: 'GET /download?size=N · POST /upload · /hello · /getip · /capabilities · /ping (web-client direct lane)',
         },
       },
       null,
@@ -441,6 +443,26 @@ export default {
         return handleMeta(request, env);
       }
 
+      // Ookla WEB-CLIENT XHR surface (DIRECT LANE, operator contract 27
+      // Nov 2026): /download /upload /hello /getip /capabilities /ping.
+      // The VPS 307s the browser's heavy XHRs onto /download + /upload so
+      // payload bytes flow client ↔ edge ONLY (no VPS relay). Token-gated
+      // exactly like /__down /__up when a shared secret is set.
+      if (isOoklaXhrPath(path)) {
+        const secret = env.HYBRID_SHARED_SECRET || '';
+        if (secret) {
+          const v = await verifyToken(secret, extractToken(request, url), { ip: peerIp(request) });
+          if (!v.ok) return new Response(JSON.stringify({ error: 'unauthorized', reason: v.reason }), { status: 401 });
+        }
+        // Smart-pool mutual help for the payload paths (OPTIONS is cheap,
+        // never deflected; 307 preserves the POST body for uploads).
+        if (request.method !== 'OPTIONS') {
+          const deflected = maybeDeflect(request, url, env, true);
+          if (deflected) return deflected;
+        }
+        return await handleOoklaXhr(request, url, env, logEvent, endRequest);
+      }
+
       // Daemon-parity legacy HTTP surface (/, /hi, latency.txt, random*.jpg,
       // upload.php, crossdomain.xml, 404 shape) — G-7: OFF by default in
       // code. Production (K-7) keeps it off; local conformance and the
@@ -478,7 +500,8 @@ export default {
       // (__down, WS) release it via stream completion / close handlers.
       const streaming =
         path === '/ws' ||
-        (path === '/__down' && request.method === 'GET' && Number(url.searchParams.get('bytes') || 0) > 0);
+        (path === '/__down' && request.method === 'GET' && Number(url.searchParams.get('bytes') || 0) > 0) ||
+        (path === '/download' && request.method === 'GET' && Number(url.searchParams.get('size') || 0) > 0);
       if (!streaming) endRequest();
     }
   },

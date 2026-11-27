@@ -45,6 +45,7 @@ const ENV_KEY_MAP = {
   HYBRID_WORKER_PROBE_INTERVAL_MS: 'probeIntervalMs',
   HYBRID_WORKER_URLS: 'workerUrls',
   HYBRID_VPS_DL_SHARE: 'vpsDlShare',
+  HYBRID_WEB_DIRECT: 'webDirect',
   HYBRID_FRONT_RATE_LIMIT_MPM: 'frontRateLimitMpm',
   HYBRID_FRONT_MAX_DOWN_BYTES: 'frontMaxDownBytes',
   HYBRID_FRONT_TOKEN_CACHE_MS: 'frontTokenCacheMs',
@@ -100,6 +101,9 @@ export function createRuntime({ log = () => {} } = {}) {
       Math.max(30000, num(process.env.HYBRID_TOKEN_TTL_MS, 300000) - 60000),
     ),
     vpsDlShare: clampShare(process.env.HYBRID_VPS_DL_SHARE, 0.15),
+    // DIRECT LANE (operator contract 27 Nov 2026): 307-hand the web client's
+    // heavy XHRs to the Worker (payload client ↔ edge ONLY). Default true.
+    webDirect: String(process.env.HYBRID_WEB_DIRECT || '') !== 'false',
     // worker routing pool
     workerBase: process.env.HYBRID_WORKER_BASE || 'http://127.0.0.1:8790',
     workerUrls: (process.env.HYBRID_WORKER_URLS || '').split(',').map((s) => s.trim()).filter(Boolean),
@@ -189,6 +193,7 @@ export function createRuntime({ log = () => {} } = {}) {
     // token / front / pool keys
     track('HYBRID_SHARED_SECRET', () => { cfg.secret = map.get('HYBRID_SHARED_SECRET') || ''; });
     track('HYBRID_VPS_DL_SHARE', () => { cfg.vpsDlShare = clampShare(map.get('HYBRID_VPS_DL_SHARE'), 0.15); });
+    track('HYBRID_WEB_DIRECT', () => { cfg.webDirect = String(map.get('HYBRID_WEB_DIRECT') || '') !== 'false'; });
     numApply('HYBRID_FRONT_RATE_LIMIT_MPM', 'frontRateLimitMpm', 90);
     numApply('HYBRID_FRONT_MAX_DOWN_BYTES', 'frontMaxDownBytes', 26214400);
     numApply('HYBRID_FRONT_TOKEN_CACHE_MS', 'frontTokenCacheMs', 240000);

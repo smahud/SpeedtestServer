@@ -727,3 +727,177 @@ test('T20: PORT AUTHORITY — socket mode: gateway serves over a UNIX socket, NO
     try { fs.unlinkSync(sockPath); } catch {}
   }
 });
+
+// ---------------------------------------------------------------------------
+// DIRECT LANE (operator contract 27 Nov 2026): the official speedtest.net web
+// client's XHR surface + 307 handoff to the Worker. Verified live against the
+// real speedtest.net page in the 27 Nov PoC (hybrid/lab evidence poc-run.jsonl):
+// download 533 MB and upload both flowed client ↔ edge ONLY; the VPS carried
+// 440 bytes of HTTP control + WSS pings.
+// ---------------------------------------------------------------------------
+
+test('T21: web XHR control surface — shapes, CORS, OPTIONS preflight echo', async () => {
+  const g = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+      HYBRID_WORKER_POOL_MAX: '1',
+    },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  try {
+    const O = 'https://www.speedtest.net';
+    // /hello (XHR handshake — lowercase, trailing newline)
+    const hello = await req(g.port, 'GET', '/hello?guid=t21', { headers: { Origin: O } });
+    assert.equal(hello.status, 200);
+    assert.equal(hello.body, 'hello 2.11 (2.11.5) 2026-06-04.1737.7d0993d\n');
+    assert.equal(hello.headers['access-control-allow-origin'], O);
+    // /getip
+    const getip = await req(g.port, 'GET', '/getip', { headers: { Origin: O } });
+    assert.equal(getip.status, 200);
+    assert.ok(/^127\.0\.0\.1\n$|^::1\n$/.test(getip.body), `getip body: ${JSON.stringify(getip.body)}`);
+    // /capabilities — NO UPLOAD_STATS on the direct lane (upload is measured
+    // locally because the bytes land at the edge)
+    const caps = await req(g.port, 'GET', '/capabilities', { headers: { Origin: O } });
+    assert.equal(caps.body, 'capabilities SERVER_HOST_AUTH\n');
+    assert.ok(!caps.body.includes('UPLOAD_STATS'), 'UPLOAD_STATS must NOT be announced on the direct lane');
+    // /ping (lowercase pong quirk)
+    const ping = await req(g.port, 'GET', '/ping?nocache=x', { headers: { Origin: O } });
+    assert.equal(ping.body, 'pong\n');
+    // OPTIONS preflight MUST echo Access-Control-Request-Headers — without it
+    // the SDK's octet-stream POST never gets sent (the exact bug found live)
+    const pre = await req(g.port, 'OPTIONS', '/upload?guid=t21', {
+      headers: { Origin: O, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type' },
+    });
+    assert.equal(pre.status, 200);
+    assert.equal(pre.headers['access-control-allow-origin'], O);
+    assert.equal(pre.headers['access-control-allow-headers'], 'content-type');
+    assert.ok((pre.headers['access-control-allow-methods'] || '').includes('POST'));
+    // /upload-stats → 400 parity
+    const us = await req(g.port, 'GET', '/upload-stats?testDurationMillis=15000', { headers: { Origin: O } });
+    assert.equal(us.status, 400);
+  } finally {
+    await g.stop();
+  }
+});
+
+test('T22: web /download 307 handoff (lane=edge, CORS on the redirect) + webDirect=false local fallback', async () => {
+  const g = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+      HYBRID_WORKER_POOL_MAX: '1',
+    },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  try {
+    const O = 'https://www.speedtest.net';
+    const r = await req(g.port, 'GET', '/download?size=25000000&guid=t22&nocache=abc', { headers: { Origin: O } });
+    assert.equal(r.status, 307);
+    const loc = r.headers.location;
+    assert.ok(loc.startsWith('http://127.0.0.1:59999/download?size=25000000&guid=t22&nocache=abc&token=v1~'), `bad location: ${loc}`);
+    assert.equal(r.headers['access-control-allow-origin'], O, 'the 307 hop itself must pass CORS');
+    assert.equal(r.headers['x-hybrid-lane'], 'edge');
+    assert.equal(r.headers.location.split('?')[1].split('&').find((p) => p.startsWith('size=')), 'size=25000000');
+  } finally {
+    await g.stop();
+  }
+  // webDirect=false → full-VPS octet serve with the exact Content-Length
+  const g2 = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      HYBRID_WEB_DIRECT: 'false',
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+    },
+    (nextPort = freePort()),
+  );
+  await g2.waitReady();
+  try {
+    const r2 = await req(g2.port, 'GET', '/download?size=1000&guid=t22b', { headers: { Origin: 'https://www.speedtest.net' } });
+    assert.equal(r2.status, 200);
+    assert.equal(r2.headers['content-length'], '1000');
+    assert.equal(r2.headers['content-type'], 'application/octet-stream');
+    assert.equal(r2.headers['x-hybrid-lane'], 'vps');
+    assert.equal(r2.body.length, 1000);
+  } finally {
+    await g2.stop();
+  }
+});
+
+test('T23: web POST /upload 307 handoff preserves method+body semantics (307, token, CORS)', async () => {
+  const g = spawnNode(
+    {
+      HYBRID_SHARED_SECRET: SECRET,
+      HYBRID_FRONT_ENABLED: 'true',
+      HYBRID_FRONT_TOKEN_CACHE_MS: '0',
+      HYBRID_WORKER_BASE: 'http://127.0.0.1:59999',
+    },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  try {
+    const O = 'https://www.speedtest.net';
+    // GET on /upload → 404 (daemon parity) — checked FIRST: the POST below
+    // destroys its socket after the 307 flush, and Node's keep-alive agent
+    // would hand the dead socket to the next request.
+    const r404 = await req(g.port, 'GET', '/upload?guid=t23');
+    assert.equal(r404.status, 404);
+    const r = await req(g.port, 'POST', '/upload?guid=t23&nocache=xyz', {
+      body: 'A'.repeat(2000),
+      headers: { Origin: O, 'Content-Type': 'application/octet-stream' },
+    });
+    assert.equal(r.status, 307, 'upload handoff must be 307 (method+body preserved)');
+    const loc = r.headers.location;
+    assert.ok(loc.startsWith('http://127.0.0.1:59999/upload?guid=t23&nocache=xyz&token=v1~'), `bad location: ${loc}`);
+    assert.equal(r.headers['access-control-allow-origin'], O);
+    assert.equal(r.headers['x-hybrid-lane'], 'edge');
+  } finally {
+    await g.stop();
+  }
+});
+
+test('T24: WSS /ws control engine — web quirks (no trailing \\n on HELLO/CAPABILITIES, no UPLOAD_STATS)', async () => {
+  const g = spawnNode(
+    { HYBRID_SHARED_SECRET: SECRET, HYBRID_FRONT_ENABLED: 'true' },
+    (nextPort = freePort()),
+  );
+  await g.waitReady();
+  const WebSocket = require('ws');
+  const ws = new WebSocket(`ws://127.0.0.1:${g.port}/ws`);
+  const received = [];
+  ws.on('message', (d, isBinary) => received.push({ bin: isBinary, data: Buffer.from(d) }));
+  await new Promise((res, rej) => { ws.on('open', res); ws.on('error', rej); });
+  try {
+    ws.send('HI\n');
+    await new Promise((r) => setTimeout(r, 150));
+    ws.send('GETIP\n');
+    await new Promise((r) => setTimeout(r, 150));
+    ws.send('CAPABILITIES\n');
+    await new Promise((r) => setTimeout(r, 150));
+    ws.send('PING 123\n');
+    await new Promise((r) => setTimeout(r, 150));
+    ws.send('DOWNLOAD 100\n');
+    await new Promise((r) => setTimeout(r, 200));
+
+    const hello = received.find((m) => !m.bin && m.data.toString().startsWith('HELLO '));
+    assert.ok(hello, 'HELLO received');
+    assert.ok(!hello.data.toString().endsWith('\n'), 'HELLO must carry NO trailing newline (web quirk)');
+    const caps = received.find((m) => !m.bin && m.data.toString().startsWith('CAPABILITIES'));
+    assert.ok(caps, 'CAPABILITIES received');
+    assert.ok(!caps.data.toString().endsWith('\n'), 'CAPABILITIES must carry NO trailing newline');
+    assert.ok(!caps.data.toString().includes('UPLOAD_STATS'), 'no UPLOAD_STATS on the direct lane');
+    const pong = received.find((m) => !m.bin && m.data.toString().startsWith('PONG '));
+    assert.ok(pong && pong.data.toString().endsWith('\n'), 'PONG with newline');
+    const dl = received.find((m) => m.bin);
+    assert.ok(dl, 'DOWNLOAD binary frame received');
+    assert.equal(dl.data.length, 100, 'DOWNLOAD frame is exactly n bytes');
+  } finally {
+    ws.close();
+    await g.stop();
+  }
+});

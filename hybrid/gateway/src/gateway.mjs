@@ -40,6 +40,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { createFront } from './front.mjs';
+import { attachWebWs } from './webws.mjs';
 import { createWorkerPool, createRateLimiter } from './workerpool.mjs';
 import { createRuntime } from './runtime.mjs';
 import { createWorkerSync } from './workersync.mjs';
@@ -283,6 +284,7 @@ const front = cfg.frontEnabled
       tokenCacheMs: cfg.frontTokenCacheMs,
       tokenBindIp: cfg.tokenBindIp,
       vpsDlShare: cfg.vpsDlShare,
+      webDirect: cfg.webDirect,
       workersAvailable: edgeAvailable,
     })
   : null;
@@ -301,6 +303,7 @@ function applyLiveConfig() {
       maxDownBytes: cfg.frontMaxDownBytes,
       tokenCacheMs: cfg.frontTokenCacheMs,
       vpsDlShare: cfg.vpsDlShare,
+      webDirect: cfg.webDirect,
     });
   }
 }
@@ -514,6 +517,11 @@ const listener = TLS_CERT && !SOCKET
     )
   : http.createServer(safeHandler);
 
+// DIRECT LANE (27 Nov 2026): the official web client's WSS control plane
+// (wss://<server>:8080/ws — server-selection pings, idle + loaded latency).
+// The bridge pipes the decrypted WS upgrade here (Unix socket / plain lane).
+attachWebWs(listener, { log, counters, versionString: '2.11 (2.11.5) 2026-06-04.1737.7d0993d' });
+
 // BUG FIX (kept): an EADDRINUSE/EACCES on listen surfaced as an unhandled
 // 'error' event → hard crash → systemd restart loop. Fail loudly ONCE.
 listener.on('error', (e) => {
@@ -630,6 +638,7 @@ if (SOCKET) {
 // the SAME gateway socket — no second listener needed.
 if (!SOCKET && PLAIN_PORT > 0) {
   const plainListener = http.createServer(safeHandler);
+  attachWebWs(plainListener, { log, counters, versionString: '2.11 (2.11.5) 2026-06-04.1737.7d0993d' });
   plainListener.on('error', (e) => {
     console.error(JSON.stringify({ kind: 'gateway_error', listener: 'plain', error: String(e && e.code ? e.code : e).slice(0, 200), port: PLAIN_PORT, bind: '127.0.0.1' }));
     process.exit(1);

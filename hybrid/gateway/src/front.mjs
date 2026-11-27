@@ -107,6 +107,11 @@ export function createFront(ctx) {
       ctx.tokenCacheMs ?? Math.max(30_000, (Number(ctx.tokenTtlMs ?? 300_000) || 300_000) - 60_000),
     ),
     vpsDlShare: Math.min(1, Math.max(0, Number.isFinite(Number(ctx.vpsDlShare)) ? Number(ctx.vpsDlShare) : 0.15)),
+    // DIRECT LANE (operator contract 27 Nov 2026): the official web client's
+    // heavy XHRs are 307-handed to the Worker so payload bytes flow client ↔
+    // edge ONLY. Default ON (falls back to full-VPS serving when the edge is
+    // unavailable or the mint is rate-limited).
+    webDirect: ctx.webDirect === false ? false : true,
   };
   const tokenBindIp = ctx.tokenBindIp === true;
 
@@ -254,6 +259,86 @@ export function createFront(ctx) {
     res.end();
   }
 
+  /** CORS reflection (daemon §4.5 semantics: reflect when allowedDomains
+   *  accepts — the gateway default serves "*"). Every hop of a CORS
+   *  redirect must carry ACAO or the browser aborts the measurement. */
+  function corsHeaders(req) {
+    const o = req.headers.origin;
+    if (!o) return {};
+    return { 'Access-Control-Allow-Origin': o };
+  }
+
+  /** Serve `size` bytes of daemon-parity pool data as application/octet-stream
+   *  with the exact Content-Length (the Ookla web-client download shape). */
+  function serveLocalOctet(res, size, meta) {
+    counters.frontDlLocalServed = (counters.frontDlLocalServed || 0) + 1;
+    log('web_download_local', { ...meta, lane: meta && meta.lane ? meta.lane : 'vps' });
+    res.writeHead(200, {
+      'Content-Type': 'application/octet-stream',
+      'Content-Length': size,
+      'Cache-Control': 'no-store, no-transform',
+      'X-Hybrid-Lane': 'vps',
+      'X-Hybrid-Front': FRONT_ID,
+    });
+    if (size === 0) {
+      res.end();
+      return;
+    }
+    const pool = getVpsPool();
+    const CHUNK = 256 * 1024;
+    let off = 0;
+    let stopped = false;
+    res.on('close', () => {
+      stopped = true;
+    });
+    const writeNext = () => {
+      while (off < size && !stopped) {
+        const len = Math.min(CHUNK, size - off);
+        const start = off % POOL_SIZE;
+        const take = Math.min(POOL_SIZE - start, len);
+        const out = Buffer.allocUnsafe(len);
+        pool.copy(out, 0, start, start + take);
+        if (take < len) pool.copy(out, take, 0, len - take);
+        off += len;
+        counters.frontDlLocalBytes = (counters.frontDlLocalBytes || 0) + len;
+        counters.frontBytesOut = (counters.frontBytesOut || 0) + len;
+        let writable;
+        try {
+          writable = res.write(out);
+        } catch {
+          stopped = true;
+          break;
+        }
+        if (!writable) {
+          res.once('drain', writeNext);
+          return;
+        }
+      }
+      if (off >= size && !stopped) {
+        try {
+          res.end();
+        } catch {
+          /* socket gone */
+        }
+      }
+    };
+    writeNext();
+  }
+
+  /** 307 redirect with CORS (each redirect hop of a CORS request must pass
+   *  the CORS check — verified live in the 27 Nov direct-lane PoC). */
+  function redirectCors(req, res, location) {
+    res.writeHead(307, {
+      'Content-Length': 0,
+      Location: location,
+      'Cache-Control': 'no-store, no-transform',
+      'X-Hybrid-Lane': 'edge',
+      'X-Hybrid-Front': FRONT_ID,
+      ...corsHeaders(req),
+    });
+    res.end();
+  }
+
   /** Drain the upload body FULLY, then answer `size=N` (daemon legacy
    *  parity). No early answer: an early response + close would abort the
    *  client's send loop mid-body on real-RTT links (observed T-10). */
@@ -314,9 +399,150 @@ export function createFront(ctx) {
     const stripped = path.startsWith('/speedtest/') ? path.slice('/speedtest'.length) : path;
     if (stripped.endsWith('/') && stripped !== '/') stripped = stripped.slice(0, -1);
 
-    // ---- OPTIONS (compat) ----
+    // ---- OPTIONS (compat + web-client preflight) -----------------------
+    // The Ookla web SDK POSTs application/octet-stream, which browsers
+    // preflight with Access-Control-Request-Headers: content-type. Without
+    // echoing ACAH the preflight fails and the upload POST is never sent
+    // (verified live, 27 Nov direct-lane PoC — this exact failure killed
+    // the upload stage before the fix).
     if (method === 'OPTIONS') {
-      finish(res, 200, '', { Allow: 'GET, HEAD, POST, OPTIONS' });
+      const h = {
+        Allow: 'GET, HEAD, POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
+        ...corsHeaders(req),
+      };
+      const reqH = req.headers['access-control-request-headers'];
+      if (reqH) h['Access-Control-Allow-Headers'] = reqH;
+      finish(res, 200, '', h);
+      return true;
+    }
+
+    // ---- Ookla WEB-CLIENT XHR surface (direct lane, 27 Nov 2026) -------
+    // Control endpoints are served here (tiny); the heavy endpoints
+    // (/download, POST /upload) are 307-handed to the Worker so the payload
+    // flows client ↔ edge ONLY. Byte shapes verified against production
+    // OoklaServer 2.11.5/2.11.7 + the live speedtest.net SDK (PoC 27 Nov).
+    if (stripped === '/hello' && (method === 'GET' || method === 'HEAD')) {
+      counters.webHello = (counters.webHello || 0) + 1;
+      finish(res, 200, `hello ${VERSION_STRING}\n`, {
+        'Content-Type': 'text/plain; charset=UTF-8',
+        ...corsHeaders(req),
+      });
+      return true;
+    }
+    if (stripped === '/getip' && (method === 'GET' || method === 'HEAD')) {
+      counters.webGetip = (counters.webGetip || 0) + 1;
+      finish(res, 200, `${ip}\n`, {
+        'Content-Type': 'text/plain; charset=UTF-8',
+        ...corsHeaders(req),
+      });
+      return true;
+    }
+    if (stripped === '/capabilities' && (method === 'GET' || method === 'HEAD')) {
+      counters.webCapabilities = (counters.webCapabilities || 0) + 1;
+      // NO UPLOAD_STATS: on the direct lane the upload bytes land at the
+      // edge — the SDK then measures upload LOCALLY (its designed fallback).
+      finish(res, 200, 'capabilities SERVER_HOST_AUTH\n', {
+        'Content-Type': 'text/plain; charset=UTF-8',
+        ...corsHeaders(req),
+      });
+      return true;
+    }
+    if (stripped === '/ping' && (method === 'GET' || method === 'HEAD')) {
+      counters.webPing = (counters.webPing || 0) + 1;
+      finish(res, 200, 'pong\n', {
+        'Content-Type': 'text/plain; charset=UTF-8',
+        ...corsHeaders(req),
+      });
+      return true;
+    }
+    if (stripped === '/upload-stats') {
+      // production parity: 400 (the web client measures via WSS, not HTTP)
+      finish(res, 400, '', corsHeaders(req));
+      return true;
+    }
+
+    // ---- /download?size=N — the web client's heavy download -------------
+    if (stripped === '/download' && (method === 'GET' || method === 'HEAD')) {
+      const n = Number(url.searchParams.get('size') || 0);
+      const size = Number.isInteger(n) && n >= 0 ? n : 0;
+      counters.webDownloads = (counters.webDownloads || 0) + 1;
+      const guid = url.searchParams.get('guid') || '';
+
+      const edgeUsable = opts.webDirect && workersAvailable() && method === 'GET' && size > 0;
+      if (edgeUsable) {
+        const effective = opts.maxDownBytes && size > opts.maxDownBytes ? opts.maxDownBytes : size;
+        if (effective !== size) counters.frontDownCapped = (counters.frontDownCapped || 0) + 1;
+        const token = getOffloadToken(ip);
+        if (token) {
+          const worker = pickWorker();
+          recordMint(worker.id);
+          counters.webDownRedirects = (counters.webDownRedirects || 0) + 1;
+          log('web_download_redirect', { ip, size: effective, guid, workerId: worker.id, lane: 'edge' });
+          const sep = url.search ? '&' : '?';
+          redirectCors(req, res, `${worker.url}/download${url.search}${sep}token=${token}`);
+          return true;
+        }
+        // mint rate-limited → forced local serve (never break the client)
+        counters.webDlLocalForced = (counters.webDlLocalForced || 0) + 1;
+        log('web_download_local_forced', { ip, size, guid });
+      }
+      if (method === 'HEAD') {
+        finish(res, 200, '', {
+          'Content-Type': 'application/octet-stream',
+          'Content-Length': size,
+          'X-Hybrid-Lane': 'vps',
+          ...corsHeaders(req),
+        });
+        return true;
+      }
+      counters.webDlLocal = (counters.webDlLocal || 0) + 1;
+      serveLocalOctet(res, size, { ip, guid });
+      return true;
+    }
+
+    // ---- POST /upload — the web client's heavy upload -------------------
+    if (stripped === '/upload') {
+      if (method !== 'POST') {
+        finish(res, 404, '', corsHeaders(req));
+        return true;
+      }
+      counters.webUploads = (counters.webUploads || 0) + 1;
+      const guid = url.searchParams.get('guid') || '';
+      if (opts.webDirect && workersAvailable()) {
+        const token = getOffloadToken(ip);
+        if (token) {
+          const worker = pickWorker();
+          recordMint(worker.id);
+          counters.webUlRedirects = (counters.webUlRedirects || 0) + 1;
+          let saw = 0;
+          req.on('data', (c) => {
+            saw += c.length;
+          });
+          log('web_upload_redirect', { ip, guid, workerId: worker.id, lane: 'edge' });
+          const sep = url.search ? '&' : '?';
+          // 307 preserves method+body: the browser re-POSTs the whole body
+          // DIRECTLY to the edge. Answer immediately; discard the body bytes
+          // that were already in flight (redirect spill ≈ 1 RTT of body).
+          res.writeHead(307, {
+            'Content-Length': 0,
+            Location: `${worker.url}/upload${url.search}${sep}token=${token}`,
+            'Cache-Control': 'no-store, no-transform',
+            'X-Hybrid-Lane': 'edge',
+            'X-Hybrid-Front': FRONT_ID,
+            ...corsHeaders(req),
+          });
+          res.end(() => {
+            counters.webUlSpillBytes = (counters.webUlSpillBytes || 0) + saw;
+            log('web_upload_redirect_flushed', { ip, guid, spillBytes: saw });
+            req.destroy();
+          });
+          return true;
+        }
+        counters.webUlLocalForced = (counters.webUlLocalForced || 0) + 1;
+      }
+      // full-VPS upload (direct lane off / no edge / mint limited)
+      handleUpload(req, res, ip, url);
       return true;
     }
 
@@ -447,6 +673,10 @@ export function createFront(ctx) {
     if (patch.vpsDlShare !== undefined && Number.isFinite(Number(patch.vpsDlShare))) {
       opts.vpsDlShare = Math.min(1, Math.max(0, Number(patch.vpsDlShare)));
       applied.vpsDlShare = opts.vpsDlShare;
+    }
+    if (patch.webDirect !== undefined) {
+      opts.webDirect = patch.webDirect === true || patch.webDirect === 'true' || patch.webDirect === 1;
+      applied.webDirect = opts.webDirect;
     }
     if (Object.keys(applied).length > 0) log('front_options_updated', applied);
   };

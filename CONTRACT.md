@@ -4,7 +4,7 @@
 > target proyek, siapa berjalan di mana, tata letak port, cara instalasi,
 > cara menguji dengan aplikasi RESMI Ookla, dan peta reverse engineering.
 > Bahasa: Indonesia; istilah teknis mengikuti repo. Terakhir diperbarui:
-> 27 Nov 2026 (PORT AUTHORITY + installer beku).
+> 27 Nov 2026 (DIRECT LANE — kontrak operator: relay dilarang).
 
 ## 1. Target proyek (kalimat pembuka yang tidak boleh berubah)
 
@@ -25,13 +25,48 @@ Menjadi **pengganti mandiri (standalone) OoklaServer** yang:
    **installer beku** yang tidak pernah berubah meski code berubah
    (lihat §5 dan docs/INSTALL_BOOTSTRAP.md).
 
+### Prinsip arsitektur — LARANGAN RELAY (kontrak operator, 27 Nov 2026)
+
+> "Konsep relay, bridge, atau sejenisnya itu **salah total** — justru
+> menyalahi target awal proyek. Kalau konsep tersebut dijalankan, artinya
+> ada **pemborosan resource**: daripada pakai worker, sekalian saja full
+> VPS. Yang dimau: **worker membantu load berat LANGSUNG ke client**
+> (di-serve DL dan UL secara simultan, tanpa transit VPS)." — operator
+
+Aturan turunannya (berlaku untuk semua agent berikutnya):
+
+1. **Worker hanya boleh membawa payload yang mengalir LANGSUNG client ↔
+   edge CF.** Setiap byte payload yang transit NIC VPS = pelanggaran
+   kontrak (terukur audit 27 Nov: relay membuat semua lane terkunci di
+   egress VPS 429–473 Mbps; worker jadi pemborosan resource).
+2. **VPS = control plane saja** untuk lane edge: handshake, ping/jitter
+   (WSS), token, identitas, loss. Payload berat = edge.
+3. **Klien NetGauge-native (CLI resmi) tidak punya permukaan redirect** —
+   diverifikasi ulang first-hand 27 Nov (hello terenkripsi → ERROR →
+   plaintext HI → ERROR → "Latency test failed"; **0 request HTTP, 0 port
+   lain** walau permukaan HTTP penuh + 307 tersedia di port yang sama).
+   Maka CLI dilayani **full-VPS** (`SPEEDTEST_BRIDGE_BACKEND=local`) —
+   sesuai logika operator: kalau worker hanya bisa relay untuk lane itu,
+   jangan pakai worker.
+4. **Klien web resmi speedtest.net (SDK Ookla, tanpa modifikasi) PUNYA
+   permukaan redirect**: payload-nya XHR (`GET /download?size=` +
+   `POST /upload`) → **307 handoff ke Worker** = direct lane. Terbukti
+   live 27 Nov (PoC sandbox, halaman speedtest.net asli): DL 232 Mbps / UL 23.3 Mbps dilayani
+   100% dari edge, VPS hanya 440 byte control HTTP + WSS ping.
+
 ### Label jujur (wajib dipertahankan saat mengutip hasil)
 
-- Mode bridge (payload dari Worker): **edge-ORIGIN dengan RELAY VPS** —
-  semua byte tetap transit link VPS; **tidak menambah kapasitas per sesi**
-  (terukur: DL bridge 416–449 Mbps vs daemon 451–462 Mbps, 27 Nov 2026).
-- Jalur edge **langsung** (non-relay) untuk klien native **tetap BLOCKED**
-  (BLOCKED_BY_PROTOCOL + BLOCKED_BY_FREE_PLAN — audit 26–27 Nov 2026).
+- Mode **direct lane** (web client resmi): **payload client ↔ edge CF
+  LANGSUNG** — VPS hanya control (terukur: 533 MB DL + UL dilayani edge,
+  VPS 440 byte HTTP control + ~46 KB WSS ping + spill ~1 MB pra-redirect).
+  Ini SATU-SATUNYA lane yang memenuhi target "hasil > bandwidth VPS".
+- Klien native (CLI/app): **full-VPS, tanpa worker** (backend `local`);
+  mode bridge-relay LAMA (payload dari Worker transit VPS) **dilarang
+  kontrak** — semua lane relay terkunci egress VPS 429–473 Mbps
+  (audit 27 Nov; ingress 872 Mbps tak terpakai untuk DL).
+- Jalur edge langsung untuk **CLI** tetap BLOCKED_BY_PROTOCOL (bukan
+  karena CF free, tapi karena CLI sendiri tidak punya transport
+  redirect-able — bukti fresh 27 Nov: `docs/DIRECT_EDGE_LANE_2026-11-27.md` §2).
 
 ## 2. Siapa berjalan di mana (jawaban atas salah paham umum)
 
@@ -173,6 +208,7 @@ CLI resmi + hosts-mock langsung dilayani `speedtest-bridge` di SEMUA port
 | Engine referensi TypeScript (port NetGaugeEngine yang diverifikasi) | `reverse-engineered/typescript/` |
 | Analisis binary CLI resmi (hello terenkripsi → ERROR → fallback plaintext) | `speedtest-cli_analysis/`, `validation/OFFICIAL_CLI_FAILURE_ANALYSIS.md` |
 | Semantik Worker `/__down` `/__up` `/ws` + cap 128 MiB + `?pace=` | `hybrid/worker/` (suite conformance/token/free-hardening/pool) |
+| **DIRECT LANE web client resmi** (307 handoff, bukti PoC live + metode uji ulang) | `docs/DIRECT_EDGE_LANE_2026-11-27.md` + `hybrid/lab/evidence/direct-edge-lane-2026-11-27/` |
 | Audit jalur edge langsung (verdict BLOCKED) | `audit/historical-native-worker-2026-11-27` (branch) |
 | Eksperimen bridge asli + kronologi perbaikan | `docs/CLI_BRIDGE_REPORT_2026-11-27.md` + `hybrid/lab/evidence/cli-bridge-2026-11-27/` |
 | Kontrak installer beku (bootstrap ↔ core ↔ updater) | `docs/INSTALL_BOOTSTRAP.md` |
