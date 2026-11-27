@@ -22,7 +22,20 @@
  *   PING                   → ERROR
  *   INITPLOSS              → OK                          (arms packet-loss accounting)
  *   PLOSS                  → PLOSS <count> <dupes> <maxseq>
- *   UPLOAD_STATS           → ERROR                       (daemon parity; tolerated by clients)
+ *   UPLOAD_STATS (argless) → ERROR                       (daemon parity — verified
+ *                            2026-11-27 on production OoklaServer 2.11.5 AND
+ *                            2.11.7: no-arg form answers ERROR even with a session)
+ *   UPLOAD_STATS <durMs> <intMs> [<index>]
+ *                          → newline-delimited JSON stream (web-client remote
+ *                            upload measurement; verified 2026-11-27 against
+ *                            production 2.11.5/2.11.7 and a real speedtest.net
+ *                            web run — 302 frames for `UPLOAD_STATS 15000 50 0`):
+ *                            immediate ack {"t":"u"}\n, then every intMs a line
+ *                            {"b":<session upload bytes since stream start>,
+ *                             "e":<i*intMs>,"i":<index+i>,"t":"u"}\n, then the
+ *                            transport is CLOSED (WS close code 1000) once
+ *                            durMs elapses. REQUIRES a session ("HI <uuid>") —
+ *                            with a bare HI the daemon answers ERROR.
  *   DOWNLOAD <n>           → exactly n bytes: "DOWNLOAD " prefix (truncated for
  *                            n<10) + (n-10) pool bytes + trailing "\n" (all counted
  *                            in n; n=0 → just "\n"). Pool data is printable ASCII
@@ -30,7 +43,17 @@
  *   UPLOAD <n> [ms] [c]    → reads n bytes INCLUSIVE of the command line, then
  *                            OK <n> <epoch-ms>. n < command-line length → ERROR
  *                            (n=0 included). Non-numeric/negative n → silently
- *                            ignored (connection continues).
+ *                            ignored (connection continues). TCP ONLY — over
+ *                            WebSocket every frame that starts with the 7-byte
+ *                            prefix "UPLOAD " is a RAW UPLOAD FRAME counted by
+ *                            its full frame length (no size parsing, no payload
+ *                            phase), answered `OK <frame-length> <epoch-ms>`
+ *                            (verified 2026-11-27 on production 2.11.5/2.11.7:
+ *                            a 9-byte "UPLOAD 50" frame is answered
+ *                            `OK 9 <epoch>` — the CLI size-command form does not
+ *                            exist over WS). See feedRawUploadFrame().
+ *   DOWNLOAD 0 (ws)        → ERROR over WebSocket (verified 2026-11-27,
+ *                            production 2.11.5); over TCP it stays "\n".
  *   QUIT                   → close (TCP) / ERROR reply (WebSocket — verified F-14)
  *   <unknown>              → ERROR
  *
@@ -69,6 +92,59 @@ export interface NetGaugeEngineOptions {
    *  counter; the HI bad-argument ERROR does NOT count; WebSocket sessions
    *  do not enforce the limit at all. 0 disables (default). */
   errorStrikeLimit?: number;
+  /** Transport the engine is attached to. 'ws' (WebSocket) selects the
+   *  transport-specific daemon quirks verified on production servers
+   *  (2026-11-27): DOWNLOAD 0 answers ERROR instead of "\n". */
+  transport?: 'tcp' | 'ws';
+  /** Shared cross-connection upload-session accounting (per run GUID). The
+   *  web client binds ALL its upload traffic to one GUID — "HI <uuid>" on the
+   *  WebSocket and "?guid=<uuid>" on every XHR upload — and the daemon's
+   *  UPLOAD_STATS stream reports the session's cumulative received bytes
+   *  (verified with a real speedtest.net run: 302 frames, b → 1.14 GB).
+   *  When unset, UPLOAD_STATS answers ERROR (no session accounting). */
+  uploadSessions?: UploadSessionRegistry;
+}
+
+/**
+ * UploadSessionRegistry — per-run-GUID cumulative upload byte accounting,
+ * shared across transports (WS raw upload frames, CLI UPLOAD payloads and
+ * XHR/legacy HTTP upload bodies — the HTTP side attributes via the "?guid="
+ * query parameter exactly like the web client sends it).
+ *
+ * Bounded like LossRegistry (F-33): client-supplied GUIDs are an
+ * exhaustion vector, so the registry caps the number of tracked sessions
+ * (default 4096) and evicts the least-recently-added entry. Only UUID-shaped
+ * keys are accepted (the daemon binds sessions to UUIDs; junk GUID params
+ * from HTTP requests must not allocate registry entries).
+ */
+export class UploadSessionRegistry {
+  private totals = new Map<string, number>();
+  private maxSessions: number;
+
+  constructor(maxSessions = 4096) {
+    this.maxSessions = Math.max(1, Math.floor(maxSessions));
+  }
+
+  size(): number {
+    return this.totals.size;
+  }
+
+  /** Attribute n received upload bytes to a session. Invalid (non-UUID) keys
+   *  are ignored — only daemon-shaped session identifiers allocate entries. */
+  add(uuid: string, n: number): void {
+    if (!UUID_RE.test(uuid) || !Number.isFinite(n) || n <= 0) return;
+    const total = (this.totals.get(uuid) ?? 0) + Math.floor(n);
+    if (!this.totals.has(uuid) && this.totals.size >= this.maxSessions) {
+      const oldest = this.totals.keys().next().value;
+      if (oldest !== undefined) this.totals.delete(oldest);
+    }
+    this.totals.delete(uuid); // re-insert at the end (recency order)
+    this.totals.set(uuid, total);
+  }
+
+  get(uuid: string): number {
+    return this.totals.get(uuid) ?? 0;
+  }
 }
 
 /** Packet-loss session registry shared between the TCP and UDP engines.
@@ -249,6 +325,8 @@ export class NetGaugeEngine {
   private hiSeen = false;
   /** Cumulative ERROR replies ("three strikes" — verified F-24). */
   private errorStrikes = 0;
+  /** Active UPLOAD_STATS stream timer (cleared on stream end / destroy). */
+  private statsTimer: NodeJS.Timeout | null = null;
   /** Bytes transferred on this connection (evidence counters). */
   public readonly counters = { commands: 0, downloads: 0, uploads: 0, bytesDown: 0, bytesUp: 0 };
 
@@ -296,6 +374,7 @@ export class NetGaugeEngine {
         this.uploadRemaining -= take;
         this.buf = this.buf.subarray(take);
         this.counters.bytesUp += take;
+        this.attributeUploadBytes(take);
         if (this.uploadRemaining === 0) {
           this.hooks.onEvent?.('upload_done', { declared: this.uploadTotal, counted: this.uploadCounted });
           this.counters.uploads++;
@@ -339,6 +418,96 @@ export class NetGaugeEngine {
         this.hooks.close();
         this.closed = true;
       }
+    }
+  }
+
+  /** Attribute received upload bytes to this connection's session (when a
+   *  "HI <uuid>" registered one and a registry is wired). Shared across all
+   *  of the run's connections — the web client binds XHR uploads by the
+   *  "?guid=" parameter and WS uploads by the session on this transport. */
+  private attributeUploadBytes(n: number): void {
+    if (this.sessionUuid && this.opts.uploadSessions) {
+      this.opts.uploadSessions.add(this.sessionUuid, n);
+    }
+  }
+
+  /**
+   * RAW UPLOAD FRAME (WebSocket only — verified 2026-11-27 against production
+   * OoklaServer 2.11.5 and 2.11.7): a frame whose first 7 bytes are the ASCII
+   * prefix "UPLOAD " is upload DATA, not a command. The whole frame counts as
+   * received upload bytes (no size parsing — a 9-byte "UPLOAD 50" frame is
+   * answered `OK 9 <epoch>`, so the CLI size-command form does not exist over
+   * WS) and the reply is `OK <frame-length> <epoch-ms>`. The web client sends
+   * these frames as binary payloads of exactly the requested message size
+   * (bundle: bytes 0..6 = 85,80,76,79,65,68,32, then random bytes ≥ 0x14).
+   */
+  feedRawUploadFrame(buf: Buffer): void {
+    if (this.closed || this.muted) return;
+    this.counters.uploads++;
+    this.counters.bytesUp += buf.length;
+    this.attributeUploadBytes(buf.length);
+    this.hooks.onEvent?.('upload_frame', { bytes: buf.length });
+    this.hooks.writeLine(`OK ${buf.length} ${Date.now()}`);
+  }
+
+  /**
+   * UPLOAD_STATS stream (web-client remote upload measurement — verified
+   * 2026-11-27 on production 2.11.5/2.11.7 and against a real speedtest.net
+   * web run that streamed 302 frames for `UPLOAD_STATS 15000 50 0`):
+   *
+   *   "HI <uuid>" (session) is REQUIRED — with a bare HI the daemon answers
+   *   ERROR (verified). The argless form answers ERROR even with a session
+   *   (verified). 2 or 3 integer arguments are accepted:
+   *   `UPLOAD_STATS <durationMillis> <intervalMillis> [<index>]`.
+   *
+   *   Reply: an immediate ack line `{"t":"u"}`, then one line every
+   *   intervalMillis `{"b":<session upload bytes received since the stream
+   *   started>,"e":<i*intervalMillis>,"i":<index+i>,"t":"u"}` until
+   *   durationMillis elapses, then the transport is CLOSED (WS close code
+   *   1000 — verified). A second UPLOAD_STATS on the same connection
+   *   replaces the active stream.
+   */
+  private startUploadStats(durationMs: number, intervalMs: number, index: number): void {
+    this.stopUploadStats();
+    const sessions = this.opts.uploadSessions;
+    if (!sessions || !this.sessionUuid) {
+      // Verified: no session (bare HI) → ERROR.
+      this.errorReply();
+      return;
+    }
+    const baseline = sessions.get(this.sessionUuid);
+    let i = 0;
+    const emitLine = (): void => {
+      if (this.closed) return;
+      const b = sessions.get(this.sessionUuid as string) - baseline;
+      const e = i * intervalMs;
+      this.hooks.writeLine(`{"b":${Math.max(0, b)},"e":${e},"i":${index + i},"t":"u"}`);
+    };
+    // Immediate ack (no b/e/i fields — verified shape), then the first data
+    // line right away with e=0 (the observed stream delivered 1 ack + 301
+    // lines for `15000 50`: i=0..300, e=0..15000).
+    this.hooks.writeLine('{"t":"u"}');
+    emitLine();
+    const startedAt = Date.now();
+    this.statsTimer = setInterval(() => {
+      if (this.closed) {
+        this.stopUploadStats();
+        return;
+      }
+      i++;
+      emitLine();
+      if (Date.now() - startedAt >= durationMs) {
+        this.stopUploadStats();
+        this.hooks.onEvent?.('upload_stats_done', { durationMs, intervalMs, lines: i + 1 });
+        this.hooks.close();
+      }
+    }, intervalMs);
+  }
+
+  private stopUploadStats(): void {
+    if (this.statsTimer !== null) {
+      clearInterval(this.statsTimer);
+      this.statsTimer = null;
     }
   }
 
@@ -424,8 +593,21 @@ export class NetGaugeEngine {
       this.hooks.writeLine(this.opts.loss.statsLine());
       return;
     }
-    if (s === 'UPLOAD_STATS') {
-      this.errorReply(); // daemon parity (verified 2026-11-04)
+    if (s === 'UPLOAD_STATS' || s.startsWith('UPLOAD_STATS ')) {
+      // Argless form → ERROR (daemon parity, re-verified 2026-11-27 on
+      // production 2.11.5/2.11.7: ERROR even with an active session).
+      const args = s.slice('UPLOAD_STATS'.length).trim().split(/\s+/).filter((a) => a.length > 0);
+      const numbers = args.map((a) => (/^\d{1,10}$/.test(a) ? parseInt(a, 10) : NaN));
+      if (args.length < 2 || args.length > 3 || numbers.some((n) => !Number.isFinite(n))) {
+        this.errorReply();
+        return;
+      }
+      const [durationMs, intervalMs, index = 0] = numbers;
+      if (durationMs <= 0 || intervalMs <= 0) {
+        this.errorReply();
+        return;
+      }
+      this.startUploadStats(durationMs, intervalMs, index);
       return;
     }
     if (s.startsWith('DOWNLOAD ')) {
@@ -434,6 +616,12 @@ export class NetGaugeEngine {
         // The reference daemon streams UNBOUNDED data for unparsable sizes
         // (verified: multi-GB before the probe was killed). We refuse with
         // ERROR instead — deliberate, documented safety deviation.
+        this.errorReply();
+        return;
+      }
+      if (n === 0 && this.opts.transport === 'ws') {
+        // Verified 2026-11-27 (production 2.11.5, WebSocket): DOWNLOAD 0 is
+        // answered ERROR over WS (the TCP "\n" reply is TCP-only).
         this.errorReply();
         return;
       }
@@ -561,5 +749,6 @@ export class NetGaugeEngine {
 
   destroy(): void {
     this.closed = true;
+    this.stopUploadStats();
   }
 }

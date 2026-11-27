@@ -32,9 +32,31 @@
  *   - GET /ws without an upgrade request is dropped silently.
  *   - Chunked POST bodies on upload.php get no response at all (daemon
  *     parser behavior; connection is kept until timeout).
+ *
+ * Web-client (speedtest.net JS engine) surface — verified 2026-11-27 against
+ * PRODUCTION OoklaServer 2.11.5 (XL) and 2.11.7 (Tuxsindo) plus real
+ * captured web runs (docs/WEB_CLIENT_REVERSE_ENGINEERING_2026-11-26.md):
+ *   - GET /hello → "hello <version>\n" (exact alias of /hi; both verified).
+ *   - GET /getip → "<peer-ip>\n" (text/plain; the XHR twin of GETIP).
+ *   - GET /capabilities → "capabilities SERVER_HOST_AUTH UPLOAD_STATS\n".
+ *   - GET /ping → "pong\n" (lowercase, no timestamp, 5 bytes).
+ *   - GET /download?size=N → exactly N bytes, application/octet-stream,
+ *     exact Content-Length, no-store + reflected CORS Origin. Unparsable /
+ *     missing / negative size: the production daemon streams its 10 GiB
+ *     default (Content-Length: 10737418240, HEAD-verified) — we serve
+ *     Content-Length: 0 instead (documented safety deviation, same rationale
+ *     as the engine's DOWNLOAD cap refusal).
+ *   - GET /upload-stats → 400 Bad Request, empty body (verified on both
+ *     production versions; the web client measures uploads via the WebSocket
+ *     UPLOAD_STATS command instead).
+ *   - POST /upload?guid=<uuid> bodies are attributed to the upload session
+ *     (UploadSessionRegistry) so the WS UPLOAD_STATS stream sees them —
+ *     exactly how the real client binds its XHR uploads (verified: a real
+ *     run's stats stream counted 1.14 GB of XHR-upload bytes).
  */
 
 import { IncomingMessage, ServerResponse } from 'node:http';
+import { normalizeIp, UploadSessionRegistry } from './NetGaugeEngine';
 
 /** Mutable certificate-host information shared with ServerCore (refreshed
  *  on TLS hot reload). */
@@ -80,6 +102,16 @@ export interface HttpApiOptions {
    *
    *  0 disables the early answer (strict full-body parity). */
   slowUploadResponseMs?: number;
+  /** Shared per-run-GUID upload byte accounting (see UploadSessionRegistry).
+   *  POST upload bodies with a "?guid=<uuid>" parameter are attributed to
+   *  that session so the WebSocket UPLOAD_STATS stream measures them —
+   *  exactly the web client's binding (verified 2026-11-26/27). */
+  uploadSessions?: UploadSessionRegistry;
+  /** Per-request download cap for GET /download?size=N (default 2 GiB - 1,
+   *  engine parity). Valid sizes above the cap are refused with the minimal
+   *  500 (documented safety deviation — the production daemon has no observed
+   *  cap; unparsable sizes there stream a 10 GiB default). */
+  maxDownloadBytes?: number;
   onEvent?: (kind: string, detail: Record<string, unknown>) => void;
 }
 
@@ -452,13 +484,83 @@ export function createRequestHandler(opts: HttpApiOptions) {
       notFound();
       return;
     }
-    if (path === '/hi') {
+    if (path === '/hi' || path === '/hello') {
       if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') {
         const body = `hello ${opts.versionString}\n`;
         respond(200, body, [...commonHeaders(), ['Content-Type', 'text/plain; charset=UTF-8']], connMode, mode);
         return;
       }
       notFound();
+      return;
+    }
+    if (path === '/getip') {
+      if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') {
+        // Verified 2026-11-27 (production 2.11.5/2.11.7): "<peer-ip>\n",
+        // text/plain; charset=UTF-8 (the XHR twin of the WS GETIP command).
+        const body = `${normalizeIp(req.socket.remoteAddress || '')}\n`;
+        respond(200, body, [...commonHeaders(), ['Content-Type', 'text/plain; charset=UTF-8']], connMode, mode);
+        return;
+      }
+      notFound();
+      return;
+    }
+    if (path === '/capabilities') {
+      if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') {
+        const body = 'capabilities SERVER_HOST_AUTH UPLOAD_STATS\n';
+        respond(200, body, [...commonHeaders(), ['Content-Type', 'text/plain; charset=UTF-8']], connMode, mode);
+        return;
+      }
+      notFound();
+      return;
+    }
+    if (path === '/ping') {
+      if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') {
+        // Verified 2026-11-27 (production): lowercase "pong\n", 5 bytes, no
+        // timestamp (NOT the WS PING/PONG <epoch-ms> form).
+        const body = 'pong\n';
+        respond(200, body, [...commonHeaders(), ['Content-Type', 'text/plain; charset=UTF-8']], connMode, mode);
+        return;
+      }
+      notFound();
+      return;
+    }
+    if (path === '/download') {
+      if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') {
+        // Verified 2026-11-27 (production 2.11.5, HEAD + GET): size=N →
+        // exactly N bytes, application/octet-stream, exact Content-Length,
+        // no-store + reflected Origin. Missing size → CL 0; unparsable /
+        // negative → the daemon streams its 10 GiB default (CL 10737418240)
+        // — we serve CL 0 instead (documented safety deviation).
+        const q = target.slice(target.indexOf('?') + 1);
+        const sizeRaw = new URLSearchParams(q).get('size') ?? '';
+        const size = /^\d{1,15}$/.test(sizeRaw) ? parseInt(sizeRaw, 10) : 0;
+        const cap = opts.maxDownloadBytes ?? 0x7fffffff;
+        if (size > cap) {
+          opts.onEvent?.('http_download_cap_rejected', { requested: size, cap });
+          minimalError(res.socket, 'Internal Server Error');
+          return;
+        }
+        if (method === 'GET') {
+          respondStream(res, opts.pool, size, [...commonHeaders(), ['Content-Type', 'application/octet-stream']], connMode);
+        } else {
+          respond(200, Buffer.alloc(0), [...commonHeaders(), ['Content-Type', 'application/octet-stream']], connMode, mode, size);
+        }
+        return;
+      }
+      notFound();
+      return;
+    }
+    if (path === '/upload-stats') {
+      // Verified 2026-11-27 (production 2.11.5/2.11.7): 400 Bad Request,
+      // empty body — the web client measures uploads via the WebSocket
+      // UPLOAD_STATS command instead.
+      opts.onEvent?.('http_upload_stats_rejected', { query: target.slice(target.indexOf('?') + 1, target.indexOf('?') + 80) });
+      res.setHeader('Date', utcDate());
+      res.setHeader('Connection', 'Close');
+      for (const [k, v] of commonHeaders()) res.setHeader(k, v);
+      res.useChunkedEncodingByDefault = false;
+      res.writeHead(400);
+      res.end();
       return;
     }
     if (path === '/speedtest/latency.txt' || path === '/latency.txt') {
@@ -510,6 +612,14 @@ export function createRequestHandler(opts: HttpApiOptions) {
       const clHeader = req.headers['content-length'];
       const clRaw = clHeader === undefined ? '' : String(clHeader).trim();
       const cl = /^\d{1,15}$/.test(clRaw) ? Number(clRaw) : undefined;
+      // Web-client upload-session binding: the speedtest.net JS engine tags
+      // every XHR upload with "?guid=<run-uuid>" — the same uuid it
+      // registered on its WebSocket ("HI <uuid>") — and the daemon's
+      // UPLOAD_STATS stream reports the session's cumulative bytes
+      // (verified 2026-11-26/27 with real runs). Attribute received body
+      // bytes to that session when a registry is wired.
+      const guidMatch = target.match(/[?&]guid=([0-9A-Za-z][0-9A-Za-z-]{0,63})/);
+      const sessionGuid = opts.uploadSessions && guidMatch ? guidMatch[1] : undefined;
       const earlyMs = opts.slowUploadResponseMs ?? 2500;
       let received = 0;
       let aborted = false;
@@ -551,6 +661,7 @@ export function createRequestHandler(opts: HttpApiOptions) {
       req.on('data', (chunk: Buffer) => {
         if (settled) return;
         received += chunk.length;
+        if (sessionGuid) opts.uploadSessions?.add(sessionGuid, chunk.length);
         if (received > opts.maxBodyBytes && !aborted) {
           aborted = true;
           clearEarly();
