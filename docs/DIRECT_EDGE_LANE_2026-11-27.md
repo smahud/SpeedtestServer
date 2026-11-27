@@ -126,11 +126,16 @@ speedtest.net asli):
 | Run | selesai penuh + `POST /api/results.php` (payload 10.637 byte terkirim) |
 | Perbaikan lapangan | gateway produksi awalnya `webws_unavailable` (ws tidak ter-ship ke $HYBRID_PREFIX) → SDK fallback XHR ping (run tetap selesai); FIXED: ws di-copy ke `/opt/speedtest-hybrid/gateway/node_modules` + installer kini selalu menship ws (commit ini) → upgrade **101 Switching Protocols** terverifikasi via Unix socket |
 
-Catatan: angka DL/UL final run produksi (payload hasil resmi) dicatat dari
-`results.php` capture; atribusi byte di atas adalah sisi browser +
-`web_download_redirect`/`web_upload_redirect` di JSONL gateway (cek
-`/api/health` counter `webDownRedirects`/`webUlRedirects`) + event `xhr_dl`
-/`xhr_ul` worker (guid cocok).
+**Run final (setelah fix ws — WSS control lane aktif, evidence
+`prod-run3.jsonl` + `prod-run3.result-payload.json`):**
+
+| Sisi | Bukti |
+|---|---|
+| SDK resmi (payload hasil) | **DL 208,7 Mbps** (390,0 MB, 6 koneksi) · **UL 23,1 Mbps** · ping 60,1 ms · jitter 0,7 · **testmethod `wss,xhrs,xhrs`** |
+| Browser (per-host) | `workers.dev`: **492.468.080 byte** DL, 59 redirect diikuti; VPS host: 528 byte; **920 frame WSS control** ke VPS |
+| Gateway VPS (journal) | 40 × `web_download_redirect` + 274 × `web_upload_redirect` (lane=edge, guid cocok) + `web_ws_open` |
+
+Ketiga sisi cocok: payload berat 100% client ↔ edge; VPS hanya control.
 
 ## 5. Keputusan desain + batasan jujur
 

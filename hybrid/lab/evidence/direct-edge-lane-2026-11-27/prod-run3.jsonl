@@ -1,0 +1,1349 @@
+{"ms":109,"t":"step","msg":"navigating https://www.speedtest.net/server/66281"}
+{"ms":2446,"t":"ws-open","url":"wss://hk-hkg12.speed.misaka.one:8080/ws?"}
+{"ms":2446,"t":"ws-open","url":"wss://kami.smartone.com.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2447,"t":"ws-open","url":"wss://suntechspeedtest.com.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2452,"t":"ws-open","url":"wss://hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2455,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"HI"}
+{"ms":2455,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"GETIP"}
+{"ms":2455,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2455,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PING "}
+{"ms":2456,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2456,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2456,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2456,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2457,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2457,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2457,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2457,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2457,"t":"ws-open","url":"wss://hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2457,"t":"ws-open","url":"wss://sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2459,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"HELLO 2.11 (2.11.1) 2024-02-13.1456.91c4"}
+{"ms":2459,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"YOURIP 47.57.232.232."}
+{"ms":2459,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2460,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PONG 1795796561198."}
+{"ms":2460,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2460,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2460,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2460,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2462,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PING 2350.699999999255"}
+{"ms":2466,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2466,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2466,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 8.212.10.159."}
+{"ms":2466,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2468,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561199."}
+{"ms":2468,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 47.57.242.119."}
+{"ms":2468,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2468,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561199."}
+{"ms":2468,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2468,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2468,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2468,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2468,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PONG 1795796561207."}
+{"ms":2468,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PING 2357.5"}
+{"ms":2468,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2468,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2468,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2468,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2469,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2470,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2358.7999999988824"}
+{"ms":2470,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 8.212.10.159."}
+{"ms":2470,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2470,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561210."}
+{"ms":2471,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2359.5"}
+{"ms":2475,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2364.0999999996275"}
+{"ms":2485,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2485,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PONG 1795796561214."}
+{"ms":2486,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PING 2368"}
+{"ms":2486,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2594,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561214."}
+{"ms":2594,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2482.699999999255"}
+{"ms":2594,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561216."}
+{"ms":2594,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2482.9000000003725"}
+{"ms":2594,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 47.57.242.119."}
+{"ms":2594,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2594,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561211."}
+{"ms":2594,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 47.57.242.119."}
+{"ms":2594,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2595,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561212."}
+{"ms":2595,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561223."}
+{"ms":2595,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2484.2999999988824"}
+{"ms":2595,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PONG 1795796561225."}
+{"ms":2595,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PING 2484.2999999988824"}
+{"ms":2595,"t":"ws-open","url":"wss://hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2595,"t":"ws-open","url":"wss://speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2595,"t":"ws-open","url":"wss://speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2597,"t":"ws-open","url":"wss://1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":2604,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2492.699999999255"}
+{"ms":2608,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2495.5"}
+{"ms":2613,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PONG 1795796561346."}
+{"ms":2613,"t":"ws-tx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PING 2501.5999999996275"}
+{"ms":2615,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561348."}
+{"ms":2615,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2503.9000000003725"}
+{"ms":2615,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2615,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2615,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2615,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2615,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2615,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2615,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2615,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2616,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2616,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2616,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2616,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2617,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI"}
+{"ms":2617,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":2617,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":2617,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":2642,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561344."}
+{"ms":2642,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2531.199999999255"}
+{"ms":2642,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561344."}
+{"ms":2642,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2531.2999999988824"}
+{"ms":2643,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561353."}
+{"ms":2643,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2532.7999999988824"}
+{"ms":2645,"t":"ws-rx","host":"hk-hkg12.speed.misaka.one:8080","bin":false,"head":"PONG 1795796561358."}
+{"ms":2646,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561362."}
+{"ms":2646,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2535.5"}
+{"ms":2648,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2648,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2649,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2649,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.7) 2026-10-26.2035.bc13"}
+{"ms":2651,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 47.57.242.119."}
+{"ms":2651,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2652,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561369."}
+{"ms":2652,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 47.57.232.232."}
+{"ms":2652,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2653,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561360."}
+{"ms":2654,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 47.57.242.119."}
+{"ms":2654,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2655,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561361."}
+{"ms":2655,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 47.57.232.232."}
+{"ms":2655,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH UPLOAD_STA"}
+{"ms":2656,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561363."}
+{"ms":2659,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2547.5"}
+{"ms":2659,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2547.699999999255"}
+{"ms":2659,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561398."}
+{"ms":2659,"t":"ws-tx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2547.699999999255"}
+{"ms":2659,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561393."}
+{"ms":2659,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2547.7999999988824"}
+{"ms":2659,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561394."}
+{"ms":2659,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2547.7999999988824"}
+{"ms":2659,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2547.9000000003725"}
+{"ms":2659,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561394."}
+{"ms":2659,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2547.9000000003725"}
+{"ms":2660,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2548.7999999988824"}
+{"ms":2666,"t":"ws-rx","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561408."}
+{"ms":2666,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561404."}
+{"ms":2666,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2555.5999999996275"}
+{"ms":2667,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561405."}
+{"ms":2667,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2556"}
+{"ms":2667,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561412."}
+{"ms":2667,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2556.0999999996275"}
+{"ms":2667,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561404."}
+{"ms":2667,"t":"ws-tx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2556.0999999996275"}
+{"ms":2667,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561405."}
+{"ms":2667,"t":"ws-tx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2556.4000000003725"}
+{"ms":2667,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561405."}
+{"ms":2667,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2556.5"}
+{"ms":2667,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561405."}
+{"ms":2667,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2556.9000000003725"}
+{"ms":2671,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561409."}
+{"ms":2671,"t":"ws-tx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2560.7999999988824"}
+{"ms":2673,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561410."}
+{"ms":2673,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2561.7999999988824"}
+{"ms":2673,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561419."}
+{"ms":2673,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2561.9000000003725"}
+{"ms":2673,"t":"ws-rx","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561411."}
+{"ms":2673,"t":"ws-rx","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561411."}
+{"ms":2673,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561411."}
+{"ms":2673,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2562.699999999255"}
+{"ms":2676,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561412."}
+{"ms":2676,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2565.0999999996275"}
+{"ms":2677,"t":"ws-rx","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561414."}
+{"ms":2678,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561416."}
+{"ms":2678,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2567.699999999255"}
+{"ms":2678,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561424."}
+{"ms":2678,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2567.7999999988824"}
+{"ms":2680,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561418."}
+{"ms":2680,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2569.0999999996275"}
+{"ms":2684,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561421."}
+{"ms":2684,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2573.2999999988824"}
+{"ms":2685,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561422."}
+{"ms":2685,"t":"ws-tx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2574"}
+{"ms":2686,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561431."}
+{"ms":2686,"t":"ws-tx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2575.4000000003725"}
+{"ms":2686,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561424."}
+{"ms":2686,"t":"ws-tx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2575.5"}
+{"ms":2714,"t":"ws-rx","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561429."}
+{"ms":2714,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561429."}
+{"ms":2714,"t":"ws-tx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2603.199999999255"}
+{"ms":2714,"t":"ws-rx","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561438."}
+{"ms":2714,"t":"ws-rx","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561431."}
+{"ms":2756,"t":"ws-rx","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561462."}
+{"ms":2814,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561347."}
+{"ms":2814,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2702.9000000003725"}
+{"ms":2819,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561557."}
+{"ms":2819,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2708.0999999996275"}
+{"ms":2824,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561562."}
+{"ms":2824,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2713.2999999988824"}
+{"ms":2831,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561567."}
+{"ms":2831,"t":"ws-tx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 2719.2999999988824"}
+{"ms":2852,"t":"ws-rx","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796561573."}
+{"ms":2926,"t":"ws-close","host":"1010.hkspeedtest.com.prod.hosts.ooklaserver.net:8080"}
+{"ms":2926,"t":"ws-close","host":"kami.smartone.com.prod.hosts.ooklaserver.net:8080"}
+{"ms":2935,"t":"ws-close","host":"hkspeedtest.netvigator.com.prod.hosts.ooklaserver.net:8080"}
+{"ms":2937,"t":"ws-close","host":"hk-hkg12.speed.misaka.one:8080"}
+{"ms":2944,"t":"ws-close","host":"hk1.speedtest.gslnetworks.com.prod.hosts.ooklaserver.net:8080"}
+{"ms":2944,"t":"ws-close","host":"sunmobile.hkspeedtest.com.prod.hosts.ooklaserver.net:8080"}
+{"ms":2944,"t":"ws-close","host":"hkt.hkspeedtest.com.prod.hosts.ooklaserver.net:8080"}
+{"ms":2944,"t":"ws-close","host":"speedtest21.hkbn.net.prod.hosts.ooklaserver.net:8080"}
+{"ms":2945,"t":"ws-close","host":"speedtest-hkg.retn.net.prod.hosts.ooklaserver.net:8080"}
+{"ms":2945,"t":"ws-close","host":"suntechspeedtest.com.prod.hosts.ooklaserver.net:8080"}
+{"ms":7238,"t":"step","msg":"GO clicked"}
+{"ms":8488,"t":"ws-open","url":"wss://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":8551,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI 8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":8552,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":8552,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":8552,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":8614,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.5) 2026-06-04.1737.7d09"}
+{"ms":8614,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 127.0.0.1."}
+{"ms":8615,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH"}
+{"ms":8615,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567324."}
+{"ms":8616,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8505.199999999255"}
+{"ms":8677,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567386."}
+{"ms":8677,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8566"}
+{"ms":8739,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567448."}
+{"ms":8739,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8628"}
+{"ms":8801,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567510."}
+{"ms":8801,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8690"}
+{"ms":8861,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567570."}
+{"ms":8861,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8750.299999998882"}
+{"ms":8922,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567631."}
+{"ms":8922,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8810.900000000373"}
+{"ms":8982,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567691."}
+{"ms":8982,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8871.299999998882"}
+{"ms":9043,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567752."}
+{"ms":9043,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8931.900000000373"}
+{"ms":9103,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567813."}
+{"ms":9103,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 8992.400000000373"}
+{"ms":9165,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567874."}
+{"ms":9165,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 9054.199999999255"}
+{"ms":9225,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796567935."}
+{"ms":9420,"t":"ws-close","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080"}
+{"ms":10628,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=71b1f803-8052-4275-be1d-420d8bad61d3&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10629,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=23c7d5f5-492e-4624-a64f-4bb06984af4d&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10630,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=a2e4d8a4-4fe9-46c0-bb10-eb991e6257c6&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10631,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=eab60943-a579-423c-9bcc-d1238a546eb7&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10757,"t":"ws-open","url":"wss://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":10816,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":10817,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":10821,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI 8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10821,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":10821,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":10821,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":10826,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":10830,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":10831,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=4af2b2ff-e33e-4b50-9b1c-f900b10cf739&size=25000000&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10832,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=74d3c3a1-5c22-4419-bceb-804cc68495e2&size=25000000&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10833,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=a50cf397-5f54-4bb9-a166-ce50180db93b&size=25000000&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10833,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=31fd4a10-8735-4012-b95e-ad82cba46ee2&size=25000000&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":10881,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.5) 2026-06-04.1737.7d09"}
+{"ms":10889,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 127.0.0.1."}
+{"ms":10893,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH"}
+{"ms":10893,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796569592."}
+{"ms":10902,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=a50cf397-5f54-4bb9-a166-ce50180db93b&size=25000000&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":10903,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=31fd4a10-8735-4012-b95e-ad82cba46ee2&size=25000000&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":10907,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=4af2b2ff-e33e-4b50-9b1c-f900b10cf739&size=25000000&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":10907,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=74d3c3a1-5c22-4419-bceb-804cc68495e2&size=25000000&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":10908,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 10793.799999998882"}
+{"ms":10960,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":25000000,"redirected":true,"loc":"","acao":"null"}
+{"ms":10969,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":25000000,"redirected":true,"loc":"","acao":"null"}
+{"ms":10971,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796569678."}
+{"ms":10971,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 10859.400000000373"}
+{"ms":10977,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":25000000,"redirected":true,"loc":"","acao":"null"}
+{"ms":10991,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":25000000,"redirected":true,"loc":"","acao":"null"}
+{"ms":11037,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796569741."}
+{"ms":11037,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 10926.199999999255"}
+{"ms":11097,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796569807."}
+{"ms":11097,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 10986.199999999255"}
+{"ms":11125,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=14ad146d-85e8-4a08-a5d6-5d147a801b2e&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":11126,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=c3ee56bb-2f62-45dd-82a3-dea9c0a8bdfd&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":11169,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796569868."}
+{"ms":11169,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11058.299999998882"}
+{"ms":11195,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":11195,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=c2c251bb-7a66-462b-9f04-3852f4a848a2&size=35164287&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":11197,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":11198,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=bf6c14e3-1006-4842-a896-2f61b64cde76&size=35164287&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":11245,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796569941."}
+{"ms":11245,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11133.900000000373"}
+{"ms":11263,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=bf6c14e3-1006-4842-a896-2f61b64cde76&size=35164287&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":11264,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=c2c251bb-7a66-462b-9f04-3852f4a848a2&size=35164287&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":11295,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":35164287,"redirected":true,"loc":"","acao":"null"}
+{"ms":11306,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570016."}
+{"ms":11306,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11195.5"}
+{"ms":11309,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":35164287,"redirected":true,"loc":"","acao":"null"}
+{"ms":11369,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570077."}
+{"ms":11369,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11258.299999998882"}
+{"ms":11451,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570140."}
+{"ms":11451,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11340.400000000373"}
+{"ms":11511,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570221."}
+{"ms":11511,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11400.5"}
+{"ms":11571,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570282."}
+{"ms":11572,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11460.900000000373"}
+{"ms":11607,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=38f61a36-689b-44bf-951d-52f67b90334f&size=44842881&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":11654,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570343."}
+{"ms":11654,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11543.199999999255"}
+{"ms":11675,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=38f61a36-689b-44bf-951d-52f67b90334f&size=44842881&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":11743,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570426."}
+{"ms":11744,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11606.900000000373"}
+{"ms":11757,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":44842881,"redirected":true,"loc":"","acao":"null"}
+{"ms":11807,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570512."}
+{"ms":11807,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11695.799999998882"}
+{"ms":11873,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570578."}
+{"ms":11873,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11762.199999999255"}
+{"ms":11953,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570644."}
+{"ms":11953,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11842.099999999627"}
+{"ms":11968,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=40efa36c-908f-49cf-9ad6-15eb26a379fd&size=49263239&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":12045,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570728."}
+{"ms":12045,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11933.900000000373"}
+{"ms":12046,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=40efa36c-908f-49cf-9ad6-15eb26a379fd&size=49263239&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":12141,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570817."}
+{"ms":12142,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 11999.799999998882"}
+{"ms":12148,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":49263239,"redirected":true,"loc":"","acao":"null"}
+{"ms":12204,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570914."}
+{"ms":12204,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12093.799999998882"}
+{"ms":12265,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796570975."}
+{"ms":12266,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12154.299999998882"}
+{"ms":12350,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571036."}
+{"ms":12350,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12238.699999999255"}
+{"ms":12452,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571123."}
+{"ms":12452,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12339.199999999255"}
+{"ms":12551,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=3c17aee3-5fba-4c5e-9021-54713bdb5934&size=50191653&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":12558,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571227."}
+{"ms":12558,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12447.199999999255"}
+{"ms":12646,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571328."}
+{"ms":12646,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12535.099999999627"}
+{"ms":12647,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=3c17aee3-5fba-4c5e-9021-54713bdb5934&size=50191653&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":12695,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":50191653,"redirected":true,"loc":"","acao":"null"}
+{"ms":12707,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571417."}
+{"ms":12707,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12596.5"}
+{"ms":12769,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571477."}
+{"ms":12769,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12658.5"}
+{"ms":12846,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571541."}
+{"ms":12846,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12735.599999999627"}
+{"ms":12942,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571617."}
+{"ms":12942,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12798.299999998882"}
+{"ms":12977,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571680."}
+{"ms":12977,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12866.400000000373"}
+{"ms":13049,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571749."}
+{"ms":13049,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 12938.799999998882"}
+{"ms":13069,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=3f3ff8fd-599c-46c4-8809-6bd37c5c10a4&size=50112103&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":13146,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571822."}
+{"ms":13146,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 13035"}
+{"ms":13147,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=3f3ff8fd-599c-46c4-8809-6bd37c5c10a4&size=50112103&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":13198,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":50112103,"redirected":true,"loc":"","acao":"null"}
+{"ms":13206,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571916."}
+{"ms":13206,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 13095.599999999627"}
+{"ms":13276,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796571977."}
+{"ms":13276,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 13164.699999999255"}
+{"ms":13352,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796572048."}
+{"ms":13352,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 13241.099999999627"}
+{"ms":13450,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796572124."}
+{"ms":13450,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 13339.099999999627"}
+{"ms":13565,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796572220."}
+{"ms":13565,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 13454.5"}
+{"ms":13687,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796572337."}
+{"ms":13687,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 13576.199999999255"}
+{"ms":13799,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796572457."}
+{"ms":13799,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 13688.599999999627"}
+{"ms":13973,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=2441e1bb-8fa5-46fd-89bd-91f407d646a6&size=50976365&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":14164,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796572570."}
+{"ms":14164,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14053"}
+{"ms":14251,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796572934."}
+{"ms":14251,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14140.099999999627"}
+{"ms":14347,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573023."}
+{"ms":14347,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14236.400000000373"}
+{"ms":14349,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=2441e1bb-8fa5-46fd-89bd-91f407d646a6&size=50976365&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":14369,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=84afa135-f19b-4173-b612-6017e057fe71&size=51752713&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":14404,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":50976365,"redirected":true,"loc":"","acao":"null"}
+{"ms":14408,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573118."}
+{"ms":14408,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14297.400000000373"}
+{"ms":14446,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=84afa135-f19b-4173-b612-6017e057fe71&size=51752713&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":14471,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573180."}
+{"ms":14471,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14360.400000000373"}
+{"ms":14494,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":51752713,"redirected":true,"loc":"","acao":"null"}
+{"ms":14546,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573241."}
+{"ms":14546,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14434.900000000373"}
+{"ms":14607,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573317."}
+{"ms":14607,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14496.5"}
+{"ms":14672,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573378."}
+{"ms":14672,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14560.900000000373"}
+{"ms":14746,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573443."}
+{"ms":14746,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14634.599999999627"}
+{"ms":14808,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573517."}
+{"ms":14808,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14697.5"}
+{"ms":14905,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573614."}
+{"ms":14905,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14794.199999999255"}
+{"ms":14969,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573676."}
+{"ms":14969,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14857.699999999255"}
+{"ms":15046,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573742."}
+{"ms":15046,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14935.099999999627"}
+{"ms":15107,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573817."}
+{"ms":15107,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 14996.900000000373"}
+{"ms":15169,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573878."}
+{"ms":15170,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15058.900000000373"}
+{"ms":15245,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796573941."}
+{"ms":15245,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15134.5"}
+{"ms":15306,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574016."}
+{"ms":15306,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15195.400000000373"}
+{"ms":15369,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574077."}
+{"ms":15369,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15257.699999999255"}
+{"ms":15445,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574140."}
+{"ms":15445,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15333.699999999255"}
+{"ms":15505,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574215."}
+{"ms":15505,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15394.299999998882"}
+{"ms":15570,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574277."}
+{"ms":15570,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15459"}
+{"ms":15649,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574341."}
+{"ms":15649,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15537.400000000373"}
+{"ms":15710,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574420."}
+{"ms":15710,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15599.299999998882"}
+{"ms":15786,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574490."}
+{"ms":15787,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15675.900000000373"}
+{"ms":15859,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574559."}
+{"ms":15860,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15748.400000000373"}
+{"ms":15951,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574636."}
+{"ms":15951,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15839.900000000373"}
+{"ms":16044,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574722."}
+{"ms":16044,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15933.199999999255"}
+{"ms":16105,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574815."}
+{"ms":16105,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 15994.699999999255"}
+{"ms":16170,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574876."}
+{"ms":16170,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16058.400000000373"}
+{"ms":16244,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796574940."}
+{"ms":16244,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16132.900000000373"}
+{"ms":16312,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575015."}
+{"ms":16312,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16201.400000000373"}
+{"ms":16372,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575083."}
+{"ms":16373,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16262"}
+{"ms":16446,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575144."}
+{"ms":16446,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16335.099999999627"}
+{"ms":16507,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575217."}
+{"ms":16507,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16396.699999999255"}
+{"ms":16571,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575278."}
+{"ms":16571,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16459.900000000373"}
+{"ms":16653,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575341."}
+{"ms":16653,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16542.299999998882"}
+{"ms":16744,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575427."}
+{"ms":16744,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16633.5"}
+{"ms":16806,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575515."}
+{"ms":16806,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16695"}
+{"ms":16871,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575578."}
+{"ms":16871,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16760.199999999255"}
+{"ms":16945,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575641."}
+{"ms":16945,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16834.400000000373"}
+{"ms":17042,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575718."}
+{"ms":17044,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16904.400000000373"}
+{"ms":17104,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575814."}
+{"ms":17104,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 16993.799999998882"}
+{"ms":17170,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575877."}
+{"ms":17170,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17058.799999998882"}
+{"ms":17254,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796575941."}
+{"ms":17254,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17143.799999998882"}
+{"ms":17345,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576026."}
+{"ms":17345,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17233.799999998882"}
+{"ms":17446,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576116."}
+{"ms":17446,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17332.599999999627"}
+{"ms":17510,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576217."}
+{"ms":17510,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17399.099999999627"}
+{"ms":17575,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576281."}
+{"ms":17575,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17464.900000000373"}
+{"ms":17646,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576346."}
+{"ms":17646,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17535"}
+{"ms":17713,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576418."}
+{"ms":17713,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17602.400000000373"}
+{"ms":17774,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576483."}
+{"ms":17775,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17663.699999999255"}
+{"ms":17849,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576545."}
+{"ms":17849,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17737.599999999627"}
+{"ms":17949,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576630."}
+{"ms":17949,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17837.799999998882"}
+{"ms":18010,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576720."}
+{"ms":18010,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17899.099999999627"}
+{"ms":18072,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576781."}
+{"ms":18072,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 17961.799999998882"}
+{"ms":18147,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576843."}
+{"ms":18147,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18035.299999998882"}
+{"ms":18214,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576917."}
+{"ms":18214,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18103.799999998882"}
+{"ms":18275,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796576985."}
+{"ms":18275,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18164.900000000373"}
+{"ms":18368,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577047."}
+{"ms":18368,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18257.299999998882"}
+{"ms":18504,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577139."}
+{"ms":18505,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18392.900000000373"}
+{"ms":18644,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577274."}
+{"ms":18645,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18533.099999999627"}
+{"ms":18709,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577414."}
+{"ms":18709,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18598"}
+{"ms":18770,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577480."}
+{"ms":18771,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18660"}
+{"ms":18845,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577542."}
+{"ms":18845,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18734"}
+{"ms":18907,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577615."}
+{"ms":18907,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18796.199999999255"}
+{"ms":18998,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577677."}
+{"ms":18999,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18870.299999998882"}
+{"ms":19052,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577754."}
+{"ms":19052,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 18940.799999998882"}
+{"ms":19147,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577825."}
+{"ms":19147,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19036.5"}
+{"ms":19208,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577918."}
+{"ms":19208,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19097.599999999627"}
+{"ms":19270,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796577979."}
+{"ms":19270,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19159.400000000373"}
+{"ms":19350,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578041."}
+{"ms":19350,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19239"}
+{"ms":19411,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578120."}
+{"ms":19411,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19300.400000000373"}
+{"ms":19472,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578182."}
+{"ms":19472,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19361.599999999627"}
+{"ms":19546,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578244."}
+{"ms":19546,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19435.299999998882"}
+{"ms":19608,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578318."}
+{"ms":19608,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19497.699999999255"}
+{"ms":19671,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578380."}
+{"ms":19671,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19560.5"}
+{"ms":19745,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578442."}
+{"ms":19745,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19634.400000000373"}
+{"ms":19805,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578515."}
+{"ms":19805,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19694.799999998882"}
+{"ms":19868,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578576."}
+{"ms":19868,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19757"}
+{"ms":19951,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578639."}
+{"ms":19951,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19840.799999998882"}
+{"ms":20012,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578722."}
+{"ms":20012,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19901.799999998882"}
+{"ms":20098,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578795."}
+{"ms":20098,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 19987.299999998882"}
+{"ms":20161,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578868."}
+{"ms":20161,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20050.400000000373"}
+{"ms":20253,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796578931."}
+{"ms":20253,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20142.5"}
+{"ms":20314,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579024."}
+{"ms":20314,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20203.400000000373"}
+{"ms":20378,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579086."}
+{"ms":20378,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20267.199999999255"}
+{"ms":20460,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579148."}
+{"ms":20460,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20349"}
+{"ms":20556,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579232."}
+{"ms":20556,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20445.5"}
+{"ms":20654,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579327."}
+{"ms":20654,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20542.299999998882"}
+{"ms":20715,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579425."}
+{"ms":20715,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20604.099999999627"}
+{"ms":20776,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579485."}
+{"ms":20776,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20665.199999999255"}
+{"ms":20854,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579548."}
+{"ms":20854,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20743.5"}
+{"ms":20915,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579625."}
+{"ms":20915,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20804.299999998882"}
+{"ms":20976,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579686."}
+{"ms":20976,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20865.199999999255"}
+{"ms":21048,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579747."}
+{"ms":21048,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20937.5"}
+{"ms":21109,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579819."}
+{"ms":21109,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 20998.599999999627"}
+{"ms":21172,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579880."}
+{"ms":21172,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21061.699999999255"}
+{"ms":21247,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796579943."}
+{"ms":21247,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21136.799999998882"}
+{"ms":21309,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580018."}
+{"ms":21309,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21198.299999998882"}
+{"ms":21381,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580081."}
+{"ms":21381,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21270.199999999255"}
+{"ms":21450,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580152."}
+{"ms":21450,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21339.299999998882"}
+{"ms":21510,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580220."}
+{"ms":21510,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21399.799999998882"}
+{"ms":21571,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580281."}
+{"ms":21571,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21460.400000000373"}
+{"ms":21656,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580343."}
+{"ms":21656,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21543.900000000373"}
+{"ms":21749,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580427."}
+{"ms":21749,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21635.599999999627"}
+{"ms":21812,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580521."}
+{"ms":21812,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21701.099999999627"}
+{"ms":21873,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580582."}
+{"ms":21873,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21761.900000000373"}
+{"ms":21943,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580644."}
+{"ms":21944,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21833"}
+{"ms":22006,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580714."}
+{"ms":22006,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21895"}
+{"ms":22070,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580776."}
+{"ms":22070,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 21959.099999999627"}
+{"ms":22151,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580840."}
+{"ms":22151,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22040.299999998882"}
+{"ms":22215,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580925."}
+{"ms":22215,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22104.199999999255"}
+{"ms":22287,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796580987."}
+{"ms":22287,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22176.199999999255"}
+{"ms":22358,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581059."}
+{"ms":22358,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22246.799999998882"}
+{"ms":22455,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581130."}
+{"ms":22455,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22343.699999999255"}
+{"ms":22549,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581225."}
+{"ms":22549,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22437.299999998882"}
+{"ms":22609,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581319."}
+{"ms":22609,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22498.299999998882"}
+{"ms":22672,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581381."}
+{"ms":22672,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22561.400000000373"}
+{"ms":22745,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581443."}
+{"ms":22745,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22634.299999998882"}
+{"ms":22809,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581516."}
+{"ms":22809,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22698.5"}
+{"ms":22871,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581580."}
+{"ms":22871,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22760.299999998882"}
+{"ms":22950,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581641."}
+{"ms":22950,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22839.299999998882"}
+{"ms":23010,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581721."}
+{"ms":23011,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22899.900000000373"}
+{"ms":23072,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581783."}
+{"ms":23072,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 22962"}
+{"ms":23149,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581845."}
+{"ms":23149,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23038.599999999627"}
+{"ms":23210,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581920."}
+{"ms":23210,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23099.699999999255"}
+{"ms":23271,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796581981."}
+{"ms":23271,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23160.699999999255"}
+{"ms":23347,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582043."}
+{"ms":23347,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23236.599999999627"}
+{"ms":23453,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582118."}
+{"ms":23454,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23342.299999998882"}
+{"ms":23572,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582223."}
+{"ms":23573,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23461.799999998882"}
+{"ms":23681,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582343."}
+{"ms":23682,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23570.900000000373"}
+{"ms":23747,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582452."}
+{"ms":23747,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23636.699999999255"}
+{"ms":23809,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/download?nocache=c93d1dbf-ccab-4805-8631-9c0058e5d2de&size=25000000&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":23813,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582518."}
+{"ms":23813,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23702"}
+{"ms":23873,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582583."}
+{"ms":23873,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23762.699999999255"}
+{"ms":23952,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582644."}
+{"ms":23952,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23840.799999998882"}
+{"ms":24007,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/download","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=c93d1dbf-ccab-4805-8631-9c0058e5d2de&size=25000000&guid=8c452b","acao":"https://www.speedtest.net"}
+{"ms":24013,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582723."}
+{"ms":24013,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23902.799999998882"}
+{"ms":24056,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/download","cl":25000000,"redirected":true,"loc":"","acao":"null"}
+{"ms":24074,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582784."}
+{"ms":24074,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 23963.799999998882"}
+{"ms":24145,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582846."}
+{"ms":24145,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24034.199999999255"}
+{"ms":24206,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582915."}
+{"ms":24206,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24095.099999999627"}
+{"ms":24269,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796582976."}
+{"ms":24269,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24157.799999998882"}
+{"ms":24346,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583042."}
+{"ms":24346,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24235.199999999255"}
+{"ms":24406,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583116."}
+{"ms":24406,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24295.699999999255"}
+{"ms":24471,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583177."}
+{"ms":24471,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24360.299999998882"}
+{"ms":24545,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583243."}
+{"ms":24545,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24434.199999999255"}
+{"ms":24606,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583315."}
+{"ms":24606,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24495"}
+{"ms":24669,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583376."}
+{"ms":24669,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24558.799999998882"}
+{"ms":24746,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583441."}
+{"ms":24746,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24635.599999999627"}
+{"ms":24812,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583517."}
+{"ms":24812,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24701.400000000373"}
+{"ms":24873,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583583."}
+{"ms":24873,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24762"}
+{"ms":24944,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583644."}
+{"ms":24944,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24833.299999998882"}
+{"ms":25006,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583716."}
+{"ms":25006,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24895.299999998882"}
+{"ms":25069,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583776."}
+{"ms":25069,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 24958.199999999255"}
+{"ms":25149,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583840."}
+{"ms":25149,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25038.400000000373"}
+{"ms":25211,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583921."}
+{"ms":25211,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25100.099999999627"}
+{"ms":25272,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796583981."}
+{"ms":25272,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25161.5"}
+{"ms":25347,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796584043."}
+{"ms":25348,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25236.799999998882"}
+{"ms":25413,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796584119."}
+{"ms":25413,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25301.900000000373"}
+{"ms":25488,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796584184."}
+{"ms":25488,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25377.900000000373"}
+{"ms":25559,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796584260."}
+{"ms":25559,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25448"}
+{"ms":25648,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796584329."}
+{"ms":25649,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25537.799999998882"}
+{"ms":25741,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796584420."}
+{"ms":25741,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25605"}
+{"ms":25853,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796584514."}
+{"ms":25853,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 25742.299999998882"}
+{"ms":25944,"t":"reqfail","url":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=3f3ff8fd-599c-46c4-8809-6bd37c5c10a4&size=50112103&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4&token=v1~6e13b9fc-ceff-49f2-a","err":"net::ERR_ABORTED"}
+{"ms":25944,"t":"reqfail","url":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=3c17aee3-5fba-4c5e-9021-54713bdb5934&size=50191653&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4&token=v1~6e13b9fc-ceff-49f2-a","err":"net::ERR_ABORTED"}
+{"ms":25945,"t":"reqfail","url":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=40efa36c-908f-49cf-9ad6-15eb26a379fd&size=49263239&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4&token=v1~6e13b9fc-ceff-49f2-a","err":"net::ERR_ABORTED"}
+{"ms":25945,"t":"reqfail","url":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=c93d1dbf-ccab-4805-8631-9c0058e5d2de&size=25000000&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4&token=v1~6e13b9fc-ceff-49f2-a","err":"net::ERR_ABORTED"}
+{"ms":25946,"t":"reqfail","url":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=84afa135-f19b-4173-b612-6017e057fe71&size=51752713&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4&token=v1~6e13b9fc-ceff-49f2-a","err":"net::ERR_ABORTED"}
+{"ms":25947,"t":"reqfail","url":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/download?nocache=2441e1bb-8fa5-46fd-89bd-91f407d646a6&size=50976365&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4&token=v1~6e13b9fc-ceff-49f2-a","err":"net::ERR_ABORTED"}
+{"ms":25954,"t":"ws-close","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080"}
+{"ms":27113,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=38421ef6-1d23-4efa-8585-ad9e865d3c78&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27114,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=ad2c295f-c3b9-4c49-8fb1-fbd9c96ed65e&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27114,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=8ecdc38c-fc71-4f6e-8cb9-dcb9321ce7ce&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27114,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=cbdee6eb-8e8a-4f81-8c5d-84572269efd6&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27182,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":27240,"t":"ws-open","url":"wss://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/ws?"}
+{"ms":27246,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":27301,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":27303,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HI 8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27303,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"GETIP"}
+{"ms":27303,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES"}
+{"ms":27303,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING "}
+{"ms":27308,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":27311,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=6316341f-a83d-40fa-b867-26c2a2f3891c&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27311,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=e083a2c8-21d9-4437-9962-b42df7c07232&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27311,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=433632d0-4c71-4d17-a737-ef50bb51557c&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27313,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=846e2483-e384-4573-a835-a7f5d05ab294&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27365,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"HELLO 2.11 (2.11.5) 2026-06-04.1737.7d09"}
+{"ms":27366,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"YOURIP 127.0.0.1."}
+{"ms":27366,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"CAPABILITIES SERVER_HOST_AUTH"}
+{"ms":27366,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586074."}
+{"ms":27378,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27267.299999998882"}
+{"ms":27440,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=6316341f-a83d-40fa-b867-26c2a2f3891c&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":27441,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586151."}
+{"ms":27441,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27330.599999999627"}
+{"ms":27498,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=e083a2c8-21d9-4437-9962-b42df7c07232&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":27502,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586212."}
+{"ms":27502,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27391.599999999627"}
+{"ms":27513,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=433632d0-4c71-4d17-a737-ef50bb51557c&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":27517,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":27517,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=07896ff4-9f89-46c2-89bf-c0daacc8dc01&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27519,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=846e2483-e384-4573-a835-a7f5d05ab294&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":27557,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":27558,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=90f92e35-7e1d-44e5-a649-f6f620e7574e&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27567,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586274."}
+{"ms":27567,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27456.5"}
+{"ms":27570,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":27570,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=348fe3d9-94a2-46da-9e96-6d00f751d740&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27575,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":27575,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=a798c114-e279-41e2-9505-4b004197d320&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27629,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586338."}
+{"ms":27629,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27517.900000000373"}
+{"ms":27690,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586399."}
+{"ms":27690,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27579.099999999627"}
+{"ms":27752,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586461."}
+{"ms":27752,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27640.900000000373"}
+{"ms":27814,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586524."}
+{"ms":27814,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27703.699999999255"}
+{"ms":27827,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=07896ff4-9f89-46c2-89bf-c0daacc8dc01&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":27876,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586585."}
+{"ms":27876,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27765.099999999627"}
+{"ms":27899,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":27899,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=00f63731-fd98-4335-b3ad-baa9f20656a8&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":27936,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=348fe3d9-94a2-46da-9e96-6d00f751d740&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":27937,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586646."}
+{"ms":27937,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27826.099999999627"}
+{"ms":27955,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=90f92e35-7e1d-44e5-a649-f6f620e7574e&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28001,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586708."}
+{"ms":28001,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27889.900000000373"}
+{"ms":28003,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28004,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=7f315649-7502-4615-b6f4-ca3a98cde985&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28006,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28007,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=20e23010-1319-4e15-8883-232b4e5161cb&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28025,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=a798c114-e279-41e2-9505-4b004197d320&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28065,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586774."}
+{"ms":28065,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 27953.799999998882"}
+{"ms":28107,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28108,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=887dd63e-c1e8-4f07-bff8-1369821a8ca1&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28127,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586836."}
+{"ms":28127,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28016"}
+{"ms":28189,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586898."}
+{"ms":28189,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28078.5"}
+{"ms":28251,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796586960."}
+{"ms":28251,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28140.599999999627"}
+{"ms":28312,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587022."}
+{"ms":28312,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28201.900000000373"}
+{"ms":28315,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=00f63731-fd98-4335-b3ad-baa9f20656a8&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28373,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=7f315649-7502-4615-b6f4-ca3a98cde985&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28374,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587083."}
+{"ms":28374,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28263.299999998882"}
+{"ms":28399,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28400,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=0ea3f294-8732-488f-aa39-1a4e9d2185fa&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28403,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=20e23010-1319-4e15-8883-232b4e5161cb&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28436,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587146."}
+{"ms":28436,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28326"}
+{"ms":28474,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28474,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=46eabe8c-454b-4c75-b574-f034e211a180&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28483,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28483,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=f4134eb3-8327-442f-98b5-61a1e25e6707&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28486,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=887dd63e-c1e8-4f07-bff8-1369821a8ca1&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28502,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587210."}
+{"ms":28502,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28391"}
+{"ms":28544,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28544,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=4e78325a-e442-48b3-961b-58790f226ab7&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28564,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587273."}
+{"ms":28564,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28453.099999999627"}
+{"ms":28625,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587335."}
+{"ms":28625,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28514.599999999627"}
+{"ms":28688,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587398."}
+{"ms":28688,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28577.299999998882"}
+{"ms":28696,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=0ea3f294-8732-488f-aa39-1a4e9d2185fa&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28754,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28754,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=d58dfa81-738d-4092-82b9-2ad8a48b2f43&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28755,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587460."}
+{"ms":28755,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28644.400000000373"}
+{"ms":28821,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587527."}
+{"ms":28821,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28710.5"}
+{"ms":28870,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=46eabe8c-454b-4c75-b574-f034e211a180&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28885,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587592."}
+{"ms":28885,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28774.099999999627"}
+{"ms":28919,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=4e78325a-e442-48b3-961b-58790f226ab7&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28946,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587655."}
+{"ms":28946,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28835"}
+{"ms":28949,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28949,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=24150fb4-0fdb-45db-8af8-5499ad06d130&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":28971,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=f4134eb3-8327-442f-98b5-61a1e25e6707&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":28994,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":28995,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=a0c0ea77-d1c9-4efe-af64-5b5e2d470feb&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":29007,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587716."}
+{"ms":29007,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28896.199999999255"}
+{"ms":29037,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":29037,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=9a52b2a7-1e02-4b8b-8745-65cc734c9cda&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":29069,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587779."}
+{"ms":29069,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 28958.799999998882"}
+{"ms":29087,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=d58dfa81-738d-4092-82b9-2ad8a48b2f43&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":29131,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587840."}
+{"ms":29131,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29020.099999999627"}
+{"ms":29154,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":29154,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=0b1a6caa-440b-420a-a2ed-4083c1639977&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":29192,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587902."}
+{"ms":29192,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29081.400000000373"}
+{"ms":29253,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796587963."}
+{"ms":29253,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29142.799999998882"}
+{"ms":29319,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588026."}
+{"ms":29319,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29207.400000000373"}
+{"ms":29322,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=24150fb4-0fdb-45db-8af8-5499ad06d130&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":29381,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588091."}
+{"ms":29381,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29270.400000000373"}
+{"ms":29395,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":29395,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=2fb5cb61-9246-4ace-a331-20671ce2871f&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":29436,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=a0c0ea77-d1c9-4efe-af64-5b5e2d470feb&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":29442,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588152."}
+{"ms":29442,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29331.5"}
+{"ms":29464,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=0b1a6caa-440b-420a-a2ed-4083c1639977&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":29471,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=9a52b2a7-1e02-4b8b-8745-65cc734c9cda&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":29504,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588213."}
+{"ms":29504,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29392.900000000373"}
+{"ms":29536,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":29536,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=89d8e27f-38fa-415f-b9af-f69a70227a54&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":29554,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":29554,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=e9cf4711-8afe-413e-b437-259572753f0e&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":29564,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":29565,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=6d6afa3b-0eab-4113-92be-3509094eff8d&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":29571,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588276."}
+{"ms":29571,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29460.5"}
+{"ms":29635,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588342."}
+{"ms":29635,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29524.400000000373"}
+{"ms":29697,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588407."}
+{"ms":29697,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29586.599999999627"}
+{"ms":29707,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=2fb5cb61-9246-4ace-a331-20671ce2871f&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":29762,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588469."}
+{"ms":29762,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29651.799999998882"}
+{"ms":29788,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":29789,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=68ab68b8-a4a3-4634-9141-477e7a39b33c&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":29825,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588535."}
+{"ms":29825,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29714.5"}
+{"ms":29886,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588596."}
+{"ms":29886,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29775.5"}
+{"ms":29913,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=89d8e27f-38fa-415f-b9af-f69a70227a54&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":29939,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=e9cf4711-8afe-413e-b437-259572753f0e&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":29948,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588657."}
+{"ms":29948,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29836.799999998882"}
+{"ms":29990,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":29991,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=e3c69fcb-1355-4fde-add2-7eb5dff91b4b&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30012,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588718."}
+{"ms":30012,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29901.699999999255"}
+{"ms":30021,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":30021,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=f99a1b83-c5d7-4aae-9a5c-b1e27d0f7479&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30070,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=6d6afa3b-0eab-4113-92be-3509094eff8d&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":30075,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588784."}
+{"ms":30075,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 29964.299999998882"}
+{"ms":30136,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588846."}
+{"ms":30136,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30025.400000000373"}
+{"ms":30164,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":30164,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=f372cf0d-1dc8-4127-aa43-d3c343f2e26f&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30179,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=68ab68b8-a4a3-4634-9141-477e7a39b33c&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":30202,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588908."}
+{"ms":30202,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30091.5"}
+{"ms":30264,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":30264,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=b7512ccb-bb96-4e62-a6a1-fcf71fce422c&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30265,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796588974."}
+{"ms":30265,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30154.799999998882"}
+{"ms":30327,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589036."}
+{"ms":30327,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30216.099999999627"}
+{"ms":30388,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589098."}
+{"ms":30388,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30277.299999998882"}
+{"ms":30452,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=e3c69fcb-1355-4fde-add2-7eb5dff91b4b&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":30453,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=f99a1b83-c5d7-4aae-9a5c-b1e27d0f7479&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":30455,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589160."}
+{"ms":30455,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30344.299999998882"}
+{"ms":30479,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=852a9a29-c94a-4f5c-8880-d3efee6bdd65&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30518,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589226."}
+{"ms":30518,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30407.400000000373"}
+{"ms":30542,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":30543,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=1ef28b82-09d1-43a4-b5f4-02fcda3fa4f7&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30552,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":30552,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=385770e4-4bd9-493b-872f-cf2c91954c0b&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30555,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":30555,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=d72f598b-e2e5-4793-805b-7cb3f6f98faa&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30556,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=f372cf0d-1dc8-4127-aa43-d3c343f2e26f&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":30580,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589290."}
+{"ms":30580,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30469.799999998882"}
+{"ms":30645,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589354."}
+{"ms":30645,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30534"}
+{"ms":30648,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":30648,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=dad0581d-418d-4308-b6ad-af4ff2c5f92b&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":30707,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589417."}
+{"ms":30707,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30596.799999998882"}
+{"ms":30769,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589478."}
+{"ms":30769,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30658.400000000373"}
+{"ms":30834,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589542."}
+{"ms":30834,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30723.699999999255"}
+{"ms":30896,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589605."}
+{"ms":30896,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30785"}
+{"ms":30958,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589668."}
+{"ms":30958,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30847.599999999627"}
+{"ms":30979,"t":"req","method":"GET","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/hello?nocache=c61a88b3-2a8c-4807-8d49-1f21e3c7b776&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31020,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589729."}
+{"ms":31020,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30909"}
+{"ms":31044,"t":"res","status":200,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/hello","cl":44,"redirected":false,"loc":"","acao":"https://www.speedtest.net"}
+{"ms":31044,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=abfd75d0-dabb-4891-86e5-98b7be7a03f0&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31080,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=1ef28b82-09d1-43a4-b5f4-02fcda3fa4f7&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":31081,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589791."}
+{"ms":31081,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 30970.599999999627"}
+{"ms":31091,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=385770e4-4bd9-493b-872f-cf2c91954c0b&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":31107,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=d72f598b-e2e5-4793-805b-7cb3f6f98faa&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":31124,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=dad0581d-418d-4308-b6ad-af4ff2c5f92b&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":31145,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589852."}
+{"ms":31145,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31033.900000000373"}
+{"ms":31164,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":31165,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=92f441e6-70d2-4172-8a67-b887e2d61ef4&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31185,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":31185,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=ef3f27a0-6823-4b32-8726-7cd9e2141f9c&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31203,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":31204,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=dddc4cb1-c343-4cd4-a0ce-2068b43061d9&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31208,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589918."}
+{"ms":31208,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31097.799999998882"}
+{"ms":31221,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":31222,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=3b1ff432-4ede-4d5e-9161-724b9799ab03&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31270,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796589979."}
+{"ms":31270,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31159.099999999627"}
+{"ms":31335,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590042."}
+{"ms":31335,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31224"}
+{"ms":31396,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590105."}
+{"ms":31396,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31285.599999999627"}
+{"ms":31458,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590167."}
+{"ms":31458,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31347.099999999627"}
+{"ms":31475,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=abfd75d0-dabb-4891-86e5-98b7be7a03f0&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":31520,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590229."}
+{"ms":31520,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31409.199999999255"}
+{"ms":31553,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":31554,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=87e6732d-cd13-40b6-946d-69e6167fff5f&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31585,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590292."}
+{"ms":31585,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31473.799999998882"}
+{"ms":31646,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590355."}
+{"ms":31646,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31535.099999999627"}
+{"ms":31707,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590417."}
+{"ms":31707,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31596.599999999627"}
+{"ms":31769,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590478."}
+{"ms":31769,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31658.799999998882"}
+{"ms":31773,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=3b1ff432-4ede-4d5e-9161-724b9799ab03&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":31776,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=ef3f27a0-6823-4b32-8726-7cd9e2141f9c&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":31835,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590542."}
+{"ms":31835,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31724.400000000373"}
+{"ms":31858,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":31858,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=9599e976-3675-4e9a-8b7f-77fdc173e81a&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31870,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":31871,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=e465e893-695c-4ad5-b7e6-8e705d2d57a9&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":31896,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590606."}
+{"ms":31896,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31785.699999999255"}
+{"ms":31958,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590667."}
+{"ms":31958,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31847.099999999627"}
+{"ms":32020,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=92f441e6-70d2-4172-8a67-b887e2d61ef4&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":32021,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=dddc4cb1-c343-4cd4-a0ce-2068b43061d9&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":32021,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590729."}
+{"ms":32021,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31909.199999999255"}
+{"ms":32070,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=87e6732d-cd13-40b6-946d-69e6167fff5f&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":32084,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590793."}
+{"ms":32084,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 31973.5"}
+{"ms":32114,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":32114,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=27d42b81-f638-4858-8a2a-2cb0ace8cece&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":32121,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":32121,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=686615ec-c59a-4b43-af62-261f71a3c65e&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":32146,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590855."}
+{"ms":32146,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32035.400000000373"}
+{"ms":32154,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":32155,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=624ed796-a8d9-4150-84c2-0390956b6095&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":32212,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590918."}
+{"ms":32212,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32101.599999999627"}
+{"ms":32274,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796590983."}
+{"ms":32274,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32163.099999999627"}
+{"ms":32335,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591044."}
+{"ms":32335,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32224.199999999255"}
+{"ms":32396,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591106."}
+{"ms":32396,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32285.5"}
+{"ms":32457,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591167."}
+{"ms":32457,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32346.599999999627"}
+{"ms":32520,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591228."}
+{"ms":32520,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32409.699999999255"}
+{"ms":32584,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591291."}
+{"ms":32584,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32472.900000000373"}
+{"ms":32645,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591354."}
+{"ms":32645,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32534.099999999627"}
+{"ms":32708,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591418."}
+{"ms":32708,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32597.299999998882"}
+{"ms":32771,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591479."}
+{"ms":32771,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32660.099999999627"}
+{"ms":32787,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=9599e976-3675-4e9a-8b7f-77fdc173e81a&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":32836,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591543."}
+{"ms":32836,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32725.099999999627"}
+{"ms":32890,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":32890,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=7085562d-69be-495a-86a8-175651264907&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":32897,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591607."}
+{"ms":32897,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32786.199999999255"}
+{"ms":32957,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=27d42b81-f638-4858-8a2a-2cb0ace8cece&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":32958,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591667."}
+{"ms":32958,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32847.09999999963"}
+{"ms":33020,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591729."}
+{"ms":33020,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32909.29999999888"}
+{"ms":33045,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":33045,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=62d5539a-4f85-4cb7-993e-21dc54ea616d&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":33074,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=624ed796-a8d9-4150-84c2-0390956b6095&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":33086,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591791."}
+{"ms":33086,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 32974.09999999963"}
+{"ms":33148,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591857."}
+{"ms":33148,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33036.90000000037"}
+{"ms":33179,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":33180,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=d017d88c-c841-4a03-879a-ea772a34705d&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":33213,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591919."}
+{"ms":33213,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33102.59999999963"}
+{"ms":33274,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796591984."}
+{"ms":33274,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33163.59999999963"}
+{"ms":33336,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592045."}
+{"ms":33336,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33225.199999999255"}
+{"ms":33397,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592107."}
+{"ms":33397,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33286.59999999963"}
+{"ms":33458,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592168."}
+{"ms":33458,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33347.699999999255"}
+{"ms":33520,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592229."}
+{"ms":33520,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33409.59999999963"}
+{"ms":33584,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592291."}
+{"ms":33584,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33472.29999999888"}
+{"ms":33644,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592353."}
+{"ms":33644,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33533.29999999888"}
+{"ms":33705,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592414."}
+{"ms":33705,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33594.199999999255"}
+{"ms":33757,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=7085562d-69be-495a-86a8-175651264907&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":33769,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592476."}
+{"ms":33769,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33657.5"}
+{"ms":33834,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":33834,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=67d85a74-dd00-43c7-a1b7-0560c0c6f2d6&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":33837,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592541."}
+{"ms":33837,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33725.59999999963"}
+{"ms":33900,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592607."}
+{"ms":33900,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33789.40000000037"}
+{"ms":33963,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592671."}
+{"ms":33963,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33852.199999999255"}
+{"ms":34024,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592734."}
+{"ms":34024,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33913.5"}
+{"ms":34086,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592795."}
+{"ms":34086,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 33974.90000000037"}
+{"ms":34147,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592856."}
+{"ms":34147,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34036.29999999888"}
+{"ms":34208,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592918."}
+{"ms":34208,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34097.699999999255"}
+{"ms":34270,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796592979."}
+{"ms":34270,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34159.199999999255"}
+{"ms":34331,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593040."}
+{"ms":34331,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34220.29999999888"}
+{"ms":34392,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593101."}
+{"ms":34392,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34281.40000000037"}
+{"ms":34453,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593163."}
+{"ms":34453,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34342.40000000037"}
+{"ms":34525,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593224."}
+{"ms":34525,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34414.699999999255"}
+{"ms":34587,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593296."}
+{"ms":34587,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34475.90000000037"}
+{"ms":34648,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593357."}
+{"ms":34648,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34537.199999999255"}
+{"ms":34717,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593421."}
+{"ms":34717,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34606.5"}
+{"ms":34754,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=67d85a74-dd00-43c7-a1b7-0560c0c6f2d6&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":34782,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593490."}
+{"ms":34782,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34670.90000000037"}
+{"ms":34844,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":34845,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=2b5e4ca7-3da0-4b79-9789-681b41e5a9af&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":34846,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593555."}
+{"ms":34846,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34735"}
+{"ms":34908,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593618."}
+{"ms":34908,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34797.699999999255"}
+{"ms":34970,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593679."}
+{"ms":34970,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34859"}
+{"ms":35031,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593740."}
+{"ms":35031,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34920.59999999963"}
+{"ms":35093,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593802."}
+{"ms":35093,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 34982.199999999255"}
+{"ms":35154,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593864."}
+{"ms":35154,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35043.699999999255"}
+{"ms":35219,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593926."}
+{"ms":35219,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35107.79999999888"}
+{"ms":35281,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796593990."}
+{"ms":35281,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35169.90000000037"}
+{"ms":35342,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594051."}
+{"ms":35342,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35231.40000000037"}
+{"ms":35404,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594113."}
+{"ms":35404,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35292.90000000037"}
+{"ms":35468,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594175."}
+{"ms":35468,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35357.09999999963"}
+{"ms":35486,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=2b5e4ca7-3da0-4b79-9789-681b41e5a9af&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":35529,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594239."}
+{"ms":35529,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35418.79999999888"}
+{"ms":35560,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":35560,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=72edb770-c56a-40f9-9903-e35a4595167c&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":35591,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594301."}
+{"ms":35592,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35480.79999999888"}
+{"ms":35653,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594362."}
+{"ms":35653,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35542.5"}
+{"ms":35718,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594424."}
+{"ms":35718,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35607.29999999888"}
+{"ms":35779,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594489."}
+{"ms":35779,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35668.699999999255"}
+{"ms":35842,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594552."}
+{"ms":35842,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35731.5"}
+{"ms":35904,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594613."}
+{"ms":35904,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35792.90000000037"}
+{"ms":35969,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594675."}
+{"ms":35969,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35858.40000000037"}
+{"ms":36031,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594740."}
+{"ms":36031,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35920"}
+{"ms":36092,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594802."}
+{"ms":36092,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 35981.79999999888"}
+{"ms":36154,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594863."}
+{"ms":36154,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36043.29999999888"}
+{"ms":36223,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594925."}
+{"ms":36223,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36112.09999999963"}
+{"ms":36231,"t":"res","status":307,"host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","path":"/upload","cl":0,"redirected":false,"loc":"https://speedtest-hybrid-worker.lumajangnetworks.workers.dev/upload?nocache=72edb770-c56a-40f9-9903-e35a4595167c&guid=8c452bdd-33dc-43bf-ad4","acao":"https://www.speedtest.net"}
+{"ms":36285,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796594994."}
+{"ms":36285,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36174.40000000037"}
+{"ms":36300,"t":"res","status":200,"host":"speedtest-hybrid-worker.lumajangnetworks.workers.dev","path":"/upload","cl":12,"redirected":true,"loc":"","acao":"null"}
+{"ms":36300,"t":"req","method":"POST","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=e536f0b6-1101-4efb-923d-76c1ebe1096a&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4"}
+{"ms":36347,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595056."}
+{"ms":36347,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36236.09999999963"}
+{"ms":36408,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595117."}
+{"ms":36408,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36297.699999999255"}
+{"ms":36471,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595181."}
+{"ms":36471,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36360.40000000037"}
+{"ms":36533,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595241."}
+{"ms":36533,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36422.5"}
+{"ms":36595,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595304."}
+{"ms":36595,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36483.90000000037"}
+{"ms":36656,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595365."}
+{"ms":36656,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36545.09999999963"}
+{"ms":36719,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595426."}
+{"ms":36719,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36608.09999999963"}
+{"ms":36780,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595490."}
+{"ms":36780,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36669.5"}
+{"ms":36843,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595552."}
+{"ms":36843,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36732"}
+{"ms":36905,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595615."}
+{"ms":36905,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36794.699999999255"}
+{"ms":36968,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595676."}
+{"ms":36968,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36857.29999999888"}
+{"ms":37030,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595740."}
+{"ms":37030,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36919.59999999963"}
+{"ms":37092,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595801."}
+{"ms":37092,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 36981.699999999255"}
+{"ms":37158,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595866."}
+{"ms":37158,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37046.90000000037"}
+{"ms":37220,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595929."}
+{"ms":37220,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37109.40000000037"}
+{"ms":37284,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796595991."}
+{"ms":37284,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37172.59999999963"}
+{"ms":37346,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596055."}
+{"ms":37346,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37235.09999999963"}
+{"ms":37408,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596117."}
+{"ms":37408,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37297.09999999963"}
+{"ms":37472,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596179."}
+{"ms":37472,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37361.09999999963"}
+{"ms":37535,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596243."}
+{"ms":37535,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37423.79999999888"}
+{"ms":37596,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596306."}
+{"ms":37596,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37485.40000000037"}
+{"ms":37658,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596367."}
+{"ms":37658,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37546.90000000037"}
+{"ms":37720,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596429."}
+{"ms":37720,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37608.90000000037"}
+{"ms":37781,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596491."}
+{"ms":37781,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37670.59999999963"}
+{"ms":37842,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596552."}
+{"ms":37842,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37731.79999999888"}
+{"ms":37904,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596613."}
+{"ms":37904,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37793.5"}
+{"ms":37968,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596675."}
+{"ms":37968,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37857.09999999963"}
+{"ms":38030,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596739."}
+{"ms":38030,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37919.09999999963"}
+{"ms":38091,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596801."}
+{"ms":38091,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 37980.59999999963"}
+{"ms":38153,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596862."}
+{"ms":38153,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38042.09999999963"}
+{"ms":38214,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596924."}
+{"ms":38215,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38103.79999999888"}
+{"ms":38276,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796596985."}
+{"ms":38276,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38164.90000000037"}
+{"ms":38337,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597046."}
+{"ms":38337,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38226.199999999255"}
+{"ms":38400,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597108."}
+{"ms":38400,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38288.90000000037"}
+{"ms":38462,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597170."}
+{"ms":38462,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38351.40000000037"}
+{"ms":38523,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597233."}
+{"ms":38523,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38412.699999999255"}
+{"ms":38584,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597294."}
+{"ms":38584,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38473.699999999255"}
+{"ms":38646,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597355."}
+{"ms":38646,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38535"}
+{"ms":38707,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597417."}
+{"ms":38707,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38596.5"}
+{"ms":38773,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597479."}
+{"ms":38773,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38662.29999999888"}
+{"ms":38834,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597544."}
+{"ms":38834,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38723.79999999888"}
+{"ms":38896,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597605."}
+{"ms":38896,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38785.5"}
+{"ms":38958,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597667."}
+{"ms":38958,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38847"}
+{"ms":39019,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597729."}
+{"ms":39019,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38908.59999999963"}
+{"ms":39081,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597790."}
+{"ms":39081,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 38970.40000000037"}
+{"ms":39143,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597852."}
+{"ms":39143,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39032"}
+{"ms":39204,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597914."}
+{"ms":39205,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39093.699999999255"}
+{"ms":39269,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796597975."}
+{"ms":39269,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39157.79999999888"}
+{"ms":39330,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598040."}
+{"ms":39330,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39219.5"}
+{"ms":39392,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598101."}
+{"ms":39392,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39281.199999999255"}
+{"ms":39453,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598163."}
+{"ms":39453,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39342.5"}
+{"ms":39518,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598224."}
+{"ms":39518,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39407.699999999255"}
+{"ms":39581,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598290."}
+{"ms":39581,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39470.5"}
+{"ms":39643,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598352."}
+{"ms":39643,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39531.90000000037"}
+{"ms":39704,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598413."}
+{"ms":39704,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39593.40000000037"}
+{"ms":39769,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598475."}
+{"ms":39769,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39657.199999999255"}
+{"ms":39833,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598541."}
+{"ms":39833,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39722.199999999255"}
+{"ms":39895,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598604."}
+{"ms":39895,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39783.90000000037"}
+{"ms":39956,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598666."}
+{"ms":39956,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39845.29999999888"}
+{"ms":40019,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598727."}
+{"ms":40019,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39907.90000000037"}
+{"ms":40080,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598790."}
+{"ms":40080,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 39969.40000000037"}
+{"ms":40142,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598851."}
+{"ms":40142,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40030.90000000037"}
+{"ms":40203,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598913."}
+{"ms":40203,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40092.5"}
+{"ms":40268,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796598974."}
+{"ms":40268,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40157.59999999963"}
+{"ms":40330,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599039."}
+{"ms":40330,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40219.09999999963"}
+{"ms":40391,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599101."}
+{"ms":40391,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40280.59999999963"}
+{"ms":40453,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599162."}
+{"ms":40453,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40342.199999999255"}
+{"ms":40518,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599224."}
+{"ms":40518,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40407.40000000037"}
+{"ms":40579,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599289."}
+{"ms":40579,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40468.699999999255"}
+{"ms":40641,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599350."}
+{"ms":40641,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40530.199999999255"}
+{"ms":40704,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599413."}
+{"ms":40704,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40593"}
+{"ms":40768,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599476."}
+{"ms":40768,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40657.40000000037"}
+{"ms":40830,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599539."}
+{"ms":40830,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40719"}
+{"ms":40893,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599602."}
+{"ms":40893,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40781.90000000037"}
+{"ms":40954,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599664."}
+{"ms":40954,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40843.40000000037"}
+{"ms":41018,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599725."}
+{"ms":41018,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40907.40000000037"}
+{"ms":41080,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599789."}
+{"ms":41080,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 40968.90000000037"}
+{"ms":41141,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599851."}
+{"ms":41141,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41030.5"}
+{"ms":41203,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599912."}
+{"ms":41203,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41092"}
+{"ms":41264,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796599973."}
+{"ms":41264,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41153.09999999963"}
+{"ms":41325,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600034."}
+{"ms":41325,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41214.29999999888"}
+{"ms":41386,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600096."}
+{"ms":41386,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41275.5"}
+{"ms":41450,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600157."}
+{"ms":41450,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41339"}
+{"ms":41512,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600221."}
+{"ms":41512,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41401.29999999888"}
+{"ms":41573,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600283."}
+{"ms":41573,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41462.59999999963"}
+{"ms":41634,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600344."}
+{"ms":41634,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41523.699999999255"}
+{"ms":41698,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600407."}
+{"ms":41698,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41587.29999999888"}
+{"ms":41762,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600469."}
+{"ms":41763,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41651.79999999888"}
+{"ms":41824,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600533."}
+{"ms":41824,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41713.09999999963"}
+{"ms":41885,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600595."}
+{"ms":41885,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41774.699999999255"}
+{"ms":41946,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600656."}
+{"ms":41946,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41835.699999999255"}
+{"ms":42008,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600717."}
+{"ms":42008,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41897.09999999963"}
+{"ms":42069,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600779."}
+{"ms":42069,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 41958.79999999888"}
+{"ms":42131,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600840."}
+{"ms":42131,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 42020.199999999255"}
+{"ms":42206,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600903."}
+{"ms":42208,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 42084.90000000037"}
+{"ms":42260,"t":"ws-rx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PONG 1795796600966."}
+{"ms":42260,"t":"ws-tx","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080","bin":false,"head":"PING 42149.199999999255"}
+{"ms":42309,"t":"reqfail","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=686615ec-c59a-4b43-af62-261f71a3c65e&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4","err":"net::ERR_ABORTED"}
+{"ms":42310,"t":"reqfail","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=e465e893-695c-4ad5-b7e6-8e705d2d57a9&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4","err":"net::ERR_ABORTED"}
+{"ms":42310,"t":"reqfail","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=e536f0b6-1101-4efb-923d-76c1ebe1096a&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4","err":"net::ERR_ABORTED"}
+{"ms":42310,"t":"reqfail","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=b7512ccb-bb96-4e62-a6a1-fcf71fce422c&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4","err":"net::ERR_ABORTED"}
+{"ms":42310,"t":"reqfail","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=62d5539a-4f85-4cb7-993e-21dc54ea616d&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4","err":"net::ERR_ABORTED"}
+{"ms":42310,"t":"reqfail","url":"https://speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080/upload?nocache=d017d88c-c841-4a03-879a-ea772a34705d&guid=8c452bdd-33dc-43bf-ad4c-3ed064556ae4","err":"net::ERR_ABORTED"}
+{"ms":42332,"t":"results_post","bytes":10686}
+{"ms":42371,"t":"ws-close","host":"speedtest.tuxsnet.id.prod.hosts.ooklaserver.net:8080"}
+{"ms":47276,"t":"final_state","state":{"url":"https://www.speedtest.net/result/19960764968","gauge":""},"gotResultPayload":true}
